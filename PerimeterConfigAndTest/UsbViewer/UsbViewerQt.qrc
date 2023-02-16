@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/UsbViewerQt"/>
+    <qresource prefix="/">
+        <file>Icon/Keyboard.png</file>
+        <file>Icon/Mouse.png</file>
+        <file>Icon/Net.png</file>
+        <file>Icon/SystemDevice.png</file>
+        <file>Icon/title.png</file>
+        <file>Icon/Token.png</file>
+        <file>Icon/USB.png</file>
+    </qresource>
+</RCC>
