@@ -1,0 +1,7 @@
+module qxpack.indcom.ui_qml_control
+
+ModalPopupDialog   1.0  modalpopupdialog.qml
+
+IcModalPopupDialog 1.0  modalpopupdialog.qml
+IcPageBase         1.0  pagebase.qml
+

@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/perimeter/main/view/Utils">
+        <file>qmldir</file>
+        <file>CusUtils.qml</file>
+        <file>CommonSettings.qml</file>
+    </qresource>
+</RCC>

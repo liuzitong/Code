@@ -1,0 +1,35 @@
+<RCC>
+    <qresource prefix="/perimeter/main/view">
+        <file>About.qml</file>
+        <file>Analysis.qml</file>
+        <file>AnalysisLobby.qml</file>
+        <file>Application.qml</file>
+        <file>Check.qml</file>
+        <file>ChooseProgram.qml</file>
+        <file>Content.qml</file>
+        <file>DynamicAnalysis.qml</file>
+        <file>DynamicParamsSetting.qml</file>
+        <file>Login.qml</file>
+        <file>NewProgram.qml</file>
+        <file>PatientManagement.qml</file>
+        <file>ProgramCustomize.qml</file>
+        <file>ProgressAnalysis.qml</file>
+        <file>ProgressAnalysisBaseLine.qml</file>
+        <file>ProgressAnalysisLobby.qml</file>
+        <file>ProgressAnalysisSingle.qml</file>
+        <file>ProgressThreeFollowUps.qml</file>
+        <file>SaveToAnotherProgram.qml</file>
+        <file>Settings.qml</file>
+        <file>StaticAnalysis.qml</file>
+        <file>StaticAnalysisReportOverView.qml</file>
+        <file>StaticAnalysisReportScreening.qml</file>
+        <file>StaticAnalysisReportSingle.qml</file>
+        <file>StaticAnalysisReportThreeInOne.qml</file>
+        <file>StaticParamsSetting.qml</file>
+        <file>VisionFieldIsland.qml</file>
+        <file>StaticAnalysisReportTwoInOne.qml</file>
+        <file>StaticAnalysisReportDB.qml</file>
+        <file>ProgramCustomizeCircleDot.qml</file>
+        <file>ProgramCustomizeSquareDot.qml</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/qxpack/indcom/ui_qml_base">
+        <file alias="qmldir">qmldir_rls</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,19 @@
+<RCC>
+    <qresource prefix="/perimeter/main/view/Controls">
+        <file>CusCalendar.qml</file>
+        <file>CusButton.qml</file>
+        <file>CusComboBox.qml</file>
+        <file>CusText.qml</file>
+        <file>LineEdit.qml</file>
+        <file>qmldir</file>
+        <file>CusCheckBox.qml</file>
+        <file>NumberLineEdit.qml</file>
+        <file>ProgramCustomizeDisplay.qml</file>
+        <file>CheckDisplay.qml</file>
+        <file>FixationDeviation.qml</file>
+        <file>VisionDiagram.qml</file>
+        <file>AnalysisDiagram.qml</file>
+        <file>CusComboBoxButton.qml</file>
+    </qresource>
+    <qresource prefix="/"/>
+</RCC>

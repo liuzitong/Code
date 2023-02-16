@@ -1,0 +1,3 @@
+﻿module perimeter.main.view.Utils
+singleton CusUtils 1.0           CusUtils.qml
+singleton CommonSettings 1.0     CommonSettings.qml
