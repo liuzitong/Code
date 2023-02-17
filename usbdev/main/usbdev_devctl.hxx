@@ -4,9 +4,9 @@
 #include "usbdev/common/usbdev_def.h"
 #include <QObject>
 #include <QByteArray>
-#include <spdlog/spdlog.h>
-#include <spdlog/sinks/rotating_file_sink.h>
+
 #include <QFile>
+#include <QDebug>
 namespace UsbDev {
 
 class Profile;
@@ -27,6 +27,9 @@ class MoveCache;
 class USBDEV_API  DevCtl : public QObject {
     Q_OBJECT
 public:
+    static void hello(){qDebug()<<"hello from dev";}
+
+
     //! enumeric
     enum WorkStatus {
         WorkStatus_S_Disconnected = 0,     //!< device has been disconnect from device

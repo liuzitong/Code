@@ -35,21 +35,24 @@ else: VERSION = 0.5.0
 #SRCFILE = $$QXIC_MODULE_DESTDIR/$${TARGET}d.dll
 
 CONFIG(debug,debug|release){
-    PERIMETERDIR = $$PWD/../../PerimeterConfigAndTest/bin/debug/$${TARGET}d.dll
+    PERIMETER_DIR = $$PWD/../../perimeter/bin/debug/$${TARGET}d.dll
+    PERIMETER_CONFIG_DIR = $$PWD/../../PerimeterConfigAndTest/bin/debug/$${TARGET}d.dll
     SRCFILE = $$QXIC_MODULE_DESTDIR/$${TARGET}d.dll
 }else {
-    PERIMETERDIR = $$PWD/../../PerimeterConfigAndTest/bin/release/$${TARGET}.dll
+    PERIMETER_DIR = $$PWD/../../perimeter/bin/release/$${TARGET}.dll
+    PERIMETER_CONFIG_DIR = $$PWD/../../PerimeterConfigAndTest/bin/release/$${TARGET}.dll
     SRCFILE = $$QXIC_MODULE_DESTDIR/$${TARGET}.dll
 }
 message( $$SRCFILE)
-message( $$PERIMETERDIR)
+message( $$PERIMETER_CONFIG_DIR)
 
 SRCFILE_WIN = $$replace(SRCFILE, "/", "\\")
-PERIMETERDIR_WIN = $$replace(PERIMETERDIR, "/", "\\")
+PERIMETER_DIR_WIN = $$replace(PERIMETER_DIR, "/", "\\")
+PERIMETER_CONFIG_DIR_WIN = $$replace(PERIMETER_CONFIG_DIR, "/", "\\")
 message( $$SRCFILE_WIN)
-message( $$PERIMETERDIR_WIN)
+message( $$PERIMETER_CONFIG_DIR_WIN)
 
-QMAKE_POST_LINK += copy /Y $$SRCFILE_WIN $$PERIMETERDIR_WIN
+QMAKE_POST_LINK += copy /Y $$SRCFILE_WIN $$PERIMETER_DIR_WIN & copy /Y $$SRCFILE_WIN $$PERIMETER_CONFIG_DIR_WIN
 
 # ////////////////////////////////////////////////
 # sub modules section

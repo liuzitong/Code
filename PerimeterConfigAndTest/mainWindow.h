@@ -169,6 +169,7 @@ private slots:
 
     void on_rawComand_clicked();
 
+
 private:
     void initData();
     void initTable();

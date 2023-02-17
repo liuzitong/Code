@@ -11,6 +11,7 @@
 #include "perimeter/main/viewModel/progressAnalysislistVm.h"
 #include <perimeter/main/services/analysis_svc.h>
 #include "qxpack/indcom/common/qxpack_ic_global.hxx"
+#include <deviceOperation/device_operation.h>
 
 
 namespace Perimeter {
@@ -28,6 +29,8 @@ void TestClass::test()
 //    drawPicData();
 //testData();
 //    serialization();
+    DevOps::DeviceOperation::hello();
+
 
 }
 

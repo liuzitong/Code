@@ -24,8 +24,7 @@ DEFINES *= PERIMETER_CFG_STATIC
 include( $$PWD/../../base/perimeter_base.pri )
 include( $$PWD/../../main/perimeter_main.pri )
 include( $$PWD/../../third-part/qxpackic_all.pri )
-#include( $$PWD/../../third-part/usbdev-build/usbdev/usbdev.pri )
-
+#include( $$PWD/../../../deviceOperation-build/deviceOperation.pri )
 # ///////////////////////////////////////////////////////////////////////////
 # put the final app into /tmp for debug
 # ///////////////////////////////////////////////////////////////////////////
@@ -35,7 +34,7 @@ target.path = $${APP_INSTALL_PATH}
 INSTALLS += target
 
 
-# QxOrm 库相关配置
+# 库相关配置
 INCLUDEPATH += $$PWD/../../../perimeter/third-part/QxOrm/include
 INCLUDEPATH += $$PWD/../../../perimeter/third-part/LimeReport/include
 INCLUDEPATH += $$PWD/../../../perimeter/third-part/LimeReport/limereport/base
@@ -44,18 +43,21 @@ INCLUDEPATH += $$PWD/../../../perimeter/third-part/
 
 LIBS += -L$$PWD/../../../perimeter/third-part/QxOrm/lib
 LIBS += -L$$PWD/../../../perimeter/third-part/boost/lib
-LIBS += -L$$PWD/../../../perimeter/third-part/LimeReport/build/5.9.7/win32/debug/lib
-LIBS += -L$$PWD/../../../perimeter/third-part/LimeReport/build/5.9.7/win32/release/lib
+
+
 
 # 设置生成的目标名称、添加依赖库
 CONFIG(debug, debug|release) {
-    LIBS += -l"QxOrmd" -l"limereportd" -l"QtZintd"
+    LIBS += -L$$PWD/../../../deviceOperation/bin/debug
+    LIBS += -L$$PWD/../../../perimeter/third-part/LimeReport/build/5.9.7/win32/debug/lib
+    LIBS += -l"QxOrmd" -l"limereportd" -l"QtZintd" -l"deviceOperationd"
 #    CONFIG += qml_debug console
 #    LIBS += -l"libboost_serialization-vc140-mt-gd-x32-1_78"
     DESTDIR=$$PWD/../../bin/debug
 } else {
-    LIBS += -l"QxOrm" -l"limereport" -l"QtZint"
-
+    LIBS += -L$$PWD/../../../deviceOperation/bin/release
+    LIBS += -L$$PWD/../../../perimeter/third-part/LimeReport/build/5.9.7/win32/release/lib
+    LIBS += -l"QxOrm" -l"limereport" -l"QtZint" -l"deviceOperation"
     CONFIG -= qml_debug
     CONFIG -= console
     DEFINES+=QT_QML_DEBUG_NO_WARNING

@@ -13,10 +13,7 @@ LocalTableData::LocalTableData()
     m_focalLengthMotorPosMappingData=SingleTableData(25,6,m_data.data()+31*3*31*2+46+25*2);
 }
 
-CoordMotorPosFocalDistInfo::CoordMotorPosFocalDistInfo(int x, int y, int f):motorX(x),motorY(y),focalDist(f)
-{
-
-}
+CoordMotorPosFocalDistInfo::CoordMotorPosFocalDistInfo(int x, int y, int f):motorX(x),motorY(y),focalDist(f){}
 
 CoordMotorPosFocalDistInfo &CoordMotorPosFocalDistInfo::operator=(CoordMotorPosFocalDistInfo& other)
 {

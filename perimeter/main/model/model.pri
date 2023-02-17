@@ -13,5 +13,8 @@ HEADERS += \
     $$PWD/utility.h
 
 
-SOURCES +=
+SOURCES += \
+    $$PWD/programModel.cpp \
+    $$PWD/patientModel.cpp \
+    $$PWD/checkResultModel.cpp
 
