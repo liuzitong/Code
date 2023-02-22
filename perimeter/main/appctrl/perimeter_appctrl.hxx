@@ -26,6 +26,7 @@ class PERIMETER_API  AppCtrl : public QxPack::IcAppCtrlBase {
     Q_PROPERTY( QObject* checkSvc  READ getCheckSvc CONSTANT)
     Q_PROPERTY( QObject* settings READ getSettings CONSTANT)
 
+
 public:
     //! ctor
     explicit AppCtrl( QObject *pa = Q_NULLPTR );
@@ -46,6 +47,9 @@ public:
     QObject*    getAnalysisSvc() const;
     QObject*    getCheckSvc() const;
     QObject*    getSettings();
+
+
+//    Q_INVOKABLE void Quit();
 //    QObject*    getCurrentPatient();    void setCurrentPatient(QObject* value);     Q_SIGNAL void  currentPatientChanged(QObject* value);
 //    Q_SIGNAL void  changePage(QString value);
 protected:

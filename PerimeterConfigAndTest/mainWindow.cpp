@@ -125,8 +125,8 @@ void MainWindow::initDevCtl()
 
 void MainWindow::initData()
 {
-    QString configPath=m_settings.localConfig;
-    QString dataPath=m_settings.localData;
+    QString configPath=m_settings.localConfigPath;
+    QString dataPath=m_settings.localDataPath;
     readLocalConfig(configPath);
     readLocalData(dataPath);
 }
@@ -584,7 +584,7 @@ void MainWindow::on_pushButton_light1_clicked()
     int id;
     switch (index)
     {
-    case 0:id=index;
+    case 0:id=index;break;
     case 1:case 2:case 3:case 4:case 5:id=index+2;
     }
 

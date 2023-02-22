@@ -16,6 +16,7 @@ class CheckSvc: public QObject
     Q_PROPERTY(CheckResultVm* checkResult READ getCheckResult WRITE setCheckResult NOTIFY checkResultChanged)
     Q_PROPERTY(int checkState READ getCheckState WRITE setCheckState NOTIFY checkStateChanged)
     Q_PROPERTY(int checkedCount READ getCheckedCount WRITE setCheckedCount NOTIFY checkedCountChanged)
+    Q_PROPERTY(bool devReady READ getDevReady NOTIFY devReadyChanged)
 public:
     explicit CheckSvc(QObject *parent = nullptr);
     ~CheckSvc();
@@ -23,6 +24,7 @@ public:
     Q_INVOKABLE void pause();
     Q_INVOKABLE void resume();
     Q_INVOKABLE void stop();
+    Q_INVOKABLE void connectDev();
 
 //signals:
 //  void setCheckState(int value);
@@ -33,8 +35,8 @@ public:
     CheckResultVm* getCheckResult(){return m_checkResultVm;}void setCheckResult(CheckResultVm* value){m_checkResultVm=value;} Q_SIGNAL void checkResultChanged();
     int getCheckState(){return m_checkState;} void setCheckState(int value){m_checkState=value;emit checkStateChanged();}Q_SIGNAL void checkStateChanged();
     int getCheckedCount(){return m_checkedCount;}void setCheckedCount(int value){m_checkedCount=value;emit checkedCountChanged();}Q_SIGNAL void checkedCountChanged();
-//public slots:
-//  void handleResults(const QString &);
+    bool getDevReady();Q_SIGNAL void devReadyChanged();
+
 
 private:
     CheckSvcWorker* m_worker;

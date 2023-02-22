@@ -1186,7 +1186,7 @@ void DevCtl::setWhiteLamp(quint8 r,quint8 g,quint8 b)
 {
     QByteArray ba(512,0);
     unsigned char* ptr=reinterpret_cast<unsigned char*>(ba.data());
-    ptr[0]=0x5a;ptr[1]=0x80;ptr[2]=r;ptr[3]=g;ptr[4]=b;
+    ptr[0]=0x5a;ptr[1]=0x81;ptr[2]=r;ptr[3]=g;ptr[4]=b;
     QMetaObject::invokeMethod(
         T_PrivPtr( m_obj )->wkrPtr(), "cmd_GeneralCmd", Qt::QueuedConnection,
         Q_ARG( QByteArray, ba),Q_ARG( QString,QString("设置背景白灯")),Q_ARG( quint32, 5 )

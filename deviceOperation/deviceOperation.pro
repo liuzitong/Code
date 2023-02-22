@@ -1,6 +1,8 @@
 include( $$PWD/deviceOperation.pri )
 include( $$PWD/../usbdev-build/usbdev/usbdev.pri )
 #include( $$PWD/defines.pri )
+QT       += core
+QT *= gui
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)

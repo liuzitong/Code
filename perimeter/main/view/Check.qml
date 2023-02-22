@@ -25,6 +25,7 @@ Item {id:root; width: 1366;height: 691
 
 
     Component.onCompleted:{
+        IcUiQmlApi.appCtrl.checkSvc.connectDev();
         IcUiQmlApi.appCtrl.checkSvc.checkResultChanged.connect(currentCheckResultChanged);
 
     }

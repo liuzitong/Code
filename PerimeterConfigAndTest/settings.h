@@ -19,7 +19,7 @@ public:
     QString m_VID,m_PID;
     QJsonObject m_rootObj;
     QList<QPair<QString,int>> m_colorToSlot,m_spotSizeToSlot;
-    QString localConfig,localData;
+    QString localConfigPath,localDataPath;
     void Write();
 };
 

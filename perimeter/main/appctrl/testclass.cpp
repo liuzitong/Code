@@ -29,7 +29,7 @@ void TestClass::test()
 //    drawPicData();
 //testData();
 //    serialization();
-    DevOps::DeviceOperation::hello();
+    DevOps::DeviceOperation::getSingleton()->hello();
 
 
 }

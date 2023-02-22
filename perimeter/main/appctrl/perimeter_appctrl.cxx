@@ -150,6 +150,11 @@ QObject *AppCtrl::getSettings()
     return T_PrivPtr(m_obj)->getSettings();
 }
 
+//void AppCtrl::Quit()
+//{
+//    QCoreApplication::quit();
+//}
+
 
 //QObject*    AppCtrl::getCurrentPatient()                {
 //    return T_PrivPtr( m_obj )->getCurrentPatient();

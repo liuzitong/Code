@@ -8,7 +8,7 @@
 
 Settings::Settings()
 {
-    QFile loadFile(R"(data/settings.json)");
+    QFile loadFile(R"(deviceData/settings.json)");
 
     if(!loadFile.open(QIODevice::ReadOnly))
     {
@@ -43,8 +43,8 @@ Settings::Settings()
     m_updateRefreshInfo=m_rootObj.value("updateRefreshInfo").toBool();
     m_updateRefreshIOInfo=m_rootObj.value("updateRefreshIOInfo").toBool();
 
-    localConfig=m_rootObj.value("localConfig").toString();
-    localData=m_rootObj.value("localData").toString();
+    localConfigPath=m_rootObj.value("localConfigPath").toString();
+    localDataPath=m_rootObj.value("localDataPath").toString();
 
     QJsonArray spotSizeToSlot=m_rootObj.value("spotSizeToSlot").toArray();
     QJsonArray colorToSlot=m_rootObj.value("colorToSlot").toArray();

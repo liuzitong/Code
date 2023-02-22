@@ -1,11 +1,6 @@
-QT += core gui
-QT+=widgets
-QT+= printsupport
-QT += xml
-QT += datavisualization
+
 #QT += sql
 CONFIG += thread
-#CONFIG += c++17  qml_debug
 CONFIG += c++11
 CONFIG -= app_bundle
 DEFINES += QT_DEPRECATED_WARNINGS QT_MESSAGELOGCONTEXT _QX_NO_PRECOMPILED_HEADER

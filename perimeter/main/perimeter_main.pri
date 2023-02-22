@@ -4,6 +4,13 @@
 
   QT *= quick qml
   QT += sql
+  QT += quick
+  QT += multimedia
+  QT += core gui
+  QT+=widgets
+  QT+= printsupport
+  QT += xml
+  QT += datavisualization
   HEADERS += \
     $$PWD/appctrl/perimeter_appctrl.hxx \
     \
@@ -52,7 +59,8 @@ SOURCES += \
     $$PWD/object_wrapper.cpp \
     $$PWD/services/translate_svc.cpp \
     $$PWD/services/device_svc.cpp \
-    $$PWD/services/utility_svc.cpp
+    $$PWD/services/utility_svc.cpp \
+    $$PWD/services/frame_provid_svc.cpp
 
 HEADERS += \
     $$PWD/appctrl/testclass.h \
@@ -61,7 +69,8 @@ HEADERS += \
     $$PWD/object_wrapper.h \
     $$PWD/services/translate_svc.h \
     $$PWD/services/device_svc.h \
-    $$PWD/services/utility_svc.h
+    $$PWD/services/utility_svc.h \
+    $$PWD/services/frame_provid_svc.h
 
 RESOURCES += \
     $$PWD/view/utils/utils.qrc

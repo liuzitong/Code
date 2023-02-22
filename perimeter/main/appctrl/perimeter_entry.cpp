@@ -160,6 +160,8 @@ int  main ( int argc, char *argv[] )
         qmlRegisterSingletonType(QUrl("qrc:/perimeter/main/view/Utils/CusUtils.qml"), "perimeter.main.view.Utils", 1, 0, "CusUtils");
 
         gPrintMemCntr("enter eventloop stage");
+//        QObject::connect(eng, &QQmlEngine::quit, QCoreApplication::instance(),  &QCoreApplication::quit);
+//        QObject::connect(eng, &QQmlEngine::quit,[](){qDebug()<<"engquit";});
 
         app.setWindowIcon(QIcon(":/Pics/base-svg/2logo_256_black.svg"));
         ret = app.exec();
