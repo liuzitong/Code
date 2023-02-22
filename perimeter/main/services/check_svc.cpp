@@ -4,7 +4,6 @@
 #include <QTimer>
 #include <QElapsedTimer>
 #include <perimeter/main/services/utility_svc.h>
-#include "device_svc.h"
 #include <QtMath>
 #include <deviceOperation/device_operation.h>
 namespace Perimeter{
@@ -84,7 +83,6 @@ public:
     ~DynamicCheck()=default;
 private:
     QSharedPointer<UtilitySvc> utilitySvc=UtilitySvc::getSingleton();
-    QSharedPointer<DeviceSvc> deviceSvc=DeviceSvc::getSingleton();
     QVector<int> unCheckedIndex;
 
     virtual void initialize() override;
@@ -133,8 +131,6 @@ CheckSvc::CheckSvc(QObject *parent)
 {
     m_worker = new CheckSvcWorker();
     m_worker->moveToThread(&m_workerThread);
-//    connect(&m_workerThread, &QThread::finished, m_worker, &QObject::deleteLater);
-//    connect(&m_workerThread, &QThread::started, m_worker, &CheckSvcWorker::doWork);
     connect(m_worker,&CheckSvcWorker::checkResultChanged,this, &CheckSvc::checkResultChanged);
     connect(m_worker,&CheckSvcWorker::checkStateChanged,this, &CheckSvc::checkStateChanged);
     connect(m_worker,&CheckSvcWorker::checkedCountChanged,this, &CheckSvc::setCheckedCount);
@@ -183,7 +179,7 @@ void CheckSvc::stop()
 
 void CheckSvc::connectDev()
 {
-    QMetaObject::invokeMethod(m_worker,"connectDev",Qt::QueuedConnection);
+//    QMetaObject::invokeMethod(m_worker,"connectDev",Qt::QueuedConnection);
 }
 
 bool CheckSvc::getDevReady()
@@ -247,34 +243,32 @@ void CheckSvcWorker::doWork()
         case 2:                                             //pause
         {
             qDebug()<<("pausing");
-            //                m_elapsedTimer.restart();
-            //                QThread::msleep(500);
-            //                while(m_elapsedTimer.elapsed()<=1000)
-            //                {
-            //                    QApplication::processEvents();
-            //                }
-            //                QApplication::processEvents();
+            m_elapsedTimer.restart();
+            QThread::msleep(500);
+            while(m_elapsedTimer.elapsed()<=1000)
+            {
+                QApplication::processEvents();
+            }
+            QApplication::processEvents();
             break;
         }
         case 3:                                             //stop
         {
             qDebug()<<("stopped");
-            //                goto exit;
             return;
         }
         case 4:                                             //finish
         {
-            /*m_checkResultVm->insertCheckResult()*/
+            //m_checkResultVm->insertCheckResult()
+            m_checkResultVm->insert();
             qDebug()<<("finished");
             emit checkProcessFinished();
             return;
-            //                goto exit;
         }
         };
         UtilitySvc::wait(500);
     }
-    //        exit:
-    //            qDebug()<<("work end");
+
 }
 
 void StaticCheck::initialize()
@@ -297,7 +291,6 @@ void StaticCheck::initialize()
     case FixationTarget::bottomPoint:m_y_offset=-12;break;
     }
 
-
     int DBChanged=0;
     if(m_programModel->m_params.commonParams.strategy==StaticParams::CommonParams::Strategy::oneStage
             ||m_programModel->m_params.commonParams.strategy==StaticParams::CommonParams::Strategy::twoStages
@@ -317,8 +310,6 @@ void StaticCheck::initialize()
         m_isStartWithBaseDots=false;
     }
 
-
-
     if(m_programModel->m_params.commonParams.strategy!=StaticParams::CommonParams::Strategy::singleStimulation)
     {
         for(int i=0;i<m_totalCount;i++)
@@ -329,18 +320,9 @@ void StaticCheck::initialize()
             {
                 auto baseDots=m_programModel->m_data.baseDots;
                 for(uint j=0;j<baseDots.size();j++)
-                {
-                    if((qAbs(dot.x-baseDots[j].x)<FLT_EPSILON)&&(qAbs(dot.y-baseDots[j].y)<FLT_EPSILON))
-                    {
-                        isBaseDot=true;
-                    }
-                }
+                    if((qAbs(dot.x-baseDots[j].x)<FLT_EPSILON)&&(qAbs(dot.y-baseDots[j].y)<FLT_EPSILON)) isBaseDot=true;
             }
-            m_dotRecords.push_back(
-                        DotRecord{i,QPointF{dot.x,dot.y},{utilitySvc->getExpectedDB(m_value_30d,{dot.x,dot.y},m_resultModel->m_OS_OD)+DBChanged},
-                                  -1, {},isBaseDot,false,false,MinDB,MaxDB});
-
-
+            m_dotRecords.push_back(DotRecord{i,QPointF{dot.x,dot.y},{utilitySvc->getExpectedDB(m_value_30d,{dot.x,dot.y},m_resultModel->m_OS_OD)+DBChanged},-1, {},isBaseDot,false,false,MinDB,MaxDB});
         }
         m_centerDotRecord=DotRecord{0,QPointF{0,0},{utilitySvc->getExpectedDB(m_value_30d,{0,0},m_resultModel->m_OS_OD)+DBChanged},-1,{},false,false,MinDB,MaxDB};
     }
@@ -350,15 +332,10 @@ void StaticCheck::initialize()
         for(int i=0;i<m_totalCount;i++)
         {
             auto dot=m_programModel->m_data.dots[i];
-            m_dotRecords.push_back(
-                        DotRecord{i,QPointF{dot.x,dot.y},{DB},
-                                  -1, {},false,false,false,MinDB,MaxDB});
-
+            m_dotRecords.push_back(DotRecord{i,QPointF{dot.x,dot.y},{DB},-1, {},false,false,false,MinDB,MaxDB});
         }
-        m_centerDotRecord=
-                DotRecord{0,QPointF{0,0},{DB},-1,{},false,false,false,MinDB,MaxDB};
+        m_centerDotRecord=DotRecord{0,QPointF{0,0},{DB},-1,{},false,false,false,MinDB,MaxDB};
     }
-
     deviceOperation->setCursorColorAndCursorSize(int(cursorColor),int(cursorSize));
 }
 
@@ -539,7 +516,7 @@ void StaticCheck::CheckDot(StaticCheck::DotRecord &dotRecord, int y_offset, bool
     auto cursorSize=m_resultModel->m_params.commonParams.cursorSize;
     deviceOperation->staticStimulate({dotRecord.loc.x(),dotRecord.loc.y()+y_offset},int(cursorSize),dotRecord.StimulationDBs.last(),m_programModel->m_params.fixedParams.stimulationTime);
     m_resultModel->m_data.realTimeDB[dotRecord.index].push_back(dotRecord.StimulationDBs.last());          //实时刺激的DB.
-    m_resultModel->m_blob.append(deviceOperation->getRealTimeStimulationEyeImage());
+    m_resultModel->m_blob.append(deviceOperation->m_frameData.rawData());                                   //实时眼位
     bool isAnswered=deviceOperation->waitForAnswer(m_programModel->m_params.fixedParams.intervalTime);
     int dotDB=dotRecord.StimulationDBs.last();
     isAnswered?dotRecord.lowerBound=dotDB:dotRecord.upperBound=dotDB;
@@ -705,8 +682,8 @@ void DynamicCheck::Checkprocess()
     {
         int dotIndex=unCheckedIndex.takeAt(qrand()%unCheckedIndex.size());
         auto dataNode=m_resultModel->m_data.checkData[dotIndex];
-        deviceSvc->dynamicStimulate(QPointF{dataNode.start.x,dataNode.start.y},QPointF{dataNode.end.x,dataNode.end.y},1);
-        bool isSeen=deviceSvc->waitForAnswer({4,5});             //TODO 填入motorIDS
+//        deviceSvc->dynamicStimulate(QPointF{dataNode.start.x,dataNode.start.y},QPointF{dataNode.end.x,dataNode.end.y},1);
+//        bool isSeen=deviceSvc->waitForAnswer({4,5});             //TODO 填入motorIDS
         //            if(isSeen)
     }
 }

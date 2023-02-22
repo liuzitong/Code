@@ -6,10 +6,6 @@
 #include <QtCore>
 #include <array>
 //#include <QQmlEngine>
-
-
-
-
 namespace DevOps{
 
 QSharedPointer<DeviceOperation> DeviceOperation::m_singleton=nullptr;
@@ -18,6 +14,11 @@ DeviceOperation::DeviceOperation()
 {
     m_statusTimer.setInterval(1000);
     connect(&m_statusTimer,&QTimer::timeout,[&](){m_devReady=false;emit devConStatusChanged();connectDev();});
+//    connect(m_devCtl.data(),&UsbDev::DevCtl::newStatusData,this,&DeviceOperation::newStatusData);
+//    connect(m_devCtl.data(),&UsbDev::DevCtl::newFrameData,this,&DeviceOperation::newFrameData);
+    connect(this,&DeviceOperation::newFrameData,this,&DeviceOperation::onNewFrameData);
+    connect(this,&DeviceOperation::newStatusData,this,&DeviceOperation::onNewStatuData);
+    connect(this,&DeviceOperation::newFrameData,this,&DeviceOperation::onNewFrameData);
 }
 
 QSharedPointer<DeviceOperation> DeviceOperation::getSingleton()
@@ -119,9 +120,8 @@ void DeviceOperation::connectDev()
             updateDevInfo("Connect Successfully.");
             connect(m_devCtl.data(),&UsbDev::DevCtl::workStatusChanged,this,&DeviceOperation::workStatusChanged);
             connect(m_devCtl.data(),&UsbDev::DevCtl::updateInfo,this,&DeviceOperation::updateDevInfo);
-            connect(m_devCtl.data(),&UsbDev::DevCtl::newStatusData,this,&DeviceOperation::newStatusData);
-            connect(m_devCtl.data(),&UsbDev::DevCtl::newFrameData,this,&DeviceOperation::newFrameData);
-            connect(m_devCtl.data(),&UsbDev::DevCtl::newStatusData,this,&DeviceOperation::newStatusData);
+            connect(m_devCtl.data(),&UsbDev::DevCtl::newStatusData,this,&DeviceOperation::onNewStatuData);
+            connect(m_devCtl.data(),&UsbDev::DevCtl::newFrameData,this,&DeviceOperation::onNewFrameData);
             connect(m_devCtl.data(),&UsbDev::DevCtl::newProfile,this,[&](){updateDevInfo("Profile updated successfully.");isProfileUpdate=true;});
             connect(m_devCtl.data(),&UsbDev::DevCtl::newConfig,this,[&](){updateDevInfo("Config updated successfully.");isConfigUpdated=true;});
             m_devReady=true;
@@ -240,6 +240,13 @@ void DeviceOperation::onNewStatuData()
 {
     m_statusTimer.start();
     m_statusData=m_devCtl->takeNextPendingStatusData();
+    emit newStatusData();
+}
+
+void DeviceOperation::onNewFrameData()
+{
+    m_frameData=m_devCtl->takeNextPendingFrameData();
+    emit newFrameData();
 }
 }
 

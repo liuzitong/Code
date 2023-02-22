@@ -51,6 +51,7 @@ private:
 
 public slots:
     void onNewStatuData();
+    void onNewFrameData();
 signals:
     void workStatusChanged();
     void newStatusData();
@@ -63,12 +64,12 @@ signals:
 
 public:
     QSharedPointer<UsbDev::DevCtl> m_devCtl;
+    UsbDev::StatusData m_statusData;
+    UsbDev::FrameData m_frameData;
 
 private:
     static QSharedPointer<DeviceOperation> m_singleton;
     Status m_status={-1,-1,-1};
-    UsbDev::StatusData m_statusData;
-    UsbDev::FrameData m_frameData;
     bool isConfigUpdated=false,isProfileUpdate=false;
     bool isConnected=false;
 

@@ -1,12 +1,14 @@
 ﻿#include "frame_provid_svc.h"
 #include <QImage>
 #include <QDebug>
+#include <deviceOperation/device_operation.h>
 namespace Perimeter{
 
 QSharedPointer<FrameProvidSvc> FrameProvidSvc::m_singleton=nullptr;
 
 FrameProvidSvc::FrameProvidSvc()
 {
+    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::newFrameData,this,&FrameProvidSvc::onNewVideoContentReceived);
 }
 
 FrameProvidSvc::~FrameProvidSvc()
@@ -62,13 +64,23 @@ void FrameProvidSvc::setFormat(int width, int heigth, QVideoFrame::PixelFormat f
 
 
 
-void FrameProvidSvc::onNewVideoContentReceived(QByteArray qa)
+void FrameProvidSvc::onNewVideoContentReceived(/*QByteArray qa*/)
 {
-    static quint8 grey=0;
-    grey+=1;
-    grey%=255;
-    QByteArray qa2(640*480,grey);
-    QImage img1((uchar*)qa2.data(),640,480,QImage::Format::Format_Grayscale8);
+
+//    static quint8 grey=0;
+//    grey+=1;
+//    grey%=255;
+//    QByteArray qa2(640*480,grey);
+//    QImage img1((uchar*)qa2.data(),640,480,QImage::Format::Format_Grayscale8);
+//    auto img2=img1.convertToFormat(QImage::Format::Format_ARGB32);
+//    QVideoFrame frame2(img2);
+
+//    if (m_surface)
+//        m_surface->present(frame2);
+
+    auto devOp=DevOps::DeviceOperation::getSingleton();
+    auto qa=devOp->m_frameData.rawData();
+    QImage img1((uchar*)qa.data(),640,480,QImage::Format::Format_Grayscale8);
     auto img2=img1.convertToFormat(QImage::Format::Format_ARGB32);
     QVideoFrame frame2(img2);
 

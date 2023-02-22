@@ -161,8 +161,7 @@ FrameData :: FrameData ( const QByteArray &ba)
     priv->shutterStatusRef()=buff[8];
     priv->xMotorCoordinateRef()=gReadData_Le_I32(&buff[12]);
     priv->yMotorCoordinateRef()=gReadData_Le_I32(&buff[16]);
-    priv->rawDataRef().resize(ba.size()-20);
-    memcpy(priv->rawDataRef().data(),&buff[20],priv->rawDataRef().size());
+    priv->rawDataRef()=ba;
     m_obj = d;
 }
 

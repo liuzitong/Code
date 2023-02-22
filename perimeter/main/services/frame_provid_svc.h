@@ -1,5 +1,5 @@
-﻿#ifndef FRAMEPROVIDER_H
-#define FRAMEPROVIDER_H
+﻿#ifndef FRAMEPROVIDSVC_H
+#define FRAMEPROVIDSVC_H
 
 #include <QObject>
 #include <QAbstractVideoSurface>
@@ -42,7 +42,7 @@ public slots:
      * \brief 接收外部数据源，视频帧
      * \param frame
      */
-    void onNewVideoContentReceived(QByteArray qa);
+    void onNewVideoContentReceived(/*QByteArray qa*/);
 private:
     QAbstractVideoSurface *m_surface = NULL;
     QVideoSurfaceFormat m_format;

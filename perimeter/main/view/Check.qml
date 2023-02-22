@@ -22,9 +22,11 @@ Item {id:root; width: 1366;height: 691
     signal refresh();
     property int fontPointSize: CommonSettings.fontPointSize;
     signal realTimePicRefresh(var count);
+    property var frameProvidSvc: null;
 
 
     Component.onCompleted:{
+        frameProvidSvc=IcUiQmlApi.appCtrl.frameProvidSvc;
         IcUiQmlApi.appCtrl.checkSvc.connectDev();
         IcUiQmlApi.appCtrl.checkSvc.checkResultChanged.connect(currentCheckResultChanged);
 
@@ -190,10 +192,25 @@ Item {id:root; width: 1366;height: 691
                         Item{anchors.fill: parent;anchors.margins: parent.height*0.02;
                             Column{id: column;anchors.fill: parent;spacing:/*(height-videoArea.height-controlPanel.height-eyeOptionsGroup.height)/2*/height*0.03;
                                 Item{id:videoArea; width: parent.width*0.83;height: width*3/4;anchors.horizontalCenter: parent.horizontalCenter;
-                                    Rectangle{anchors.fill: parent;color:"black";}
-                                    MediaPlayer{
-                                        id:vedio;
+                                    Rectangle
+                                    {   anchors.fill: parent;color:"black";
+                                        VideoOutput{
+                                            source: frameProvidSvc //cameraDev
+                                            anchors.fill: parent
+                                            focus : visible
+                                            id:vedio;
+
+                                        }
                                     }
+//                                    Timer
+//                                    {
+//                                        id:tt;
+//                                        repeat: true
+//                                        interval: 1000/30
+//                                        running: false;
+//                                        onTriggered: frameProvidSvc.onNewVideoContentReceived();
+//                                    }
+//                                    Button{width: 100;height: 20; anchors.bottom: parent.bottom; anchors.bottomMargin: 0; anchors.right: parent.right; anchors.rightMargin: 0;onClicked: tt.running=!tt.running;}
                                 }
                                 Item{id:controlPanel;width:controlPanel.height*4/3;height: parent.height*0.23;anchors.horizontalCenter: parent.horizontalCenter;
                                     CusButton{ id:autoButton;width: parent.width*0.35;height: parent.height*0.28;buttonColor: backGroundColor; text:"Auto";borderColor: "black";anchors.horizontalCenter: parent.horizontalCenter; anchors.verticalCenter: parent.verticalCenter;}

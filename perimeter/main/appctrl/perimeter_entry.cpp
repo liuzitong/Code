@@ -159,6 +159,7 @@ int  main ( int argc, char *argv[] )
         eng->load(QUrl(QLatin1String("qrc:/perimeter/main/view/Application.qml")));
         qmlRegisterSingletonType(QUrl("qrc:/perimeter/main/view/Utils/CusUtils.qml"), "perimeter.main.view.Utils", 1, 0, "CusUtils");
 
+
         gPrintMemCntr("enter eventloop stage");
 //        QObject::connect(eng, &QQmlEngine::quit, QCoreApplication::instance(),  &QCoreApplication::quit);
 //        QObject::connect(eng, &QQmlEngine::quit,[](){qDebug()<<"engquit";});

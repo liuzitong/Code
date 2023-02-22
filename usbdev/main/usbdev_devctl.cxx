@@ -657,6 +657,8 @@ protected:
 
            void  ensureWorker( bool );
            void  ensureTimer ( bool );
+
+    //这几个SLOT被Devwoker连接,之后又会调用自己的SIGNAL,然后传递到最上层
     Q_SLOT void  wkr_onWorkStatusChanged( int );
     Q_SLOT void  wkr_onNewFrameData ( const UsbDev::FrameData & );
     Q_SLOT void  wkr_onNewStatusData( const UsbDev::StatusData & );

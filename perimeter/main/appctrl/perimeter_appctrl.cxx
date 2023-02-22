@@ -13,7 +13,7 @@
 #include "perimeter/main/viewModel/checkResultVm.h"
 #include "perimeter/main/perimeter_main.hxx"
 #include "perimeter/main/services/check_svc.h"
-
+#include "perimeter/main/services/frame_provid_svc.h"
 namespace Perimeter {
 
 // ////////////////////////////////////////////////////////////////////////////
@@ -49,6 +49,7 @@ public :
     QObject*    getTestClass() const                {return m_testClass;}
     QObject*    getCheckSvc() const                 {return m_checkSvc;}
     QObject*    getSettings()                       {return m_settings;}
+    QObject*    getFrameProvidSvc()                 {return FrameProvidSvc::getSingleton().data();}
 //    QString     getLanguage()                       {return m_language;}
 //    void        setLanguage(QString value)          {m_language=value;}
 //    bool        getDoubleName()                     {return m_doubleName;}
@@ -67,7 +68,7 @@ AppCtrlPriv :: AppCtrlPriv ( AppCtrl *pa )
     m_app_set_svc = AppSettingsSvc::getInstance();
     m_msg_bus_svc = MsgBusSvc::getInstance();
     m_obj_mgr_svc = ObjMgrSvc::getInstance();
-
+    FrameProvidSvc::getSingleton().data();
 //    m_databaseSvc = static_cast<QObject*>(new databaseSvc());
     m_databaseSvc = perimeter_new(databaseSvc);
     m_testClass = perimeter_new(TestClass);
@@ -142,7 +143,13 @@ QObject *  AppCtrl::getTestClass() const
 
 QObject *AppCtrl::getCheckSvc() const
 {
-     return T_PrivPtr( m_obj )-> getCheckSvc();
+    return T_PrivPtr( m_obj )-> getCheckSvc();
+}
+
+
+QObject *AppCtrl::getFrameProvidSvc() const
+{
+    return T_PrivPtr( m_obj )-> getFrameProvidSvc();
 }
 
 QObject *AppCtrl::getSettings()

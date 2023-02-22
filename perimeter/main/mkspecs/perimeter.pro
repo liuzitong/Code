@@ -1,5 +1,11 @@
-
-#QT += sql
+QT *= quick qml
+QT += sql
+QT += multimedia
+QT += core gui
+QT += widgets
+QT += printsupport
+QT += xml
+QT += datavisualization
 CONFIG += thread
 CONFIG += c++11
 CONFIG -= app_bundle
