@@ -17,6 +17,8 @@ class CheckSvc: public QObject
     Q_PROPERTY(int checkState READ getCheckState WRITE setCheckState NOTIFY checkStateChanged)
     Q_PROPERTY(int checkedCount READ getCheckedCount WRITE setCheckedCount NOTIFY checkedCountChanged)
     Q_PROPERTY(bool devReady READ getDevReady NOTIFY devReadyChanged)
+    Q_PROPERTY(bool autoAlignPupil READ getAutoAlignPupil WRITE setAutoAlignPupil)
+    Q_PROPERTY(bool pupilDiameter READ getPupilDiameter NOTIFY pupilDiameterChanged)
 public:
     explicit CheckSvc(QObject *parent = nullptr);
     ~CheckSvc();
@@ -36,7 +38,8 @@ public:
     int getCheckState(){return m_checkState;} void setCheckState(int value){m_checkState=value;emit checkStateChanged();}Q_SIGNAL void checkStateChanged();
     int getCheckedCount(){return m_checkedCount;}void setCheckedCount(int value){m_checkedCount=value;emit checkedCountChanged();}Q_SIGNAL void checkedCountChanged();
     bool getDevReady();Q_SIGNAL void devReadyChanged();
-
+    bool getAutoAlignPupil();void setAutoAlignPupil(bool autoAlign);
+    float getPupilDiameter();Q_SIGNAL void pupilDiameterChanged();
 
 private:
     CheckSvcWorker* m_worker;
@@ -46,6 +49,7 @@ private:
     PatientVm* m_patientVm;
     ProgramVm* m_programVm;
     CheckResultVm* m_checkResultVm;
+
 };
 }
 #endif // CheckSvc_H

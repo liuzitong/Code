@@ -64,7 +64,7 @@ private:
     QVector<int> m_lastShortTermCycleCheckedDotIndex;
     QVector<DotRecord> m_shortTermFlucRecords;          //index为程序点总数+位置index
     int m_falsePosCycCount=qrand()%10,m_falseNegCycCount=qrand()%10,m_fiaxationViewLossCyc=qrand()%10;  //错开
-    QVector<QPoint> m_blindDot;
+    QVector<QPointF> m_blindDot;
     int m_blindDotLocateIndex=-1;
     int m_stimulationCount=0;                   //刺激次数到了测试盲点位置
     QVector<DotRecord*> m_lastCheckDotRecord;
@@ -118,7 +118,7 @@ void StaticCheck::initialize()
 
     if(m_resultModel->m_params.commonParams.fixationTarget==FixationTarget::centerPoint&&m_resultModel->m_params.commonParams.centerDotCheck==true)
     {
-        m_centerDotRecord.loc={0,y_offsetDiamond};
+        m_centerDotRecord.loc={0,float(y_offsetDiamond)};
         m_centerDotRecord.index=m_totalCount*2+1;
     }
 
@@ -308,6 +308,62 @@ void StaticCheck::getReadyToStimulate(QPointF loc, int DB)
     m_deviceOperation->getReadyToStimulate(loc,int(m_resultModel->m_params.commonParams.cursorSize),DB);
 }
 
+void StaticCheck::getProperValByRefToNearDotDB(StaticCheck::DotRecord &dotRecord)
+{
+    QVector<DotRecord> largerRadiusDotRecords;
+    QVector<DotRecord> smallerRadiusDotRecords;
+    auto selectedDotRadius=sqrt(pow(dotRecord.loc.x(),2)+pow(dotRecord.loc.y(),2));
+    for(auto&i:m_dotRecords)
+    {
+        if(i.checked)
+        {
+            auto radius=sqrt(pow(i.loc.x(),2)+pow(i.loc.y(),2));
+            if(qAbs(selectedDotRadius-radius)>FLT_EPSILON)
+            {
+                if(selectedDotRadius>radius)
+                {
+                    largerRadiusDotRecords.append(i);
+                }
+                else
+                {
+                    smallerRadiusDotRecords.append(i);
+                }
+            }
+        }
+    }
+
+    QVector<DotRecord> lowerDBRefDotRecord;
+    QVector<DotRecord> higherDBRefDotRecord;
+    auto minDist=FLT_MAX;
+
+    for(auto&i:largerRadiusDotRecords)
+    {
+        auto dist=sqrt(pow(dotRecord.loc.x()-i.loc.x(),2)+pow(dotRecord.loc.y()-i.loc.y(),2));
+        if(dist<minDist)
+        {
+            minDist=dist;
+            lowerDBRefDotRecord.append(i);
+        }
+    }
+
+    for(auto&i:smallerRadiusDotRecords)
+    {
+        auto dist=sqrt(pow(dotRecord.loc.x()-i.loc.x(),2)+pow(dotRecord.loc.y()-i.loc.y(),2));
+        if(dist<minDist)
+        {
+            minDist=dist;
+            higherDBRefDotRecord.append(i);
+        }
+    }
+    int lowerDB,higherDB;
+    if(!lowerDBRefDotRecord.isEmpty()) lowerDB=lowerDBRefDotRecord[0].DB;
+    if(!higherDBRefDotRecord.isEmpty()) higherDB=higherDBRefDotRecord[0].DB;
+    auto averageDB=float(lowerDB+higherDB)/2;
+    auto dist1=qAbs(dotRecord.lowerBound-averageDB);
+    auto dist2=qAbs(dotRecord.lowerBound+1-averageDB);
+    dist1<dist2?dotRecord.DB=dotRecord.lowerBound:dotRecord.DB=dotRecord.lowerBound+1;
+}
+
 std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
 {
     //测试盲点
@@ -363,8 +419,7 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
 bool StaticCheck::waitForAnswer()
 {
 
-    auto statusData=m_deviceOperation->m_statusData;
-    while(statusData.answerpadStatus())   //一直按着算暂停
+    while(m_deviceOperation->getAnswerPadStatus())   //一直按着算暂停
     {
         QApplication::processEvents();
     }
@@ -389,7 +444,7 @@ bool StaticCheck::waitForAnswer()
 
     while(elapsedTimer.elapsed()<waitTime)   //应答时间内
     {
-        if(statusData.answerpadStatus())
+        if(m_deviceOperation->getAnswerPadStatus())
         {
             m_answeredTimes.append(elapsedTimer.elapsed());
             return true;                    //时间内应答
@@ -683,6 +738,7 @@ CheckSvc::CheckSvc(QObject *parent)
     connect(m_worker,&CheckSvcWorker::checkedCountChanged,this, &CheckSvc::setCheckedCount);
     connect(m_worker,&CheckSvcWorker::checkProcessFinished,this, [&](){m_checkResultVm->insert();});
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::devConStatusChanged,this,&CheckSvc::devReadyChanged);
+    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::pupilDiameterChanged,this,&CheckSvc::pupilDiameterChanged);
     m_workerThread.start();
 }
 
@@ -734,6 +790,21 @@ void CheckSvc::connectDev()
 bool CheckSvc::getDevReady()
 {
     return DevOps::DeviceOperation::getSingleton()->getIsDeviceReady();
+}
+
+bool CheckSvc::getAutoAlignPupil()
+{
+    return DevOps::DeviceOperation::getSingleton()->getAutoAlignPupil();
+}
+
+void CheckSvc::setAutoAlignPupil(bool autoAlign)
+{
+    DevOps::DeviceOperation::getSingleton()->setAutoAlignPupil(autoAlign);
+}
+
+float CheckSvc::getPupilDiameter()
+{
+    return DevOps::DeviceOperation::getSingleton()->getPupilDiameter();
 }
 
 
@@ -833,19 +904,6 @@ void DynamicCheck::Checkprocess()
         //            if(isSeen)
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
 #include "check_svc.moc"
 

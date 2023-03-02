@@ -54,14 +54,28 @@ int StaticCheckResultVm::drawRealTimeEyePosPic(int index)
         picIndexStart+=realTimeDB[i].size();
     }
 //    int picCount=blob.size()/(320*240);
-    for(uint i=0;i<realTimeDB[index].size();i++)
+    if(m_data->m_imgData.size()>index+1)                    //检查的时候
     {
-        int picIndex=picIndexStart+i;
-        auto qa=blob.mid(picIndex*320*240,320*240);
-        QImage img((uchar*)qa.data(),320,240,QImage::Format_Grayscale8);
-        img.save(R"(./realTimeEyePosPic/)"+QString::number(i)+".bmp");
-
+        auto imgs=m_data->m_imgData[index];
+        for(int i=0;i<imgs.length();i++)
+        {
+            QImage img((uchar*)imgs[i].data(),320,240,QImage::Format_Grayscale8);
+            img.save(R"(./realTimeEyePosPic/)"+QString::number(i)+".bmp");
+        }
     }
+    else
+    {
+        for(uint i=0;i<realTimeDB[index].size();i++)        //读取结果的时候
+        {
+            int picIndex=picIndexStart+i;
+            auto qa=blob.mid(picIndex*320*240,320*240);
+            QImage img((uchar*)qa.data(),320,240,QImage::Format_Grayscale8);
+            img.save(R"(./realTimeEyePosPic/)"+QString::number(i)+".bmp");
+
+        }
+    }
+
+
     return realTimeDB[index].size();
 }
 
