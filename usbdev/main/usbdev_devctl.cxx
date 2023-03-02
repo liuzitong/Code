@@ -685,7 +685,7 @@ public:
         bool ret = m_frame_data_queue.dequeue( fd );
         if ( ! m_frame_data_queue.isEmpty() ) {
            QMetaObject::invokeMethod( this, "emitNewFrameData", Qt::QueuedConnection );
-           // this->emitNewFrameData();
+//            this->emitNewFrameData();
         }
         return ret;
     }
@@ -696,7 +696,7 @@ public:
         bool ret = m_status_data_queue.dequeue( sd );
         if ( ! m_status_data_queue.isEmpty()) {
             QMetaObject::invokeMethod( this, "emitNewStatusData", Qt::QueuedConnection );
-            //this->emitNewStatusData();
+//            this->emitNewStatusData();
         }
         return ret;
     }

@@ -74,9 +74,9 @@ private:
     void waitMotorStop(QVector<UsbDev::DevCtl::MotorId> motorIDs);
     void moveChin(ChinHozMoveDirection hozChin,ChinVertMoveDirection vertChin);                        //0左,1不动,2右;0上,1不动,2下
 public slots:
-    void onNewStatuData();
-    void onNewFrameData();
-    void onWorkStatusChanged();
+    void workOnNewStatuData();
+    void workOnNewFrameData();
+    void workOnWorkStatusChanged();
 signals:
     void workStatusChanged();
     void newStatusData();

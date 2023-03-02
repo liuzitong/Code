@@ -16,9 +16,7 @@ DeviceOperation::DeviceOperation()
 //    connect(&m_statusTimer,&QTimer::timeout,[&](){m_isDeviceReady=false;emit devConStatusChanged();connectDev();});
 //    connect(m_devCtl.data(),&UsbDev::DevCtl::newStatusData,this,&DeviceOperation::newStatusData);
 //    connect(m_devCtl.data(),&UsbDev::DevCtl::newFrameData,this,&DeviceOperation::newFrameData);
-    connect(this,&DeviceOperation::newFrameData,this,&DeviceOperation::onNewFrameData);
-    connect(this,&DeviceOperation::newStatusData,this,&DeviceOperation::onNewStatuData);
-    connect(this,&DeviceOperation::newFrameData,this,&DeviceOperation::onNewFrameData);
+    connect(this,&DeviceOperation::updateDevInfo,[](QString info){qDebug()<<info;});
 }
 
 DeviceOperation::~DeviceOperation()
@@ -137,18 +135,35 @@ void DeviceOperation::connectDev()
 //        emit devConStatusChanged();
 //    }
 
-    connect(this,&DeviceOperation::updateDevInfo,[](QString info){qDebug()<<info;});
+
     auto deviceSettings=DeviceSettings::getSingleton();
     quint32 vid_pid=deviceSettings->m_VID.toInt(nullptr,16)<<16|deviceSettings->m_PID.toInt(nullptr,16);
+    qDebug()<<QString::number(vid_pid,16);
+
+//    m_devCtl.reset(UsbDev::DevCtl::createInstance(vid_pid));
+//    connect(m_devCtl.data(),&UsbDev::DevCtl::workStatusChanged,this,&DeviceOperation::workStatusChanged);
+//    connect(m_devCtl.data(),&UsbDev::DevCtl::updateInfo,this,&DeviceOperation::updateDevInfo);
+//    connect(m_devCtl.data(),&UsbDev::DevCtl::newStatusData,this,&DeviceOperation::onNewStatuData);
+//    connect(m_devCtl.data(),&UsbDev::DevCtl::newFrameData,this,&DeviceOperation::onNewFrameData);
+//    connect(m_devCtl.data(),&UsbDev::DevCtl::newProfile,this,[&](){updateDevInfo("Profile updated successfully.");m_isProfileUpdate=true;});
+//    connect(m_devCtl.data(),&UsbDev::DevCtl::newConfig,this,[&](){updateDevInfo("Config updated successfully.");m_isConfigUpdated=true;});
+
     do{
         m_devCtl.reset(UsbDev::DevCtl::createInstance(vid_pid));
+        {
+            static QElapsedTimer elapsedTimer;
+            elapsedTimer.restart();
+            do{
+                QCoreApplication::processEvents();
+            }while((elapsedTimer.elapsed()<3000));      //等待连接
+        }
         if(m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_OK)
         {
             updateDevInfo("Connect Successfully.");
-            connect(m_devCtl.data(),&UsbDev::DevCtl::workStatusChanged,this,&DeviceOperation::workStatusChanged);
+            connect(m_devCtl.data(),&UsbDev::DevCtl::workStatusChanged,this,&DeviceOperation::workOnWorkStatusChanged);
             connect(m_devCtl.data(),&UsbDev::DevCtl::updateInfo,this,&DeviceOperation::updateDevInfo);
-            connect(m_devCtl.data(),&UsbDev::DevCtl::newStatusData,this,&DeviceOperation::onNewStatuData);
-            connect(m_devCtl.data(),&UsbDev::DevCtl::newFrameData,this,&DeviceOperation::onNewFrameData);
+            connect(m_devCtl.data(),&UsbDev::DevCtl::newStatusData,this,&DeviceOperation::workOnNewStatuData);
+            connect(m_devCtl.data(),&UsbDev::DevCtl::newFrameData,this,&DeviceOperation::workOnNewFrameData);
             connect(m_devCtl.data(),&UsbDev::DevCtl::newProfile,this,[&](){updateDevInfo("Profile updated successfully.");m_isProfileUpdate=true;});
             connect(m_devCtl.data(),&UsbDev::DevCtl::newConfig,this,[&](){updateDevInfo("Config updated successfully.");m_isConfigUpdated=true;});
             m_isDeviceReady=true;
@@ -163,10 +178,10 @@ void DeviceOperation::connectDev()
             elapsedTimer.restart();
             do{
                 QCoreApplication::processEvents();
-            }while((elapsedTimer.nsecsElapsed()/10000000<1000));//10000ms
+            }while((elapsedTimer.elapsed()<3000));
             qDebug()<<retryTimes;
         }
-    }while(m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_Disconnected);
+    }while(m_devCtl==nullptr||m_devCtl->workStatus()!=UsbDev::DevCtl::WorkStatus::WorkStatus_S_OK);
 }
 
 void DeviceOperation::staticStimulate(QPointF loc,int spotSize,int DB,int durationTime)
@@ -339,14 +354,14 @@ void DeviceOperation::moveChin(ChinHozMoveDirection hozChin, ChinVertMoveDirecti
 }
 
 
-void DeviceOperation::onNewStatuData()
+void DeviceOperation::workOnNewStatuData()
 {
-//    m_statusTimer.start();
     m_statusData=m_devCtl->takeNextPendingStatusData();
+    qDebug()<<"receive status data";
     emit newStatusData();
 }
 
-void DeviceOperation::onNewFrameData()
+void DeviceOperation::workOnNewFrameData()
 {
 
     m_frameData=m_devCtl->takeNextPendingFrameData();
@@ -399,12 +414,13 @@ void DeviceOperation::onNewFrameData()
 
 }
 
-void DeviceOperation::onWorkStatusChanged()
+void DeviceOperation::workOnWorkStatusChanged()
 {
     if(m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_Disconnected)
     {
         connectDev();
     }
+    emit workStatusChanged();
 }
 }
 
