@@ -1,9 +1,12 @@
-﻿#include "device_agorithm.h"
+﻿#include "device_data_processer.h"
 #include <QDebug>
 #include <usbdev/main/usbdev_devctl.hxx>
 #include <device_operation.h>
 namespace DevOps{
-int DeviceAgorithm::interpolation(int value[], QPointF loc)
+
+QSharedPointer<DeviceDataProcesser> DeviceDataProcesser::m_singleton=nullptr;
+
+int DeviceDataProcesser::interpolation(int value[], QPointF loc)
 {
     double secondVal[2];
     secondVal[0]=value[0]+(value[1]-value[0])*(loc.x()/6.0);
@@ -12,7 +15,7 @@ int DeviceAgorithm::interpolation(int value[], QPointF loc)
     return ret;
 }
 
-int DeviceAgorithm::getFocusMotorPosByDist(int focalDist, int spotSlot)
+int DeviceDataProcesser::getFocusMotorPosByDist(int focalDist, int spotSlot)
 {
 
 //    auto config=DeviceOperation::getSingleton()->m_devCtl->config();
@@ -26,7 +29,7 @@ int DeviceAgorithm::getFocusMotorPosByDist(int focalDist, int spotSlot)
     return focalMotorPos;
 }
 
-CoordMotorPosFocalDistInfo DeviceAgorithm::getXYMotorPosAndFocalDistFromCoord(const QPointF loc)
+CoordMotorPosFocalDistInfo DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoord(const QPointF loc)
 {
     CoordMotorPosFocalDistInfo coordSpacePosInfo;
     static bool isMainDotInfoTable=true;
@@ -105,5 +108,25 @@ CoordMotorPosFocalDistInfo DeviceAgorithm::getXYMotorPosAndFocalDistFromCoord(co
               arg(QString::number(coordSpacePosInfo.motorY)).
               arg(QString::number(coordSpacePosInfo.focalDist));
     return coordSpacePosInfo;
+}
+
+QPoint DeviceDataProcesser::caculatePupilDeviation(const QByteArray img, int width, int height)
+{
+
+    return QPoint();
+}
+
+float DeviceDataProcesser::caculatePupilDiameter(const QByteArray img, int width, int height)
+{
+    return 0;
+}
+
+QSharedPointer<DeviceDataProcesser> DeviceDataProcesser::getSingleton()
+{
+    if(m_singleton==nullptr)
+    {
+        m_singleton.reset(new DeviceDataProcesser());
+    }
+    return m_singleton;
 }
 }

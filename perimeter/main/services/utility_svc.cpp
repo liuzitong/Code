@@ -15,74 +15,105 @@ namespace Perimeter
 
 UtilitySvc::UtilitySvc()
 {
-    QFile jsonFile("./data.json");
-    if( !jsonFile.open(QIODevice::ReadOnly))
     {
-        qDebug() << "read file error!";
-    }
-    QJsonParseError jsonParserError;
-    auto JsonDoc = QJsonDocument::fromJson(jsonFile.readAll(),&jsonParserError);
-    auto jsonArray=JsonDoc.array();
-    jsonFile.close();
-
-    auto jsonArrToVectorPoint=[&](QVector<QPoint>& vec,const QString& name,QJsonObject& jo)->void
-    {
-        if(jo["name"]==name)
+        QFile jsonFile("./data.json");
+        if( !jsonFile.open(QIODevice::ReadOnly))
         {
-            auto arr=jo["data"].toArray();
-            for(int i=0;i<arr.count();i++)
+            qDebug() << "read file error!";
+        }
+        QJsonParseError jsonParserError;
+        auto JsonDoc = QJsonDocument::fromJson(jsonFile.readAll(),&jsonParserError);
+        auto jsonArray=JsonDoc.array();
+        jsonFile.close();
+
+        auto jsonArrToVectorPoint=[&](QVector<QPoint>& vec,const QString& name,QJsonObject& jo)->void
+        {
+            if(jo["name"]==name)
             {
-                auto arr2=arr[i].toArray();
-                QPoint point(arr2[0].toInt(),arr2[1].toInt());
-                vec.push_back(point);
+                auto arr=jo["data"].toArray();
+                for(int i=0;i<arr.count();i++)
+                {
+                    auto arr2=arr[i].toArray();
+                    QPoint point(arr2[0].toInt(),arr2[1].toInt());
+                    vec.push_back(point);
+                }
             }
-        }
-    };
-    auto jsonArrToVectorInt=[&](QVector<int>& vec,const QString& name,QJsonObject& jo)->void
-    {
-        if(jo["name"]==name)
+        };
+        auto jsonArrToVectorInt=[&](QVector<int>& vec,const QString& name,QJsonObject& jo)->void
         {
-            auto arr=jo["data"].toArray();
-            for(int i=0;i<arr.count();i++){vec.push_back(arr[i].toInt());}
-        }
-    };
-
-
-    for(auto i:jsonArray)
-    {
-        auto jo=i.toObject();
-
-        jsonArrToVectorPoint(m_pointLoc_30d,"XY_NORMAL_VALUE_30d",jo);
-        jsonArrToVectorPoint(m_pointLoc_60d,"XY_NORMAL_VALUE_60d",jo);
-
-        QVector<QVector<QString>> jsonObjNames={
-            {"NORMAL_VALUE36_45_B1_White","NORMAL_VALUE36_45_B1_Red","NORMAL_VALUE36_45_B1_Blue"},
-            {"NORMAL_VALUE36_45_B2_White","NORMAL_VALUE36_45_B2_Red","NORMAL_VALUE36_45_B2_Blue"},
-            {/*B3_WHITE采用该jsonObjNames2*/"NORMAL_VALUE36_45_B3_Red","NORMAL_VALUE36_45_B3_Blue"},
-            {"NORMAL_VALUE36_45_B4_White","NORMAL_VALUE36_45_B4_Red","NORMAL_VALUE36_45_B4_Blue"},
-            {"NORMAL_VALUE36_45_B5_White","NORMAL_VALUE36_45_B5_Red","NORMAL_VALUE36_45_B5_Blue"}
+            if(jo["name"]==name)
+            {
+                auto arr=jo["data"].toArray();
+                for(int i=0;i<arr.count();i++){vec.push_back(arr[i].toInt());}
+            }
         };
 
-        QVector<QString> jsonObjNames2={"NORMAL_VALUE15_35","NORMAL_VALUE36_45","NORMAL_VALUE46_55","NORMAL_VALUE56_65","NORMAL_VALUE66_75"};
 
-        m_value_30d_cursorSize_cursorColor.resize(jsonObjNames.length());
-        for(int i=0;i<jsonObjNames.length();i++)
+        for(auto i:jsonArray)
         {
-            m_value_30d_cursorSize_cursorColor[i].resize(jsonObjNames[i].length());
-            for(int j=0;j<jsonObjNames[i].length();j++)
+            auto jo=i.toObject();
+
+            jsonArrToVectorPoint(m_pointLoc_30d,"XY_NORMAL_VALUE_30d",jo);
+            jsonArrToVectorPoint(m_pointLoc_60d,"XY_NORMAL_VALUE_60d",jo);
+            jsonArrToVectorPoint(m_left_blindDot,"BLIND_DOT_LEFTP",jo);
+            jsonArrToVectorPoint(m_right_blindDot,"BLIND_DOT_RIGHTP",jo);
+
+            QVector<QVector<QString>> jsonObjNames={
+                {"NORMAL_VALUE36_45_B1_White","NORMAL_VALUE36_45_B1_Red","NORMAL_VALUE36_45_B1_Blue"},
+                {"NORMAL_VALUE36_45_B2_White","NORMAL_VALUE36_45_B2_Red","NORMAL_VALUE36_45_B2_Blue"},
+                {/*B3_WHITE采用该jsonObjNames2*/"NORMAL_VALUE36_45_B3_Red","NORMAL_VALUE36_45_B3_Blue"},
+                {"NORMAL_VALUE36_45_B4_White","NORMAL_VALUE36_45_B4_Red","NORMAL_VALUE36_45_B4_Blue"},
+                {"NORMAL_VALUE36_45_B5_White","NORMAL_VALUE36_45_B5_Red","NORMAL_VALUE36_45_B5_Blue"}
+            };
+
+            QVector<QString> jsonObjNames2={"NORMAL_VALUE15_35","NORMAL_VALUE36_45","NORMAL_VALUE46_55","NORMAL_VALUE56_65","NORMAL_VALUE66_75"};
+
+            m_value_30d_cursorSize_cursorColor.resize(jsonObjNames.length());
+            for(int i=0;i<jsonObjNames.length();i++)
             {
-                 jsonArrToVectorInt(m_value_30d_cursorSize_cursorColor[i][j],jsonObjNames[i][j],jo);
+                m_value_30d_cursorSize_cursorColor[i].resize(jsonObjNames[i].length());
+                for(int j=0;j<jsonObjNames[i].length();j++)
+                {
+                     jsonArrToVectorInt(m_value_30d_cursorSize_cursorColor[i][j],jsonObjNames[i][j],jo);
+                }
             }
-        }
 
-        m_value_30d_cursorSizeIII_ageCorrection.resize(jsonObjNames2.length());
-        for(int i=0;i<jsonObjNames2.length();i++)
+            m_value_30d_cursorSizeIII_ageCorrection.resize(jsonObjNames2.length());
+            for(int i=0;i<jsonObjNames2.length();i++)
+            {
+                 jsonArrToVectorInt(m_value_30d_cursorSizeIII_ageCorrection[i],jsonObjNames2[i],jo);
+            }
+
+            jsonArrToVectorInt(m_value_60d,"NORMAL_VALUE15_35_60d",jo);
+        }
+    }
+
+    {
+        QFile jsonFile("./checkAndAnalysisSettings.json");
+        if( !jsonFile.open(QIODevice::ReadOnly))
         {
-             jsonArrToVectorInt(m_value_30d_cursorSizeIII_ageCorrection[i],jsonObjNames2[i],jo);
+            qDebug() << "read file error!";
         }
+        QJsonParseError jsonParserError;
+        auto JsonDoc = QJsonDocument::fromJson(jsonFile.readAll(),&jsonParserError);
+        auto jsonArray=JsonDoc.array();
+        jsonFile.close();
 
-        jsonArrToVectorInt(m_value_60d,"NORMAL_VALUE15_35_60d",jo);
+        auto jo=JsonDoc.object();
+        m_checkCountBeforeGetBlindDotCheck=jo["checkCountBeforeGetBlindDotCheck"].toInt();
+        m_blindDotTestDB=jo["blindDotTestDB"].toInt();
+        m_falsePositiveDecDB=jo["falsePositiveAddDB"].toInt();
+        m_VFImultiplier=jo["VFImultiplier"].toDouble();
 
+        std::sort(m_left_blindDot.begin(),m_left_blindDot.end(),[&](QPoint dotFront,QPoint dotBack){
+            return (pow(dotFront.x()-m_left_blindDot[0].x(),2)+pow(dotFront.y()-m_left_blindDot[0].y(),2))<
+                   (pow(dotBack.x()-m_left_blindDot[0].x(),2)+pow(dotBack.y()-m_left_blindDot[0].y(),2));
+        });
+
+        std::sort(m_right_blindDot.begin(),m_right_blindDot.end(),[&](QPoint dotFront,QPoint dotBack){
+            return (pow(dotFront.x()-m_right_blindDot[0].x(),2)+pow(dotFront.y()-m_right_blindDot[0].y(),2))<
+                   (pow(dotBack.x()-m_right_blindDot[0].x(),2)+pow(dotBack.y()-m_right_blindDot[0].y(),2));
+        });
     }
 }
 

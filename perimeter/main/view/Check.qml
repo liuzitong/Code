@@ -23,10 +23,12 @@ Item {id:root; width: 1366;height: 691
     property int fontPointSize: CommonSettings.fontPointSize;
     signal realTimePicRefresh(var count);
     property var frameProvidSvc: null;
+    property var devOps: IcUiQmlApi.appCtrl.deviceOperation;
 
 
     Component.onCompleted:{
         frameProvidSvc=IcUiQmlApi.appCtrl.frameProvidSvc;
+        console.log("hehe");
         IcUiQmlApi.appCtrl.checkSvc.connectDev();
         IcUiQmlApi.appCtrl.checkSvc.checkResultChanged.connect(currentCheckResultChanged);
 
@@ -106,29 +108,30 @@ Item {id:root; width: 1366;height: 691
                                             Row{width:parent.width;height: parent.height*0.65/3;spacing: width*0.05;
                                                 CusText{text:lt+qsTr("Cursor"); horizontalAlignment: Text.AlignLeft;width: parent.width*0.45;font.pointSize: fontPointSize;}
                                                 LineEdit{
-                                                    text:"";width: parent.width*0.50;textInput.readOnly: true;
-                                                    Component.onCompleted: {currentProgramChanged.connect(function(){
-                                                        text="";
-                                                        var params=currentProgram.type!==2?currentProgram.params.commonParams:currentProgram.params;
-                                                        switch (params.cursorSize){ case 0:text+="I";break;case 1:text+="II";break;case 2:text+="III";break;case 3: text+="IV";break;case 4:text+="V";break;}
-                                                        text+=",";
-                                                        switch (params.cursorColor){case 0:text+=lt+qsTr("White");break;case 1:text+=lt+qsTr("Red");break;case 2:text+=lt+qsTr("Blue");break;}
-                                                    });}
+                                                    property var cursorSize: ["I","II","III","IV","V"];
+                                                    property var cursorColor: [lt+qsTr("White"),lt+qsTr("Red"),lt+qsTr("Blue")];
+                                                    property var params:currentProgram.type!==2?currentProgram.params.commonParams:currentProgram.params;
+                                                    text:currentProgram==null?"":cursorSize[params.cursorSize]+","+cursorColor[params.cursorColor];
+                                                    width: parent.width*0.50;textInput.readOnly: true;
                                                 }
                                             }
                                             Row{width:parent.width;height: parent.height*0.65/3;spacing: width*0.05;
                                                 CusText{text:lt+qsTr("Strategy"); horizontalAlignment: Text.AlignLeft;width: parent.width*0.45;font.pointSize: fontPointSize;}
                                                 LineEdit{
-                                                    text:"";width: parent.width*0.5;textInput.readOnly: true;
-                                                    Component.onCompleted: {currentProgramChanged.connect(function(){
-                                                        text="";
-                                                        var params=(currentProgram.type!==2?currentProgram.params.commonParams:currentProgram.params);
-                                                        if(currentProgram.type!==2)
-                                                            switch (params.strategy){ case 0:text+=lt+qsTr("Full threshold");break;case 1:text+=lt+qsTr("Smart interactive");break;case 2:text+=lt+qsTr("Fast interative");break;case 3: text+=lt+qsTr("One stage");break;
-                                                                                      case 4:text+=lt+qsTr("Two stages");break;case 5:text+=lt+qsTr("Quantify defects");break;case 6:text+=lt+qsTr("Single stimulus");break;}
-                                                        else
-                                                            switch (params.strategy){ case 0:text+=lt+qsTr("Standard");break;case 1:text+=lt+qsTr("Blind area");break;case 2:text+=lt+qsTr("Dark area");break;case 3: text+=lt+qsTr("Straight line");break;}
-                                                    });}
+                                                    property var staticStrategy: [lt+qsTr("Full threshold"),lt+qsTr("Smart interactive"),lt+qsTr("Fast interative"),lt+qsTr("One stage"),lt+qsTr("Two stages"),lt+qsTr("Quantify defects"),lt+qsTr("Single stimulus")];
+                                                    property var dynamicStrategy: [lt+qsTr("Standard"),lt+qsTr("Blind area"),lt+qsTr("Dark area"),lt+qsTr("Single stimulus")]
+                                                    property var params:currentProgram.type!==2?currentProgram.params.commonParams:currentProgram.params;
+                                                    width: parent.width*0.5;textInput.readOnly: true;
+                                                    text:currentProgram.type!==2?staticStrategy[params.strategy]:dynamicStrategy[params.strategy];
+//                                                    Component.onCompleted: {currentProgramChanged.connect(function(){
+//                                                        text="";
+//                                                        var params=(currentProgram.type!==2?currentProgram.params.commonParams:currentProgram.params);
+//                                                        if(currentProgram.type!==2)
+//                                                            switch (params.strategy){ case 0:text+=lt+qsTr("Full threshold");break;case 1:text+=lt+qsTr("Smart interactive");break;case 2:text+=lt+qsTr("Fast interative");break;case 3: text+=lt+qsTr("One stage");break;
+//                                                                                      case 4:text+=lt+qsTr("Two stages");break;case 5:text+=lt+qsTr("Quantify defects");break;case 6:text+=lt+qsTr("Single stimulus");break;}
+//                                                        else
+//                                                            switch (params.strategy){ case 0:text+=lt+qsTr("Standard");break;case 1:text+=lt+qsTr("Blind area");break;case 2:text+=lt+qsTr("Dark area");break;case 3: text+=lt+qsTr("Straight line");break;}
+//                                                    });}
                                                 }
                                             }
                                         }
@@ -202,22 +205,23 @@ Item {id:root; width: 1366;height: 691
 
                                         }
                                     }
-//                                    Timer
-//                                    {
-//                                        id:tt;
-//                                        repeat: true
-//                                        interval: 1000/30
-//                                        running: false;
-//                                        onTriggered: frameProvidSvc.onNewVideoContentReceived();
-//                                    }
-//                                    Button{width: 100;height: 20; anchors.bottom: parent.bottom; anchors.bottomMargin: 0; anchors.right: parent.right; anchors.rightMargin: 0;onClicked: tt.running=!tt.running;}
+                                    Timer
+                                    {
+                                        id:tt;
+                                        repeat: true
+                                        interval: 1000/30
+                                        running: false;
+                                        onTriggered: frameProvidSvc.onNewVideoContentReceived();
+                                    }
+                                    Button{width: 100;height: 20; anchors.bottom: parent.bottom; anchors.bottomMargin: 0; anchors.right: parent.right; anchors.rightMargin: 0;onClicked: tt.running=!tt.running;}
                                 }
                                 Item{id:controlPanel;width:controlPanel.height*4/3;height: parent.height*0.23;anchors.horizontalCenter: parent.horizontalCenter;
-                                    CusButton{ id:autoButton;width: parent.width*0.35;height: parent.height*0.28;buttonColor: backGroundColor; text:"Auto";borderColor: "black";anchors.horizontalCenter: parent.horizontalCenter; anchors.verticalCenter: parent.verticalCenter;}
-                                    Image {id: upButton;anchors.left: parent.Top;height: sourceSize.height*root.height/691;width: sourceSize.width*root.width/1366;anchors.horizontalCenter: parent.horizontalCenter;source: "qrc:/Pics/capture-svg/arrow_1up.svg"; }
-                                    Image { id: downButton;anchors.bottom: parent.bottom; height: sourceSize.height*root.height/691;width: sourceSize.width*root.width/1366;anchors.horizontalCenter: parent.horizontalCenter;source: "qrc:/Pics/capture-svg/arrow_2down.svg";}
-                                    Image { id: leftButton; anchors.right: autoButton.left; anchors.verticalCenter: parent.verticalCenter; height: sourceSize.height*root.height/691; anchors.rightMargin:(controlPanel.height-autoButton.height-upButton.height*2)/2;width: sourceSize.width*root.width/1366;source: "qrc:/Pics/capture-svg/arrow_3left.svg";}
-                                    Image {id: rightButton;anchors.left: autoButton.right;anchors.verticalCenter: parent.verticalCenter;height: sourceSize.height*root.height/691; anchors.leftMargin:(controlPanel.height-autoButton.height-upButton.height*2)/2;width: sourceSize.width*root.width/1366; source: "qrc:/Pics/capture-svg/arrow_4right.svg";}
+                                    property bool isAuto: IcUiQmlApi.appCtrl.deviceOperation.autoAlignPupil;
+                                    CusButton {id:autoButton;width: parent.width*0.35;height: parent.height*0.28;buttonColor: backGroundColor; text:controlPanel.isAuto?"Auto":"Manual";borderColor: "black";anchors.horizontalCenter: parent.horizontalCenter; anchors.verticalCenter: parent.verticalCenter;onClicked: IcUiQmlApi.appCtrl.deviceOperation.autoAlignPupil=!IcUiQmlApi.appCtrl.deviceOperation.autoAlignPupil;}
+                                    CusButton {id:upButton;enabled:!controlPanel.isAuto;rec.visible: false;anchors.left: parent.Top;height: image.sourceSize.height*root.height/691;imageHightScale:1.0;width: image.sourceSize.width*root.width/1366;anchors.horizontalCenter: parent.horizontalCenter;imageSrc: "qrc:/Pics/capture-svg/arrow_1up.svg";onPressed:{imageHightScale=1.1;devOps.moveChinUp();}onReleased:{imageHightScale=1.0;devOps.stopMovingChin();}}
+                                    CusButton {id:downButton;enabled:!controlPanel.isAuto;rec.visible: false;anchors.bottom: parent.bottom; height: image.sourceSize.height*root.height/691;imageHightScale:1.0;width: image.sourceSize.width*root.width/1366;anchors.horizontalCenter: parent.horizontalCenter;imageSrc: "qrc:/Pics/capture-svg/arrow_2down.svg";onPressed:{imageHightScale=1.1;devOps.moveChinDown();}onReleased:{imageHightScale=1.0;devOps.stopMovingChin();}}
+                                    CusButton {id:leftButton;enabled:!controlPanel.isAuto;rec.visible: false; anchors.right: autoButton.left; anchors.verticalCenter: parent.verticalCenter; imageHightScale:1.0;height: image.sourceSize.height*root.height/691; anchors.rightMargin:(controlPanel.height-autoButton.height-upButton.height*2)/2;width: image.sourceSize.width*root.width/1366;imageSrc: "qrc:/Pics/capture-svg/arrow_3left.svg";onPressed:{imageHightScale=1.1;devOps.moveChinLeft();}onReleased:{imageHightScale=1.0;devOps.stopMovingChin();}}
+                                    CusButton {id:rightButton;enabled:!controlPanel.isAuto;rec.visible: false;anchors.left: autoButton.right;anchors.verticalCenter: parent.verticalCenter;imageHightScale:1.0;height: image.sourceSize.height*root.height/691; anchors.leftMargin:(controlPanel.height-autoButton.height-upButton.height*2)/2;width: image.sourceSize.width*root.width/1366; imageSrc: "qrc:/Pics/capture-svg/arrow_4right.svg";onPressed:{imageHightScale=1.1;devOps.moveChinRight();}onReleased:{imageHightScale=1.0;devOps.stopMovingChin();}}
                                 }
                                 Rectangle{id:eyeOptionsGroup; width: parent.width*0.83;height: parent.height*0.25;anchors.horizontalCenter: parent.horizontalCenter; border.color: backGroundBorderColor;color: backGroundColor; radius: width*0.03;
                                     Item{ anchors.fill: parent;anchors.margins: parent.height*0.1;

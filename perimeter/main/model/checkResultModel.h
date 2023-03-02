@@ -27,7 +27,8 @@ struct StaticResultData:public ResultData
     int fixationLostCount;
     int fixationLostTestCount;
     std::vector<std::vector<int>> realTimeDB;   //realTimeDB[点序号][每个点图片序号]
-    std::vector<int> checkData;
+    std::vector<std::vector<QByteArray>> realTimeEyePosImg;     //img[点序号][图片序号]
+    std::vector<int> checkData;         //第一段程序点个数为测出点DB,第二段程序点个数为短波周期DB,第三段为中心点DB
 
     template<class Archive>
     void serialize(Archive& archive, const unsigned int version)
@@ -102,6 +103,7 @@ struct StaticCheckResultModel:public CheckResultModel
     StaticParams m_params;
     StaticResultData m_data;
     QByteArray m_blob;
+    QVector<QVector<QByteArray>> m_imgData;
 
     StaticCheckResultModel()=default;
     StaticCheckResultModel(CheckResult_ptr checkResult_ptr);

@@ -33,6 +33,13 @@ public:
     QVector<QPoint> m_pointLoc_30d;
     QVector<QPoint> m_pointLoc_60d;
 
+    QVector<QPoint> m_left_blindDot;
+    QVector<QPoint> m_right_blindDot;
+    int m_checkCountBeforeGetBlindDotCheck;
+    int m_blindDotTestDB;
+    int m_falsePositiveDecDB;
+    double m_VFImultiplier;
+
     QVector<QVector<QVector<int>>> m_value_30d_cursorSize_cursorColor;
     QVector<QVector<int>> m_value_30d_cursorSizeIII_ageCorrection;     //cursorSize!=2 ,it's CursorColor
     QVector<int> m_value_60d;

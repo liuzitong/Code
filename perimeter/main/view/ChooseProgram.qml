@@ -19,6 +19,9 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
     signal ok();
     signal cancel();
     property int fontPointSize: CommonSettings.fontPointSize;
+    Component.onCompleted:{
+        ltChanged.connect(function(){console.log("programlist");});
+    }
 
 
    contentItem:
@@ -70,6 +73,12 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                             anchors.fill: parent;currentIndex: bar.currentIndex;
                             Repeater {
                                 id:programLists;
+                                property var programListModelVmThreshold: null;
+                                property var programListModelVmScreening: null;
+                                property var programListModelVmSpecial: null;
+                                property var programListModelVmDynamic: null;
+                                property var programListModelVmCustom: null;
+
                                 function refreshData()
                                 {
                                     programListModelVmThreshold.refreshData();
@@ -79,11 +88,6 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                     programListModelVmCustom.refreshData();
                                 }
 
-                                property var programListModelVmThreshold: null;
-                                property var programListModelVmScreening: null;
-                                property var programListModelVmSpecial: null;
-                                property var programListModelVmDynamic: null;
-                                property var programListModelVmCustom: null;
                                 Component.onCompleted: {
                                     programListModelVmThreshold=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::ProgramListModelVm", false,[0]);
                                     programListModelVmScreening=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::ProgramListModelVm", false,[1]);
@@ -106,7 +110,7 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                     }
                                     Component{id:delegateProg;
                                         Rectangle{height: (homeTab.height-1)*1/12+1;width: listView.width;color:"white";border.color: backGroundBorderColor;
-                                            CusText{width: parent.width;text:model.name;font.pointSize: fontPointSize;}
+                                            CusText{width: parent.width;text:lt+model.name;font.pointSize: fontPointSize;}
                                             MouseArea{ anchors.fill: parent;
                                                 onClicked:
                                                 {

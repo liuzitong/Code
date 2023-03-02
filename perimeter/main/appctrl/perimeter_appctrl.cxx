@@ -14,6 +14,7 @@
 #include "perimeter/main/perimeter_main.hxx"
 #include "perimeter/main/services/check_svc.h"
 #include "perimeter/main/services/frame_provid_svc.h"
+#include <deviceOperation/device_operation.h>
 namespace Perimeter {
 
 // ////////////////////////////////////////////////////////////////////////////
@@ -50,6 +51,7 @@ public :
     QObject*    getCheckSvc() const                 {return m_checkSvc;}
     QObject*    getSettings()                       {return m_settings;}
     QObject*    getFrameProvidSvc()                 {return FrameProvidSvc::getSingleton().data();}
+    QObject*    getDeviceOperation()                {return DevOps::DeviceOperation::getSingleton().data();/*return new QObject();*/}
 //    QString     getLanguage()                       {return m_language;}
 //    void        setLanguage(QString value)          {m_language=value;}
 //    bool        getDoubleName()                     {return m_doubleName;}
@@ -150,6 +152,11 @@ QObject *AppCtrl::getCheckSvc() const
 QObject *AppCtrl::getFrameProvidSvc() const
 {
     return T_PrivPtr( m_obj )-> getFrameProvidSvc();
+}
+
+QObject *AppCtrl::getDeviceOperation() const
+{
+    return T_PrivPtr( m_obj )-> getDeviceOperation();
 }
 
 QObject *AppCtrl::getSettings()

@@ -170,6 +170,13 @@ Item{
             drawText(db,x_pix,y_pix);
         }
 
+        function drawShortFlucDB(db,dot)
+        {
+            var x_pix=(dot.x/degreeRange)*(diameter*0.5)+width/2;
+            var y_pix=(-dot.y/degreeRange)*(diameter*0.5)+height/2;
+            drawText("("+db+")",x_pix,y_pix-fontPointSize*3);
+        }
+
         function drawAxisEndText(string,x_pix,y_pix,size)
         {
             var ctx = getContext("2d")
@@ -271,12 +278,19 @@ Item{
                 {
                     var dBList=currentCheckResult.resultData.checkData;
                     var dotList=currentProgram.data.dots;
-                    for(i=0;i<dotList.length;i++)
+                    for(i=0;i<dBList.length;i++)
                     {
-                        if(dBList[i]===-1)
-                            drawDot(dotList[i]);
-                        else
-                            drawDB(dBList[i],dotList[i]);
+                        if(i<dotList.length)                                            //一般结果
+                        {
+                            if(dBList[i]===-1)
+                                drawDot(dotList[i]);
+                            else
+                                drawDB(dBList[i],dotList[i]);
+                        }
+                        else                                                            //短周期
+                        {
+                            if(dBList[i]!==-1) drawShortFlucDB(dBList[i],dotList[i-dotList.length]);
+                        }
                     }
                 }
                 else                                                        //绘制动态检查结果

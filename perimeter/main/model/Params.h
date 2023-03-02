@@ -71,41 +71,50 @@ struct StaticParams/*:public QObject*/
 
         int                         Range[2];
         Strategy                    strategy;
-        StrategyMode                strategyMode;
-        CursorColor                 cursorColor;
-        CursorSize                  cursorSize;
-        BackGroundColor             backGroundColor;
+        StrategyMode                strategyMode;                   //obsolete
+        CursorColor                 cursorColor;                    //done
+        CursorSize                  cursorSize;                     //done
+        BackGroundColor             backGroundColor;                //done
 
         /**
          * @brief blueYellowTest
          * 打开此开光,刺激设置为蓝色,5号大小,背景光为黄色.相关UI联动显示,并置为只读.
          */
-        ON_OFF                      blueYellowTest;
-        ON_OFF                      responseAutoAdapt;
+        ON_OFF                      blueYellowTest;                     //done
+        /**
+         * @brief responseAutoAdapt
+         * 自适应时间
+         * 开起此项算出应答时间平均值,加上延迟时间,取代intervalTime
+         */
+        ON_OFF                      responseAutoAdapt;                  //check proscess
+        /**
+         * @brief responseDelayTime
+         * 相应延迟时间
+         */
         int                         responseDelayTime;
         /**
          * @brief centerDotCheck
          * 中心点检测,打开此开关,开始的时候测试版中心点,如果中心点是固视点,那么就测试菱形中心点.
          */
-        ON_OFF                      centerDotCheck;
+        ON_OFF                      centerDotCheck;                         //done
         /**
          * @brief shortTermFluctuation
          * 短周期波动测试, 即是一个位置测试两次(测试方式按照策),得到两个结果.周期长度按照固定参数设置(目前默认是10);
          * 测试方式是测完周期长度的数目的点,再随机选中一个点再次测试.第二次结果以括号的形式写在旁边(打印,实时均要求此项).
-         * 目前考虑的处理方法是,低字节存放第一次,高字节存放第二次.高字节为0,表示此点没有测试短周期.
+         * 目前考虑的处理方法是,设置结果设置为两倍长度,第一倍是普通结果,第二倍是短周期波动结果.-1表示没有测试.
          */
-        ON_OFF                      shortTermFluctuation;
+        ON_OFF                      shortTermFluctuation;                  //done
         /**
          * @brief fixationTarget
          * 有中心点,大菱形,小菱形,底点,这几种固视.Y坐标分别,偏移0,-8,-8(大小菱形同心),-12度.
          */
-        FixationTarget              fixationTarget;
-        FixationMonitor             fixationMonitor;                //即是eye move alarm mode
+        FixationTarget              fixationTarget;                 //done
+        FixationMonitor             fixationMonitor;                //即是eye move alarm mode         //todo 在on take frame 处理
         /**
          * @brief blindDotTest
          * 盲点测试,经过固视率丢失周期次数, 之后在盲点测试一次,应答视为固视丢失.
          */
-        ON_OFF                      blindDotTest;
+        ON_OFF                      blindDotTest;                  //donte
 
         template<class Archive>
         void serialize(Archive& archive, const unsigned int version)
@@ -131,24 +140,36 @@ struct StaticParams/*:public QObject*/
     struct FixedParams/*:public QObject*/
     {
 //        Q_OBJECT
+        /**
+         * @brief stimulationTime
+         * 刺激时间
+         */
         int stimulationTime;
+        /**
+         * @brief intervalTime
+         * 间隔时间
+         * 等关闭到下一次灯亮的时间
+         */
         int intervalTime;
 
         /**
          * @brief falsePositiveCycle
-         * 假阴性：在曾经响应过的位置，再减少几个DB的亮度(即是更亮)再次测试，如响应就正常，不响应则记录一次假阴性。
+         * 假阳性：在曾经响应过的位置，再减少几个DB的亮度(即是更亮)再次测试，如响应就正常，不响应则记录一次假阴性。
          * 此为周期,即时经过固定个点,在上个周期数个点之中随机调一个做此项测试.
+         * 周期为亮点次数
          */
         int falsePositiveCycle;
         /**
          * @brief falseNegativeCycle
-         * 假阳性：在测试过程中，投射器转动到一定位置,但是快门关闭，如果不响应就正常，如果响应就记录一次假阳性。
+         * 假阴性：在测试过程中，投射器转动到一定位置,但是快门关闭，如果不响应就正常，如果响应就记录一次假阳性。
          * 此为周期,即是经过固定个点,搞一次
+         * 周期为亮点次数
          */
         int falseNegativeCycle;
         /**
          * @brief fixationViewLossCycle
-         * 固视丢失周期,属于盲点测试打开的情况下的,测试这个数目的点数后,在盲点刺激,应答就属于一次固视丢失
+         * 固视丢失周期,属于盲点测试打开的情况下的,测试这个亮点次数后,在盲点刺激,应答就属于一次固视丢失
+         * 周期为亮点次数
          */
         int fixationViewLossCycle;
         /**

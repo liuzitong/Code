@@ -1,4 +1,4 @@
-import QtQuick 2.0
+﻿import QtQuick 2.0
 import QtQml 2.2
 Item{
     id:root
@@ -26,6 +26,8 @@ Item{
     height:parent.height;/*300*/
     width:parent.height*2.5;/*100*/
     signal clicked()
+    signal pressed()
+    signal released()
     signal entered()
     signal exited()
 //    onEnabledChanged: {
@@ -37,7 +39,7 @@ Item{
         anchors.fill: parent
         hoverEnabled: root.hoverEnabled
         onClicked:{ if(isAnime) anime.start();else root.clicked();}
-        onPressed:{if(pressImageSrc!="") image.source=pressImageSrc;}
+        onPressed:{if(pressImageSrc!="") {image.source=pressImageSrc;} root.pressed();}
         onEntered:{
             if(root.hoverEnabled)
             {
@@ -58,7 +60,7 @@ Item{
                 root.exited();
             }
         }
-        onReleased: {if(root.type=="click"){image.source=imageSrc;}}
+        onReleased: {if(root.type=="click"){image.source=imageSrc;} root.released();}
     }
     Item{
         anchors.horizontalCenter: parent.horizontalCenter
