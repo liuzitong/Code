@@ -18,7 +18,7 @@ public:
 
     QString m_VID,m_PID;
     QJsonObject m_rootObj;
-
+    int m_pupilAutoAlignPixelTolerance;
     quint8 m_5MotorSpeed[5];
     quint8 m_motorChinSpeed[2];
     QString localConfigPath,localDataPath;

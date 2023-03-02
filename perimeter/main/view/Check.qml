@@ -41,23 +41,16 @@ Item {id:root; width: 1366;height: 691
 
 
     onRefresh: {
-        var program_id=IcUiQmlApi.appCtrl.settings.defaultProgramId;
-        var program_type=IcUiQmlApi.appCtrl.settings.defaultProgramType;
-//        console.log(program_id);
-//        console.log(program_type);
-        if (currentProgram!==null)
+        if (currentProgram==null)
         {
-            if(currentProgram.type!==2)
-                IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::StaticProgramVM", currentProgram);
+            var program_id=IcUiQmlApi.appCtrl.settings.defaultProgramId;
+            var program_type=IcUiQmlApi.appCtrl.settings.defaultProgramType;
+            if(program_type!==2)
+                currentProgram=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::StaticProgramVM", false,[program_id]);
             else
-                IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::DynamicProgramVM", currentProgram);
+                currentProgram=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::DynamicProgramVM", false,[program_id]);
         }
-        if(program_type!==2)
-            currentProgram=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::StaticProgramVM", false,[program_id]);
-        else
-            currentProgram=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::DynamicProgramVM", false,[program_id]);
         program_type!==2?staticParamsSetting.currentProgram=currentProgram:dynamicParamsSetting.currentProgram=currentProgram;
-
         if(currentCheckResult!=null)
         {
             if(currentProgram.type!==2)
@@ -66,11 +59,8 @@ Item {id:root; width: 1366;height: 691
                 IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::DynamicCheckResultVm",currentCheckResult);
             currentCheckResult=null;
         }
-
         realTimeDBRec.visible=false;
         checkDisplay.clickedDotIndex=-1;
-        IcUiQmlApi.appCtrl.checkSvc.checkedCount=0;
-
     }
 
 

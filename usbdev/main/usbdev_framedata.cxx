@@ -5,6 +5,7 @@
 #include "usbdev/common/usbdev_pimplprivtemp.hpp"
 #include "usbdev_framedata.hxx"
 #include "usbdev_profile.hxx"
+#include <memory>
 
 namespace UsbDev {
 
@@ -149,7 +150,7 @@ FrameData :: ~FrameData( )
 // ============================================================================
 // ctor (build )
 // ============================================================================
-FrameData :: FrameData ( const QByteArray &ba)
+FrameData :: FrameData (const QByteArray &ba)
 {
     gRegInQt(); m_obj = nullptr;
     void *d = nullptr;
@@ -161,6 +162,7 @@ FrameData :: FrameData ( const QByteArray &ba)
     priv->shutterStatusRef()=buff[8];
     priv->xMotorCoordinateRef()=gReadData_Le_I32(&buff[12]);
     priv->yMotorCoordinateRef()=gReadData_Le_I32(&buff[16]);
+    memset((void*)buff,buff[20],20);                           //抹掉左上角的数字信息,避免发生闪烁.
     priv->rawDataRef()=ba;
     m_obj = d;
 }

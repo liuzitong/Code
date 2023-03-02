@@ -407,8 +407,7 @@ bool  DevCtl_Worker :: cmd_ReadFrameData()
     ret = this->cmdComm_strInSync( reinterpret_cast<unsigned char*>( ba.data()), ba.size());
     if ( ret ) {
         updateRefreshIOInfo(QString("R:")+buffToQStr(reinterpret_cast<const char*>(ba.data()),20));
-//        count++;
-//        if(count%100==0)
+//        if(count%10==0)
 //        {
 //            QFile file(QString(R"(./videoData/)")+QString::number(count));
 //            file.open(QIODevice::ReadWrite);
@@ -419,6 +418,7 @@ bool  DevCtl_Worker :: cmd_ReadFrameData()
 //        }
         FrameData fd( ba );
         emit this->newFrameData( fd );
+        count++;
 
     }
     else
@@ -465,6 +465,7 @@ bool  DevCtl_Worker :: cmd_ReadFrameData()
 // ============================================================================
 bool  DevCtl_Worker :: cmd_TurnOnVideo()
 {
+    cmd_ClearCache();
     if ( ! this->isDeviceWork()) { updateInfo("no connection!");return false; }
 //    if ( m_is_video_on ) { return true; }
     bool ret = true;
@@ -765,7 +766,7 @@ void  DevCtlPriv :: ensureTimer( bool sw )
 
     } else {   // delete timer in timer thread
         if ( m_trg_tmr != Q_NULLPTR ) {
-            QxPack::IcRmtObjSigBlocker::blockSignals ( m_t_tmr, true );
+//            QxPack::IcRmtObjSigBlocker::blockSignals ( m_t_tmr, true );  //影响退出.
             m_trg_tmr->deleteLater();
             m_trg_tmr = Q_NULLPTR;
         }
@@ -804,7 +805,7 @@ void  DevCtlPriv :: ensureWorker( bool sw )
 
     } else {    // delete the worker
         if ( m_wkr != Q_NULLPTR ) {
-            QxPack::IcRmtObjSigBlocker::blockSignals( m_wkr, true );
+//            QxPack::IcRmtObjSigBlocker::blockSignals( m_wkr, true );     //影响退出.
             m_wkr->deleteLater();
             m_wkr = Q_NULLPTR;
         }

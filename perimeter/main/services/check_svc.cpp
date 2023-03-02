@@ -728,6 +728,77 @@ signals:
     void checkedCountChanged(int count);
 };
 
+void CheckSvcWorker::initialize()
+{
+    qDebug()<<("initializing");
+    qsrand(QTime::currentTime().second());
+    int type=m_programVm->getType();
+    qDebug()<<type;
+    if(type!=2)
+    {
+        m_check.reset(new StaticCheck());
+        m_check->m_patientModel=m_patientVm->getModel();
+        ((StaticCheck*)m_check.data())->m_resultModel=static_cast<StaticCheckResultVm*>(m_checkResultVm)->getModel();
+        ((StaticCheck*)m_check.data())->m_programModel=static_cast<StaticProgramVm*>(m_programVm)->getModel();
+    }
+    else
+    {
+        m_check.reset(new DynamicCheck());
+        m_check->m_patientModel=m_patientVm->getModel();
+        ((DynamicCheck*)m_check.data())->m_resultModel=static_cast<DynamicCheckResultVm*>(m_checkResultVm)->getModel();
+        ((DynamicCheck*)m_check.data())->m_programModel=static_cast<DynamicProgramVm*>(m_programVm)->getModel();
+    }
+    emit checkedCountChanged(0);
+    emit checkResultChanged();
+}
+
+void CheckSvcWorker::doWork()
+{
+    *m_checkState=0;
+    while(true)
+    {
+        switch (*m_checkState)
+        {
+        case 0:                                             //start
+        {
+            initialize();
+            m_check->initialize();
+            setCheckState(1);
+            break;
+        }
+        case 1:                                             //check
+        {
+            qDebug()<<("Checking");
+            m_check->Checkprocess();
+            if(m_check->m_checkedCount==m_check->m_totalCount) setCheckState(4);
+            emit checkResultChanged();
+            break;
+        }
+        case 2:                                             //pause
+        {
+            qDebug()<<("pausing");
+            UtilitySvc::wait(500);
+            break;
+        }
+        case 3:                                             //stop
+        {
+            qDebug()<<("stopped");
+            return;
+        }
+        case 4:                                             //finish
+        {
+            m_checkResultVm->insert();
+            qDebug()<<("finished");
+            emit checkProcessFinished();
+            return;
+        }
+        };
+        UtilitySvc::wait(500);
+    }
+}
+
+
+
 
 CheckSvc::CheckSvc(QObject *parent)
 {
@@ -808,75 +879,6 @@ float CheckSvc::getPupilDiameter()
 }
 
 
-
-void CheckSvcWorker::initialize()
-{
-    qDebug()<<("initializing");
-    qsrand(QTime::currentTime().second());
-    int type=m_programVm->getType();
-    qDebug()<<type;
-    if(type!=2)
-    {
-        m_check.reset(new StaticCheck());
-        m_check->m_patientModel=m_patientVm->getModel();
-        ((StaticCheck*)m_check.data())->m_resultModel=static_cast<StaticCheckResultVm*>(m_checkResultVm)->getModel();
-        ((StaticCheck*)m_check.data())->m_programModel=static_cast<StaticProgramVm*>(m_programVm)->getModel();
-    }
-    else
-    {
-        m_check.reset(new DynamicCheck());
-        m_check->m_patientModel=m_patientVm->getModel();
-        ((DynamicCheck*)m_check.data())->m_resultModel=static_cast<DynamicCheckResultVm*>(m_checkResultVm)->getModel();
-        ((DynamicCheck*)m_check.data())->m_programModel=static_cast<DynamicProgramVm*>(m_programVm)->getModel();
-    }
-    emit checkedCountChanged(0);
-    emit checkResultChanged();
-}
-
-void CheckSvcWorker::doWork()
-{
-    *m_checkState=0;
-    while(true)
-    {
-        switch (*m_checkState)
-        {
-        case 0:                                             //start
-        {
-            initialize();
-            m_check->initialize();
-            setCheckState(1);
-            break;
-        }
-        case 1:                                             //check
-        {
-            qDebug()<<("Checking");
-            m_check->Checkprocess();
-            if(m_check->m_checkedCount==m_check->m_totalCount) setCheckState(4);
-            emit checkResultChanged();
-            break;
-        }
-        case 2:                                             //pause
-        {
-            qDebug()<<("pausing");
-            UtilitySvc::wait(500);
-            break;
-        }
-        case 3:                                             //stop
-        {
-            qDebug()<<("stopped");
-            return;
-        }
-        case 4:                                             //finish
-        {
-            m_checkResultVm->insert();
-            qDebug()<<("finished");
-            emit checkProcessFinished();
-            return;
-        }
-        };
-        UtilitySvc::wait(500);
-    }
-}
 
 
 

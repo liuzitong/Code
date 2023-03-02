@@ -25,7 +25,7 @@ public:
     //! @param ba [in] the raw data
     //! @param pf [in] the profile that spec. video width, height and format...
     //! @note this CTOR is called inside DevCtl, user should not use it.
-    FrameData ( const QByteArray &ba);
+    FrameData (const QByteArray &ba);
 
     //! ctor ( construct )
     FrameData ( const FrameData & );
