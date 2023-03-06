@@ -76,6 +76,8 @@ private:
 public slots:
     void workOnNewStatuData();
     void workOnNewFrameData();
+    void workOnNewProfile();
+    void workOnNewConfig();
     void workOnWorkStatusChanged();
 signals:
     void workStatusChanged();
@@ -93,9 +95,14 @@ public:
 public:
     Status m_status={-1,-1,-1};
     bool m_isConfigUpdated=false,m_isProfileUpdate=false,m_isDeviceReady=false,m_autoAlignPupil=true;
+    float m_deviation;
+    QSize m_videoSize;
     QSharedPointer<UsbDev::DevCtl> m_devCtl;
+    UsbDev::Config m_config;
+    UsbDev::Profile m_profile;
     UsbDev::StatusData m_statusData;
     UsbDev::FrameData m_frameData;
+    QByteArray m_frameRawData;
 private:
     float m_pupilDiameter=-1;
     QVector<float> m_pupilDiameterArr;

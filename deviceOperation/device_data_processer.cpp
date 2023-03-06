@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <usbdev/main/usbdev_devctl.hxx>
 #include <device_operation.h>
+#include <device_settings.h>
 namespace DevOps{
 
 QSharedPointer<DeviceDataProcesser> DeviceDataProcesser::m_singleton=nullptr;
@@ -110,16 +111,98 @@ CoordMotorPosFocalDistInfo DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoo
     return coordSpacePosInfo;
 }
 
-QPoint DeviceDataProcesser::caculatePupilDeviation(const QByteArray img, int width, int height)
+QVector<QPoint> DeviceDataProcesser::caculatePupilDeviation(const QByteArray ba, int width, int height)
 {
+    int y_max=0;
+    int y_min=UINT_MAX;
+    int x_max=0;
+    int x_min=UINT_MAX;
+    QVector<int> x_vc;
+    QVector<int> y_vc;
+    QVector<int> x_vc2;
+    QVector<int> y_vc2;
+    auto pupilGreyLimit=DeviceSettings::getSingleton()->m_pupilGreyLimit;
+    auto pupilPixelDiameterLimit=DeviceSettings::getSingleton()->m_pupilPixelDiameterLimit;
+    for(quint32 y=height*0.25;y<height*0.75;y++)
+    {
+        for(quint32 x=width*0.25;x<width*0.75;x++)
+        {
+            if(ba[x+width*y]<pupilGreyLimit)
+            {
+                x_vc.push_back(x);
+                y_vc.push_back(y);
+            }
+        }
+    }
 
-    return QPoint();
+    int x_avg,y_avg,sum=0;
+    for(int i=0;i<x_vc.length();i++)
+    {
+        sum+=x_vc[i];
+    }
+    x_avg=sum/x_vc.length();
+    sum=0;
+    for(int i=0;i<y_vc.length();i++)
+    {
+        sum+=y_vc[i];
+    }
+    y_avg=sum/y_vc.length();
+
+    for(int i=0;i<x_vc.length();i++)
+    {
+        auto x=x_vc[i];
+        if(qAbs(int(x-x_avg))<pupilPixelDiameterLimit)
+        {
+            if(x>x_max) x_max=x;
+            if(x<x_min) x_min=x;
+            x_vc2.push_back(x);
+        }
+    }
+
+    for(int i=0;i<y_vc.length();i++)
+    {
+        auto y=y_vc[i];
+        if(qAbs(int(y-y_avg))<pupilPixelDiameterLimit)
+        {
+            if(y>y_max) y_max=y;
+            if(y<y_min) y_min=y;
+            y_vc2.push_back(y);
+        }
+
+    }
+    for(int i=0;i<x_vc2.length();i++)
+    {
+        sum+=x_vc2[i];
+    }
+    int x_avg2=sum/x_vc2.length();
+    sum=0;
+    for(int i=0;i<y_vc2.length();i++)
+    {
+        sum+=y_vc2[i];
+    }
+    int y_avg2=sum/y_vc2.length();
+    QPoint center={int(x_avg2-width*0.5),int(y_avg2-height*0.5)};
+    QPoint topLeft={x_min,y_max};
+    QPoint bottomRight={x_max,y_min};
+    return QVector<QPoint>{center,topLeft,bottomRight};
 }
 
-float DeviceDataProcesser::caculatePupilDiameter(const QByteArray img, int width, int height)
+float DeviceDataProcesser::caculatePupilDiameter(QPoint topLeft,QPoint bottomRight)
 {
-    return 0;
+    auto width=bottomRight.x()-topLeft.x();
+    auto height=topLeft.y()-bottomRight.y();
+    auto pixelDiameter=sqrt(width*height);
+    auto diameter=pixelDiameter*DeviceSettings::getSingleton()->m_pupilDiameterPixelToMillimeterConstant;
+    return diameter;
 }
+
+int DeviceDataProcesser::caculateFixationDeviation(QPoint point)
+{
+    auto deviation=sqrt(pow(point.x(),2)+pow(point.y(),2))*DeviceSettings::getSingleton()->m_pupilDiameterPixelToFixationDeviationConstant;
+    return deviation;
+}
+
+
 
 QSharedPointer<DeviceDataProcesser> DeviceDataProcesser::getSingleton()
 {

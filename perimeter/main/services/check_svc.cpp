@@ -7,6 +7,7 @@
 #include <QtMath>
 #include <deviceOperation/device_operation.h>
 #include <tuple>
+#include "frame_provid_svc.h"
 namespace Perimeter{
 constexpr int MaxDB=52;
 constexpr int MinDB=0;
@@ -475,6 +476,7 @@ void StaticCheck::ProcessAnswer(bool answered)
     }
     case LastCheckedDotType::blindDotTest:
     {
+        m_resultModel->m_data.fixationDeviation.push_back(-m_deviceOperation->m_deviation);
         m_resultModel->m_data.fixationLostTestCount++;
         if(answered)
             m_resultModel->m_data.fixationLostCount++;
@@ -482,6 +484,7 @@ void StaticCheck::ProcessAnswer(bool answered)
     }
     case LastCheckedDotType::falsePositiveTest:
     {
+        m_resultModel->m_data.fixationDeviation.push_back(-m_deviceOperation->m_deviation);
         m_resultModel->m_data.falsePositiveTestCount++;
         if(!answered)
             m_resultModel->m_data.falsePositiveCount++;
@@ -489,6 +492,7 @@ void StaticCheck::ProcessAnswer(bool answered)
     }
     case LastCheckedDotType::falseNegativeTest:
     {
+        m_resultModel->m_data.fixationDeviation.push_back(-m_deviceOperation->m_deviation);
         m_resultModel->m_data.falseNegativeTestCount++;
         if(answered)
         {
@@ -497,6 +501,7 @@ void StaticCheck::ProcessAnswer(bool answered)
     }
     case LastCheckedDotType::commonCheckDot:
     {
+        m_resultModel->m_data.fixationDeviation.push_back(m_deviceOperation->m_deviation);
         int dotDB=lastCheckedDot->StimulationDBs.last();
         answered?lastCheckedDot->lowerBound=dotDB:lastCheckedDot->upperBound=dotDB;
         int boundDistance=lastCheckedDot->upperBound-lastCheckedDot->lowerBound;
@@ -810,6 +815,7 @@ CheckSvc::CheckSvc(QObject *parent)
     connect(m_worker,&CheckSvcWorker::checkProcessFinished,this, [&](){m_checkResultVm->insert();});
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::devConStatusChanged,this,&CheckSvc::devReadyChanged);
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::pupilDiameterChanged,this,&CheckSvc::pupilDiameterChanged);
+    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::newFrameData,FrameProvidSvc::getSingleton().data(),&FrameProvidSvc::onNewVideoContentReceived);
     m_workerThread.start();
 }
 

@@ -23,6 +23,10 @@ public:
     quint8 m_motorChinSpeed[2];
     QString localConfigPath,localDataPath;
     QList<QPair<int,int>> m_colorToSlot,m_spotSizeToSlot;
+    int m_pupilGreyLimit;
+    int m_pupilPixelDiameterLimit;
+    double m_pupilDiameterPixelToMillimeterConstant;
+    double m_pupilDiameterPixelToFixationDeviationConstant;
     static QSharedPointer<DeviceSettings> getSingleton();
     static QSharedPointer<DeviceSettings> m_singleton;
 };

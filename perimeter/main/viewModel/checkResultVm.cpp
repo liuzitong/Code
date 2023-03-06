@@ -2,6 +2,7 @@
 #include "paramsVm.h"
 #include <QImage>
 #include <QPainter>
+#include <deviceOperation/device_operation.h>
 namespace Perimeter
 {
 
@@ -32,6 +33,13 @@ void StaticCheckResultVm::insert()
 {
     auto sp=m_data->ModelToDB();
     sp->m_time=QDateTime::currentDateTime();
+    for(auto& dotImgs:m_data->m_imgData)
+    {
+        for(auto& img:dotImgs)
+        {
+            sp->m_blob.append(img);
+        }
+    }
     qx::dao::insert(sp);
     m_data->m_id=sp->m_id;
     qDebug()<<sp->m_id;
@@ -47,6 +55,7 @@ int StaticCheckResultVm::drawRealTimeEyePosPic(int index)
 {
     auto blob=m_data->m_blob;
     auto realTimeDB=m_data->m_data.realTimeDB;
+    auto imgSize=DevOps::DeviceOperation::getSingleton()->m_videoSize;
     if(uint(index)>=realTimeDB.size()) return 0;
     int picIndexStart=0;
     for(int i=0;i<index;i++)
@@ -59,7 +68,8 @@ int StaticCheckResultVm::drawRealTimeEyePosPic(int index)
         auto imgs=m_data->m_imgData[index];
         for(int i=0;i<imgs.length();i++)
         {
-            QImage img((uchar*)imgs[i].data(),320,240,QImage::Format_Grayscale8);
+            QImage img((uchar*)imgs[i].data(),imgSize.width(),imgSize.height(),QImage::Format_Grayscale8);
+//            QImage img((uchar*)imgs[i].data(),320,240,QImage::Format_Grayscale8);
             img.save(R"(./realTimeEyePosPic/)"+QString::number(i)+".bmp");
         }
     }
@@ -68,8 +78,10 @@ int StaticCheckResultVm::drawRealTimeEyePosPic(int index)
         for(uint i=0;i<realTimeDB[index].size();i++)        //读取结果的时候
         {
             int picIndex=picIndexStart+i;
-            auto qa=blob.mid(picIndex*320*240,320*240);
-            QImage img((uchar*)qa.data(),320,240,QImage::Format_Grayscale8);
+            auto qa=blob.mid(picIndex*imgSize.width()*imgSize.height(),imgSize.width()*imgSize.height());
+            QImage img((uchar*)qa.data(),imgSize.width(),imgSize.height(),QImage::Format_Grayscale8);
+//            auto qa=blob.mid(picIndex*320*240,320*240);
+//            QImage img((uchar*)qa.data(),320,240,QImage::Format_Grayscale8);
             img.save(R"(./realTimeEyePosPic/)"+QString::number(i)+".bmp");
 
         }

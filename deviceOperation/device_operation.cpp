@@ -5,6 +5,7 @@
 #include <qobject.h>
 #include <QtCore>
 #include <array>
+#include <QtMath>
 //#include <QQmlEngine>
 namespace DevOps{
 
@@ -363,15 +364,16 @@ void DeviceOperation::workOnNewStatuData()
 
 void DeviceOperation::workOnNewFrameData()
 {
-
     m_frameData=m_devCtl->takeNextPendingFrameData();
+    m_frameRawData=m_frameData.rawData();
     emit newFrameData();
-    auto profile=m_devCtl->profile();
+    auto profile=m_profile;
+    auto vc=DeviceDataProcesser::caculatePupilDeviation(m_frameData.rawData(),profile.videoSize().width(),profile.videoSize().height());
+    auto deviation=vc[0];
+    m_deviation=sqrt(pow(deviation.x(),2)+pow(deviation.y(),2));
     if(m_autoAlignPupil)                //自动对眼位
     {
         int tolerance=DeviceSettings::getSingleton()->m_pupilAutoAlignPixelTolerance;
-
-        auto deviation=DeviceDataProcesser::caculatePupilDeviation(m_frameData.rawData(),profile.videoSize().width(),profile.videoSize().height());
         quint8 sps[2]{0};
         int motorPos[2]{0};
         auto spsConfig=DeviceSettings::getSingleton()->m_motorChinSpeed;
@@ -399,7 +401,7 @@ void DeviceOperation::workOnNewFrameData()
     }
     if(m_pupilDiameter<0)
     {
-        auto pupilDiameter=DeviceDataProcesser::caculatePupilDiameter(m_frameData.rawData(),profile.videoSize().width(),profile.videoSize().height());
+        auto pupilDiameter=DeviceDataProcesser::caculatePupilDiameter(vc[1],vc[2]);
         m_pupilDiameterArr.push_back(pupilDiameter);
         if(m_pupilDiameterArr.size()>=50)
         {
@@ -412,6 +414,17 @@ void DeviceOperation::workOnNewFrameData()
         }
     }
 
+}
+
+void DeviceOperation::workOnNewProfile()
+{
+    m_profile=m_devCtl->profile();
+    m_videoSize=m_profile.videoSize();
+}
+
+void DeviceOperation::workOnNewConfig()
+{
+    m_config=m_devCtl->config();
 }
 
 void DeviceOperation::workOnWorkStatusChanged()

@@ -46,6 +46,10 @@ DeviceSettings::DeviceSettings()
     localConfigPath=m_rootObj.value("localConfigPath").toString();
     localDataPath=m_rootObj.value("localDataPath").toString();
 
+    m_pupilGreyLimit=m_rootObj.value("pupilGreyLimit").toInt();
+    m_pupilPixelDiameterLimit=m_rootObj.value("pupilPixelDiameterLimit").toInt();
+    m_pupilDiameterPixelToMillimeterConstant=m_rootObj.value("pupilDiameterPixelToMillimeterConstant").toDouble();
+    m_pupilDiameterPixelToFixationDeviationConstant=m_rootObj.value("pupilDiameterPixelToFixationDeviationConstant").toDouble();
     auto motorSpeed=m_rootObj.value("motorSpeed").toArray();
     for(int i=0;i<motorSpeed.count();i++)
     {

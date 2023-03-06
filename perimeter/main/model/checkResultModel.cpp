@@ -38,15 +38,7 @@ CheckResult_ptr StaticCheckResultModel::ModelToDB()
     auto pp=CheckResultModel::ModelToDB();
     pp->m_params=Utility::entityToQString(m_params);
     pp->m_data=Utility::entityToQString(m_data);
-    for(auto& dotImgs:m_imgData)
-    {
-        for(auto& img:dotImgs)
-        {
-            pp->m_blob.append(img);
-        }
-    }
     return pp;
-
 }
 
 DynamicCheckResultModel::DynamicCheckResultModel(CheckResult_ptr checkResult_ptr):CheckResultModel(checkResult_ptr)
