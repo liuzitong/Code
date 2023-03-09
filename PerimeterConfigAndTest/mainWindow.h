@@ -164,11 +164,11 @@ private slots:
 
     void on_reCalcXYFocalMotorPos_clicked(){fillXYMotorAndFocalInfoByXYCoord();};
 
-
     void on_plainTextEdit_rawCommand_textChanged();
 
     void on_rawComand_clicked();
 
+    void on_action_disconnect_triggered();
 
 private:
     void initData();

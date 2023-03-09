@@ -11,9 +11,8 @@
 namespace Perimeter{
 constexpr int MaxDB=52;
 constexpr int MinDB=0;
-class Check:public QObject
+class Check
 {
-    Q_OBJECT
 public:
     Check()=default;
     ~Check()=default;
@@ -24,9 +23,6 @@ public:
     static constexpr int y_offsetDiamond=-8,y_offsetBottomPoint=-12;
     virtual void Checkprocess()=0;
     virtual void initialize()=0;
-signals:
-    void checkedCountChanged(int count);
-
 };
 
 class StaticCheck:public Check
@@ -63,7 +59,7 @@ private:
     QVector<int> m_answeredTimes;    //根据此处得到autoAdaptTime;
     int m_autoAdaptTime;
     QVector<int> m_lastShortTermCycleCheckedDotIndex;
-    QVector<DotRecord> m_shortTermFlucRecords;          //index为程序点总数+位置index
+    QVector<DotRecord> m_shortTermFlucRecords;          //index为程序点总数+位置index,里面存储了所有的短周期点
     int m_falsePosCycCount=qrand()%10,m_falseNegCycCount=qrand()%10,m_fiaxationViewLossCyc=qrand()%10;  //错开
     QVector<QPointF> m_blindDot;
     int m_blindDotLocateIndex=-1;
@@ -76,7 +72,10 @@ public:
     QSharedPointer<StaticCheckResultModel> m_resultModel;
     QSharedPointer<StaticProgramModel> m_programModel;
     StaticCheck()=default;
-    ~StaticCheck()=default;
+//    ~StaticCheck()=default;
+    ~StaticCheck(){
+        qDebug()<<"check deleted";
+    }
     virtual void initialize() override;
     virtual void Checkprocess() override;
     std::tuple<bool,QPointF,int> getCheckCycleLocAndDB();
@@ -105,6 +104,7 @@ void StaticCheck::initialize()
     m_resultModel->m_program_id=m_programModel->m_id;
     m_totalCount=m_programModel->m_data.dots.size();
     m_resultModel->m_data.checkData=std::vector<int>(m_totalCount*2+1,-1);  //第一段程序点个数为测出点DB,第二段程序点个数为短波周期DB,第三段为中心点DB
+    m_resultModel->m_data.realTimeDB.reserve(m_totalCount*2+1);
     auto cursorSize=m_programModel->m_params.commonParams.cursorSize;
     auto cursorColor=m_programModel->m_params.commonParams.cursorColor;
     m_value_30d=m_utilitySvc->getValue30d(int(cursorSize),int(cursorColor),m_patientModel->m_age);
@@ -169,22 +169,28 @@ void StaticCheck::initialize()
         m_centerDotRecord=DotRecord{0,QPointF{0,0},{DB},-1,{},false,false,MinDB,MaxDB};
     }
     m_deviceOperation->setCursorColorAndCursorSize(int(cursorColor),int(cursorSize));
+//    m_deviceOperation->getReadyToStimulate({3,3},int(cursorSize),0);
+//    m_deviceOperation->openShutter(20000);
 }
 
-void StaticCheck::Checkprocess()
+void StaticCheck::Checkprocess()            //第一次先跑点,直接刺激,第二次跑点,等待上次刺激的应答,然后再刺激,再跑点,再等待上次的应答.(保证再等待应答的同时跑点.)
 {
     auto checkCycleLocAndDB=getCheckCycleLocAndDB();                //存储LastdotType为各种检查
     if(std::get<0>(checkCycleLocAndDB))
     {
+        qDebug()<<"checkCycleLocAndDB loc:"<<std::get<1>(checkCycleLocAndDB)<<" DB"<<std::get<2>(checkCycleLocAndDB);
         m_lastCheckDotRecord.push_back(nullptr);
-        getReadyToStimulate(std::get<1>(checkCycleLocAndDB),std::get<2>(getCheckCycleLocAndDB()));
+        getReadyToStimulate(std::get<1>(checkCycleLocAndDB),std::get<2>(checkCycleLocAndDB));
     }
     else
     {
         m_lastCheckDotRecord.push_back(&getCheckDotRecordRef());   //存储lastDotType为commondot 并且存储指针
+        auto dotRec=m_lastCheckDotRecord.last();
+        qDebug()<<"getCheckDotRecordRef loc:"<<dotRec->loc<<" DB"<<dotRec->StimulationDBs.last();
         getReadyToStimulate(m_lastCheckDotRecord.last()->loc,m_lastCheckDotRecord.last()->StimulationDBs.last());
     }
-    if(m_stimulationCount!=0)                               //最开始刺激过就不需要处理
+    qDebug()<<"last Checked Dot length:"+QString::number(m_lastCheckeDotType.size())+".first:"+int(m_lastCheckeDotType.first())+".last:"+int(m_lastCheckeDotType.last());
+    if(m_stimulationCount!=0)                               //最开始没刺激过就不需要处理
     {
         waitAndProcessAnswer();                             //取出commondot 并且取出指针
     }
@@ -197,12 +203,13 @@ void StaticCheck::Checkprocess()
 
 StaticCheck::DotRecord &StaticCheck::getCheckDotRecordRef()
 {
+    m_lastCheckeDotType.push_back(LastCheckedDotType::commonCheckDot);
+
     if(m_resultModel->m_params.commonParams.centerDotCheck==true&&m_centerDotRecord.checked==false)
     {
         return m_centerDotRecord;
     }
 
-    m_lastCheckeDotType.push_back(LastCheckedDotType::commonCheckDot);
     if(!m_shortTermFlucRecords.isEmpty())
     {
         if(m_shortTermFlucRecords.size()>=2)
@@ -215,7 +222,10 @@ StaticCheck::DotRecord &StaticCheck::getCheckDotRecordRef()
         else
         {
             if(qrand()%(1+m_resultModel->m_params.fixedParams.fixationViewLossCycle)==0)    //周期内随机到了短波周期
+            {
+
                 return m_shortTermFlucRecords.last();
+            }
         }
     }
     if(m_isStartWithBaseDots)
@@ -300,8 +310,11 @@ void StaticCheck::stimulate()
 {
     m_stimulationCount++;
     int durationTime=m_programModel->m_params.fixedParams.stimulationTime;
-    m_deviceOperation->openShutter(durationTime);
-    m_resultModel->m_blob.append(m_deviceOperation->getRealTimeStimulationEyeImage());                                   //实时眼位
+    if(m_lastCheckeDotType.last()!=LastCheckedDotType::falseNegativeTest)               //假阴不开快门
+        m_deviceOperation->openShutter(durationTime);
+    //实时眼位
+    QByteArray ba=m_deviceOperation->getRealTimeStimulationEyeImage();
+    if(!ba.isEmpty()){m_resultModel->m_blob.append(ba);}
 }
 
 void StaticCheck::getReadyToStimulate(QPointF loc, int DB)
@@ -370,20 +383,25 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
     //测试盲点
     auto commomParams=m_resultModel->m_params.commonParams;
     auto fixedParams=m_resultModel->m_params.fixedParams;
-    if(commomParams.blindDotTest==true)
+    if(commomParams.blindDotTest==true)                 //盲点测试
     {
-        //确定盲点
-        if(m_stimulationCount>UtilitySvc::getSingleton()->m_checkCountBeforeGetBlindDotCheck&&m_blindDot.isEmpty())
+        //确定盲点,条件是要经历一点测试次数,而且盲不为空
+        if(m_stimulationCount>UtilitySvc::getSingleton()->m_checkCountBeforeGetBlindDotCheck&&!m_blindDot.isEmpty())
         {
             m_lastCheckeDotType.push_back(LastCheckedDotType::locateBlindDot);
             QPoint blindDotLoc;
+            qDebug()<<m_blindDotLocateIndex;
+            qDebug()<<UtilitySvc::getSingleton()->m_left_blindDot;
+            qDebug()<<UtilitySvc::getSingleton()->m_right_blindDot;
             if(m_resultModel->m_OS_OD)
                 blindDotLoc=UtilitySvc::getSingleton()->m_left_blindDot[m_blindDotLocateIndex];
             else
                 blindDotLoc=UtilitySvc::getSingleton()->m_right_blindDot[m_blindDotLocateIndex];
+
             return {true,blindDotLoc,m_stimulationCount>UtilitySvc::getSingleton()->m_blindDotTestDB};
         }
 
+        //盲点不为空的时候到了周期测试盲点.
         if(!m_blindDot.isEmpty()&&m_stimulationCount%fixedParams.fixationViewLossCycle==0)
         {
             auto blindDB=UtilitySvc::getSingleton()->m_blindDotTestDB;
@@ -393,7 +411,7 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
     }
 
 
-    if(m_stimulationCount%fixedParams.falsePositiveCycle==0)
+    if(m_stimulationCount%fixedParams.falsePositiveCycle==0&&m_stimulationCount!=0)         //假阳
     {
         QVector<DotRecord> m_checkedRecords;
         for(auto& recordDot:m_dotRecords)
@@ -403,11 +421,14 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
                 m_checkedRecords.push_back(recordDot);
             }
         }
+        if(m_checkedRecords.size()==0) return {false,{0,0},0};
         auto recordDot=m_checkedRecords[qrand()%m_checkedRecords.size()];
         m_lastCheckeDotType.push_back(LastCheckedDotType::falsePositiveTest);
         return {true,recordDot.loc,recordDot.DB-UtilitySvc::getSingleton()->m_falsePositiveDecDB};
     }
-    if(m_stimulationCount%fixedParams.falseNegativeCycle==0)
+
+
+    if(m_stimulationCount%fixedParams.falseNegativeCycle==0&&m_stimulationCount!=0)         //假阴,随机点,到刺激的时候不开快门
     {
         auto locs=m_programModel->m_data.dots;
         auto loc=locs[qrand()%locs.size()];
@@ -419,9 +440,11 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
 
 bool StaticCheck::waitForAnswer()
 {
+    qDebug()<<"waitForAnswer";
 
     while(m_deviceOperation->getAnswerPadStatus())   //一直按着算暂停
     {
+        qDebug()<<"pausing";
         QApplication::processEvents();
     }
     QElapsedTimer elapsedTimer;
@@ -442,6 +465,8 @@ bool StaticCheck::waitForAnswer()
         }
         waitTime=sum/(m_answeredTimes.size())+commonParams.responseDelayTime;
     }
+    qDebug()<<"wait Time is:"+QString::number(waitTime);
+
 
     while(elapsedTimer.elapsed()<waitTime)   //应答时间内
     {
@@ -452,11 +477,12 @@ bool StaticCheck::waitForAnswer()
         }
         else QApplication::processEvents();
     }
-        return false;                       //超出时间应答
+    return false;                       //超出时间应答
 }
 
 void StaticCheck::ProcessAnswer(bool answered)
 {
+    qDebug()<<"Process Answer.";
     auto lastCheckedDot=m_lastCheckDotRecord.takeFirst();
     auto lastCheckedDotType=m_lastCheckeDotType.takeFirst();
     switch (lastCheckedDotType)
@@ -643,7 +669,7 @@ void StaticCheck::ProcessAnswer(bool answered)
             if(lastCheckedDot->index<=int(m_programModel->m_data.dots.size()))                //非短周期
             {
                 m_checkedCount++;
-                m_resultModel->m_data.checkData[lastCheckedDot->index]=lastCheckedDot->DB;
+                m_resultModel->m_data.checkData[lastCheckedDot->index]=lastCheckedDot->DB;          //在check初始化的时候扩充了大小.
                 m_resultModel->m_data.realTimeDB[lastCheckedDot->index]=lastCheckedDot->StimulationDBs.toStdVector();
                 if(m_resultModel->m_params.commonParams.shortTermFluctuation)
                 {
@@ -724,6 +750,11 @@ public slots:
         qDebug()<<"connect dev";
         DevOps::DeviceOperation::getSingleton()->connectDev();    //连接设备
     }
+    void disconnectDev()
+    {
+        qDebug()<<"disconnect dev";
+        DevOps::DeviceOperation::getSingleton()->disconnectDev();    //连接设备
+    }
     void doWork();
 
 signals:
@@ -744,6 +775,7 @@ void CheckSvcWorker::initialize()
         m_check.reset(new StaticCheck());
         m_check->m_patientModel=m_patientVm->getModel();
         ((StaticCheck*)m_check.data())->m_resultModel=static_cast<StaticCheckResultVm*>(m_checkResultVm)->getModel();
+        qDebug()<<QString::number((((StaticCheck*)m_check.data())->m_resultModel)->m_id);
         ((StaticCheck*)m_check.data())->m_programModel=static_cast<StaticProgramVm*>(m_programVm)->getModel();
     }
     else
@@ -768,6 +800,8 @@ void CheckSvcWorker::doWork()
         {
             initialize();
             m_check->initialize();
+//            setCheckState(3);
+//            return;
             setCheckState(1);
             break;
         }
@@ -775,6 +809,9 @@ void CheckSvcWorker::doWork()
         {
             qDebug()<<("Checking");
             m_check->Checkprocess();
+
+//            qDebug()<<m_check->m_checkedCount;
+//            qDebug()<<m_check->m_totalCount;
             if(m_check->m_checkedCount==m_check->m_totalCount) setCheckState(4);
             emit checkResultChanged();
             break;
@@ -798,7 +835,7 @@ void CheckSvcWorker::doWork()
             return;
         }
         };
-        UtilitySvc::wait(500);
+        UtilitySvc::wait(1000);
     }
 }
 
@@ -807,15 +844,17 @@ void CheckSvcWorker::doWork()
 
 CheckSvc::CheckSvc(QObject *parent)
 {
+//    qDebug()<<"mianThread:"+QString::number(int(thread()->currentThread()),16);
     m_worker = new CheckSvcWorker();
     m_worker->moveToThread(&m_workerThread);
+    DevOps::DeviceOperation::getSingleton()->moveToThread(&m_workerThread);
     connect(m_worker,&CheckSvcWorker::checkResultChanged,this, &CheckSvc::checkResultChanged);
     connect(m_worker,&CheckSvcWorker::checkStateChanged,this, &CheckSvc::checkStateChanged);
     connect(m_worker,&CheckSvcWorker::checkedCountChanged,this, &CheckSvc::setCheckedCount);
     connect(m_worker,&CheckSvcWorker::checkProcessFinished,this, [&](){m_checkResultVm->insert();});
-    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::devConStatusChanged,this,&CheckSvc::devReadyChanged);
+    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::isDeviceReadyChanged,this,&CheckSvc::devReadyChanged);
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::pupilDiameterChanged,this,&CheckSvc::pupilDiameterChanged);
-    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::newFrameData,FrameProvidSvc::getSingleton().data(),&FrameProvidSvc::onNewVideoContentReceived);
+//    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::newFrameData,FrameProvidSvc::getSingleton().data(),&FrameProvidSvc::onNewVideoContentReceived);
     m_workerThread.start();
 }
 
@@ -828,6 +867,10 @@ CheckSvc::~CheckSvc()
 
 void CheckSvc::start()
 {
+    if(m_checkResultVm==nullptr)
+    {
+        qDebug()<<QString::number(m_checkResultVm->getPatient_id());
+    }
     m_worker->m_patientVm=m_patientVm;
     m_worker->m_programVm=m_programVm;
     m_worker->m_checkResultVm=m_checkResultVm;
@@ -861,7 +904,51 @@ void CheckSvc::stop()
 void CheckSvc::connectDev()
 {
 //  有设备之后启用
+    qDebug()<<"connect";
     QMetaObject::invokeMethod(m_worker,"connectDev",Qt::QueuedConnection);
+}
+
+void CheckSvc::disconnectDev()
+{
+    qDebug()<<"connect";
+    QMetaObject::invokeMethod(m_worker,"disconnectDev",Qt::QueuedConnection);
+}
+
+void CheckSvc::moveChinUp()
+{
+    DevOps::DeviceOperation::getSingleton()->moveChinUp();
+}
+
+void CheckSvc::moveChinDown()
+{
+    DevOps::DeviceOperation::getSingleton()->moveChinDown();
+}
+
+void CheckSvc::moveChinLeft()
+{
+    DevOps::DeviceOperation::getSingleton()->moveChinLeft();
+}
+
+void CheckSvc::moveChinRight()
+{
+    DevOps::DeviceOperation::getSingleton()->moveChinRight();
+}
+
+void CheckSvc::stopMovingChin()
+{
+    DevOps::DeviceOperation::getSingleton()->stopMovingChin();
+}
+
+void CheckSvc::turnOnVideo()
+{
+    qDebug()<<"trunOnVideo";
+    DevOps::DeviceOperation::getSingleton()->turnOnVideo();
+}
+
+void CheckSvc::turnOffVideo()
+{
+    qDebug()<<"trunOffVideo";
+    DevOps::DeviceOperation::getSingleton()->turnOffVideo();
 }
 
 bool CheckSvc::getDevReady()

@@ -82,7 +82,8 @@ CoordMotorPosFocalDistInfo DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoo
     for(unsigned int i=0;i<sizeof(arr)/sizeof(int);i++) {arr[i]=fourDots[i].motorY;}
     coordSpacePosInfo.motorY=interpolation(arr,locInterpol);
 
-    auto config=DeviceOperation::getSingleton()->m_devCtl->config();
+//    auto config=DeviceOperation::getSingleton()->m_devCtl->config();
+    auto config=DeviceOperation::getSingleton()->m_config;
     if(isMainDotInfoTable)
     {
         auto centerX=config.mainTableCenterXRef();
@@ -104,14 +105,14 @@ CoordMotorPosFocalDistInfo DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoo
 //                arg(QString::number(coordMotorPosFocalDistInfo.motorX)).
 //                arg(QString::number(coordMotorPosFocalDistInfo.motorY)).
 //                arg(QString::number(coordMotorPosFocalDistInfo.focalDist)));
-    qDebug()<<QString("X电机:%1,Y电机:%2,焦距:%3.").
+    qDebug()<<QString("X 电机:%1,Y 电机:%2,焦距 :%3.").
               arg(QString::number(coordSpacePosInfo.motorX)).
               arg(QString::number(coordSpacePosInfo.motorY)).
               arg(QString::number(coordSpacePosInfo.focalDist));
     return coordSpacePosInfo;
 }
 
-QVector<QPoint> DeviceDataProcesser::caculatePupilDeviation(const QByteArray ba, int width, int height)
+QVector<QPoint> DeviceDataProcesser::caculatePupilDeviation(const QByteArray ba, int width, int height,bool& valid)
 {
     int y_max=0;
     int y_min=UINT_MAX;
@@ -123,16 +124,28 @@ QVector<QPoint> DeviceDataProcesser::caculatePupilDeviation(const QByteArray ba,
     QVector<int> y_vc2;
     auto pupilGreyLimit=DeviceSettings::getSingleton()->m_pupilGreyLimit;
     auto pupilPixelDiameterLimit=DeviceSettings::getSingleton()->m_pupilPixelDiameterLimit;
+    int validCount=0;
     for(quint32 y=height*0.25;y<height*0.75;y++)
     {
         for(quint32 x=width*0.25;x<width*0.75;x++)
         {
             if(ba[x+width*y]<pupilGreyLimit)
             {
+                qDebug()<<ba[x+width*y];
                 x_vc.push_back(x);
                 y_vc.push_back(y);
+                validCount++;
             }
         }
+    }
+    if(validCount>0&&validCount<=100*100)
+    {
+        valid=true;
+    }
+    else
+    {
+        valid=false;
+        return QVector<QPoint>{{0,0},{0,0},{0,0}};
     }
 
     int x_avg,y_avg,sum=0;

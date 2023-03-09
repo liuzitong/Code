@@ -2,7 +2,7 @@
 #define DEVICE_DATA_H
 #include <QObject>
 #include <QSharedPointer>
-
+#include <usbdev/main/usbdev_config.hxx>
 
 namespace DevOps{
 
@@ -55,6 +55,7 @@ public:
     DeviceData();
     static QSharedPointer<DeviceData> getSingleton();
     LocalTableData m_localTableData;
+    UsbDev::Config m_config;
 
 
 private:

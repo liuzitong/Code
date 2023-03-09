@@ -70,7 +70,7 @@ AppCtrlPriv :: AppCtrlPriv ( AppCtrl *pa )
     m_app_set_svc = AppSettingsSvc::getInstance();
     m_msg_bus_svc = MsgBusSvc::getInstance();
     m_obj_mgr_svc = ObjMgrSvc::getInstance();
-    FrameProvidSvc::getSingleton().data();
+//    FrameProvidSvc::getSingleton();
 //    m_databaseSvc = static_cast<QObject*>(new databaseSvc());
     m_databaseSvc = perimeter_new(databaseSvc);
     m_testClass = perimeter_new(TestClass);

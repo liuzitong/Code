@@ -14,12 +14,13 @@
 #include <usbdev/main/usbdev_cache.hxx>
 #include <QElapsedTimer>
 #include <QTimer>
+#include <QMutex>
 
 namespace DevOps{
 struct Status
 {
-   int colorSlot;
-   int spotSlot;
+   int color;
+   int spot;
    int DB;
 };
 
@@ -47,15 +48,16 @@ public:
     DeviceOperation();
     ~DeviceOperation();
 //    static void Initialize();
-    Q_INVOKABLE void moveChinUp(){moveChin(ChinHozMoveDirection::Stop,ChinVertMoveDirection::Up);}
-    Q_INVOKABLE void moveChinDown(){moveChin(ChinHozMoveDirection::Stop,ChinVertMoveDirection::Down);}
-    Q_INVOKABLE void moveChinLeft(){moveChin(ChinHozMoveDirection::Left,ChinVertMoveDirection::Stop);}
-    Q_INVOKABLE void moveChinRight(){moveChin(ChinHozMoveDirection::Right,ChinVertMoveDirection::Stop);}
-    Q_INVOKABLE void stopMovingChin(){moveChin(ChinHozMoveDirection::Stop,ChinVertMoveDirection::Stop);}
-
-
+    void moveChinUp(){moveChin(ChinHozMoveDirection::Stop,ChinVertMoveDirection::Up);}
+    void moveChinDown(){moveChin(ChinHozMoveDirection::Stop,ChinVertMoveDirection::Down);}
+    void moveChinLeft(){moveChin(ChinHozMoveDirection::Left,ChinVertMoveDirection::Stop);}
+    void moveChinRight(){moveChin(ChinHozMoveDirection::Right,ChinVertMoveDirection::Stop);}
+    void stopMovingChin(){moveChin(ChinHozMoveDirection::Stop,ChinVertMoveDirection::Stop);}
+    void turnOnVideo(){m_devCtl->setFrontVideo(true);}
+    void turnOffVideo(){m_devCtl->setFrontVideo(false);}
     static QSharedPointer<DeviceOperation> getSingleton();
     void connectDev();
+    void disconnectDev();
     void staticStimulate(QPointF loc,int spotSize,int DB,int durationTime);
     void getReadyToStimulate(QPointF loc,int spotSize,int DB);
     void dynamicStimulate(QPointF begin, QPointF end, int speedLevel);
@@ -64,6 +66,7 @@ public:
     void move5Motors(bool isMotorMove[],int MotorPoses[]);
     void setCursorColorAndCursorSize(int color, int size);
     bool getAnswerPadStatus();
+
     void hello();
 
 
@@ -86,21 +89,24 @@ signals:
     void newProfile();
     void newConfig();
     void updateDevInfo(QString info);
-    void devConStatusChanged();
-
+//    void devConStatusChanged();
+//    void newFixationDeviation(int deviation)
 public:
     bool getAutoAlignPupil(){return m_autoAlignPupil;}void setAutoAlignPupil(bool value){m_autoAlignPupil=value;emit autoAlignPupilChanged();}Q_SIGNAL void autoAlignPupilChanged();
     bool getIsDeviceReady(){return m_isDeviceReady;}void setIsDeviceReady(bool value){m_isDeviceReady=value;emit isDeviceReadyChanged();}Q_SIGNAL void isDeviceReadyChanged();
     float getPupilDiameter(){return m_pupilDiameter;}void setPupilDiameter(float value){m_pupilDiameter=value;emit pupilDiameterChanged();}Q_SIGNAL void pupilDiameterChanged();
 public:
     Status m_status={-1,-1,-1};
-    bool m_isConfigUpdated=false,m_isProfileUpdate=false,m_isDeviceReady=false,m_autoAlignPupil=true;
+    bool m_isDeviceReady=false,m_autoAlignPupil=true;
     float m_deviation;
+//    bool m_deviation_valid;
     QSize m_videoSize;
     QSharedPointer<UsbDev::DevCtl> m_devCtl;
+//    UsbDev::DevCtl* m_devCtl;
     UsbDev::Config m_config;
     UsbDev::Profile m_profile;
     UsbDev::StatusData m_statusData;
+    QMutex m_statusLock;
     UsbDev::FrameData m_frameData;
     QByteArray m_frameRawData;
 private:

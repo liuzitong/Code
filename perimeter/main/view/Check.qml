@@ -23,14 +23,15 @@ Item {id:root; width: 1366;height: 691
     property int fontPointSize: CommonSettings.fontPointSize;
     signal realTimePicRefresh(var count);
     property var frameProvidSvc: null;
-    property var devOps: IcUiQmlApi.appCtrl.deviceOperation;
+    property var checkSvc: IcUiQmlApi.appCtrl.checkSvc;
 
 
     Component.onCompleted:{
+        refresh();
         frameProvidSvc=IcUiQmlApi.appCtrl.frameProvidSvc;
         console.log("hehe");
-        IcUiQmlApi.appCtrl.checkSvc.connectDev();
-        IcUiQmlApi.appCtrl.checkSvc.checkResultChanged.connect(currentCheckResultChanged);
+//        IcUiQmlApi.appCtrl.checkSvc.connectDev();
+        checkSvc.checkResultChanged.connect(currentCheckResultChanged);
 
     }
 
@@ -195,23 +196,14 @@ Item {id:root; width: 1366;height: 691
 
                                         }
                                     }
-                                    Timer
-                                    {
-                                        id:tt;
-                                        repeat: true
-                                        interval: 1000/30
-                                        running: false;
-                                        onTriggered: frameProvidSvc.onNewVideoContentReceived();
-                                    }
-                                    Button{width: 100;height: 20; anchors.bottom: parent.bottom; anchors.bottomMargin: 0; anchors.right: parent.right; anchors.rightMargin: 0;onClicked: tt.running=!tt.running;}
                                 }
                                 Item{id:controlPanel;width:controlPanel.height*4/3;height: parent.height*0.23;anchors.horizontalCenter: parent.horizontalCenter;
-                                    property bool isAuto: IcUiQmlApi.appCtrl.deviceOperation.autoAlignPupil;
+                                    property bool isAuto:checkSvc.autoAlignPupil;
                                     CusButton {id:autoButton;width: parent.width*0.35;height: parent.height*0.28;buttonColor: backGroundColor; text:controlPanel.isAuto?"Auto":"Manual";borderColor: "black";anchors.horizontalCenter: parent.horizontalCenter; anchors.verticalCenter: parent.verticalCenter;onClicked: IcUiQmlApi.appCtrl.deviceOperation.autoAlignPupil=!IcUiQmlApi.appCtrl.deviceOperation.autoAlignPupil;}
-                                    CusButton {id:upButton;enabled:!controlPanel.isAuto;rec.visible: false;anchors.left: parent.Top;height: image.sourceSize.height*root.height/691;imageHightScale:1.0;width: image.sourceSize.width*root.width/1366;anchors.horizontalCenter: parent.horizontalCenter;imageSrc: "qrc:/Pics/capture-svg/arrow_1up.svg";onPressed:{imageHightScale=1.1;devOps.moveChinUp();}onReleased:{imageHightScale=1.0;devOps.stopMovingChin();}}
-                                    CusButton {id:downButton;enabled:!controlPanel.isAuto;rec.visible: false;anchors.bottom: parent.bottom; height: image.sourceSize.height*root.height/691;imageHightScale:1.0;width: image.sourceSize.width*root.width/1366;anchors.horizontalCenter: parent.horizontalCenter;imageSrc: "qrc:/Pics/capture-svg/arrow_2down.svg";onPressed:{imageHightScale=1.1;devOps.moveChinDown();}onReleased:{imageHightScale=1.0;devOps.stopMovingChin();}}
-                                    CusButton {id:leftButton;enabled:!controlPanel.isAuto;rec.visible: false; anchors.right: autoButton.left; anchors.verticalCenter: parent.verticalCenter; imageHightScale:1.0;height: image.sourceSize.height*root.height/691; anchors.rightMargin:(controlPanel.height-autoButton.height-upButton.height*2)/2;width: image.sourceSize.width*root.width/1366;imageSrc: "qrc:/Pics/capture-svg/arrow_3left.svg";onPressed:{imageHightScale=1.1;devOps.moveChinLeft();}onReleased:{imageHightScale=1.0;devOps.stopMovingChin();}}
-                                    CusButton {id:rightButton;enabled:!controlPanel.isAuto;rec.visible: false;anchors.left: autoButton.right;anchors.verticalCenter: parent.verticalCenter;imageHightScale:1.0;height: image.sourceSize.height*root.height/691; anchors.leftMargin:(controlPanel.height-autoButton.height-upButton.height*2)/2;width: image.sourceSize.width*root.width/1366; imageSrc: "qrc:/Pics/capture-svg/arrow_4right.svg";onPressed:{imageHightScale=1.1;devOps.moveChinRight();}onReleased:{imageHightScale=1.0;devOps.stopMovingChin();}}
+                                    CusButton {id:upButton;enabled:!controlPanel.isAuto;rec.visible: false;anchors.left: parent.Top;height: image.sourceSize.height*root.height/691;imageHightScale:1.0;width: image.sourceSize.width*root.width/1366;anchors.horizontalCenter: parent.horizontalCenter;imageSrc: "qrc:/Pics/capture-svg/arrow_1up.svg";onPressed:{imageHightScale=1.1;checkSvc.moveChinUp();}onReleased:{imageHightScale=1.0;checkSvc.stopMovingChin();}}
+                                    CusButton {id:downButton;enabled:!controlPanel.isAuto;rec.visible: false;anchors.bottom: parent.bottom; height: image.sourceSize.height*root.height/691;imageHightScale:1.0;width: image.sourceSize.width*root.width/1366;anchors.horizontalCenter: parent.horizontalCenter;imageSrc: "qrc:/Pics/capture-svg/arrow_2down.svg";onPressed:{imageHightScale=1.1;checkSvc.moveChinDown();}onReleased:{imageHightScale=1.0;checkSvc.stopMovingChin();}}
+                                    CusButton {id:leftButton;enabled:!controlPanel.isAuto;rec.visible: false; anchors.right: autoButton.left; anchors.verticalCenter: parent.verticalCenter; imageHightScale:1.0;height: image.sourceSize.height*root.height/691; anchors.rightMargin:(controlPanel.height-autoButton.height-upButton.height*2)/2;width: image.sourceSize.width*root.width/1366;imageSrc: "qrc:/Pics/capture-svg/arrow_3left.svg";onPressed:{imageHightScale=1.1;checkSvc.moveChinLeft();}onReleased:{imageHightScale=1.0;checkSvc.stopMovingChin();}}
+                                    CusButton {id:rightButton;enabled:!controlPanel.isAuto;rec.visible: false;anchors.left: autoButton.right;anchors.verticalCenter: parent.verticalCenter;imageHightScale:1.0;height: image.sourceSize.height*root.height/691; anchors.leftMargin:(controlPanel.height-autoButton.height-upButton.height*2)/2;width: image.sourceSize.width*root.width/1366; imageSrc: "qrc:/Pics/capture-svg/arrow_4right.svg";onPressed:{imageHightScale=1.1;checkSvc.moveChinRight();}onReleased:{imageHightScale=1.0;checkSvc.stopMovingChin();}}
                                 }
                                 Rectangle{id:eyeOptionsGroup; width: parent.width*0.83;height: parent.height*0.25;anchors.horizontalCenter: parent.horizontalCenter; border.color: backGroundBorderColor;color: backGroundColor; radius: width*0.03;
                                     Item{ anchors.fill: parent;anchors.margins: parent.height*0.1;
@@ -313,6 +305,14 @@ Item {id:root; width: 1366;height: 691
                                 realTimePicRefresh(count);
                             }
                         }
+                        Row{
+                            width: parent.width;height: 20; layoutDirection: Qt.LeftToRight;anchors.bottom: parent.bottom;
+                            Button{text:"video on";width: parent.width/8;height: parent.height; onClicked: IcUiQmlApi.appCtrl.checkSvc.turnOnVideo();}
+                            Button{text:"video off";width: parent.width/8;height: parent.height; onClicked: IcUiQmlApi.appCtrl.checkSvc.turnOffVideo();}
+                            Button{text:"connect";width: parent.width/8;height: parent.height;onClicked:IcUiQmlApi.appCtrl.checkSvc.connectDev();}
+                            Button{text:"disconnect";width: parent.width/8;height: parent.height;onClicked:IcUiQmlApi.appCtrl.checkSvc.disconnectDev();}
+                        }
+
                     }
                 }
             }
@@ -356,6 +356,7 @@ Item {id:root; width: 1366;height: 691
                             height: parent.height;spacing: height*0.8;anchors.horizontalCenter: parent.horizontalCenter;
                             CusButton{
 //                                text:"开始测试";
+                                enabled: IcUiQmlApi.appCtrl.checkSvc.devReady;
                                 property int checkState: IcUiQmlApi.appCtrl.checkSvc.checkState;
                                 text:{if(checkState>2) return lt+qsTr("Start");if(checkState===2) return lt+qsTr("Resume");if(checkState===0||checkState===1) return lt+qsTr("Pause")}
                                 onClicked:{

@@ -19,6 +19,8 @@ class CheckSvc: public QObject
     Q_PROPERTY(bool devReady READ getDevReady NOTIFY devReadyChanged)
     Q_PROPERTY(bool autoAlignPupil READ getAutoAlignPupil WRITE setAutoAlignPupil)
     Q_PROPERTY(bool pupilDiameter READ getPupilDiameter NOTIFY pupilDiameterChanged)
+
+//    Q_PROPERTY(CheckSvcWorker* worker READ getWorker)
 public:
     explicit CheckSvc(QObject *parent = nullptr);
     ~CheckSvc();
@@ -27,6 +29,15 @@ public:
     Q_INVOKABLE void resume();
     Q_INVOKABLE void stop();
     Q_INVOKABLE void connectDev();
+    Q_INVOKABLE void disconnectDev();
+
+    Q_INVOKABLE void moveChinUp();
+    Q_INVOKABLE void moveChinDown();
+    Q_INVOKABLE void moveChinLeft();
+    Q_INVOKABLE void moveChinRight();
+    Q_INVOKABLE void stopMovingChin();
+    Q_INVOKABLE void turnOnVideo();
+    Q_INVOKABLE void turnOffVideo();
 
 //signals:
 //  void setCheckState(int value);
@@ -40,6 +51,7 @@ public:
     bool getDevReady();Q_SIGNAL void devReadyChanged();
     bool getAutoAlignPupil();void setAutoAlignPupil(bool autoAlign);
     float getPupilDiameter();Q_SIGNAL void pupilDiameterChanged();
+//    CheckSvcWorker* getWorker(){return m_worker;}
 
 private:
     CheckSvcWorker* m_worker;

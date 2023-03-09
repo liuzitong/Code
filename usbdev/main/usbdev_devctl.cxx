@@ -684,8 +684,8 @@ public:
         if ( m_frame_data_emit_cntr > 0 ) { -- m_frame_data_emit_cntr; }
         bool ret = m_frame_data_queue.dequeue( fd );
         if ( ! m_frame_data_queue.isEmpty() ) {
-           QMetaObject::invokeMethod( this, "emitNewFrameData", Qt::QueuedConnection );
-//            this->emitNewFrameData();
+//           QMetaObject::invokeMethod( this, "emitNewFrameData", Qt::QueuedConnection );
+            this->emitNewFrameData();
         }
         return ret;
     }
@@ -695,8 +695,8 @@ public:
         if ( m_status_data_emit_cntr > 0 ) { -- m_status_data_emit_cntr; }
         bool ret = m_status_data_queue.dequeue( sd );
         if ( ! m_status_data_queue.isEmpty()) {
-            QMetaObject::invokeMethod( this, "emitNewStatusData", Qt::QueuedConnection );
-//            this->emitNewStatusData();
+//            QMetaObject::invokeMethod( this, "emitNewStatusData", Qt::QueuedConnection );
+            this->emitNewStatusData();
         }
         return ret;
     }

@@ -11,7 +11,7 @@ public:
     DeviceDataProcesser()=default;
     static int getFocusMotorPosByDist(int focalDist,int spotSlot);
     static CoordMotorPosFocalDistInfo getXYMotorPosAndFocalDistFromCoord(const QPointF loc);
-    static QVector<QPoint> caculatePupilDeviation(const QByteArray ba,int width,int height);
+    static QVector<QPoint> caculatePupilDeviation(const QByteArray ba,int width,int height,bool& valid);
     static float caculatePupilDiameter(QPoint topLeft,QPoint bottomRight);
     static int caculateFixationDeviation(QPoint point);
     static QSharedPointer<DeviceDataProcesser> getSingleton();

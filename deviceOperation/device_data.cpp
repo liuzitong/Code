@@ -1,6 +1,7 @@
 ﻿#include "device_data.h"
 #include "device_settings.h"
 #include <QFile>
+#include <QDebug>
 
 namespace DevOps{
 LocalTableData::LocalTableData()
@@ -23,8 +24,10 @@ DeviceData::DeviceData()
     auto settings=DeviceSettings::getSingleton();
     QString configPath=settings->localConfigPath;
     QString dataPath=settings->localDataPath;
-
+    readLocalConfig(configPath);
     readLocalData(dataPath);
+    qDebug()<<m_config.DbPosMappingPtr()[0][0];
+    qDebug()<<m_config.DbPosMappingPtr()[0][1];
 }
 
 QSharedPointer<DeviceData> DeviceData::getSingleton()
@@ -35,6 +38,26 @@ QSharedPointer<DeviceData> DeviceData::getSingleton()
         m_singleton.reset(new DeviceData());
     }
     return m_singleton;
+}
+
+bool DeviceData::readLocalConfig(QString filePath)
+{
+    QFile file(filePath);
+    if(file.exists())
+    {
+        if(file.open(QIODevice::ReadOnly))
+        {
+            QByteArray data=file.readAll();
+            if(data.length()!=m_config.dataLen())
+            {
+                return false;
+            }
+            memcpy(m_config.dataPtr(),data,m_config.dataLen());
+        }
+        file.flush();
+        file.close();
+    }
+    return true;
 }
 
 bool DeviceData::readLocalData(QString filePath)

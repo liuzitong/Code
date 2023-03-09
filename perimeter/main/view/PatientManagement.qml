@@ -25,6 +25,11 @@ Item{
 //    onLanguageChanged: console.log("haha");
 //    onDoubleNameChanged: console.log("dogdog");
 
+    Component.onCompleted:
+    {
+        currentPatient=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::PatientVm", false,[1]);
+    }
+
 
     function createNewPatient(){
         if(currentPatient!==null) IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::PatientVm", currentPatient);

@@ -622,6 +622,7 @@ void MainWindow::on_pushButton_light3_clicked()
 
 void MainWindow::on_pushButton_testStart_clicked()
 {
+    if(m_devCtl==NULL) return;
     using MotorId=UsbDev::DevCtl::MotorId;
     quint8 sps[5];
     int spotSlot=ui->spinBox_spotSlot->value();
@@ -649,7 +650,7 @@ void MainWindow::on_pushButton_testStart_clicked()
                     waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
                     m_devCtl->move5Motors(std::array<quint8, 5>{0,0,sps[2],1,1}.data(),motorPos);
                     waitMotorStop({UsbDev::DevCtl::MotorId_Focus});
-                    m_devCtl->move5Motors(std::array<quint8, 5>{1,1,1,1,1}.data(),std::array<int, 5>{0,0,0,0,0}.data(),UsbDev::DevCtl::MoveMethod::Relative);
+                    m_devCtl->move5Motors(std::array<quint8, 5>{1,1,1,1,1}.data(),std::array<int, 5>{0,0,0,0,0}.data(),UsbDev::DevCtl::MoveMethod::Relative);//焦距到位立刻停止
                 }
                 showDevInfo("调整颜色和光斑.");
                 {
@@ -1186,6 +1187,12 @@ void MainWindow::on_rawComand_clicked()
 
 }
 
+void MainWindow::on_action_disconnect_triggered()
+{
+    uninitDevCtl();
+    m_devCtl=NULL;
+}
+
 void MainWindow::on_plainTextEdit_rawCommand_textChanged()
 {
     static int previousWordCount=0;
@@ -1243,6 +1250,7 @@ void MainWindow::on_pushButton_absoluteMove5Motors_clicked()
 
 void MainWindow::on_pushButton_resetCheckedMotors_clicked()
 {
+    if(m_devCtl==NULL) return;
     UsbDev::DevCtl::MotorId motorid;
     if(ui->radioButton_xMotor->isChecked()) motorid = UsbDev::DevCtl::MotorId::MotorId_X;
     if(ui->radioButton_yMotor->isChecked()) motorid = UsbDev::DevCtl::MotorId::MotorId_Y;
@@ -1257,6 +1265,7 @@ void MainWindow::on_pushButton_resetCheckedMotors_clicked()
 
 void MainWindow::moveChinMotors(UsbDev::DevCtl::MoveMethod method)
 {
+    if(m_devCtl==NULL) return;
     qint32 value[2]={0};
     quint8 speed[2]={0};
     if(ui->checkBox_testChinHoz->isChecked())
@@ -1274,6 +1283,7 @@ void MainWindow::moveChinMotors(UsbDev::DevCtl::MoveMethod method)
 
 void MainWindow::move5Motors(UsbDev::DevCtl::MoveMethod method)
 {
+    if(m_devCtl==NULL) return;
     qint32 value[5]{0};
     quint8 speed[5]{0};
     if(ui->checkBox_testX->isChecked())
@@ -1396,6 +1406,7 @@ bool MainWindow::getXYMotorPosAndFocalDistFromCoord(const CoordSpacePosInfo& coo
 
 void MainWindow::staticCastTest(const CoordMotorPosFocalDistInfo& coordMotorPosFocalDistInfo,int focalMotorPos,int db,quint8* sps,int durationTime,int shutterPos)
 {
+    if(m_devCtl==NULL) return;
 //    以后加上
 //    if(m_config.isEmpty()) {showDevInfo("empty config"); return;}
 //    while(m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_X)||m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Y)||
@@ -1426,7 +1437,7 @@ void MainWindow::staticCastTest(const CoordMotorPosFocalDistInfo& coordMotorPosF
 
 void MainWindow::moveCastTest(const CoordSpacePosInfo& dotSpaceBegin,const CoordSpacePosInfo& dotSpaceEnd,int spotSlot ,int colorSlot,float stepLength,int db,quint8* sps)
 {
-
+    if(m_devCtl==NULL) return;
     CoordMotorPosFocalDistInfo dotMotorBegin,dotMotorEnd;
     if(!getXYMotorPosAndFocalDistFromCoord(dotSpaceBegin,dotMotorBegin))
     {

@@ -18,6 +18,10 @@ DeviceOperation::DeviceOperation()
 //    connect(m_devCtl.data(),&UsbDev::DevCtl::newStatusData,this,&DeviceOperation::newStatusData);
 //    connect(m_devCtl.data(),&UsbDev::DevCtl::newFrameData,this,&DeviceOperation::newFrameData);
     connect(this,&DeviceOperation::updateDevInfo,[](QString info){qDebug()<<info;});
+    m_config=DeviceData::getSingleton()->m_config;
+//    qDebug()<<m_config.DbPosMappingPtr()[0][0];
+//    qDebug()<<DeviceData::getSingleton()->m_config.DbPosMappingPtr()[0][0];
+//    qDebug()<<DeviceData::getSingleton()->m_config.DbPosMappingPtr()[0][1];
 }
 
 DeviceOperation::~DeviceOperation()
@@ -34,36 +38,39 @@ QSharedPointer<DeviceOperation> DeviceOperation::getSingleton()
     return m_singleton;
 }
 
-void DeviceOperation::setCursorColorAndCursorSize(int color, int size)
+void DeviceOperation::setCursorColorAndCursorSize(int color, int spot)
 {
-    auto profile=m_devCtl->profile();
-    auto config=m_devCtl->config();
-    quint8 sps[5]={1};
-    auto colorToSlot=DeviceSettings::getSingleton()->m_colorToSlot;
-    auto spotSizeToSlot=DeviceSettings::getSingleton()->m_spotSizeToSlot;
-    int colorSlot,spotSlot;
-    for(auto&i:colorToSlot)
+//    qDebug()<<"setCursorColorAndCursorSize:"+QString::number(int(thread()->currentThread()),16);
+    if(m_status.color!=color||m_status.spot!=spot)              //变换到改变光斑颜色位置
     {
-        if(i.first==color)
-            colorSlot=i.second;
-    }
-    for(auto&i:spotSizeToSlot)
-    {
-        if(i.first==size)
-            spotSlot=i.second;
-    }
-    m_devCtl->resetMotor(UsbDev::DevCtl::MotorId_Color,sps[3]);
-    m_devCtl->resetMotor(UsbDev::DevCtl::MotorId_Light_Spot,sps[4]);
-    waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
-    int colorPos=config.switchColorMotorPosPtr()[colorSlot];
-    int sizePos=config.switchLightSpotMotorPosPtr()[spotSlot];
-    if(m_status.colorSlot!=colorSlot||m_status.spotSlot!=spotSlot)              //变换到改变光斑颜色位置
-    {
+        auto profile=m_profile;
+        auto config=DeviceData::getSingleton()->m_config;
+        quint8 sps[5]={1,1,1,1,1};
+        auto colorToSlot=DeviceSettings::getSingleton()->m_colorToSlot;
+        auto spotSizeToSlot=DeviceSettings::getSingleton()->m_spotSizeToSlot;
+        int colorSlot,spotSlot;
+        for(auto&i:colorToSlot)
+        {
+            if(i.first==color)
+                colorSlot=i.second;
+        }
+        for(auto&i:spotSizeToSlot)
+        {
+            if(i.first==spot)
+                spotSlot=i.second;
+        }
+        m_devCtl->resetMotor(UsbDev::DevCtl::MotorId_Focus,sps[2]);
+        m_devCtl->resetMotor(UsbDev::DevCtl::MotorId_Color,sps[3]);
+        m_devCtl->resetMotor(UsbDev::DevCtl::MotorId_Light_Spot,sps[4]);
+        waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
+        int colorPos=config.switchColorMotorPosPtr()[colorSlot];
+        int sizePos=config.switchLightSpotMotorPosPtr()[spotSlot];
         int  color_Circl_Motor_Steps=profile.motorRange(UsbDev::DevCtl::MotorId_Color).second-profile.motorRange(UsbDev::DevCtl::MotorId_Color).first;
         int  spot_Circl_Motor_Steps=profile.motorRange(UsbDev::DevCtl::MotorId_Light_Spot).second-profile.motorRange(UsbDev::DevCtl::MotorId_Light_Spot).first;
         //焦距电机
         {
             int focalPos=config.focusPosForSpotAndColorChangeRef();
+            qDebug()<<"focalPos="+QString::number(focalPos);
             int motorPos[5]{0,0,focalPos,m_statusData.motorPosition(UsbDev::DevCtl::MotorId::MotorId_Color)+color_Circl_Motor_Steps*10,m_statusData.motorPosition(UsbDev::DevCtl::MotorId::MotorId_Light_Spot)+spot_Circl_Motor_Steps*10};
             waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
             m_devCtl->move5Motors(std::array<quint8, 5>{0,0,sps[2],1,1}.data(),motorPos);
@@ -95,8 +102,8 @@ void DeviceOperation::setCursorColorAndCursorSize(int color, int size)
             waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_Focus});
             m_devCtl->move5Motors(speed,motorPos,UsbDev::DevCtl::Relative);     //DB 脱离颜色和光斑
         }
-        m_status.colorSlot=colorSlot;
-        m_status.spotSlot=spotSlot;
+//        m_status.color=color;
+//        m_status.spot=spot;
     }
 }
 
@@ -119,70 +126,65 @@ void DeviceOperation::setDB(int DB)
 //被checkSvcWorker 调用
 void DeviceOperation::connectDev()
 {
-//    connect(this,&DeviceOperation::updateDevInfo,[](QString info){qDebug()<<info;});
-//    auto deviceSettings=DeviceSettings::getSingleton();
-//    quint32 vid_pid=deviceSettings->m_VID.toInt(nullptr,16)<<16|deviceSettings->m_PID.toInt(nullptr,16);
-//    m_devCtl.reset(UsbDev::DevCtl::createInstance(vid_pid));
-//    if(m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_OK)
-//    {
-//        updateDevInfo("Connect Successfully.");
-//        connect(m_devCtl.data(),&UsbDev::DevCtl::workStatusChanged,this,&DeviceOperation::workStatusChanged);
-//        connect(m_devCtl.data(),&UsbDev::DevCtl::updateInfo,this,&DeviceOperation::updateDevInfo);
-//        connect(m_devCtl.data(),&UsbDev::DevCtl::newStatusData,this,&DeviceOperation::onNewStatuData);
-//        connect(m_devCtl.data(),&UsbDev::DevCtl::newFrameData,this,&DeviceOperation::onNewFrameData);
-//        connect(m_devCtl.data(),&UsbDev::DevCtl::newProfile,this,[&](){updateDevInfo("Profile updated successfully.");m_isProfileUpdate=true;});
-//        connect(m_devCtl.data(),&UsbDev::DevCtl::newConfig,this,[&](){updateDevInfo("Config updated successfully.");m_isConfigUpdated=true;});
-//        m_isDeviceReady=true;
-//        emit devConStatusChanged();
-//    }
-
-
     auto deviceSettings=DeviceSettings::getSingleton();
     quint32 vid_pid=deviceSettings->m_VID.toInt(nullptr,16)<<16|deviceSettings->m_PID.toInt(nullptr,16);
+    m_devCtl.reset(UsbDev::DevCtl::createInstance(vid_pid));
     qDebug()<<QString::number(vid_pid,16);
+    connect(m_devCtl.data(),&UsbDev::DevCtl::workStatusChanged,this,&DeviceOperation::workOnWorkStatusChanged);
+    connect(m_devCtl.data(),&UsbDev::DevCtl::updateInfo,this,&DeviceOperation::updateDevInfo);
+    connect(m_devCtl.data(),&UsbDev::DevCtl::newStatusData,this,&DeviceOperation::workOnNewStatuData);
+    connect(m_devCtl.data(),&UsbDev::DevCtl::newFrameData,this,&DeviceOperation::workOnNewFrameData);
+    connect(m_devCtl.data(),&UsbDev::DevCtl::newProfile,this,&DeviceOperation::workOnNewProfile);
+    connect(m_devCtl.data(),&UsbDev::DevCtl::newConfig,this,&DeviceOperation::workOnNewConfig);
+//    connect(m_devCtl.data(),&UsbDev::DevCtl::newProfile,this,[&](){updateDevInfo("Profile updated successfully.");m_isProfileUpdate=true;if(m_isProfileUpdate/*&&m_isConfigUpdated*/){setIsDeviceReady(true);}});
+//    connect(m_devCtl.data(),&UsbDev::DevCtl::newConfig,this,[&](){updateDevInfo("Config updated successfully.");m_isConfigUpdated=true;if(m_isProfileUpdate/*&&m_isConfigUpdated*/){setIsDeviceReady(true);}});
 
-//    m_devCtl.reset(UsbDev::DevCtl::createInstance(vid_pid));
-//    connect(m_devCtl.data(),&UsbDev::DevCtl::workStatusChanged,this,&DeviceOperation::workStatusChanged);
-//    connect(m_devCtl.data(),&UsbDev::DevCtl::updateInfo,this,&DeviceOperation::updateDevInfo);
-//    connect(m_devCtl.data(),&UsbDev::DevCtl::newStatusData,this,&DeviceOperation::onNewStatuData);
-//    connect(m_devCtl.data(),&UsbDev::DevCtl::newFrameData,this,&DeviceOperation::onNewFrameData);
-//    connect(m_devCtl.data(),&UsbDev::DevCtl::newProfile,this,[&](){updateDevInfo("Profile updated successfully.");m_isProfileUpdate=true;});
-//    connect(m_devCtl.data(),&UsbDev::DevCtl::newConfig,this,[&](){updateDevInfo("Config updated successfully.");m_isConfigUpdated=true;});
+//    do{
+//        m_devCtl.reset(UsbDev::DevCtl::createInstance(vid_pid));
+//        {
+//            static QElapsedTimer elapsedTimer;
+//            elapsedTimer.restart();
+//            do{
+//                QCoreApplication::processEvents();
+//            }while((elapsedTimer.elapsed()<3000));      //等待连接
+//        }
+//        if(m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_OK)
+//        {
+//            updateDevInfo("Connect Successfully.");
+//            connect(m_devCtl.data(),&UsbDev::DevCtl::workStatusChanged,this,&DeviceOperation::workOnWorkStatusChanged);
+//            connect(m_devCtl.data(),&UsbDev::DevCtl::updateInfo,this,&DeviceOperation::updateDevInfo);
+//            connect(m_devCtl.data(),&UsbDev::DevCtl::newStatusData,this,&DeviceOperation::workOnNewStatuData);
+//            connect(m_devCtl.data(),&UsbDev::DevCtl::newFrameData,this,&DeviceOperation::workOnNewFrameData);
+//            connect(m_devCtl.data(),&UsbDev::DevCtl::newProfile,this,[&](){updateDevInfo("Profile updated successfully.");m_isProfileUpdate=true;});
+//            connect(m_devCtl.data(),&UsbDev::DevCtl::newConfig,this,[&](){updateDevInfo("Config updated successfully.");m_isConfigUpdated=true;});
+//            m_isDeviceReady=true;
+//            emit devConStatusChanged();
+//        }
 
-    do{
-        m_devCtl.reset(UsbDev::DevCtl::createInstance(vid_pid));
-        {
-            static QElapsedTimer elapsedTimer;
-            elapsedTimer.restart();
-            do{
-                QCoreApplication::processEvents();
-            }while((elapsedTimer.elapsed()<3000));      //等待连接
-        }
-        if(m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_OK)
-        {
-            updateDevInfo("Connect Successfully.");
-            connect(m_devCtl.data(),&UsbDev::DevCtl::workStatusChanged,this,&DeviceOperation::workOnWorkStatusChanged);
-            connect(m_devCtl.data(),&UsbDev::DevCtl::updateInfo,this,&DeviceOperation::updateDevInfo);
-            connect(m_devCtl.data(),&UsbDev::DevCtl::newStatusData,this,&DeviceOperation::workOnNewStatuData);
-            connect(m_devCtl.data(),&UsbDev::DevCtl::newFrameData,this,&DeviceOperation::workOnNewFrameData);
-            connect(m_devCtl.data(),&UsbDev::DevCtl::newProfile,this,[&](){updateDevInfo("Profile updated successfully.");m_isProfileUpdate=true;});
-            connect(m_devCtl.data(),&UsbDev::DevCtl::newConfig,this,[&](){updateDevInfo("Config updated successfully.");m_isConfigUpdated=true;});
-            m_isDeviceReady=true;
-            emit devConStatusChanged();
-        }
+//        else
+//        {
+//            static QElapsedTimer elapsedTimer;
+//            static int retryTimes=0;
+//            updateDevInfo("Reconnecting...");
+//            elapsedTimer.restart();
+//            do{
+//                QCoreApplication::processEvents();
+//            }while((elapsedTimer.elapsed()<3000));
+//            qDebug()<<retryTimes;
+//        }
+    //    }while(m_devCtl==nullptr||m_devCtl->workStatus()!=UsbDev::DevCtl::WorkStatus::WorkStatus_S_OK);
+}
 
-        else
-        {
-            static QElapsedTimer elapsedTimer;
-            static int retryTimes=0;
-            updateDevInfo("Reconnecting...");
-            elapsedTimer.restart();
-            do{
-                QCoreApplication::processEvents();
-            }while((elapsedTimer.elapsed()<3000));
-            qDebug()<<retryTimes;
-        }
-    }while(m_devCtl==nullptr||m_devCtl->workStatus()!=UsbDev::DevCtl::WorkStatus::WorkStatus_S_OK);
+void DeviceOperation::disconnectDev()
+{
+    disconnect(m_devCtl.data(),&UsbDev::DevCtl::workStatusChanged,this,&DeviceOperation::workOnWorkStatusChanged);
+    disconnect(m_devCtl.data(),&UsbDev::DevCtl::updateInfo,this,&DeviceOperation::updateDevInfo);
+    disconnect(m_devCtl.data(),&UsbDev::DevCtl::newStatusData,this,&DeviceOperation::workOnNewStatuData);
+    disconnect(m_devCtl.data(),&UsbDev::DevCtl::newFrameData,this,&DeviceOperation::workOnNewFrameData);
+    setIsDeviceReady(false);
+//    disconnect(m_devCtl.data(),&UsbDev::DevCtl::newProfile,this,[&](){updateDevInfo("Profile updated successfully.");m_isProfileUpdate=true;});
+//    disconnect(m_devCtl.data(),&UsbDev::DevCtl::newConfig,this,[&](){updateDevInfo("Config updated successfully.");m_isConfigUpdated=true;});
+    m_devCtl.reset(nullptr);
 }
 
 void DeviceOperation::staticStimulate(QPointF loc,int spotSize,int DB,int durationTime)
@@ -203,7 +205,7 @@ void DeviceOperation::staticStimulate(QPointF loc,int spotSize,int DB,int durati
     motorPos[2]=focalMotorPos;
     motorPos[3]=config.DbPosMappingPtr()[DB][0];
     motorPos[4]=config.DbPosMappingPtr()[DB][1];
-    bool isMotorMove[5]{true};
+    bool isMotorMove[5]{true,true,true,true,true};
     waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y});
     move5Motors(isMotorMove,motorPos);
     waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y,UsbDev::DevCtl::MotorId_Shutter});
@@ -212,6 +214,7 @@ void DeviceOperation::staticStimulate(QPointF loc,int spotSize,int DB,int durati
 
 void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB)
 {
+    qDebug()<<"跑点...";
     auto coordSpacePosInfo=DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoord(loc);
     auto spotSizeToSlot=DeviceSettings::getSingleton()->m_spotSizeToSlot;
     int spotSlot;
@@ -221,16 +224,36 @@ void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB)
             spotSlot=i.second;
     }
     auto focalMotorPos=DeviceDataProcesser::getFocusMotorPosByDist(coordSpacePosInfo.focalDist,spotSlot);
-    auto config=m_devCtl->config();
-    int motorPos[5]{0};
+    UsbDev::Config config;
+    config=m_config;
+    qDebug()<<DB;
+    qDebug()<<m_config.DbPosMappingPtr()[0][0];
+    qDebug()<<m_config.DbPosMappingPtr()[DB][0];
+    qDebug()<<config.DbPosMappingPtr()[0][0];
+    qDebug()<<config.DbPosMappingPtr()[DB][0];
+//    auto config=m_devCtl->config();
+    int motorPos[5];
     motorPos[0]=coordSpacePosInfo.motorX;
     motorPos[1]=coordSpacePosInfo.motorY;
     motorPos[2]=focalMotorPos;
     motorPos[3]=config.DbPosMappingPtr()[DB][0];
     motorPos[4]=config.DbPosMappingPtr()[DB][1];
-    bool isMotorMove[5]{true};
+
+    qDebug()<<motorPos[0];
+    qDebug()<<motorPos[1];
+    qDebug()<<motorPos[2];
+    qDebug()<<config.DbPosMappingPtr()[0][0];
+    qDebug()<<config.DbPosMappingPtr()[0][1];
+//    motorPos[0]=99358;
+//    motorPos[1]=88903;
+//    motorPos[2]=94200;
+//    motorPos[3]=110000;
+//    motorPos[4]=110000;
+    bool isMotorMove[5]{true,true,true,true,true};
     waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y});
     move5Motors(isMotorMove,motorPos);
+//    quint8 sps[5]={1,1,1,1,1};
+//    m_devCtl->move5Motors(sps,motorPos);
 }
 
 void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int speedLevel)
@@ -250,7 +273,12 @@ void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int speedLeve
 
 QByteArray DeviceOperation::getRealTimeStimulationEyeImage()
 {
-    return m_frameData.rawData();
+//    if(!m_frameData.isEmpty())
+//        return m_frameData.rawData();
+//    else return QByteArray();
+
+
+    return QByteArray();
 }
 
 void DeviceOperation::openShutter(int durationTime)
@@ -284,17 +312,20 @@ void DeviceOperation::hello()
 
 void DeviceOperation::waitMotorStop(QVector<UsbDev::DevCtl::MotorId> motorIDs)
 {
+    //次
     auto getBusy=[&]()->bool
     {
+        m_statusLock.lock();
+//        qDebug()<<"waitMotorStop:"+QString::number(int(thread()->currentThread()),16);
         for(auto& motorId:motorIDs)
         {
             if(m_statusData.isMotorBusy(motorId))
             {
-                qDebug()<<" motor "<<motorId<<" is busy";
+                m_statusLock.unlock();
                 return true;
             }
         }
-        qDebug()<<"no motor busy";
+        m_statusLock.unlock();
         return false;
     };
     QElapsedTimer mstimer;
@@ -302,7 +333,7 @@ void DeviceOperation::waitMotorStop(QVector<UsbDev::DevCtl::MotorId> motorIDs)
     do
     {
         QCoreApplication::processEvents();
-    }while(getBusy()||(mstimer.nsecsElapsed()/1000000<100)); //500ms
+    }while(getBusy()||(mstimer.elapsed()<500)); //500ms
     //    while(getBusy()){QCoreApplication::processEvents();}
 }
 
@@ -357,8 +388,16 @@ void DeviceOperation::moveChin(ChinHozMoveDirection hozChin, ChinVertMoveDirecti
 
 void DeviceOperation::workOnNewStatuData()
 {
+    //主
+    m_statusLock.lock();
     m_statusData=m_devCtl->takeNextPendingStatusData();
-    qDebug()<<"receive status data";
+    m_statusLock.unlock();
+//    static int count=1;
+//    count++;
+//    if(count%50==0)
+//    {
+//        qDebug()<<"workOnNewStatusData:"+QString::number(int(thread()->currentThread()),16);
+//    }
     emit newStatusData();
 }
 
@@ -366,33 +405,38 @@ void DeviceOperation::workOnNewFrameData()
 {
     m_frameData=m_devCtl->takeNextPendingFrameData();
     m_frameRawData=m_frameData.rawData();
+    qDebug()<<"work on new Frame."+QString::number(m_frameRawData.size());
     emit newFrameData();
+    return;
     auto profile=m_profile;
-    auto vc=DeviceDataProcesser::caculatePupilDeviation(m_frameData.rawData(),profile.videoSize().width(),profile.videoSize().height());
-    auto deviation=vc[0];
-    m_deviation=sqrt(pow(deviation.x(),2)+pow(deviation.y(),2));
+    bool valid;
+    auto vc=DeviceDataProcesser::caculatePupilDeviation(m_frameData.rawData(),profile.videoSize().width(),profile.videoSize().height(),valid);
+    if(!valid){ return;}
+    auto centerPoint=vc[0];
+//    auto deviationPix=sqrt(pow(centerPoint.x(),2)+pow(centerPoint.y(),2));
+    m_deviation=DeviceDataProcesser::caculateFixationDeviation(centerPoint);
     if(m_autoAlignPupil)                //自动对眼位
     {
         int tolerance=DeviceSettings::getSingleton()->m_pupilAutoAlignPixelTolerance;
         quint8 sps[2]{0};
         int motorPos[2]{0};
         auto spsConfig=DeviceSettings::getSingleton()->m_motorChinSpeed;
-        if(deviation.x()>tolerance)
+        if(centerPoint.x()>tolerance)
         {
             sps[0]=spsConfig[0];
             motorPos[0]=profile.motorRange(UsbDev::DevCtl::MotorId_Chin_Hoz).first;
         }
-        if(deviation.x()<-tolerance)
+        if(centerPoint.x()<-tolerance)
         {
             sps[0]=spsConfig[0];
             motorPos[0]=profile.motorRange(UsbDev::DevCtl::MotorId_Chin_Hoz).second;
         }
-        if(deviation.y()>tolerance)
+        if(centerPoint.y()>tolerance)
         {
             sps[1]=spsConfig[1];
             motorPos[1]=profile.motorRange(UsbDev::DevCtl::MotorId_Chin_Vert).first;
         }
-        if(deviation.y()<-tolerance)
+        if(centerPoint.y()<-tolerance)
         {
             sps[1]=spsConfig[1];
             motorPos[1]=profile.motorRange(UsbDev::DevCtl::MotorId_Chin_Vert).second;
@@ -419,12 +463,14 @@ void DeviceOperation::workOnNewFrameData()
 void DeviceOperation::workOnNewProfile()
 {
     m_profile=m_devCtl->profile();
+    if(!m_profile.isEmpty()/*&&!m_config.isEmpty()*/){setIsDeviceReady(true);}
     m_videoSize=m_profile.videoSize();
 }
 
 void DeviceOperation::workOnNewConfig()
 {
     m_config=m_devCtl->config();
+//    if(!m_profile.isEmpty()/*&&m_config.isEmpty()*/){setIsDeviceReady(true);}
 }
 
 void DeviceOperation::workOnWorkStatusChanged()
