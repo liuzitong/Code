@@ -37,8 +37,8 @@ CoordMotorPosFocalDistInfo DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoo
     //有15格,所以要加15,Y要反号
     int x1=floor(loc.x()/6.0f)+15;int x2=ceil(loc.x()/6.0f)+15;
     int y1=floor(-loc.y()/6.0f)+15;int y2=ceil(-loc.y()/6.0f)+15;
-    qDebug()<<"x1:"<<x1<<"x2:"<<x2;
-    qDebug()<<"y1:"<<y1<<"y2:"<<y2;
+//    qDebug()<<"x1:"<<x1<<"x2:"<<x2;
+//    qDebug()<<"y1:"<<y1<<"y2:"<<y2;
     auto data=DeviceData::getSingleton()->m_localTableData;
     SingleTableData tableData;
     isMainDotInfoTable?tableData=data.m_mainPosTableData:tableData=data.m_secondaryPosTableData;
@@ -74,7 +74,7 @@ CoordMotorPosFocalDistInfo DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoo
 
 
     QPointF locInterpol(loc.x()-(x1-15)*6,-loc.y()-(y1-15)*6);         //算出比格子位置多多少
-    qDebug()<<"loc is:"<<loc;
+//    qDebug()<<"loc is:"<<locInterpol;
     int arr[4];
     for(unsigned int i=0;i<sizeof(arr)/sizeof(int);i++) {arr[i]=fourDots[i].motorX;}            //四个格子差值计算
     coordSpacePosInfo.motorX=interpolation(arr,locInterpol);
@@ -100,15 +100,11 @@ CoordMotorPosFocalDistInfo DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoo
     }
 
     for(unsigned int i=0;i<sizeof(arr)/sizeof(int);i++) {arr[i]=fourDots[i].focalDist;}
-    coordSpacePosInfo.focalDist=interpolation(arr,loc);
-//    showDevInfo(QString("X电机:%1,Y电机:%2,焦距:%3.").
-//                arg(QString::number(coordMotorPosFocalDistInfo.motorX)).
-//                arg(QString::number(coordMotorPosFocalDistInfo.motorY)).
-//                arg(QString::number(coordMotorPosFocalDistInfo.focalDist)));
-    qDebug()<<QString("X 电机:%1,Y 电机:%2,焦距 :%3.").
-              arg(QString::number(coordSpacePosInfo.motorX)).
-              arg(QString::number(coordSpacePosInfo.motorY)).
-              arg(QString::number(coordSpacePosInfo.focalDist));
+    coordSpacePosInfo.focalDist=interpolation(arr,locInterpol);
+//    qDebug()<<QString("X motor:%1,Y motor:%2,focal :%3.").
+//              arg(QString::number(coordSpacePosInfo.motorX)).
+//              arg(QString::number(coordSpacePosInfo.motorY)).
+//              arg(QString::number(coordSpacePosInfo.focalDist));
     return coordSpacePosInfo;
 }
 

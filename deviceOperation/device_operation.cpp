@@ -17,7 +17,7 @@ DeviceOperation::DeviceOperation()
 //    connect(&m_statusTimer,&QTimer::timeout,[&](){m_isDeviceReady=false;emit devConStatusChanged();connectDev();});
 //    connect(m_devCtl.data(),&UsbDev::DevCtl::newStatusData,this,&DeviceOperation::newStatusData);
 //    connect(m_devCtl.data(),&UsbDev::DevCtl::newFrameData,this,&DeviceOperation::newFrameData);
-    connect(this,&DeviceOperation::updateDevInfo,[](QString info){qDebug()<<info;});
+//    connect(this,&DeviceOperation::updateDevInfo,[](QString info){qDebug()<<info;});
     m_config=DeviceData::getSingleton()->m_config;
 //    qDebug()<<m_config.DbPosMappingPtr()[0][0];
 //    qDebug()<<DeviceData::getSingleton()->m_config.DbPosMappingPtr()[0][0];
@@ -52,12 +52,18 @@ void DeviceOperation::setCursorColorAndCursorSize(int color, int spot)
         for(auto&i:colorToSlot)
         {
             if(i.first==color)
+            {
                 colorSlot=i.second;
+                break;
+            }
         }
         for(auto&i:spotSizeToSlot)
         {
             if(i.first==spot)
+            {
                 spotSlot=i.second;
+                break;
+            }
         }
         m_devCtl->resetMotor(UsbDev::DevCtl::MotorId_Focus,sps[2]);
         m_devCtl->resetMotor(UsbDev::DevCtl::MotorId_Color,sps[3]);
@@ -102,8 +108,8 @@ void DeviceOperation::setCursorColorAndCursorSize(int color, int spot)
             waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_Focus});
             m_devCtl->move5Motors(speed,motorPos,UsbDev::DevCtl::Relative);     //DB 脱离颜色和光斑
         }
-//        m_status.color=color;
-//        m_status.spot=spot;
+        m_status.color=color;
+        m_status.spot=spot;
     }
 }
 
@@ -203,6 +209,7 @@ void DeviceOperation::staticStimulate(QPointF loc,int spotSize,int DB,int durati
     motorPos[0]=coordSpacePosInfo.motorX;
     motorPos[1]=coordSpacePosInfo.motorY;
     motorPos[2]=focalMotorPos;
+
     motorPos[3]=config.DbPosMappingPtr()[DB][0];
     motorPos[4]=config.DbPosMappingPtr()[DB][1];
     bool isMotorMove[5]{true,true,true,true,true};
@@ -214,7 +221,6 @@ void DeviceOperation::staticStimulate(QPointF loc,int spotSize,int DB,int durati
 
 void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB)
 {
-    qDebug()<<"跑点...";
     auto coordSpacePosInfo=DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoord(loc);
     auto spotSizeToSlot=DeviceSettings::getSingleton()->m_spotSizeToSlot;
     int spotSlot;
@@ -226,11 +232,11 @@ void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB)
     auto focalMotorPos=DeviceDataProcesser::getFocusMotorPosByDist(coordSpacePosInfo.focalDist,spotSlot);
     UsbDev::Config config;
     config=m_config;
-    qDebug()<<DB;
-    qDebug()<<m_config.DbPosMappingPtr()[0][0];
-    qDebug()<<m_config.DbPosMappingPtr()[DB][0];
-    qDebug()<<config.DbPosMappingPtr()[0][0];
-    qDebug()<<config.DbPosMappingPtr()[DB][0];
+//    qDebug()<<DB;
+//    qDebug()<<m_config.DbPosMappingPtr()[0][0];
+//    qDebug()<<m_config.DbPosMappingPtr()[DB][0];
+//    qDebug()<<config.DbPosMappingPtr()[0][0];
+//    qDebug()<<config.DbPosMappingPtr()[DB][0];
 //    auto config=m_devCtl->config();
     int motorPos[5];
     motorPos[0]=coordSpacePosInfo.motorX;
@@ -242,15 +248,24 @@ void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB)
     qDebug()<<motorPos[0];
     qDebug()<<motorPos[1];
     qDebug()<<motorPos[2];
-    qDebug()<<config.DbPosMappingPtr()[0][0];
-    qDebug()<<config.DbPosMappingPtr()[0][1];
+    qDebug()<<motorPos[3];
+    qDebug()<<motorPos[4];
 //    motorPos[0]=99358;
 //    motorPos[1]=88903;
 //    motorPos[2]=94200;
 //    motorPos[3]=110000;
 //    motorPos[4]=110000;
     bool isMotorMove[5]{true,true,true,true,true};
-    waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y});
+    waitMotorStop({UsbDev::DevCtl::MotorId_Color,
+                   UsbDev::DevCtl::MotorId_Light_Spot,
+                   UsbDev::DevCtl::MotorId_Focus,
+                   UsbDev::DevCtl::MotorId_X,
+                   UsbDev::DevCtl::MotorId_Y
+                   });
+    while(m_shutterElapsedTimer.elapsed()<=m_shutterElapsedTime+100)  //增加100 防止延迟
+    {
+        QCoreApplication::processEvents();
+    }
     move5Motors(isMotorMove,motorPos);
 //    quint8 sps[5]={1,1,1,1,1};
 //    m_devCtl->move5Motors(sps,motorPos);
@@ -283,10 +298,12 @@ QByteArray DeviceOperation::getRealTimeStimulationEyeImage()
 
 void DeviceOperation::openShutter(int durationTime)
 {
-    auto config=m_devCtl->config();
-    auto shutterPos=config.shutterOpenPosRef();
+//    auto config=m_devCtl->config();
+    auto shutterPos=m_config.shutterOpenPosRef();
     waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y,UsbDev::DevCtl::MotorId_Shutter});
     m_devCtl->openShutter(durationTime,shutterPos);
+    m_shutterElapsedTimer.restart();
+    m_shutterElapsedTime=durationTime;
 }
 
 void DeviceOperation::move5Motors(bool isMotorMove[], int MotorPoses[])
@@ -333,8 +350,18 @@ void DeviceOperation::waitMotorStop(QVector<UsbDev::DevCtl::MotorId> motorIDs)
     do
     {
         QCoreApplication::processEvents();
-    }while(getBusy()||(mstimer.elapsed()<500)); //500ms
+    }while(getBusy()||(mstimer.elapsed()<50)); //50ms
     //    while(getBusy()){QCoreApplication::processEvents();}
+}
+
+void DeviceOperation::waitForSomeTime(int time)
+{
+    QElapsedTimer mstimer;
+    mstimer.restart();
+    do
+    {
+        QCoreApplication::processEvents();
+    }while(mstimer.elapsed()<time);
 }
 
 void DeviceOperation::moveChin(ChinHozMoveDirection hozChin, ChinVertMoveDirection vertChin)
@@ -463,7 +490,8 @@ void DeviceOperation::workOnNewFrameData()
 void DeviceOperation::workOnNewProfile()
 {
     m_profile=m_devCtl->profile();
-    if(!m_profile.isEmpty()/*&&!m_config.isEmpty()*/){setIsDeviceReady(true);}
+
+    if(!m_profile.isEmpty()/*&&!m_config.isEmpty()*/){ waitForSomeTime(2000);setIsDeviceReady(true);}
     m_videoSize=m_profile.videoSize();
 }
 

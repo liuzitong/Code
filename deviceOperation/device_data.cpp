@@ -26,8 +26,9 @@ DeviceData::DeviceData()
     QString dataPath=settings->localDataPath;
     readLocalConfig(configPath);
     readLocalData(dataPath);
-    qDebug()<<m_config.DbPosMappingPtr()[0][0];
-    qDebug()<<m_config.DbPosMappingPtr()[0][1];
+//    qDebug()<<m_config.shutterOpenPosRef();
+//    qDebug()<<m_config.DbPosMappingPtr()[0][0];
+//    qDebug()<<m_config.DbPosMappingPtr()[0][1];
 }
 
 QSharedPointer<DeviceData> DeviceData::getSingleton()

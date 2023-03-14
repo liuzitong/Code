@@ -27,23 +27,16 @@ Item {id:root; width: 1366;height: 691
 
 
     Component.onCompleted:{
-        refresh();
         frameProvidSvc=IcUiQmlApi.appCtrl.frameProvidSvc;
-        console.log("hehe");
-//        IcUiQmlApi.appCtrl.checkSvc.connectDev();
         checkSvc.checkResultChanged.connect(currentCheckResultChanged);
-
+        refresh();
     }
-
-
-//    onCurrentCheckResultChanged: {realTimeDBRec.visible=false;}
-//    property var selectedDotIndex;
-//    onSelectedDotIndexChanged:{if(currentCheckResult==null) return;var count=currentCheckResult.drawRealTimeEyePosPic(selectedDotIndex);realTimePicRefresh(count);}
 
 
     onRefresh: {
         if (currentProgram==null)
         {
+            console.log("changeProgram");
             var program_id=IcUiQmlApi.appCtrl.settings.defaultProgramId;
             var program_type=IcUiQmlApi.appCtrl.settings.defaultProgramType;
             if(program_type!==2)
@@ -51,6 +44,7 @@ Item {id:root; width: 1366;height: 691
             else
                 currentProgram=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::DynamicProgramVM", false,[program_id]);
         }
+        currentProgramChanged();         //不知道为毛需要主动触发,还必须放外面
         program_type!==2?staticParamsSetting.currentProgram=currentProgram:dynamicParamsSetting.currentProgram=currentProgram;
         if(currentCheckResult!=null)
         {
@@ -80,7 +74,7 @@ Item {id:root; width: 1366;height: 691
                 }
             }
             DynamicParamsSetting{id:dynamicParamsSetting;anchors.fill: parent;onDataRefreshed:root.currentProgramChanged();}
-            StaticParamsSetting{id:staticParamsSetting;anchors.fill: parent;isCustomProg:false;onDataRefreshed:{root.currentProgramChanged();}}
+            StaticParamsSetting{id:staticParamsSetting;anchors.fill: parent;isCustomProg:true; onDataRefreshed:{root.currentProgramChanged();}}
             Item{anchors.fill: parent;anchors.margins: 2;
                 Row{anchors.fill: parent;spacing: 2;
                     Rectangle{ width: parent.width*0.25-2;height: parent.height;color: backGroundColor;
@@ -345,7 +339,7 @@ Item {id:root; width: 1366;height: 691
                     Item{anchors.fill: parent;anchors.margins:parent.height*0.15;
                         Flow{height: parent.height;spacing: height*0.8;anchors.horizontalCenter: parent.horizontalCenter;
                             CusButton{enabled:IcUiQmlApi.appCtrl.checkSvc.checkState>=3;text:lt+qsTr("Select program");width:IcUiQmlApi.appCtrl.settings.isRuntimeLangEng?height*4:height*2.5;onClicked: chooseProgram.open();}
-                            CusButton{id:paramsSetting;text:lt+qsTr("Params setting");enabled:(currentProgram!==null&&IcUiQmlApi.appCtrl.checkSvc.checkState>=3);width:IcUiQmlApi.appCtrl.settings.isRuntimeLangEng?height*4:height*2.5;onClicked:if(currentProgram.type!==2){ staticParamsSetting.open()} else  { dynamicParamsSetting.open();}}
+                            CusButton{id:paramsSetting;text:lt+qsTr("Params setting");enabled:(currentProgram!==null&&IcUiQmlApi.appCtrl.checkSvc.checkState>=3);width:IcUiQmlApi.appCtrl.settings.isRuntimeLangEng?height*4:height*2.5;onClicked:if(currentProgram.type!==2){ staticParamsSetting.open();} else  { dynamicParamsSetting.open();}}
                         }
                     }
                 }
@@ -454,7 +448,8 @@ Item {id:root; width: 1366;height: 691
                             button.text: lt+qsTr("Analysis");
                             button.onClicked:
                             {
-//                                console.log(currentCheckResult.id);
+                                console.log(currentCheckResult.id);
+                                console.log(currentProgram.id);
                                 var report=listModel.get(0).report;
                                 analysis(report);
                             }
@@ -509,12 +504,9 @@ Item {id:root; width: 1366;height: 691
                             Component.onCompleted: {
                                 root.currentProgramChanged.connect(function()
                                 {
-    //                                console.log(currentProgram.type);
                                     listModel.clear();
                                     var report=currentProgram.report;
-    //                                console.log(report[0])
                                     report.forEach(function(item){
-    //                                    console.log(item);
                                         listModel.append({name:reportNames[currentProgram.type][item],report:item});
                                     })
                                     comboBox.currentIndex=0;

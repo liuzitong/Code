@@ -112,8 +112,8 @@ Rectangle {
 
         Item{
             id:contentPage;width:parent.width;height: parent.height*0.90;
-            PatientManagement{id:patientPage;anchors.fill:parent;visible: false; onChangePage: contentPage.changePage(pageName,params);}
-            Check{id:checkPage;anchors.fill: parent;visible: true;currentPatient: root.currentPatient;onChangePage: contentPage.changePage(pageName,params);}
+            PatientManagement{id:patientPage;anchors.fill:parent;visible: true; onChangePage: contentPage.changePage(pageName,params);}
+            Check{id:checkPage;anchors.fill: parent;visible: false;currentPatient: root.currentPatient;onChangePage: contentPage.changePage(pageName,params);}
             ProgramCustomize{id:programPage;anchors.fill: parent;visible: false;onChangePage: contentPage.changePage(pageName,params);}
             AnalysisLobby{id:analysisLobbypage;anchors.fill: parent;visible: false;currentPatient: root.currentPatient;onChangePage: contentPage.changePage(pageName,params);}
             Analysis{id:analysisPage;anchors.fill: parent;visible: false;currentPatient: root.currentPatient;onChangePage: contentPage.changePage(pageName,params);}

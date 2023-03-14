@@ -66,6 +66,7 @@ public:
     void move5Motors(bool isMotorMove[],int MotorPoses[]);
     void setCursorColorAndCursorSize(int color, int size);
     bool getAnswerPadStatus();
+    void waitForSomeTime(int time);
 
     void hello();
 
@@ -109,6 +110,8 @@ public:
     QMutex m_statusLock;
     UsbDev::FrameData m_frameData;
     QByteArray m_frameRawData;
+    QElapsedTimer m_shutterElapsedTimer;
+    int m_shutterElapsedTime;
 private:
     float m_pupilDiameter=-1;
     QVector<float> m_pupilDiameterArr;

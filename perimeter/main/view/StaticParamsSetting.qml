@@ -130,8 +130,9 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                                         switch (strategies[i])
                                                         {
                                                         case 0:listModel.append({modelData:lt+qsTr("Full threshold")});break;
-                                                        case 1:listModel.append({modelData:lt+qsTr("Smart interactive")});break;
-                                                        case 2:listModel.append({modelData:lt+qsTr("Fast interactive")});break;
+                                                        case 1:listModel.append({modelData:lt+qsTr("Fast threshold")});break;
+                                                        case 2:listModel.append({modelData:lt+qsTr("Smart interactive")});break;
+                                                        case 3:listModel.append({modelData:lt+qsTr("Fast interactive")});break;
                                                         }
                                                         if(currentProgram.params.commonParams.strategy===strategies[i])
                                                         {
@@ -404,17 +405,12 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                             spacing: height;
                             layoutDirection: Qt.RightToLeft
                             anchors.verticalCenter: parent.verticalCenter
-//
+
                             CusButton{text:lt+qsTr(lt+qsTr("Cancel"));onClicked: {idPopup.close();currentProgramChanged();}}
                             CusButton{text:lt+qsTr(lt+qsTr("OK"));onClicked:{ok();idPopup.close();dataRefreshed();}}
-//                             CusButton{text:"aa";onClicked:{
+//                            CusButton{text:"aa";onClicked:{
 //                                     console.log(currentProgram.params.commonParams.cursorSize) ;
 //                                     console.log(currentProgram.params.fixedParams.stimulationTime) ;
-//                                     stim.value=currentProgram.params.fixedParams.stimulationTime;
-////                                     console.log(intevalTimeididid.value);
-
-////                                     intevalTimeididid.value+=currentProgram.params.commonParams.intervalTime;
-////                                     intevalTimeididid.value=currentProgram.params.commonParams.intervalTime;
 
 //                                 }}
                         }

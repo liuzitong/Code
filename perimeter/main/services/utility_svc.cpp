@@ -206,6 +206,8 @@ int UtilitySvc::getExpectedDB(const QVector<int> &value_30d, QPointF loc,int OS_
         int index=getIndex(loc,m_pointLoc_60d,OS_OD);
         val=m_value_60d[index];
     }
+    //盲点附近的点取反号
+    if(val<0) val=-val;
     return val;
 }
 

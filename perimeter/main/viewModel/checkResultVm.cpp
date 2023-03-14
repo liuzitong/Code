@@ -78,10 +78,10 @@ int StaticCheckResultVm::drawRealTimeEyePosPic(int index)
         for(uint i=0;i<realTimeDB[index].size();i++)        //读取结果的时候
         {
             int picIndex=picIndexStart+i;
-            auto qa=blob.mid(picIndex*imgSize.width()*imgSize.height(),imgSize.width()*imgSize.height());
-            QImage img((uchar*)qa.data(),imgSize.width(),imgSize.height(),QImage::Format_Grayscale8);
-//            auto qa=blob.mid(picIndex*320*240,320*240);
-//            QImage img((uchar*)qa.data(),320,240,QImage::Format_Grayscale8);
+//            auto qa=blob.mid(picIndex*imgSize.width()*imgSize.height(),imgSize.width()*imgSize.height());
+//            QImage img((uchar*)qa.data(),imgSize.width(),imgSize.height(),QImage::Format_Grayscale8);
+            auto qa=blob.mid(picIndex*320*240,320*240);
+            QImage img((uchar*)qa.data(),320,240,QImage::Format_Grayscale8);
             img.save(R"(./realTimeEyePosPic/)"+QString::number(i)+".bmp");
 
         }
