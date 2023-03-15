@@ -221,7 +221,6 @@ void DeviceOperation::staticStimulate(QPointF loc,int spotSize,int DB,int durati
 
 void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB)
 {
-
     auto coordSpacePosInfo=DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoord(loc);
     auto spotSizeToSlot=DeviceSettings::getSingleton()->m_spotSizeToSlot;
     int spotSlot;

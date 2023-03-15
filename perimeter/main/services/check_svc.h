@@ -18,7 +18,7 @@ class CheckSvc: public QObject
     Q_PROPERTY(int checkedCount READ getCheckedCount WRITE setCheckedCount NOTIFY checkedCountChanged)
     Q_PROPERTY(int checkTime READ getCheckTime WRITE setCheckTime NOTIFY checkTimeChanged)
     Q_PROPERTY(bool devReady READ getDevReady NOTIFY devReadyChanged)
-    Q_PROPERTY(bool autoAlignPupil READ getAutoAlignPupil WRITE setAutoAlignPupil)
+    Q_PROPERTY(bool autoAlignPupil READ getAutoAlignPupil WRITE setAutoAlignPupil NOTIFY autoAlignPupilChanged)
     Q_PROPERTY(bool pupilDiameter READ getPupilDiameter NOTIFY pupilDiameterChanged)
 
 //    Q_PROPERTY(CheckSvcWorker* worker READ getWorker)
@@ -51,7 +51,7 @@ public:
     int getCheckedCount(){return m_checkedCount;}void setCheckedCount(int value){m_checkedCount=value;emit checkedCountChanged();}Q_SIGNAL void checkedCountChanged();
     int getCheckTime(){return m_checkTime;}void setCheckTime(int value){m_checkTime=value;qDebug()<<"checkTime:"+QString::number(m_checkTime);emit checkTimeChanged();}Q_SIGNAL void checkTimeChanged();
     bool getDevReady();Q_SIGNAL void devReadyChanged();
-    bool getAutoAlignPupil();void setAutoAlignPupil(bool autoAlign);
+    bool getAutoAlignPupil();void setAutoAlignPupil(bool autoAlign);Q_SIGNAL void autoAlignPupilChanged();
     float getPupilDiameter();Q_SIGNAL void pupilDiameterChanged();
 //    CheckSvcWorker* getWorker(){return m_worker;}
 

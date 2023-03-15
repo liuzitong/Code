@@ -62,7 +62,7 @@ private:
     QVector<DotRecord> m_shortTermFlucRecords;          //index为程序点总数+位置index,里面存储了所有的短周期点
 //    int m_falsePosCycCount=qrand()%10,m_falseNegCycCount=qrand()%10,m_fiaxationViewLossCyc=qrand()%10;  //错开
     QVector<QPointF> m_blindDot;
-    int m_blindDotLocateIndex=-1;
+    int m_blindDotLocateIndex=0;
     int m_stimulationCount=0;                   //刺激次数到了测试盲点位置
     QVector<DotRecord*> m_lastCheckDotRecord;
     QVector<LastCheckedDotType> m_lastCheckeDotType;
@@ -100,6 +100,8 @@ void StaticCheck::initialize()
 {
     m_checkedCount=0;
     m_autoAdaptTime=0;
+    m_blindDotLocateIndex=0;
+    m_stimulationCount=0;
     m_resultModel->m_patient_id=m_patientModel->m_id;
     m_resultModel->m_program_id=m_programModel->m_id;
     m_totalCount=m_programModel->m_data.dots.size();
@@ -174,14 +176,14 @@ void StaticCheck::initialize()
 //第一次先跑点,直接刺激,第二次跑点,等待上次刺激的应答,然后再刺激,再跑点,再等待上次的应答.(保证再等待应答的同时跑点.)
 void StaticCheck::Checkprocess()
 {
-//    auto checkCycleLocAndDB=getCheckCycleLocAndDB();                //存储LastdotType为各种检查
-//    if(std::get<0>(checkCycleLocAndDB))
-//    {
-//        qDebug()<<"checkCycleLocAndDB loc:"<<std::get<1>(checkCycleLocAndDB)<<" DB"<<std::get<2>(checkCycleLocAndDB);
-//        m_lastCheckDotRecord.push_back(nullptr);
+    auto checkCycleLocAndDB=getCheckCycleLocAndDB();                //存储LastdotType为各种检查
+    if(std::get<0>(checkCycleLocAndDB))
+    {
+        qDebug()<<"checkCycleLocAndDB loc:"<<std::get<1>(checkCycleLocAndDB)<<" DB"<<std::get<2>(checkCycleLocAndDB);
+        m_lastCheckDotRecord.push_back(nullptr);
 //        getReadyToStimulate(std::get<1>(checkCycleLocAndDB),std::get<2>(checkCycleLocAndDB));
-//    }
-//    else
+    }
+    else
     {
         m_lastCheckDotRecord.push_back(&getCheckDotRecordRef());   //存储lastDotType为commondot 并且存储指针
         auto dotRec=m_lastCheckDotRecord.last();
@@ -302,7 +304,12 @@ StaticCheck::DotRecord &StaticCheck::getCheckDotRecordRef()
         {
             if(!i.checked)
             {
-                if(!m_lastCheckDotRecord.isEmpty())
+
+                if(m_lastCheckDotRecord.isEmpty()||m_lastCheckDotRecord.first()==nullptr)
+                {
+                    unchekedDotIndex.push_back(i.index);
+                }
+                else
                 {
                     if(i.index!=m_lastCheckDotRecord.first()->index)                        //必须排除上次的,连续两次可能导致同时是最后一次检查,连续的检查完毕同一个点
                     {
@@ -312,6 +319,8 @@ StaticCheck::DotRecord &StaticCheck::getCheckDotRecordRef()
             }
         }
 
+
+        //就剩最后一个了
         if(unchekedDotIndex.count()!=0)
         {
             selectedDotIndex=unchekedDotIndex[qrand()%unchekedDotIndex.count()];
@@ -414,10 +423,9 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
     auto fixedParams=m_resultModel->m_params.fixedParams;
     if(commomParams.blindDotTest==true)                 //盲点测试
     {
-        //确定盲点,条件是要经历一点测试次数,而且盲不为空
-        if(m_stimulationCount>UtilitySvc::getSingleton()->m_checkCountBeforeGetBlindDotCheck&&!m_blindDot.isEmpty())
+        //确定盲点,条件是要经历一点测试次数,而且盲为空
+        if(m_stimulationCount>UtilitySvc::getSingleton()->m_checkCountBeforeGetBlindDotCheck&&m_blindDot.isEmpty())
         {
-            m_lastCheckeDotType.push_back(LastCheckedDotType::locateBlindDot);
             QPoint blindDotLoc;
             qDebug()<<m_blindDotLocateIndex;
             qDebug()<<UtilitySvc::getSingleton()->m_left_blindDot;
@@ -427,11 +435,12 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
             else
                 blindDotLoc=UtilitySvc::getSingleton()->m_right_blindDot[m_blindDotLocateIndex];
 
+            m_lastCheckeDotType.push_back(LastCheckedDotType::locateBlindDot);
             return {true,blindDotLoc,m_stimulationCount>UtilitySvc::getSingleton()->m_blindDotTestDB};
         }
 
         //盲点不为空的时候到了周期测试盲点.
-        if(!m_blindDot.isEmpty()&&m_stimulationCount%fixedParams.fixationViewLossCycle==0)
+        if(!m_blindDot.isEmpty()&&m_stimulationCount%fixedParams.fixationViewLossCycle==qrand()%fixedParams.fixationViewLossCycle)
         {
             auto blindDB=UtilitySvc::getSingleton()->m_blindDotTestDB;
             m_lastCheckeDotType.push_back(LastCheckedDotType::blindDotTest);
@@ -440,7 +449,7 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
     }
 
 
-    if(m_stimulationCount%fixedParams.falsePositiveCycle==qrand()%fixedParams.falsePositiveCycle&&m_stimulationCount!=0)         //假阳
+    if(m_stimulationCount%fixedParams.falsePositiveCycle==qrand()%fixedParams.falsePositiveCycle)         //假阳
     {
         QVector<DotRecord> m_checkedRecords;
         for(auto& recordDot:m_dotRecords)
@@ -457,7 +466,7 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
     }
 
 
-    if(m_stimulationCount%fixedParams.falseNegativeCycle==qrand()%fixedParams.falseNegativeCycle&&m_stimulationCount!=0)         //假阴,随机点,到刺激的时候不开快门
+    if(m_stimulationCount%fixedParams.falseNegativeCycle==qrand()%fixedParams.falseNegativeCycle)         //假阴,随机点,到刺激的时候不开快门
     {
         auto locs=m_programModel->m_data.dots;
         auto loc=locs[qrand()%locs.size()];
@@ -555,6 +564,7 @@ void StaticCheck::ProcessAnswer(bool answered)
         {
             m_resultModel->m_data.falseNegativeCount++;
         }
+        break;
     }
     case LastCheckedDotType::commonCheckDot:
     {
@@ -647,6 +657,7 @@ void StaticCheck::ProcessAnswer(bool answered)
         {
             answered?lastCheckedDot->DB=2:lastCheckedDot->DB=0;
             lastCheckedDot->checked=true;
+            break;
         }
         case StaticParams::CommonParams::Strategy::twoStages:
         {
@@ -671,6 +682,7 @@ void StaticCheck::ProcessAnswer(bool answered)
                     lastCheckedDot->DB=0;
                 }
             }
+            break;
         }
         case StaticParams::CommonParams::Strategy::quantifyDefects:
         {
@@ -696,6 +708,7 @@ void StaticCheck::ProcessAnswer(bool answered)
         {
             answered?lastCheckedDot->DB=2:lastCheckedDot->DB=0;
             lastCheckedDot->checked=true;
+            break;
         }
         }
         if(lastCheckedDot->checked==true)
@@ -1026,6 +1039,7 @@ bool CheckSvc::getAutoAlignPupil()
 void CheckSvc::setAutoAlignPupil(bool autoAlign)
 {
     DevOps::DeviceOperation::getSingleton()->setAutoAlignPupil(autoAlign);
+    emit autoAlignPupilChanged();
 }
 
 float CheckSvc::getPupilDiameter()

@@ -48,13 +48,13 @@ public:
     DeviceOperation();
     ~DeviceOperation();
 //    static void Initialize();
-    void moveChinUp(){moveChin(ChinHozMoveDirection::Stop,ChinVertMoveDirection::Up);}
-    void moveChinDown(){moveChin(ChinHozMoveDirection::Stop,ChinVertMoveDirection::Down);}
-    void moveChinLeft(){moveChin(ChinHozMoveDirection::Left,ChinVertMoveDirection::Stop);}
-    void moveChinRight(){moveChin(ChinHozMoveDirection::Right,ChinVertMoveDirection::Stop);}
-    void stopMovingChin(){moveChin(ChinHozMoveDirection::Stop,ChinVertMoveDirection::Stop);}
-    void turnOnVideo(){m_devCtl->setFrontVideo(true);}
-    void turnOffVideo(){m_devCtl->setFrontVideo(false);}
+    void moveChinUp(){if(m_isDeviceReady) moveChin(ChinHozMoveDirection::Stop,ChinVertMoveDirection::Up);}
+    void moveChinDown(){if(m_isDeviceReady) moveChin(ChinHozMoveDirection::Stop,ChinVertMoveDirection::Down);}
+    void moveChinLeft(){if(m_isDeviceReady) moveChin(ChinHozMoveDirection::Left,ChinVertMoveDirection::Stop);}
+    void moveChinRight(){if(m_isDeviceReady) moveChin(ChinHozMoveDirection::Right,ChinVertMoveDirection::Stop);}
+    void stopMovingChin(){if(m_isDeviceReady) moveChin(ChinHozMoveDirection::Stop,ChinVertMoveDirection::Stop);}
+    void turnOnVideo(){if(m_isDeviceReady) m_devCtl->setFrontVideo(true);}
+    void turnOffVideo(){if(m_isDeviceReady) m_devCtl->setFrontVideo(false);}
     static QSharedPointer<DeviceOperation> getSingleton();
     void connectDev();
     void disconnectDev();
@@ -67,7 +67,6 @@ public:
     void setCursorColorAndCursorSize(int color, int size);
     bool getAnswerPadStatus();
     void waitForSomeTime(int time);
-
     void hello();
 
 
