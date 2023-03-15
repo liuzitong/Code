@@ -159,7 +159,7 @@ Item {id:root; width: 1366;height: 691
                                                 CusText{text:lt+qsTr("Check dot count"); horizontalAlignment: Text.AlignLeft;width: parent.width*0.45;font.pointSize: fontPointSize;}
                                                 LineEdit{
 //                                                    property int centerDot:  currentProgram.params.commonParams.centerDotCheck?1:0;
-                                                    property var checkedDots: IcUiQmlApi.appCtrl.checkSvc===null?0:IcUiQmlApi.appCtrl.checkSvc.checkedCount;
+                                                    property var checkedDots: IcUiQmlApi.appCtrl.checkSvc.checkedCount;
                                                     property var totalDots: currentProgram===null?0:currentProgram.data.dots.length/*+centerDot*/;
                                                     text:checkedDots+"/"+totalDots;width: parent.width*0.5;textInput.readOnly: true;
                                                 }
@@ -167,7 +167,7 @@ Item {id:root; width: 1366;height: 691
                                             Row{width:parent.width;height: parent.height*1/3;spacing: width*0.05;
                                                 CusText{text:lt+qsTr("Check timespan"); horizontalAlignment: Text.AlignLeft;width: parent.width*0.45;font.pointSize: fontPointSize;}
                                                 LineEdit{
-                                                    property int timeSpan: currentCheckResult===null?0:currentCheckResult.resultData.testTimespan;
+                                                    property int timeSpan: IcUiQmlApi.appCtrl.checkSvc.checkTime;
                                                     text:Math.floor(timeSpan/60)+":"+timeSpan%60;width: parent.width*0.5;textInput.readOnly: true;}
                                             }
                                         }

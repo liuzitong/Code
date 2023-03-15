@@ -221,6 +221,7 @@ void DeviceOperation::staticStimulate(QPointF loc,int spotSize,int DB,int durati
 
 void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB)
 {
+
     auto coordSpacePosInfo=DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoord(loc);
     auto spotSizeToSlot=DeviceSettings::getSingleton()->m_spotSizeToSlot;
     int spotSlot;
@@ -245,11 +246,11 @@ void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB)
     motorPos[3]=config.DbPosMappingPtr()[DB][0];
     motorPos[4]=config.DbPosMappingPtr()[DB][1];
 
-    qDebug()<<motorPos[0];
-    qDebug()<<motorPos[1];
-    qDebug()<<motorPos[2];
-    qDebug()<<motorPos[3];
-    qDebug()<<motorPos[4];
+//    qDebug()<<motorPos[0];
+//    qDebug()<<motorPos[1];
+//    qDebug()<<motorPos[2];
+//    qDebug()<<motorPos[3];
+//    qDebug()<<motorPos[4];
 //    motorPos[0]=99358;
 //    motorPos[1]=88903;
 //    motorPos[2]=94200;

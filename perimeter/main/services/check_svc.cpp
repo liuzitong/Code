@@ -169,31 +169,6 @@ void StaticCheck::initialize()
         m_centerDotRecord=DotRecord{0,QPointF{0,0},{DB},-1,{},false,false,MinDB,MaxDB};
     }
 //    m_deviceOperation->setCursorColorAndCursorSize(int(cursorColor),int(cursorSize));
-
-//    for(int i=0;i<10;i++)
-//    {
-//        m_deviceOperation->getReadyToStimulate({-6,-6},int(cursorSize),0);
-//        m_deviceOperation->openShutter(1000);
-//        m_deviceOperation->getReadyToStimulate({-3,-3},int(cursorSize),0);
-//        m_deviceOperation->openShutter(1000);
-//        m_deviceOperation->getReadyToStimulate({-1,-1},int(cursorSize),0);
-//        m_deviceOperation->openShutter(1000);
-//        m_deviceOperation->getReadyToStimulate({6,-6},int(cursorSize),0);
-//        m_deviceOperation->openShutter(1000);
-//        m_deviceOperation->getReadyToStimulate({3,-3},int(cursorSize),0);
-//        m_deviceOperation->openShutter(1000);
-//        m_deviceOperation->getReadyToStimulate({1,-1},int(cursorSize),0);
-//        m_deviceOperation->openShutter(1000);
-//        m_deviceOperation->getReadyToStimulate({6,6},int(cursorSize),0);
-//        m_deviceOperation->openShutter(1000);
-//        m_deviceOperation->getReadyToStimulate({3,3},int(cursorSize),0);
-//        m_deviceOperation->openShutter(1000);
-//        m_deviceOperation->getReadyToStimulate({1,1},int(cursorSize),0);
-//        m_deviceOperation->openShutter(1000);
-//        m_deviceOperation->getReadyToStimulate({-3,3},int(cursorSize),0);
-//        m_deviceOperation->openShutter(1000);
-
-//    }
 }
 
 //第一次先跑点,直接刺激,第二次跑点,等待上次刺激的应答,然后再刺激,再跑点,再等待上次的应答.(保证再等待应答的同时跑点.)
@@ -211,7 +186,7 @@ void StaticCheck::Checkprocess()
         m_lastCheckDotRecord.push_back(&getCheckDotRecordRef());   //存储lastDotType为commondot 并且存储指针
         auto dotRec=m_lastCheckDotRecord.last();
         qDebug()<<"getCheckDotRecordRef loc:"<<dotRec->loc<<" DB:"<<QString::number(dotRec->StimulationDBs.last())<<" index:"<<QString::number(m_lastCheckDotRecord.last()->index);
-        getReadyToStimulate(m_lastCheckDotRecord.last()->loc,m_lastCheckDotRecord.last()->StimulationDBs.last());
+//        getReadyToStimulate(m_lastCheckDotRecord.last()->loc,m_lastCheckDotRecord.last()->StimulationDBs.last());
     }
 //    if(!m_lastCheckeDotType.isEmpty())
 //    {
@@ -362,13 +337,13 @@ StaticCheck::DotRecord &StaticCheck::getCheckDotRecordRef()
 void StaticCheck::stimulate()
 {
     m_stimulationCount++;
-    int durationTime=m_programModel->m_params.fixedParams.stimulationTime;
-    if(m_lastCheckeDotType.last()!=LastCheckedDotType::falseNegativeTest)               //假阴不开快门
-        m_deviceOperation->openShutter(durationTime);
-    else
-    {
-        m_deviceOperation->waitForSomeTime(durationTime);
-    }
+//    int durationTime=m_programModel->m_params.fixedParams.stimulationTime;
+//    if(m_lastCheckeDotType.last()!=LastCheckedDotType::falseNegativeTest)               //假阴不开快门
+//        m_deviceOperation->openShutter(durationTime);
+//    else
+//    {
+//        m_deviceOperation->waitForSomeTime(durationTime);
+//    }
 }
 
 void StaticCheck::getReadyToStimulate(QPointF loc, int DB)
@@ -765,9 +740,10 @@ void StaticCheck::ProcessAnswer(bool answered)
 
 void StaticCheck::waitAndProcessAnswer()
 {
-    auto answerResult=waitForAnswer();
-//    auto answerResult=qrand()%100<50;
-//    UtilitySvc::wait(50);
+//    auto answerResult=waitForAnswer();
+    auto answerResult=qrand()%100<50;
+    UtilitySvc::wait(100);
+//    QThread::msleep(1000);
     ProcessAnswer(answerResult);
 }
 
@@ -794,15 +770,17 @@ class CheckSvcWorker : public QObject
 {
     Q_OBJECT
 public:
-    QElapsedTimer m_elapsedTimer;
+    QTimer m_timer;
+    int m_time=0;
     int* m_checkState;
     PatientVm* m_patientVm;
     ProgramVm* m_programVm;
     CheckResultVm* m_checkResultVm;
+
 private:
     QSharedPointer<Check> m_check;
 public:
-    explicit CheckSvcWorker(){}
+    explicit CheckSvcWorker(){m_timer.setInterval(1000);connect(&m_timer,&QTimer::timeout,this,[&](){emit checkTimeChanged(m_time);m_time++;});}
     virtual ~CheckSvcWorker() Q_DECL_OVERRIDE {}
     void initialize();
     void setCheckState(int value)
@@ -828,6 +806,7 @@ signals:
     void checkResultChanged();
     void checkProcessFinished();
     void checkedCountChanged(int count);
+    void checkTimeChanged(int secs);
 };
 
 void CheckSvcWorker::initialize()
@@ -858,6 +837,7 @@ void CheckSvcWorker::initialize()
 void CheckSvcWorker::doWork()
 {
     *m_checkState=0;
+    m_time=0;
     while(true)
     {
         switch (*m_checkState)
@@ -866,6 +846,7 @@ void CheckSvcWorker::doWork()
         {
             initialize();
             m_check->initialize();
+            m_timer.start();
 //            setCheckState(3);
 //            return;
             if(*m_checkState==0)                              //防止其它主线程选择退出,之后被覆盖
@@ -880,6 +861,7 @@ void CheckSvcWorker::doWork()
 //            qDebug()<<m_check->m_checkedCount;
 //            qDebug()<<m_check->m_totalCount;
             if(m_check->m_checkedCount==m_check->m_totalCount) setCheckState(4);
+            emit checkedCountChanged(m_check->m_checkedCount);
             emit checkResultChanged();
             break;
         }
@@ -892,11 +874,22 @@ void CheckSvcWorker::doWork()
         case 3:                                             //stop
         {
             qDebug()<<("stopped");
-//            m_checkResultVm->insert();
+            m_timer.stop();
+            m_checkResultVm->insert();
             return;
         }
         case 4:                                             //finish
         {
+            int type=m_programVm->getType();
+            m_timer.stop();
+            if(type!=2)
+            {
+                static_cast<StaticCheckResultVm*>(m_checkResultVm)->getResultData()->setTestTimespan(m_time);
+            }
+            else
+            {
+                static_cast<DynamicCheckResultVm*>(m_checkResultVm)->getResultData()->setTestTimespan(m_time);
+            }
             m_checkResultVm->insert();
             qDebug()<<("finished");
             emit checkProcessFinished();
@@ -912,13 +905,14 @@ void CheckSvcWorker::doWork()
 
 CheckSvc::CheckSvc(QObject *parent)
 {
-//    qDebug()<<"mianThread:"+QString::number(int(thread()->currentThread()),16);
     m_worker = new CheckSvcWorker();
     m_worker->moveToThread(&m_workerThread);
+    m_worker->m_timer.moveToThread(&m_workerThread);
     DevOps::DeviceOperation::getSingleton()->moveToThread(&m_workerThread);
     connect(m_worker,&CheckSvcWorker::checkResultChanged,this, &CheckSvc::checkResultChanged);
     connect(m_worker,&CheckSvcWorker::checkStateChanged,this, &CheckSvc::checkStateChanged);
     connect(m_worker,&CheckSvcWorker::checkedCountChanged,this, &CheckSvc::setCheckedCount);
+    connect(m_worker,&CheckSvcWorker::checkTimeChanged,this, &CheckSvc::setCheckTime);
 //    connect(m_worker,&CheckSvcWorker::checkProcessFinished,this, [&](){m_checkResultVm->insert();});
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::isDeviceReadyChanged,this,&CheckSvc::devReadyChanged);
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::pupilDiameterChanged,this,&CheckSvc::pupilDiameterChanged);

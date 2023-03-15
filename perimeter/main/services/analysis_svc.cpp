@@ -230,13 +230,13 @@ void AnalysisSvc::ThresholdAnalysis(int resultId,QVector<int>& dev,QVector<int>&
 //        {
         index=UtilitySvc::getSingleton()->getIndex(QPointF{dot.x,dot.y},m_pointLoc_30d,checkResult.m_OS_OD);
         if(index==-1) continue;
-        sv[i]=value_30d[index]/10;
+        sv[i]=value_30d[index];
 //        }
 //        else if(radius<=60)                     //应该没有此情况，阈值分析都是radius<30
 //        {
 //            index=getIndex(QPointF{dot.x,dot.y},m_pointLoc_60d,checkResult.m_OS_OD);
 //            if(index==-1) continue;
-//            sv[i]=m_value_60d[index]/10;
+//            sv[i]=m_value_60d[index];
 //        }
         if(!(cursorSize==2&&cursorColor==0))                //CURSORIII_white情况已经考虑年龄了所以不年龄修正
         {
@@ -450,6 +450,7 @@ void AnalysisSvc::ThreeInOneAnalysis(int resultId, QVector<int> &dev)
     int cursorColor=int(params.commonParams.cursorColor);
 
     QVector<int> value_30d=UtilitySvc::getSingleton()->getValue30d(cursorSize,cursorColor,patient.m_age);
+//    qDebug()<<value_30d;
 
     auto dotList=program.m_data.dots;
     QVector<int> sv(dotList.size(),0);
@@ -474,14 +475,16 @@ void AnalysisSvc::ThreeInOneAnalysis(int resultId, QVector<int> &dev)
         if(radius<=30)
         {
             index=UtilitySvc::getSingleton()->getIndex(QPointF{dot.x,dot.y},m_pointLoc_30d,checkResult.m_OS_OD);
+//            qDebug()<<index;
             if(index==-1) continue;
-            sv[i]=value_30d[index]/10;
+            sv[i]=value_30d[index];
         }
+
         else if(radius<=60)
         {
             index=UtilitySvc::getSingleton()->getIndex(QPointF{dot.x,dot.y},m_pointLoc_60d,checkResult.m_OS_OD);
             if(index==-1) continue;
-            sv[i]=m_value_60d[index]/10;
+            sv[i]=m_value_60d[index];
 //            if(sv[i]>0) sv[i]-=age_correction;else if(sv[i]<0) sv[i]+=age_correction;
         }
         if(!(cursorSize==2&&cursorColor==0))                //CURSORIII_white情况已经考虑年龄了所以不年龄修正
@@ -495,9 +498,11 @@ void AnalysisSvc::ThreeInOneAnalysis(int resultId, QVector<int> &dev)
                 if(sv[i]>0){sv[i]-=(age_correction-1);} else if(sv[i]<0){sv[i]+=(age_correction-1);}
             }
         }
-
+//        qDebug()<<sv[i];
+//        qDebug()<<checkResult.m_data.checkData[i];
         if(sv[i]>0)  {dev[i]=checkResult.m_data.checkData[i]-sv[i];}                                                   //dev 盲点
         else{ dev[i]=-99; }           //盲点
+//        qDebug()<<dev[i];
     }
 }
 
