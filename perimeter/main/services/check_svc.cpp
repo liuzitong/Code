@@ -52,20 +52,22 @@ private:
     QVector<int> m_value_30d;
     QVector<int> m_value_60d;
     int m_y_offset;
-    QVector<DotRecord> m_dotRecords;    //index为位置index
+    QVector<DotRecord> m_dotRecords;    //index为位置0~m_totalCount-1
     bool m_isStartWithBaseDots;         //基础4点开始检查.
     bool m_isDoingBaseDotsCheck;        //处于给基础4点测试定值阶段
-    DotRecord m_centerDotRecord;        //index 为2*程序总数+1
+    DotRecord m_centerDotRecord;        //index 为2*m_totalCount
     QVector<int> m_answeredTimes;    //根据此处得到autoAdaptTime;
     int m_autoAdaptTime;
     QVector<int> m_lastShortTermCycleCheckedDotIndex;
-    QVector<DotRecord> m_shortTermFlucRecords;          //index为程序点总数+位置index,里面存储了所有的短周期点
+    QVector<DotRecord> m_shortTermFlucRecords;          //index为 m_totalCount~2*m_totalCount-1
 //    int m_falsePosCycCount=qrand()%10,m_falseNegCycCount=qrand()%10,m_fiaxationViewLossCyc=qrand()%10;  //错开
     QVector<QPointF> m_blindDot;
     int m_blindDotLocateIndex=0;
     int m_stimulationCount=0;                   //刺激次数到了测试盲点位置
+    bool m_stimulated;
     QVector<DotRecord*> m_lastCheckDotRecord;
     QVector<LastCheckedDotType> m_lastCheckeDotType;
+    bool m_alreadyChecked;
 
 
 public:
@@ -102,6 +104,7 @@ void StaticCheck::initialize()
     m_autoAdaptTime=0;
     m_blindDotLocateIndex=0;
     m_stimulationCount=0;
+    m_alreadyChecked=false;
     m_resultModel->m_patient_id=m_patientModel->m_id;
     m_resultModel->m_program_id=m_programModel->m_id;
     m_totalCount=m_programModel->m_data.dots.size();
@@ -122,7 +125,7 @@ void StaticCheck::initialize()
     if(m_resultModel->m_params.commonParams.fixationTarget==FixationTarget::centerPoint&&m_resultModel->m_params.commonParams.centerDotCheck==true)
     {
         m_centerDotRecord.loc={0,float(y_offsetDiamond)};
-        m_centerDotRecord.index=m_totalCount*2+1;
+        m_centerDotRecord.index=m_totalCount*2;
     }
 
     int DBChanged=0;
@@ -154,11 +157,16 @@ void StaticCheck::initialize()
             {
                 auto baseDots=m_programModel->m_data.baseDots;
                 for(uint j=0;j<baseDots.size();j++)
-                    if((qAbs(dot.x-baseDots[j].x)<FLT_EPSILON)&&(qAbs(dot.y-baseDots[j].y)<FLT_EPSILON)) isBaseDot=true;
+                    if((qAbs(dot.x-baseDots[j].x)<FLT_EPSILON)&&(qAbs(dot.y-baseDots[j].y)<FLT_EPSILON))
+                        isBaseDot=true;
             }
-            m_dotRecords.push_back(DotRecord{i,QPointF{dot.x,dot.y},{m_utilitySvc->getExpectedDB(m_value_30d,{dot.x,dot.y},m_resultModel->m_OS_OD)+DBChanged},-1, {},isBaseDot,false,MinDB,MaxDB});
+            //非参考点初始测试DB设置为-1,之后选点的时候根据周围已经检查出的值赋值
+
+            QVector<int> stimulationDBs;
+            if(isBaseDot) stimulationDBs={m_utilitySvc->getExpectedDB(m_value_30d,{dot.x,dot.y},m_resultModel->m_OS_OD)+DBChanged};
+            m_dotRecords.push_back(DotRecord{i,QPointF{dot.x,dot.y},stimulationDBs,-1,{},isBaseDot,false,MinDB,MaxDB});
         }
-        m_centerDotRecord=DotRecord{0,QPointF{0,0},{m_utilitySvc->getExpectedDB(m_value_30d,{0,0},m_resultModel->m_OS_OD)+DBChanged},-1,{},false,false,MinDB,MaxDB};
+        m_centerDotRecord=DotRecord{m_totalCount*2,QPointF{0,0},{m_utilitySvc->getExpectedDB(m_value_30d,{0,0},m_resultModel->m_OS_OD)+DBChanged},-1,{},false,false,MinDB,MaxDB};
     }
     else                            //单刺激
     {
@@ -168,7 +176,7 @@ void StaticCheck::initialize()
             auto dot=m_programModel->m_data.dots[i];
             m_dotRecords.push_back(DotRecord{i,QPointF{dot.x,dot.y},{DB},-1, {},false,false,MinDB,MaxDB});
         }
-        m_centerDotRecord=DotRecord{0,QPointF{0,0},{DB},-1,{},false,false,MinDB,MaxDB};
+        m_centerDotRecord=DotRecord{m_totalCount*2,QPointF{0,0},{DB},-1,{},false,false,MinDB,MaxDB};
     }
 //    m_deviceOperation->setCursorColorAndCursorSize(int(cursorColor),int(cursorSize));
 }
@@ -176,6 +184,8 @@ void StaticCheck::initialize()
 //第一次先跑点,直接刺激,第二次跑点,等待上次刺激的应答,然后再刺激,再跑点,再等待上次的应答.(保证再等待应答的同时跑点.)
 void StaticCheck::Checkprocess()
 {
+
+    m_alreadyChecked=false;
     auto checkCycleLocAndDB=getCheckCycleLocAndDB();                //存储LastdotType为各种检查
     if(std::get<0>(checkCycleLocAndDB))
     {
@@ -187,18 +197,24 @@ void StaticCheck::Checkprocess()
     {
         m_lastCheckDotRecord.push_back(&getCheckDotRecordRef());   //存储lastDotType为commondot 并且存储指针
         auto dotRec=m_lastCheckDotRecord.last();
-        qDebug()<<"getCheckDotRecordRef loc:"<<dotRec->loc<<" DB:"<<QString::number(dotRec->StimulationDBs.last())<<" index:"<<QString::number(m_lastCheckDotRecord.last()->index);
+        qDebug()<<"getCheckDotRecordRef loc:"<<dotRec->loc<<" DB:"<<QString::number(dotRec->StimulationDBs.last())<<"upper:"<<QString::number(dotRec->upperBound)<<"lower:"<<QString::number(dotRec->lowerBound);
 //        getReadyToStimulate(m_lastCheckDotRecord.last()->loc,m_lastCheckDotRecord.last()->StimulationDBs.last());
     }
 //    if(!m_lastCheckeDotType.isEmpty())
 //    {
 //        qDebug()<<"last Checked Dot length:"+QString::number(m_lastCheckeDotType.size())+".first:"+int(m_lastCheckeDotType.first())+".last:"+int(m_lastCheckeDotType.last());
 //    }
-    if(m_stimulationCount!=0)                               //最开始没刺激过就不需要处理
+    if(m_stimulated)                               //最开始没刺激过就不需要处理
     {
-        waitAndProcessAnswer();                             //取出commondot 并且取出指针
+        m_stimulated=false;
+        waitAndProcessAnswer();                             //取出commonDot 并且取出指针,处理的时候可能发现下一个是已经检查出结果的点,这个时候就选择不刺激置m_alreadyChecked为true
     }
-    stimulate();
+    if(m_checkedCount<m_totalCount&&!m_alreadyChecked)                         //如果测试完毕或者是已经得到结果的点就不刺激了
+    {
+        m_stimulationCount++;
+        m_stimulated=true;
+        stimulate();
+    }
 }
 
 
@@ -206,137 +222,169 @@ StaticCheck::DotRecord &StaticCheck::getCheckDotRecordRef()
 {
     m_lastCheckeDotType.push_back(LastCheckedDotType::commonCheckDot);
 
-//    if(m_resultModel->m_params.commonParams.centerDotCheck==true&&m_centerDotRecord.checked==false)
-//    {
-//        return m_centerDotRecord;
-//    }
-
-//    if(!m_shortTermFlucRecords.isEmpty())
-//    {
-//        if(m_shortTermFlucRecords.size()>=2)
-//        {
-//            if(m_shortTermFlucRecords[m_shortTermFlucRecords.size()-2].checked==false)
-//            {
-//                return m_shortTermFlucRecords[m_shortTermFlucRecords.size()-2];             //之前一个周期没测出短波要直接测完
-//            }
-//        }
-//        else
-//        {
-//            if(qrand()%(1+m_resultModel->m_params.fixedParams.fixationViewLossCycle)==0)    //周期内随机到了短波周期
-//            {
-
-//                return m_shortTermFlucRecords.last();
-//            }
-//        }
-//    }
-//    if(m_isStartWithBaseDots)
-//    {
-//        qsrand(QTime::currentTime().msec());
-//        QVector<DotRecord> zoneRightTop,zoneRightBottom,zoneLeftBottom,zoneLeftTop;
-//        QPointF zoneRightTopCenter,zoneRightBottomCenter,zoneLeftBottomCenter,zoneLeftTopCenter;
-//        QVector<int> zone;
-//        for(auto &i:m_dotRecords)
-//        {
-//            if(i.checked) continue;
-//            auto loc=i.loc;
-//            if(loc.x()>0&&loc.y()>0)
-//            {
-//                zoneRightTop.append(i);
-//                if(i.isBaseDot) zoneRightTopCenter=loc;
-//            }
-//            if(loc.x()>0&&loc.y()<0)
-//            {
-//                zoneRightBottom.append(i);
-//                if(i.isBaseDot) zoneRightBottomCenter=loc;
-//            }
-//            if(loc.x()<0&&loc.y()<0)
-//            {
-//                zoneLeftBottom.append(i);
-//                if(i.isBaseDot) zoneLeftBottomCenter=loc;
-//            }
-//            if(loc.x()<0&&loc.y()>0)
-//            {
-//                zoneLeftTop.append(i);
-//                if(i.isBaseDot) zoneLeftTopCenter=loc;
-//            }
-//        }
-
-//        if(zoneRightTop.count()>0) zone.push_back(0);
-//        if(zoneRightBottom.count()>0) zone.push_back(1);
-//        if(zoneLeftBottom.count()>0) zone.push_back(2);
-//        if(zoneLeftTop.count()>0) zone.push_back(3);
-
-//        auto zoneNumber=zone[qrand()%zone.size()];
-//        QVector<DotRecord> seletedZoneRecords;
-//        QPointF centerCoord;
-//        switch (zoneNumber)
-//        {
-//        case 0:seletedZoneRecords=zoneRightTop;centerCoord=zoneRightTopCenter;break;
-//        case 1:seletedZoneRecords=zoneRightBottom;centerCoord=zoneRightBottomCenter;break;
-//        case 2:seletedZoneRecords=zoneLeftBottom;centerCoord=zoneLeftBottomCenter;break;
-//        case 3:seletedZoneRecords=zoneLeftTop;centerCoord=zoneLeftTopCenter;break;
-//        }
-
-//        float nearestDist=FLT_MAX;
-//        QVector<DotRecord> nearestRecords;
-//        for(auto&i:seletedZoneRecords)
-//        {
-//            auto dist=sqrt(pow((i.loc.x()-centerCoord.x()),2)+pow((i.loc.y()-centerCoord.y()),2));
-//            if(qAbs(dist-nearestDist)<=FLT_EPSILON)
-//            {
-//                nearestRecords.append(i);
-//            }
-//            else if(dist<nearestDist)
-//            {
-//                nearestRecords.clear();
-//                nearestRecords.append(i);
-//                nearestDist=dist;
-//            }
-//        }
-//        auto& selectedDot=nearestRecords[qrand()%nearestRecords.count()];
-//        return selectedDot;
-//    }
-//    else
+    if(m_resultModel->m_params.commonParams.centerDotCheck==true&&m_centerDotRecord.checked==false)
     {
-        QVector<int> unchekedDotIndex;
+        return m_centerDotRecord;
+    }
+
+    if(!m_shortTermFlucRecords.isEmpty())
+    {
+        if(m_shortTermFlucRecords.size()>=2)
+        {
+            if(!m_shortTermFlucRecords[m_shortTermFlucRecords.size()-2].checked)
+            {
+                return m_shortTermFlucRecords[m_shortTermFlucRecords.size()-2];             //之前一个周期没测出短波要直接测完
+            }
+        }
+        else
+        {
+            if(qrand()%(1+m_resultModel->m_params.fixedParams.shortTermFluctuationCount)==0||m_checkedCount==m_totalCount-1)    //周期内随机到了短波周期,最后一轮了,先
+            {
+                if(!m_shortTermFlucRecords.last().checked)
+                    return m_shortTermFlucRecords.last();
+            }
+        }
+    }
+    if(m_isStartWithBaseDots)
+    {
+        qsrand(QTime::currentTime().msec());
+        QVector<DotRecord> zoneRightTop,zoneRightBottom,zoneLeftBottom,zoneLeftTop;
+        QVector<DotRecord> zoneCheckedRightTop,zoneCheckedRightBottom,zoneCheckedLeftBottom,zoneCheckedLeftTop;
+        QPointF zoneRightTopCenter,zoneRightBottomCenter,zoneLeftBottomCenter,zoneLeftTopCenter;
+        QVector<int> zone;
+        for(auto &i:m_dotRecords)                               //得到四个区域的参考点,并且把未测四点放入4个区域
+        {
+            auto loc=i.loc;
+            if(loc.x()>0&&loc.y()>0)
+            {
+                if(!i.checked) zoneRightTop.append(i);
+                else zoneCheckedRightTop.append(i);
+                if(i.isBaseDot) zoneRightTopCenter=loc;
+            }
+            if(loc.x()>0&&loc.y()<0)
+            {
+                if(!i.checked) zoneRightBottom.append(i);
+                else zoneCheckedRightBottom.append(i);
+                if(i.isBaseDot) zoneRightBottomCenter=loc;
+            }
+            if(loc.x()<0&&loc.y()<0)
+            {
+                if(!i.checked) zoneLeftBottom.append(i);
+                else zoneCheckedLeftBottom.append(i);
+                if(i.isBaseDot) zoneLeftBottomCenter=loc;
+            }
+            if(loc.x()<0&&loc.y()>0)
+            {
+                if(!i.checked) zoneLeftTop.append(i);
+                else zoneCheckedLeftTop.append(i);
+                if(i.isBaseDot) zoneLeftTopCenter=loc;
+            }
+        }
+
+        if(zoneRightTop.count()>0) zone.push_back(0);
+        if(zoneRightBottom.count()>0) zone.push_back(1);
+        if(zoneLeftBottom.count()>0) zone.push_back(2);
+        if(zoneLeftTop.count()>0) zone.push_back(3);
+
+        auto zoneNumber=zone[qrand()%zone.size()];                                                  //随机出区域和参考点坐标
+        QVector<DotRecord> seletedZoneRecords;
+        QVector<DotRecord> seletedZoneCheckedRecords;
+        QPointF centerCoord;
+        switch (zoneNumber)
+        {
+        case 0:seletedZoneRecords=zoneRightTop;seletedZoneCheckedRecords=zoneCheckedRightTop;centerCoord=zoneRightTopCenter;break;
+        case 1:seletedZoneRecords=zoneRightBottom;seletedZoneCheckedRecords=zoneCheckedRightBottom;centerCoord=zoneRightBottomCenter;break;
+        case 2:seletedZoneRecords=zoneLeftBottom;seletedZoneCheckedRecords=zoneCheckedLeftBottom;centerCoord=zoneLeftBottomCenter;break;
+        case 3:seletedZoneRecords=zoneLeftTop;seletedZoneCheckedRecords=zoneCheckedLeftTop;centerCoord=zoneLeftTopCenter;break;
+        }
+        qDebug()<<"centerCoord:"<<centerCoord;
+
+
+        float nearestDist=FLT_MAX;
+        QVector<DotRecord> nearestRecords;                                                          //选出最近点
+        for(auto&i:seletedZoneRecords)
+        {
+            auto dist=sqrt(pow((i.loc.x()-centerCoord.x()),2)+pow((i.loc.y()-centerCoord.y()),2));
+            if(qAbs(dist-nearestDist)<=FLT_EPSILON)
+            {
+                nearestRecords.append(i);
+            }
+            else if(dist<nearestDist)
+            {
+                nearestRecords.clear();
+                nearestRecords.append(i);
+                nearestDist=dist;
+            }
+        }
+
+//        qDebug()<<nearestRecords.length();
+//        qDebug()<<nearestRecords[0].loc;
+        nearestDist=FLT_MAX;
+        auto& selectedDot=nearestRecords[qrand()%nearestRecords.count()];
+        qDebug()<<"selectedDot loc:"<<selectedDot.loc;
+        if(selectedDot.StimulationDBs.isEmpty())            //第一次检查要根据周围点的结果赋值
+        {
+            qDebug()<<"empty stimDB";
+            for(auto&i:seletedZoneCheckedRecords)
+            {
+                qDebug()<<"got  checked";
+                auto dist=sqrt(pow((i.loc.x()-selectedDot.loc.x()),2)+pow((i.loc.y()-selectedDot.loc.y()),2));
+                if(dist<nearestDist)
+                {
+                    m_dotRecords[selectedDot.index].StimulationDBs.clear();
+                    m_dotRecords[selectedDot.index].StimulationDBs.append(i.DB);
+                    nearestDist=dist;
+                    qDebug()<<"appended DB";
+                }
+            }
+        }
+        qDebug()<<"getCheckDotRecordRef loc inside:"<<m_dotRecords[selectedDot.index].loc<<"DB leng"<<QString::number(m_dotRecords[selectedDot.index].StimulationDBs.count())<<"upper:"<<QString::number(m_dotRecords[selectedDot.index].upperBound)<<"lower:"<<QString::number(m_dotRecords[selectedDot.index].lowerBound);
+        qDebug()<<" DB:"<<QString::number(m_dotRecords[selectedDot.index].StimulationDBs.last());
+        return m_dotRecords[selectedDot.index];
+    }
+    else
+    {
+        QVector<int> uncheckedDotIndex;
         int selectedDotIndex;
         for(auto&i:m_dotRecords)
         {
             if(!i.checked)
             {
 
-                if(m_lastCheckDotRecord.isEmpty()||m_lastCheckDotRecord.first()==nullptr)
-                {
-                    unchekedDotIndex.push_back(i.index);
-                }
-                else
-                {
-                    if(i.index!=m_lastCheckDotRecord.first()->index)                        //必须排除上次的,连续两次可能导致同时是最后一次检查,连续的检查完毕同一个点
+//                if(m_lastCheckDotRecord.isEmpty()||m_lastCheckDotRecord.first()==nullptr)
+//                {
+//                    unchekedDotIndex.push_back(i.index);
+//                }
+//                else
+//                {
+//                    if(i.index!=m_lastCheckDotRecord.first()->index)                        //必须排除上次的,连续两次可能导致同时是最后一次检查,连续的检查完毕同一个点
                     {
-                        unchekedDotIndex.push_back(i.index);                                 //检查的编号加入容器
+                        uncheckedDotIndex.push_back(i.index);                                 //检查的编号加入容器
                     }
-                }
+//                }
             }
         }
 
 
         //就剩最后一个了
-        if(unchekedDotIndex.count()!=0)
+        if(uncheckedDotIndex.count()!=0)
         {
-            selectedDotIndex=unchekedDotIndex[qrand()%unchekedDotIndex.count()];
+            selectedDotIndex=uncheckedDotIndex[qrand()%uncheckedDotIndex.count()];
         }
-        else
-        {
-            for(auto&i:m_dotRecords)
-            {
-                if(!i.checked)
-                {
-                   selectedDotIndex=i.index;
-                }
-            }
-        }
+//        else
+//        {
+//            for(auto&i:m_dotRecords)
+//            {
+//                if(!i.checked)
+//                {
+//                   selectedDotIndex=i.index;
+//                }
+//            }
+//        }
 
-        qDebug()<<"unchecked Dots:"<<unchekedDotIndex;
+
+
+        qDebug()<<"unchecked Dots:"<<uncheckedDotIndex;
         auto& selectDot=m_dotRecords[selectedDotIndex];
         qDebug()<<"selected Dot:"<<selectDot.index;
         return selectDot;                //随机出一个
@@ -345,7 +393,6 @@ StaticCheck::DotRecord &StaticCheck::getCheckDotRecordRef()
 
 void StaticCheck::stimulate()
 {
-    m_stimulationCount++;
 //    int durationTime=m_programModel->m_params.fixedParams.stimulationTime;
 //    if(m_lastCheckeDotType.last()!=LastCheckedDotType::falseNegativeTest)               //假阴不开快门
 //        m_deviceOperation->openShutter(durationTime);
@@ -357,7 +404,7 @@ void StaticCheck::stimulate()
 
 void StaticCheck::getReadyToStimulate(QPointF loc, int DB)
 {
-    m_deviceOperation->getReadyToStimulate(loc,int(m_resultModel->m_params.commonParams.cursorSize),DB);
+    m_deviceOperation->getReadyToStimulate({loc.x(),loc.y()+m_y_offset},int(m_resultModel->m_params.commonParams.cursorSize),DB);
 }
 
 void StaticCheck::getProperValByRefToNearDotDB(StaticCheck::DotRecord &dotRecord)
@@ -520,6 +567,7 @@ bool StaticCheck::waitForAnswer()
 
 void StaticCheck::ProcessAnswer(bool answered)
 {
+
     qDebug()<<"Process Answer.";
     auto lastCheckedDot=m_lastCheckDotRecord.takeFirst();
     auto lastCheckedDotType=m_lastCheckeDotType.takeFirst();
@@ -576,12 +624,12 @@ void StaticCheck::ProcessAnswer(bool answered)
         int boundDistance=lastCheckedDot->upperBound-lastCheckedDot->lowerBound;
         switch (m_programModel->m_params.commonParams.strategy)
         {
+//        case StaticParams::CommonParams::Strategy::smartInteractive:
         case StaticParams::CommonParams::Strategy::fullThreshold:
         {
             if(boundDistance>4)
             {
                 answered?lastCheckedDot->StimulationDBs.push_back(qMin((lastCheckedDot->lowerBound+4),MaxDB)):lastCheckedDot->StimulationDBs.push_back(qMax(lastCheckedDot->upperBound-4,MinDB));
-                qDebug()<<lastCheckedDot->StimulationDBs.last();
             }
             else if(boundDistance<=4&&boundDistance>2)
             {
@@ -624,19 +672,18 @@ void StaticCheck::ProcessAnswer(bool answered)
             else if(boundDistance==2)
             {
                 if(lastCheckedDot->isBaseDot)
-                    lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->lowerBound+1);
-                else{
-                    getProperValByRefToNearDotDB(*lastCheckedDot);
+                    lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->lowerBound+1);             //最初4点多测一次
+                else
+                {
+                    getProperValByRefToNearDotDB(*lastCheckedDot);                                    //其它的通过算法
                     lastCheckedDot->checked=true;
                 }
+
             }
             else if(boundDistance<=1)                        //仅最初的4点和中心点会走到这一步.
             {
-                if(answered)
-                {
-                    lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->lowerBound);
-                    lastCheckedDot->checked=true;
-                }
+                lastCheckedDot->DB=lastCheckedDot->lowerBound;
+                lastCheckedDot->checked=true;
             }
             break;
         }
@@ -713,38 +760,42 @@ void StaticCheck::ProcessAnswer(bool answered)
         }
         if(lastCheckedDot->checked==true)
         {
-            if(lastCheckedDot->index<=int(m_programModel->m_data.dots.size()))                //非短周期
-            {
-                m_checkedCount++;
-                qDebug()<<"last Checked Index:"<<QString::number(lastCheckedDot->index);
-                qDebug()<<"checked Count:"<<QString::number(m_checkedCount);
-                m_resultModel->m_data.checkData[lastCheckedDot->index]=lastCheckedDot->DB;          //在check初始化的时候扩充了大小.
+            qDebug()<<"last Checked Index:"<<QString::number(lastCheckedDot->index);
+            qDebug()<<"checked Count:"<<QString::number(m_checkedCount);
 //                qDebug()<<QString::number(m_resultModel->m_data.realTimeDB.size());
 //                qDebug()<<QString::number(lastCheckedDot->index);
 //                qDebug()<<lastCheckedDot->StimulationDBs;
-                m_resultModel->m_data.realTimeDB[lastCheckedDot->index]=lastCheckedDot->StimulationDBs.toStdVector();
+            if(m_lastCheckDotRecord.last()!=nullptr&&m_lastCheckDotRecord.last()->index==lastCheckedDot->index)
+            {
+                m_alreadyChecked=true;
+                m_lastCheckDotRecord.pop_back();
+                m_lastCheckeDotType.pop_back();
+            }          //下次要刺激的点,是已经检查了的,所以要移除所有下次的点
+            m_resultModel->m_data.realTimeDB[lastCheckedDot->index]=lastCheckedDot->StimulationDBs.toStdVector(); //在check初始化的时候扩充了大小.
+            m_resultModel->m_data.checkData[lastCheckedDot->index]=lastCheckedDot->DB; //存储结果
+            if(lastCheckedDot->index<int(m_programModel->m_data.dots.size()))                //非短周期或者中心点
+            {
+                m_checkedCount++;
                 if(m_resultModel->m_params.commonParams.shortTermFluctuation)
                 {
                     m_lastShortTermCycleCheckedDotIndex.push_back(lastCheckedDot->index);         //加入最近检测点的集合
-                    if(m_lastShortTermCycleCheckedDotIndex.size()==m_programModel->m_params.fixedParams.fixationViewLossCycle)
+                    if(m_lastShortTermCycleCheckedDotIndex.size()==m_programModel->m_params.fixedParams.shortTermFluctuationCount)
                     {
                         auto selectedIndex=m_lastShortTermCycleCheckedDotIndex[qrand()%m_lastShortTermCycleCheckedDotIndex.size()];
                         m_lastShortTermCycleCheckedDotIndex.clear();
                         auto dotRecord=m_dotRecords[selectedIndex];
-                        dotRecord.lowerBound=MinDB;
-                        dotRecord.upperBound=MaxDB;
-                        dotRecord.StimulationDBs.clear();
-                        dotRecord.realTimeEyePosPic.clear();
-                        dotRecord.checked=false;
                         DotRecord dotfluc;
+                        dotfluc.isBaseDot=false;
+                        dotfluc.upperBound=MaxDB;
+                        dotfluc.lowerBound=MinDB;
+                        dotfluc.checked=false;
+                        dotfluc.loc=dotRecord.loc;
+                        dotfluc.DB=-1;
+                        dotfluc.StimulationDBs.append(dotRecord.DB);
                         dotfluc.index=m_programModel->m_data.dots.size()+dotRecord.index;   //短周期的话编号加上程序点个数
                         m_shortTermFlucRecords.push_back(dotfluc);
                     }
                 }
-            }
-            else                                                                        //存储结果
-            {
-                m_resultModel->m_data.checkData[lastCheckedDot->index]=lastCheckedDot->DB;
             }
         }
     }
@@ -754,8 +805,8 @@ void StaticCheck::ProcessAnswer(bool answered)
 void StaticCheck::waitAndProcessAnswer()
 {
 //    auto answerResult=waitForAnswer();
-    auto answerResult=qrand()%100<50;
-    UtilitySvc::wait(100);
+    auto answerResult=qrand()%100<20;
+    UtilitySvc::wait(50);
 //    QThread::msleep(1000);
     ProcessAnswer(answerResult);
 }
@@ -888,7 +939,7 @@ void CheckSvcWorker::doWork()
         {
             qDebug()<<("stopped");
             m_timer.stop();
-            m_checkResultVm->insert();
+//            m_checkResultVm->insert();
             return;
         }
         case 4:                                             //finish

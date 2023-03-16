@@ -174,7 +174,7 @@ Item{
         {
             var x_pix=(dot.x/degreeRange)*(diameter*0.5)+width/2;
             var y_pix=(-dot.y/degreeRange)*(diameter*0.5)+height/2;
-            drawText("("+db+")",x_pix,y_pix-fontPointSize*3);
+            drawText("("+db+")",x_pix,y_pix+fontPointSize*1.5);
         }
 
         function drawAxisEndText(string,x_pix,y_pix,size)
@@ -274,26 +274,37 @@ Item{
             }
             else
             {
-                if(currentProgram.type!==2)                                     //静态是结果-1(表示没测到)画点,其它画值
+                if(currentProgram.type===0)                                     //阈值,静态是结果-1(表示没测到)画点,其它画值
                 {
                     var dBList=currentCheckResult.resultData.checkData;
                     var dotList=currentProgram.data.dots;
                     for(i=0;i<dBList.length;i++)
                     {
-                        if(i<dotList.length)                                            //一般结果
+                        if(i<dotList.length)                                            //一般结果,和中心点
                         {
                             if(dBList[i]===-1)
                                 drawDot(dotList[i]);
                             else
                                 drawDB(dBList[i],dotList[i]);
                         }
-                        else                                                            //短周期
+                        else if(dotList.length<=i&&i<2*dotList.length)                                                            //短周期
                         {
                             if(dBList[i]!==-1) drawShortFlucDB(dBList[i],dotList[i-dotList.length]);
                         }
+                        else if(i===dotList.length*2)                           //中心点
+                        {
+                            if(dBList[i]!==-1)
+                                drawDB(dBList[i],{x:0,y:0});
+                        }
+
                     }
                 }
-                else                                                        //绘制动态检查结果
+                else if(currentProgram.type===1)                                // 筛选
+                {
+
+                }
+
+                else                                                        //动态
                 {
                     dotList=currentCheckResult.resultData.checkData;
                     var dotRadius=diameter/180*1;
@@ -342,6 +353,8 @@ Item{
                     }
                 }
             }
+
+
             if(currentProgram.type!==2&clickedDotIndex!=-1)                                     //选择点--实时图片用
             {
                 var clickedDot=currentProgram.data.dots[clickedDotIndex];
