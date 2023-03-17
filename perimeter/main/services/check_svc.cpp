@@ -105,6 +105,8 @@ void StaticCheck::initialize()
     m_blindDotLocateIndex=0;
     m_stimulationCount=0;
     m_alreadyChecked=false;
+    m_isStartWithBaseDots=false;
+    m_isDoingBaseDotsCheck=false;
     m_resultModel->m_patient_id=m_patientModel->m_id;
     m_resultModel->m_program_id=m_programModel->m_id;
     m_totalCount=m_programModel->m_data.dots.size();
@@ -136,16 +138,15 @@ void StaticCheck::initialize()
         DBChanged=-4;
     }
 
+
+
     if(m_programModel->m_params.commonParams.strategy==StaticParams::CommonParams::Strategy::smartInteractive
             ||m_programModel->m_params.commonParams.strategy==StaticParams::CommonParams::Strategy::fastInterative)
     {
         m_isStartWithBaseDots=true;
         m_isDoingBaseDotsCheck=true;
     }
-    else
-    {
-        m_isStartWithBaseDots=false;
-    }
+
 
     if(m_programModel->m_params.commonParams.strategy!=StaticParams::CommonParams::Strategy::singleStimulation)
     {
@@ -161,10 +162,11 @@ void StaticCheck::initialize()
                         isBaseDot=true;
             }
             //非参考点初始测试DB设置为-1,之后选点的时候根据周围已经检查出的值赋值
-
-
             QVector<int> stimulationDBs;
-            if(isBaseDot||!m_isStartWithBaseDots) stimulationDBs={m_utilitySvc->getExpectedDB(m_value_30d,{dot.x,dot.y},m_resultModel->m_OS_OD)+DBChanged};
+            if(isBaseDot||!m_isStartWithBaseDots)
+            {
+                stimulationDBs={m_utilitySvc->getExpectedDB(m_value_30d,{dot.x,dot.y},m_resultModel->m_OS_OD)+DBChanged};
+            }
             m_dotRecords.push_back(DotRecord{i,QPointF{dot.x,dot.y},stimulationDBs,-1,{},isBaseDot,false,MinDB,MaxDB});
         }
         m_centerDotRecord=DotRecord{m_totalCount*2,QPointF{0,0},{m_utilitySvc->getExpectedDB(m_value_30d,{0,0},m_resultModel->m_OS_OD)+DBChanged},-1,{},false,false,MinDB,MaxDB};
@@ -710,25 +712,22 @@ void StaticCheck::ProcessAnswer(bool answered)
         case StaticParams::CommonParams::Strategy::twoStages:
         {
             auto lastStimulatDB=lastCheckedDot->StimulationDBs.last();
-            if(answered)
+            if(lastStimulatDB!=0)              //第一次.
             {
-                if(lastStimulatDB!=0)
+                if(answered)
                 {
                     lastCheckedDot->DB=2;
+                    lastCheckedDot->checked=true;
                 }
-                else{
-                    lastCheckedDot->DB=1;
-                }
+                else lastCheckedDot->StimulationDBs.push_back(0);
             }
-            else
+            else                            //第二次
             {
-                if(lastStimulatDB!=0)
-                {
-                    lastCheckedDot->StimulationDBs.push_back(0);
-                }
-                else{
+                if(answered)
+                    lastCheckedDot->DB=1;
+                else
                     lastCheckedDot->DB=0;
-                }
+                lastCheckedDot->checked=true;
             }
             break;
         }
@@ -737,13 +736,14 @@ void StaticCheck::ProcessAnswer(bool answered)
 
             if(boundDistance>3)
             {
-                if(answered)
+                if(lastCheckedDot->StimulationDBs.size()==1&&answered)    //第一次
                 {
-                    if(lastCheckedDot->StimulationDBs.size()==1)
-                        lastCheckedDot->DB=2;
+                    lastCheckedDot->DB=2;
+                    lastCheckedDot->checked=true;
                 }
                 else
-                    lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->upperBound-3);
+//                    lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->lowerBound+3);
+                    answered?lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->lowerBound+3):lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->upperBound-3);
             }
             if(boundDistance<=3)
             {

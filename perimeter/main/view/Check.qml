@@ -395,6 +395,7 @@ Item {id:root; width: 1366;height: 691
                                             currentCheckResult=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::DynamicCheckResultVm", false,[]);
                                         }
                                         currentCheckResult.OS_OD=os_od.value;
+                                        currentCheckResult.type=currentProgram.type;
                                         currentCheckResult.params=currentProgram.params;
                                         IcUiQmlApi.appCtrl.checkSvc.program=currentProgram;
                                         IcUiQmlApi.appCtrl.checkSvc.patient=currentPatient;
