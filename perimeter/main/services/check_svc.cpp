@@ -162,8 +162,9 @@ void StaticCheck::initialize()
             }
             //非参考点初始测试DB设置为-1,之后选点的时候根据周围已经检查出的值赋值
 
+
             QVector<int> stimulationDBs;
-            if(isBaseDot) stimulationDBs={m_utilitySvc->getExpectedDB(m_value_30d,{dot.x,dot.y},m_resultModel->m_OS_OD)+DBChanged};
+            if(isBaseDot||!m_isStartWithBaseDots) stimulationDBs={m_utilitySvc->getExpectedDB(m_value_30d,{dot.x,dot.y},m_resultModel->m_OS_OD)+DBChanged};
             m_dotRecords.push_back(DotRecord{i,QPointF{dot.x,dot.y},stimulationDBs,-1,{},isBaseDot,false,MinDB,MaxDB});
         }
         m_centerDotRecord=DotRecord{m_totalCount*2,QPointF{0,0},{m_utilitySvc->getExpectedDB(m_value_30d,{0,0},m_resultModel->m_OS_OD)+DBChanged},-1,{},false,false,MinDB,MaxDB};
@@ -805,8 +806,8 @@ void StaticCheck::ProcessAnswer(bool answered)
 void StaticCheck::waitAndProcessAnswer()
 {
 //    auto answerResult=waitForAnswer();
-    auto answerResult=qrand()%100<20;
-    UtilitySvc::wait(50);
+    auto answerResult=qrand()%100<50;
+    UtilitySvc::wait(100);
 //    QThread::msleep(1000);
     ProcessAnswer(answerResult);
 }
