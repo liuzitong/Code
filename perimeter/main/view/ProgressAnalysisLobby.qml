@@ -51,7 +51,7 @@ Column {
                 width: parent.width;height:(infoCol.height)/(pageSize+1)*pageSize ; interactive: false; spacing: -1;clip:true;snapMode: ListView.SnapPosition;/*interactive: false;*/
                 delegate: infoDelegate
                 model:progressAnalysisListVm;
-                property var strategyNames:[lt+qsTr("Full threshold"),lt+qsTr("Smart interactive"),lt+qsTr("Fast interactive")];
+                property var strategyNames:[lt+qsTr("Full threshold"),lt+qsTr("Fast threshold"),lt+qsTr("Smart interactive"),lt+qsTr("Fast interactive")];
 
 //                currentIndex: progressAnalysisListVm.selectedIndex;
 //                currentIndex: count-1;

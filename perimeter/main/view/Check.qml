@@ -245,7 +245,8 @@ Item {id:root; width: 1366;height: 691
 //                            }
 //                        }
                         Rectangle{id: realTimeDBRec;visible:false;anchors.fill: parent;anchors.margins: parent.height*0.02;color:"grey";z:1;
-                            CusButton{opacity:0.5;anchors.right: parent.right;  anchors.top: parent.top;anchors.topMargin: 0; anchors.rightMargin: 0;z:1; imageHightScale: 1;height:image.sourceSize.height; width:image.sourceSize.width; rec.visible: false;imageSrc: "qrc:/Pics/base-svg/window_4close_1normal.svg";hoverImageSrc:"qrc:/Pics/base-svg/window_4close_2hover.svg";pressImageSrc: "qrc:/Pics/base-svg/window_4close_3press.svg";onClicked: parent.visible=false;}
+                            CusButton{opacity:0.5;anchors.right: parent.right;  anchors.top: parent.top;anchors.topMargin: 0; anchors.rightMargin: 0;z:1; imageHightScale: 1;height:image.sourceSize.height; width:image.sourceSize.width; rec.visible: false;imageSrc: "qrc:/Pics/base-svg/window_4close_1normal.svg";hoverImageSrc:"qrc:/Pics/base-svg/window_4close_2hover.svg";pressImageSrc: "qrc:/Pics/base-svg/window_4close_3press.svg";
+                                onClicked: {checkDisplay.clickedDotIndex=-1;parent.visible=false;}}
                             Grid{anchors.fill: parent;rows: 3;columns: 2;rowSpacing:(height-width/2*3)/2;columnSpacing: 0;
                                 Repeater{id:repeater;model:listModel;
                                     property ListModel listModel:ListModel{}

@@ -180,7 +180,7 @@ QString AnalysisLobbyListVm::drawImage(CheckResult_ptr checkResult_ptr)
             }
             else if(checkReport(4))
             {
-                analysisMethodSvc->drawText(values,locs,range,OS_OD,img);
+                analysisMethodSvc->drawText(values,locs,range,OS_OD,img,{-1});
             }
         }
 

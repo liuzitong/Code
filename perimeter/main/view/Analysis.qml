@@ -91,7 +91,7 @@ Column {
                     {
                         height: parent.height; layoutDirection: Qt.RightToLeft;spacing: height*0.8;width: parent.width
                         anchors.horizontalCenter: parent.horizontalCenter
-                        CusButton{text:lt+qsTr("Print");onClicked:analysisVm.showReport(report);}
+                        CusButton{text:lt+qsTr("Print");onClicked:{console.log(currentCheckResult.diagnosis);analysisVm.showReport(report);}}
                     }
                 }
             }

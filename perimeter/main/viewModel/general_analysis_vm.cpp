@@ -105,12 +105,12 @@ StaticAnalysisVm::StaticAnalysisVm(const QVariantList &args)
         if(report==0)
         {
             analysisMethodSvc->ThresholdAnalysis(resultId,m_dev,m_mDev,m_peDev,m_peMDev,m_md,m_psd,m_VFI,m_GHT,m_p_md,m_p_psd);
-            analysisMethodSvc->drawText(m_values,m_locs,m_range,m_OS_OD,img);img.save(m_previewFolder+"dBDiagram.bmp");
+            analysisMethodSvc->drawText(m_values,m_locs,m_range,m_OS_OD,img,{-1});img.save(m_previewFolder+"dBDiagram.bmp");
             analysisMethodSvc->drawGray(m_values,m_locs,m_range,m_innerRange,img);img.save(m_previewFolder+"gray.bmp");
 
 
-            analysisMethodSvc->drawText(m_dev,m_locs,m_range,m_OS_OD,img);img.save(m_previewFolder+"TotalDeviation.bmp");
-            analysisMethodSvc->drawText(m_mDev,m_locs,m_range,m_OS_OD,img);img.save(m_previewFolder+"PatternDeviation.bmp");
+            analysisMethodSvc->drawText(m_dev,m_locs,m_range,m_OS_OD,img,{-99});img.save(m_previewFolder+"TotalDeviation.bmp");
+            analysisMethodSvc->drawText(m_mDev,m_locs,m_range,m_OS_OD,img,{-99});img.save(m_previewFolder+"PatternDeviation.bmp");
 
             analysisMethodSvc->drawPE(m_peDev,m_locs,m_range,img);img.save(m_previewFolder+"TotalPE.bmp");
             analysisMethodSvc->drawPE(m_peMDev,m_locs,m_range,img);img.save(m_previewFolder+"PatternPE.bmp");
@@ -119,14 +119,14 @@ StaticAnalysisVm::StaticAnalysisVm(const QVariantList &args)
         else if(report==1)
         {
             analysisMethodSvc->ThreeInOneAnalysis(resultId,m_dev);
-            analysisMethodSvc->drawText(m_values,m_locs,m_range,m_OS_OD,img);img.save(m_previewFolder+"dBDiagram.bmp");
+            analysisMethodSvc->drawText(m_values,m_locs,m_range,m_OS_OD,img,{-1});img.save(m_previewFolder+"dBDiagram.bmp");
             analysisMethodSvc->drawGray(m_values,m_locs,m_range,m_innerRange,img);img.save(m_previewFolder+"gray.bmp");
             analysisMethodSvc->drawDefectDepth(m_dev,m_locs,m_range,img);img.save(m_previewFolder+"defectDepth.bmp");
         }
         else if(report==2)
         {
             analysisMethodSvc->ThresholdAnalysis(resultId,m_dev,m_mDev,m_peDev,m_peMDev,m_md,m_psd,m_VFI,m_GHT,m_p_md,m_p_psd);
-            analysisMethodSvc->drawText(m_values,m_locs,m_range,m_OS_OD,img);img.save(m_previewFolder+"dBDiagram.bmp");
+            analysisMethodSvc->drawText(m_values,m_locs,m_range,m_OS_OD,img,{-1});img.save(m_previewFolder+"dBDiagram.bmp");
             analysisMethodSvc->drawGray(m_values,m_locs,m_range,m_innerRange,img);img.save(m_previewFolder+"gray.bmp");
             analysisMethodSvc->drawPE(m_peDev,m_locs,m_range,img);img.save(m_previewFolder+"TotalPE.bmp");
             analysisMethodSvc->drawPE(m_peMDev,m_locs,m_range,img);img.save(m_previewFolder+"PatternPE.bmp");
@@ -134,12 +134,12 @@ StaticAnalysisVm::StaticAnalysisVm(const QVariantList &args)
         else if(report==3)
         {
             analysisMethodSvc->ThreeInOneAnalysis(resultId,m_dev);
-            analysisMethodSvc->drawText(m_values,m_locs,m_range,m_OS_OD,img,0.8);img.save(m_previewFolder+"dBDiagram.bmp");
+            analysisMethodSvc->drawText(m_values,m_locs,m_range,m_OS_OD,img,{-1},0.8);img.save(m_previewFolder+"dBDiagram.bmp");
             analysisMethodSvc->drawDefectDepth(m_dev,m_locs,m_range,img,0.8);img.save(m_previewFolder+"defectDepth.bmp");
         }
         else if(report==4)
         {
-            analysisMethodSvc->drawText(m_values,m_locs,m_range,m_OS_OD,img,0.8);img.save(m_previewFolder+"dBDiagram.bmp");
+            analysisMethodSvc->drawText(m_values,m_locs,m_range,m_OS_OD,img,{-1},0.8);img.save(m_previewFolder+"dBDiagram.bmp");
         }
     }
     else
@@ -209,36 +209,36 @@ void StaticAnalysisVm::showReport(int report)
         if(report==0)
         {
 //            analysisMethodSvc->DrawThreshold(resultId)
-            analysisMethodSvc->drawText(m_values,m_locs,m_range,m_OS_OD,img480,1.0,true);img480.save(m_reportFolder+"dBDiagram.bmp");
+            analysisMethodSvc->drawText(m_values,m_locs,m_range,m_OS_OD,img480,{-1},1.0,true);img480.save(m_reportFolder+"dBDiagram.bmp");
             analysisMethodSvc->drawGray(m_values,m_locs,m_range,m_innerRange,img480);img480.save(m_reportFolder+"gray.bmp");
 
-            analysisMethodSvc->drawText(m_dev,m_locs,m_range,m_OS_OD,img480,1.0,true);img480.save(m_reportFolder+"TotalDeviation.bmp");
-            analysisMethodSvc->drawText(m_mDev,m_locs,m_range,m_OS_OD,img480,1.0,true);img480.save(m_reportFolder+"PatternDeviation.bmp");
+            analysisMethodSvc->drawText(m_dev,m_locs,m_range,m_OS_OD,img480,{-99},1.0,true);img480.save(m_reportFolder+"TotalDeviation.bmp");
+            analysisMethodSvc->drawText(m_mDev,m_locs,m_range,m_OS_OD,img480,{-99},1.0,true);img480.save(m_reportFolder+"PatternDeviation.bmp");
 
             analysisMethodSvc->drawPE(m_peDev,m_locs,m_range,img480);img480.save(m_reportFolder+"TotalPE.bmp");
             analysisMethodSvc->drawPE(m_peMDev,m_locs,m_range,img480);img480.save(m_reportFolder+"PatternPE.bmp");
         }
         else if(report==1)
         {
-            analysisMethodSvc->drawText(m_values,m_locs,m_range,m_OS_OD,img480,1.0,true);img480.save(m_reportFolder+"dBDiagram.bmp");
+            analysisMethodSvc->drawText(m_values,m_locs,m_range,m_OS_OD,img480,{-1},1.0,true);img480.save(m_reportFolder+"dBDiagram.bmp");
             analysisMethodSvc->drawGray(m_values,m_locs,m_range,m_innerRange,img480);img480.save(m_reportFolder+"gray.bmp");
             analysisMethodSvc->drawDefectDepth(m_dev,m_locs,m_range,img480,1.0,true);img480.save(m_reportFolder+"defectDepth.bmp");
         }
         else if(report==2)
         {
-            analysisMethodSvc->drawText(m_values,m_locs,m_range,m_OS_OD,img480,1.0,true);img480.save(m_reportFolder+"dBDiagram.bmp");
+            analysisMethodSvc->drawText(m_values,m_locs,m_range,m_OS_OD,img480,{-1},1.0,true);img480.save(m_reportFolder+"dBDiagram.bmp");
             analysisMethodSvc->drawGray(m_values,m_locs,m_range,m_innerRange,img480);img480.save(m_reportFolder+"gray.bmp");
             analysisMethodSvc->drawPE(m_peDev,m_locs,m_range,img480);img480.save(m_reportFolder+"TotalPE.bmp");
             analysisMethodSvc->drawPE(m_peMDev,m_locs,m_range,img480);img480.save(m_reportFolder+"PatternPE.bmp");
         }
         else if(report==3)
         {
-            analysisMethodSvc->drawText(m_values,m_locs,m_range,m_OS_OD,img800,0.8,true);img800.save(m_reportFolder+"dBDiagram.bmp");
+            analysisMethodSvc->drawText(m_values,m_locs,m_range,m_OS_OD,img800,{-1},0.8,true);img800.save(m_reportFolder+"dBDiagram.bmp");
             analysisMethodSvc->drawDefectDepth(m_dev,m_locs,m_range,img800,0.8,true);img800.save(m_reportFolder+"defectDepth.bmp");
         }
         else if(report==4)
         {
-            analysisMethodSvc->drawText(m_values,m_locs,m_range,m_OS_OD,img1100,0.8,true);img1100.save(m_reportFolder+"dBDiagram.bmp");
+            analysisMethodSvc->drawText(m_values,m_locs,m_range,m_OS_OD,img1100,{-1},0.8,true);img1100.save(m_reportFolder+"dBDiagram.bmp");
         }
     }
     else
@@ -360,7 +360,11 @@ void StaticAnalysisVm::showReport(int report)
 
 
     manager->setReportVariable("FixationDeviationImagePath","./reportImage/FixationDeviation.bmp");
-    manager->setReportVariable("DiagnosisContent", m_checkResult.m_diagnosis);
+    //可能更新过,qml中的和这个不是同一个内存空间,需要重新从数据库刷新
+    CheckResult_ptr checkResult_ptr(new CheckResult());
+    checkResult_ptr->m_id=m_checkResult.m_id;
+    qx::dao::fetch_by_id(checkResult_ptr);
+    manager->setReportVariable("DiagnosisContent",checkResult_ptr->m_diagnosis);
     manager->setReportVariable("deviceInfo",tr("Device info")+QString(":")+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("deviceInfo").toString());
     manager->setReportVariable("version", tr("Version")+QString(":")+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("version").toString());
 

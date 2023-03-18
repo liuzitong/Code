@@ -42,7 +42,7 @@ public:
 
     void drawRoundCrossPixScale(int range,QImage& img);
 
-    void drawText(QVector<int> values,QVector<QPointF> locs,int range,int OS_OD,QImage& img,float minificationFactor=1.0,bool isReport=false);             //db,dev,mdev
+    void drawText(QVector<int> values,QVector<QPointF> locs,int range,int OS_OD,QImage& img,QVector<int> hideNumbers/*包括了一般情况和 dev mdev*/,float minificationFactor=1.0,bool isReport=false);             //db,dev,mdev
 
     void drawGray(QVector<int> values,QVector<QPointF> locs,int range,int innerRange,QImage& img);
 

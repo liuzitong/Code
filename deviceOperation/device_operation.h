@@ -98,7 +98,7 @@ public:
 public:
     Status m_status={-1,-1,-1};
     bool m_isDeviceReady=false,m_autoAlignPupil=true;
-    float m_deviation;
+    float m_deviation=0;
 //    bool m_deviation_valid;
     QSize m_videoSize;
     QSharedPointer<UsbDev::DevCtl> m_devCtl;
