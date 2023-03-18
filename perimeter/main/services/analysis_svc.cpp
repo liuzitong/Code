@@ -763,13 +763,13 @@ void AnalysisSvc::drawRoundCrossPixScale(int range, QImage &img)
     }
 }
 
-void AnalysisSvc::drawText(QVector<int> values,QVector<QPointF> locs,int range,int OS_OD,QImage& img,float minificationFactor,bool isReport)
+void AnalysisSvc::drawText(QVector<int> values,QVector<QPointF> locs,int range,int OS_OD,QImage& img,QVector<int> hideNumbers,float minificationFactor,bool isReport)
 {
     img.fill(qRgb(255, 255, 255));
     drawPixScale(range,img);
     QPainter painter(&img);
 //    int fontPixSize=img.width()/17*minificationFactor;
-    int fontPixSize=qMin(int(img.width()/17*minificationFactor),!isReport?16:32);
+    int fontPixSize=qMin(int(img.width()/18*minificationFactor),!isReport?16:32);
     QFont font("consolas");
     font.setPixelSize(fontPixSize);
     painter.setFont(font);
@@ -783,13 +783,41 @@ void AnalysisSvc::drawText(QVector<int> values,QVector<QPointF> locs,int range,i
     blindImage=blindImage.scaled(blindImage.width()*scale,blindImage.height()*scale);
     painter.drawImage(QPoint{pixLoc.x()-blindImage.width()/2,pixLoc.y()-blindImage.height()/2},blindImage);
 
-    for(int i=0;i<locs.length()&&i<values.length();i++)             //画DB图
+    for(int i=0;i<values.length();i++)             //画DB图
     {
-        if(values[i]==-99) continue;
-        auto pixLoc=convertDegLocToPixLoc(locs[i],range,img);
-        const QRect rectangle = QRect(pixLoc.x()-fontPixSize*1.6*0.45, pixLoc.y()-fontPixSize*0.8/2, fontPixSize*1.6,fontPixSize*0.8);
-        painter.drawText(rectangle,Qt::AlignCenter,QString::number(values[i]));
-        img.setPixel(pixLoc.x(),pixLoc.y(),0xFFFF0000); //标个小红点
+        bool isHideNumber=false;
+        for(auto& j:hideNumbers)
+        {
+            if(values[i]==j)
+            {
+                isHideNumber=true;
+                break;
+            }
+        }
+        if(isHideNumber) continue;
+        if(i<locs.length())
+        {
+            auto pixLoc=convertDegLocToPixLoc(locs[i],range,img);
+            const QRect rectangle = QRect(pixLoc.x()-fontPixSize*1.6*0.45, pixLoc.y()-fontPixSize*0.8/2, fontPixSize*1.6,fontPixSize*0.8);
+            painter.drawText(rectangle,Qt::AlignCenter,QString::number(values[i]));
+//            img.setPixel(pixLoc.x(),pixLoc.y(),0xFFFF0000); //标个小红点
+        }
+        else if(i>=locs.length()&&i<2*locs.length())            //短周期
+        {
+            auto pixLoc=convertDegLocToPixLoc(locs[i-locs.length()],range,img);
+            const QRect rectangle = QRect(pixLoc.x()-fontPixSize*2.0*0.50, pixLoc.y()-fontPixSize*1.0/2+fontPixSize, fontPixSize*2.0,fontPixSize*1.0);
+            if(pixLoc.y()+fontPixSize*1.5>img.height()) continue;  //防止超过图片范围,干脆不显示
+            painter.fillRect(rectangle,QBrush{Qt::white});
+            painter.drawText(rectangle,Qt::AlignCenter,"("+QString::number(values[i])+")");
+//            img.setPixel(pixLoc.x(),pixLoc.y(),0xFFFF0000); //标个小红点
+        }
+        else if(i==locs.length()*2)                           //中心点
+        {
+            auto pixLoc=convertDegLocToPixLoc({0,0},range,img);
+            const QRect rectangle = QRect(pixLoc.x()-fontPixSize*1.6*0.45, pixLoc.y()-fontPixSize*0.8/2, fontPixSize*1.6,fontPixSize*0.8);
+            painter.fillRect(rectangle,QBrush{Qt::white});
+            painter.drawText(rectangle,Qt::AlignCenter,QString::number(values[i]));
+        }
     }
 }
 

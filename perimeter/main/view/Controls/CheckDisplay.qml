@@ -9,7 +9,6 @@ Item{
     property var currentCheckResult:null;
     property int clickedDotIndex: -1;
     property alias testOver:displayCanvas.testOver;
-
 //    function testOver() {displayCanvas.testOver=true;displayCanvas.requestPaint();}
 
     onCurrentProgramChanged: displayCanvas.requestPaint();

@@ -8,6 +8,7 @@
 #include <deviceOperation/device_operation.h>
 #include <tuple>
 #include "frame_provid_svc.h"
+#include <array>
 namespace Perimeter{
 constexpr int MaxDB=52;
 constexpr int MinDB=0;
@@ -120,15 +121,11 @@ void StaticCheck::initialize()
     {
     case FixationTarget::centerPoint:m_y_offset=0;break;
     case FixationTarget::bigDiamond:
-    case FixationTarget::smallDiamond:m_y_offset=-y_offsetDiamond;break;
-    case FixationTarget::bottomPoint:m_y_offset=-y_offsetBottomPoint;break;
+    case FixationTarget::smallDiamond:m_y_offset=y_offsetDiamond;break;
+    case FixationTarget::bottomPoint:m_y_offset=y_offsetBottomPoint;break;
     }
 
-    if(m_resultModel->m_params.commonParams.fixationTarget==FixationTarget::centerPoint&&m_resultModel->m_params.commonParams.centerDotCheck==true)
-    {
-        m_centerDotRecord.loc={0,float(y_offsetDiamond)};
-        m_centerDotRecord.index=m_totalCount*2;
-    }
+
 
     int DBChanged=0;
     if(m_programModel->m_params.commonParams.strategy==StaticParams::CommonParams::Strategy::oneStage
@@ -147,7 +144,11 @@ void StaticCheck::initialize()
         m_isDoingBaseDotsCheck=true;
     }
 
-
+//    QPointF centerDotLoc;
+//    if(m_resultModel->m_params.commonParams.fixationTarget==FixationTarget::centerPoint)
+//    {
+//        centerDotLoc={0,float(y_offsetDiamond)};
+//    }
     if(m_programModel->m_params.commonParams.strategy!=StaticParams::CommonParams::Strategy::singleStimulation)
     {
         for(int i=0;i<m_totalCount;i++)
@@ -169,6 +170,7 @@ void StaticCheck::initialize()
             }
             m_dotRecords.push_back(DotRecord{i,QPointF{dot.x,dot.y},stimulationDBs,-1,{},isBaseDot,false,MinDB,MaxDB});
         }
+
         m_centerDotRecord=DotRecord{m_totalCount*2,QPointF{0,0},{m_utilitySvc->getExpectedDB(m_value_30d,{0,0},m_resultModel->m_OS_OD)+DBChanged},-1,{},false,false,MinDB,MaxDB};
     }
     else                            //单刺激
@@ -181,7 +183,8 @@ void StaticCheck::initialize()
         }
         m_centerDotRecord=DotRecord{m_totalCount*2,QPointF{0,0},{DB},-1,{},false,false,MinDB,MaxDB};
     }
-//    m_deviceOperation->setCursorColorAndCursorSize(int(cursorColor),int(cursorSize));
+    if(m_deviceOperation->m_isDeviceReady)
+        m_deviceOperation->setCursorColorAndCursorSize(int(cursorColor),int(cursorSize));
 }
 
 //第一次先跑点,直接刺激,第二次跑点,等待上次刺激的应答,然后再刺激,再跑点,再等待上次的应答.(保证再等待应答的同时跑点.)
@@ -194,14 +197,16 @@ void StaticCheck::Checkprocess()
     {
         qDebug()<<"checkCycleLocAndDB loc:"<<std::get<1>(checkCycleLocAndDB)<<" DB"<<std::get<2>(checkCycleLocAndDB);
         m_lastCheckDotRecord.push_back(nullptr);
-//        getReadyToStimulate(std::get<1>(checkCycleLocAndDB),std::get<2>(checkCycleLocAndDB));
+        if(m_deviceOperation->m_isDeviceReady)
+            getReadyToStimulate(std::get<1>(checkCycleLocAndDB),std::get<2>(checkCycleLocAndDB));
     }
     else
     {
         m_lastCheckDotRecord.push_back(&getCheckDotRecordRef());   //存储lastDotType为commondot 并且存储指针
         auto dotRec=m_lastCheckDotRecord.last();
         qDebug()<<"getCheckDotRecordRef loc:"<<dotRec->loc<<" DB:"<<QString::number(dotRec->StimulationDBs.last())<<"upper:"<<QString::number(dotRec->upperBound)<<"lower:"<<QString::number(dotRec->lowerBound);
-//        getReadyToStimulate(m_lastCheckDotRecord.last()->loc,m_lastCheckDotRecord.last()->StimulationDBs.last());
+        if(m_deviceOperation->m_isDeviceReady)
+            getReadyToStimulate(m_lastCheckDotRecord.last()->loc,m_lastCheckDotRecord.last()->StimulationDBs.last());
     }
 //    if(!m_lastCheckeDotType.isEmpty())
 //    {
@@ -216,7 +221,8 @@ void StaticCheck::Checkprocess()
     {
         m_stimulationCount++;
         m_stimulated=true;
-        stimulate();
+        if(m_deviceOperation->m_isDeviceReady)
+            stimulate();
     }
 }
 
@@ -396,17 +402,32 @@ StaticCheck::DotRecord &StaticCheck::getCheckDotRecordRef()
 
 void StaticCheck::stimulate()
 {
-//    int durationTime=m_programModel->m_params.fixedParams.stimulationTime;
-//    if(m_lastCheckeDotType.last()!=LastCheckedDotType::falseNegativeTest)               //假阴不开快门
-//        m_deviceOperation->openShutter(durationTime);
-//    else
-//    {
-//        m_deviceOperation->waitForSomeTime(durationTime);
-//    }
+    int durationTime=m_programModel->m_params.fixedParams.stimulationTime;
+    auto lastCheckedDotType=m_lastCheckeDotType.last();
+    if(lastCheckedDotType!=LastCheckedDotType::falseNegativeTest)               //假阴不开快门
+    {
+        m_deviceOperation->openShutter(durationTime);
+        switch (lastCheckedDotType)
+        {
+        case LastCheckedDotType::blindDotTest:
+        case LastCheckedDotType::falsePositiveTest:m_resultModel->m_data.fixationDeviation.push_back(-m_deviceOperation->m_deviation);break;
+        case LastCheckedDotType::commonCheckDot:m_resultModel->m_data.fixationDeviation.push_back(m_deviceOperation->m_deviation);break;
+        default:break;
+        }
+    }
+    else
+    {
+        m_deviceOperation->waitForSomeTime(durationTime);
+        m_resultModel->m_data.fixationDeviation.push_back(-m_deviceOperation->m_deviation);
+    }
 }
 
 void StaticCheck::getReadyToStimulate(QPointF loc, int DB)
 {
+    if(loc.x()==0&&loc.y()==0&&m_y_offset==0)
+    {
+        loc.ry()=y_offsetDiamond;                       //固视点为中心点时候的中心点检查
+    }
     m_deviceOperation->getReadyToStimulate({loc.x(),loc.y()+m_y_offset},int(m_resultModel->m_params.commonParams.cursorSize),DB);
 }
 
@@ -593,7 +614,6 @@ void StaticCheck::ProcessAnswer(bool answered)
     }
     case LastCheckedDotType::blindDotTest:
     {
-        m_resultModel->m_data.fixationDeviation.push_back(-m_deviceOperation->m_deviation);
         m_resultModel->m_data.fixationLostTestCount++;
         if(answered)
             m_resultModel->m_data.fixationLostCount++;
@@ -601,7 +621,6 @@ void StaticCheck::ProcessAnswer(bool answered)
     }
     case LastCheckedDotType::falsePositiveTest:
     {
-        m_resultModel->m_data.fixationDeviation.push_back(-m_deviceOperation->m_deviation);
         m_resultModel->m_data.falsePositiveTestCount++;
         if(!answered)
             m_resultModel->m_data.falsePositiveCount++;
@@ -609,7 +628,6 @@ void StaticCheck::ProcessAnswer(bool answered)
     }
     case LastCheckedDotType::falseNegativeTest:
     {
-        m_resultModel->m_data.fixationDeviation.push_back(-m_deviceOperation->m_deviation);
         m_resultModel->m_data.falseNegativeTestCount++;
         if(answered)
         {
@@ -619,7 +637,6 @@ void StaticCheck::ProcessAnswer(bool answered)
     }
     case LastCheckedDotType::commonCheckDot:
     {
-        m_resultModel->m_data.fixationDeviation.push_back(m_deviceOperation->m_deviation);
         int dotDB=lastCheckedDot->StimulationDBs.last();
         answered?lastCheckedDot->lowerBound=dotDB:lastCheckedDot->upperBound=dotDB;
         qDebug()<<"upper:"+QString::number(lastCheckedDot->upperBound);
@@ -761,14 +778,11 @@ void StaticCheck::ProcessAnswer(bool answered)
         }
         if(lastCheckedDot->checked==true)
         {
-            qDebug()<<"last Checked Index:"<<QString::number(lastCheckedDot->index);
-            qDebug()<<"checked Count:"<<QString::number(m_checkedCount);
-//                qDebug()<<QString::number(m_resultModel->m_data.realTimeDB.size());
-//                qDebug()<<QString::number(lastCheckedDot->index);
-//                qDebug()<<lastCheckedDot->StimulationDBs;
             if(m_lastCheckDotRecord.last()!=nullptr&&m_lastCheckDotRecord.last()->index==lastCheckedDot->index)
             {
                 m_alreadyChecked=true;
+                if(m_deviceOperation->m_isDeviceReady)
+                    m_deviceOperation->move5Motors(std::array<bool,5>{false,false,false,false,false}.data(),std::array<int,5>{0,0,0,0,0}.data());       //没必要跑点了,早点停止可以立即跑下一个点
                 m_lastCheckDotRecord.pop_back();
                 m_lastCheckeDotType.pop_back();
             }          //下次要刺激的点,是已经检查了的,所以要移除所有下次的点
@@ -805,9 +819,14 @@ void StaticCheck::ProcessAnswer(bool answered)
 
 void StaticCheck::waitAndProcessAnswer()
 {
-//    auto answerResult=waitForAnswer();
-    auto answerResult=qrand()%100<50;
+bool answerResult;
+if(m_deviceOperation->m_isDeviceReady)
+     answerResult=waitForAnswer();
+else
+{
+    answerResult=qrand()%100<50;
     UtilitySvc::wait(100);
+}
 //    QThread::msleep(1000);
     ProcessAnswer(answerResult);
 }
