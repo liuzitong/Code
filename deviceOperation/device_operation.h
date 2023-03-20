@@ -33,26 +33,22 @@ class DEVICEOPERATIONSHARED_EXPORT DeviceOperation:public QObject
     Q_PROPERTY(bool pupilDiameter READ getPupilDiameter WRITE setPupilDiameter NOTIFY pupilDiameterChanged)
 public:
 
-    enum class ChinHozMoveDirection
+    enum class ChinMoveDirection
     {
         Left,
-        Stop,
         Right,
-    };
-    enum class ChinVertMoveDirection
-    {
         Up,
+        Down,
         Stop,
-        Down
     };
     DeviceOperation();
     ~DeviceOperation();
 //    static void Initialize();
-    void moveChinUp(){if(m_isDeviceReady) moveChin(ChinHozMoveDirection::Stop,ChinVertMoveDirection::Up);}
-    void moveChinDown(){if(m_isDeviceReady) moveChin(ChinHozMoveDirection::Stop,ChinVertMoveDirection::Down);}
-    void moveChinLeft(){if(m_isDeviceReady) moveChin(ChinHozMoveDirection::Left,ChinVertMoveDirection::Stop);}
-    void moveChinRight(){if(m_isDeviceReady) moveChin(ChinHozMoveDirection::Right,ChinVertMoveDirection::Stop);}
-    void stopMovingChin(){if(m_isDeviceReady) moveChin(ChinHozMoveDirection::Stop,ChinVertMoveDirection::Stop);}
+    void moveChinUp(){if(m_isDeviceReady) moveChin(ChinMoveDirection::Up);}
+    void moveChinDown(){if(m_isDeviceReady) moveChin(ChinMoveDirection::Down);}
+    void moveChinLeft(){if(m_isDeviceReady) moveChin(ChinMoveDirection::Left);}
+    void moveChinRight(){if(m_isDeviceReady) moveChin(ChinMoveDirection::Right);}
+    void stopMovingChin(){if(m_isDeviceReady) moveChin(ChinMoveDirection::Stop);}
     void turnOnVideo(){if(m_isDeviceReady) m_devCtl->setFrontVideo(true);}
     void turnOffVideo(){if(m_isDeviceReady) m_devCtl->setFrontVideo(false);}
     static QSharedPointer<DeviceOperation> getSingleton();
@@ -75,7 +71,7 @@ public:
 private:
     void setDB(int DB);
     void waitMotorStop(QVector<UsbDev::DevCtl::MotorId> motorIDs);
-    void moveChin(ChinHozMoveDirection hozChin,ChinVertMoveDirection vertChin);                        //0左,1不动,2右;0上,1不动,2下
+    void moveChin(ChinMoveDirection direction);       //0左,1不动,2右;0上,1不动,2下
 public slots:
     void workOnNewStatuData();
     void workOnNewFrameData();
@@ -106,7 +102,7 @@ public:
     UsbDev::Config m_config;
     UsbDev::Profile m_profile;
     UsbDev::StatusData m_statusData;
-    QMutex m_statusLock;
+//    QMutex m_statusLock;                      //防止多线程冲突,放入同线程不再需要
     UsbDev::FrameData m_frameData;
     QByteArray m_frameRawData;
     QElapsedTimer m_shutterElapsedTimer;

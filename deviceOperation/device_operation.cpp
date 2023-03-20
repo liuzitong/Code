@@ -332,17 +332,17 @@ void DeviceOperation::waitMotorStop(QVector<UsbDev::DevCtl::MotorId> motorIDs)
     //次
     auto getBusy=[&]()->bool
     {
-        m_statusLock.lock();
+//        m_statusLock.lock();
 //        qDebug()<<"waitMotorStop:"+QString::number(int(thread()->currentThread()),16);
         for(auto& motorId:motorIDs)
         {
             if(m_statusData.isMotorBusy(motorId))
             {
-                m_statusLock.unlock();
+//                m_statusLock.unlock();
                 return true;
             }
         }
-        m_statusLock.unlock();
+//        m_statusLock.unlock();
         return false;
     };
     QElapsedTimer mstimer;
@@ -364,61 +364,59 @@ void DeviceOperation::waitForSomeTime(int time)
     }while(mstimer.elapsed()<time);
 }
 
-void DeviceOperation::moveChin(ChinHozMoveDirection hozChin, ChinVertMoveDirection vertChin)
+void DeviceOperation::moveChin(ChinMoveDirection direction)
 {
     auto profile=m_devCtl->profile();
-    quint8 sps[2]{0};
-    int motorPos[2]{0};
     auto spsConfig=DeviceSettings::getSingleton()->m_motorChinSpeed;
-    switch(hozChin)
+
+    quint8 sps[2]{0,0};
+    int motorPos[2]{0,0};
+    switch(direction)
     {
-    case ChinHozMoveDirection::Left:
+    case ChinMoveDirection::Left:
     {
+        sps[0]=spsConfig[0];
         motorPos[0]=profile.motorRange(UsbDev::DevCtl::MotorId_Chin_Hoz).first;
-        sps[0]=spsConfig[0];
+        m_devCtl->moveChinMotors(sps,motorPos);
         break;
     }
-    case ChinHozMoveDirection::Right:
+    case ChinMoveDirection::Right:
     {
+        sps[0]=spsConfig[0];
         motorPos[0]=profile.motorRange(UsbDev::DevCtl::MotorId_Chin_Hoz).second;
-        sps[0]=spsConfig[0];
+        m_devCtl->moveChinMotors(sps,motorPos);
         break;
     }
-    case ChinHozMoveDirection::Stop:
+    case ChinMoveDirection::Up:
     {
+        sps[1]=spsConfig[1];
+        motorPos[1]=profile.motorRange(UsbDev::DevCtl::MotorId_Chin_Vert).first;
+        m_devCtl->moveChinMotors(sps,motorPos);
         break;
     }
+    case ChinMoveDirection::Down:
+    {
+        sps[1]=spsConfig[1];
+        motorPos[1]=profile.motorRange(UsbDev::DevCtl::MotorId_Chin_Vert).second;
+        m_devCtl->moveChinMotors(sps,motorPos);
+        break;
     }
 
-    switch(vertChin)
+    case ChinMoveDirection::Stop:
     {
-    case ChinVertMoveDirection::Up:
-    {
-        motorPos[1]=profile.motorRange(UsbDev::DevCtl::MotorId_Chin_Vert).first;
-        sps[1]=spsConfig[1];
-        break;
-    }
-    case ChinVertMoveDirection::Down:
-    {
-        motorPos[1]=profile.motorRange(UsbDev::DevCtl::MotorId_Chin_Vert).second;
-        sps[1]=spsConfig[1];
-        break;
-    }
-    case ChinVertMoveDirection::Stop:
-    {
+        m_devCtl->moveChinMotors(std::array<quint8,2>{1,1}.data(),std::array<qint32,2>{0,0}.data(),UsbDev::DevCtl::MoveMethod::Relative);
         break;
     }
     }
-    m_devCtl->moveChinMotors(sps,motorPos);
 }
 
 
 void DeviceOperation::workOnNewStatuData()
 {
-    //主
-    m_statusLock.lock();
+//    //主
+//    m_statusLock.lock();
     m_statusData=m_devCtl->takeNextPendingStatusData();
-    m_statusLock.unlock();
+//    m_statusLock.unlock();
 //    static int count=1;
 //    count++;
 //    if(count%50==0)
@@ -441,34 +439,32 @@ void DeviceOperation::workOnNewFrameData()
     if(!valid){ return;}
     auto centerPoint=vc[0];
 //    auto deviationPix=sqrt(pow(centerPoint.x(),2)+pow(centerPoint.y(),2));
+    auto step=DeviceSettings::getSingleton()->m_pupilAutoAlignStep;
     m_deviation=DeviceDataProcesser::caculateFixationDeviation(centerPoint);
     if(m_autoAlignPupil)                //自动对眼位
     {
         int tolerance=DeviceSettings::getSingleton()->m_pupilAutoAlignPixelTolerance;
-        quint8 sps[2]{0};
-        int motorPos[2]{0};
         auto spsConfig=DeviceSettings::getSingleton()->m_motorChinSpeed;
+        quint8 sps[2]{spsConfig[0],spsConfig[1]};
+        int motorPos[2]{0};
         if(centerPoint.x()>tolerance)
         {
-            sps[0]=spsConfig[0];
-            motorPos[0]=profile.motorRange(UsbDev::DevCtl::MotorId_Chin_Hoz).first;
+            motorPos[0]=step;
         }
         if(centerPoint.x()<-tolerance)
         {
-            sps[0]=spsConfig[0];
-            motorPos[0]=profile.motorRange(UsbDev::DevCtl::MotorId_Chin_Hoz).second;
+            motorPos[0]=-step;
         }
         if(centerPoint.y()>tolerance)
         {
-            sps[1]=spsConfig[1];
-            motorPos[1]=profile.motorRange(UsbDev::DevCtl::MotorId_Chin_Vert).first;
+            motorPos[1]=step;
         }
         if(centerPoint.y()<-tolerance)
         {
-            sps[1]=spsConfig[1];
-            motorPos[1]=profile.motorRange(UsbDev::DevCtl::MotorId_Chin_Vert).second;
+            motorPos[1]=-step;
         }
-        m_devCtl->moveChinMotors(sps,motorPos);
+        m_devCtl->moveChinMotors(sps,motorPos,UsbDev::DevCtl::MoveMethod::Relative);
+
     }
     if(m_pupilDiameter<0)
     {

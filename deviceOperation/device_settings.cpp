@@ -42,7 +42,7 @@ DeviceSettings::DeviceSettings()
     m_VID = m_rootObj.value("VID").toString();
 
     m_pupilAutoAlignPixelTolerance=m_rootObj.value("pupilAutoAlignPixelTolerance").toInt();
-
+    m_pupilAutoAlignStep=m_rootObj.value("pupilAutoAlignStep").toInt();
     localConfigPath=m_rootObj.value("localConfigPath").toString();
     localDataPath=m_rootObj.value("localDataPath").toString();
 

@@ -218,7 +218,15 @@ private:
 //    QTimer* m_videoTimer=NULL;
 //    int m_videoCount=0;
 
-
+    enum class ChinMoveDirection
+    {
+        Left,
+        Right,
+        Up,
+        Down,
+        Stop,
+    };
+    void moveChin(ChinMoveDirection direction);
 };
 
 #endif // MAINWINDOW_H

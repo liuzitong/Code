@@ -520,62 +520,42 @@ void MainWindow::on_pushButton_cameraSwitch_clicked()
 
 void MainWindow::on_pushButton_chinMoveUp_pressed()
 {
-    if(m_profile.isEmpty()){showDevInfo("empty profile");return;}
-    qint32 value[2]={0};quint8 speed[2]={0};
-    speed[1]=ui->spinBox_speedChinMove->text().toInt();
-    value[1]=m_profile.motorRange(UsbDev::DevCtl::MotorId::MotorId_Y).first;
-    m_devCtl->moveChinMotors(speed,value,UsbDev::DevCtl::MoveMethod::Abosolute);
+    moveChin(ChinMoveDirection::Up);
 }
 
 void MainWindow::on_pushButton_chinMoveUp_released()
 {
-    qint32 value[2]={0};quint8 speed[2]={0};
-    m_devCtl->moveChinMotors(speed,value,UsbDev::DevCtl::MoveMethod::Abosolute);
+   moveChin(ChinMoveDirection::Stop);
 }
 
 void MainWindow::on_pushButton_chinMoveDown_pressed()
 {
-    if(m_profile.isEmpty()){showDevInfo("empty profile");return;}
-    qint32 value[2]={0};quint8 speed[2]={0};
-    speed[1]=ui->spinBox_speedChinMove->text().toInt();
-    value[1]=m_profile.motorRange(UsbDev::DevCtl::MotorId::MotorId_Y).second;
-    m_devCtl->moveChinMotors(speed,value,UsbDev::DevCtl::MoveMethod::Abosolute);
+    moveChin(ChinMoveDirection::Down);
 }
 
 void MainWindow::on_pushButton_chinMoveDown_released()
 {
-    qint32 value[2]={0};quint8 speed[2]={0};
-    m_devCtl->moveChinMotors(speed,value,UsbDev::DevCtl::MoveMethod::Abosolute);
+    moveChin(ChinMoveDirection::Stop);
 }
 
 void MainWindow::on_pushButton_chinMoveLeft_pressed()
 {
-    if(m_profile.isEmpty()){showDevInfo("empty profile");return;}
-    qint32 value[2]={0};quint8 speed[2]={0};
-    speed[0]=ui->spinBox_speedChinMove->text().toInt();
-    value[0]=m_profile.motorRange(UsbDev::DevCtl::MotorId::MotorId_X).first;
-    m_devCtl->moveChinMotors(speed,value,UsbDev::DevCtl::MoveMethod::Abosolute);
+    moveChin(ChinMoveDirection::Left);
 }
 
 void MainWindow::on_pushButton_chinMoveLeft_released()
 {
-    qint32 value[2]={0};quint8 speed[2]={0};
-    m_devCtl->moveChinMotors(speed,value,UsbDev::DevCtl::MoveMethod::Abosolute);
+    moveChin(ChinMoveDirection::Stop);
 }
 
 void MainWindow::on_pushButton_chinMoveRight_pressed()
 {
-    if(m_profile.isEmpty()){showDevInfo("empty profile");return;}
-    qint32 value[2]={0};quint8 speed[2]={0};
-    speed[0]=ui->spinBox_speedChinMove->text().toInt();
-    value[0]=m_profile.motorRange(UsbDev::DevCtl::MotorId::MotorId_X).second;
-    m_devCtl->moveChinMotors(speed,value,UsbDev::DevCtl::MoveMethod::Abosolute);
+    moveChin(ChinMoveDirection::Right);
 }
 
 void MainWindow::on_pushButton_chinMoveRight_released()
 {
-    qint32 value[2]={0};quint8 speed[2]={0};
-    m_devCtl->moveChinMotors(speed,value,UsbDev::DevCtl::MoveMethod::Abosolute);
+    moveChin(ChinMoveDirection::Stop);
 }
 
 void MainWindow::on_pushButton_light1_clicked()
@@ -1280,6 +1260,55 @@ void MainWindow::moveChinMotors(UsbDev::DevCtl::MoveMethod method)
     }
     m_devCtl->moveChinMotors(speed,value,method);
 }
+
+
+
+void MainWindow::moveChin(ChinMoveDirection direction)
+{
+
+    auto profile=m_devCtl->profile();
+    quint8 spsConfig[2]={ui->spinBox_speedChinMove->value(),ui->spinBox_speedChinMove->value()};
+    quint8 sps[2]{0,0};
+    int motorPos[2]{0,0};
+    switch(direction)
+    {
+    case ChinMoveDirection::Left:
+    {
+        sps[0]=spsConfig[0];
+        motorPos[0]=profile.motorRange(UsbDev::DevCtl::MotorId_Chin_Hoz).first;
+        m_devCtl->moveChinMotors(sps,motorPos);
+        break;
+    }
+    case ChinMoveDirection::Right:
+    {
+        sps[0]=spsConfig[0];
+        motorPos[0]=profile.motorRange(UsbDev::DevCtl::MotorId_Chin_Hoz).second;
+        m_devCtl->moveChinMotors(sps,motorPos);
+        break;
+    }
+    case ChinMoveDirection::Up:
+    {
+        sps[1]=spsConfig[1];
+        motorPos[1]=profile.motorRange(UsbDev::DevCtl::MotorId_Chin_Vert).first;
+        m_devCtl->moveChinMotors(sps,motorPos);
+        break;
+    }
+    case ChinMoveDirection::Down:
+    {
+        sps[1]=spsConfig[1];
+        motorPos[1]=profile.motorRange(UsbDev::DevCtl::MotorId_Chin_Vert).second;
+        m_devCtl->moveChinMotors(sps,motorPos);
+        break;
+    }
+
+    case ChinMoveDirection::Stop:
+    {
+        m_devCtl->moveChinMotors(std::array<quint8,2>{1,1}.data(),std::array<qint32,2>{0,0}.data(),UsbDev::DevCtl::MoveMethod::Relative);
+        break;
+    }
+    }
+}
+
 
 void MainWindow::move5Motors(UsbDev::DevCtl::MoveMethod method)
 {
