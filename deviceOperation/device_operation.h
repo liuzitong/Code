@@ -17,6 +17,8 @@
 #include <QMutex>
 
 namespace DevOps{
+using LampId=UsbDev::DevCtl::LampId;
+
 struct Status
 {
    int color;
@@ -61,6 +63,8 @@ public:
     void openShutter(int durationTime);
     void move5Motors(bool isMotorMove[],int MotorPoses[]);
     void setCursorColorAndCursorSize(int color, int size);
+    void setLamp(LampId id,int index,bool onOff);
+    void setWhiteLamp(bool onOff);
     bool getAnswerPadStatus();
     void waitForSomeTime(int time);
     void hello();
@@ -77,7 +81,7 @@ public slots:
     void workOnNewFrameData();
     void workOnNewProfile();
     void workOnNewConfig();
-    void workOnWorkStatusChanged();
+//    void workOnWorkStatusChanged();
 signals:
     void workStatusChanged();
     void newStatusData();
@@ -94,6 +98,7 @@ public:
 public:
     Status m_status={-1,-1,-1};
     bool m_isDeviceReady=false,m_autoAlignPupil=true;
+    bool m_isChecking=false;
     float m_deviation=0;
 //    bool m_deviation_valid;
     QSize m_videoSize;

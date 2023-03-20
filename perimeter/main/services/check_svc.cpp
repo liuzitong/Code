@@ -10,7 +10,7 @@
 #include "frame_provid_svc.h"
 #include <array>
 namespace Perimeter{
-constexpr int MaxDB=52;
+constexpr int MaxDB=51;
 constexpr int MinDB=0;
 class Check
 {
@@ -24,6 +24,9 @@ public:
     static constexpr int y_offsetDiamond=-8,y_offsetBottomPoint=-12;
     virtual void Checkprocess()=0;
     virtual void initialize()=0;
+    virtual void finished()=0;
+private:
+    virtual void setLight(bool onOff)=0;
 };
 
 class StaticCheck:public Check
@@ -81,6 +84,7 @@ public:
     }
     virtual void initialize() override;
     virtual void Checkprocess() override;
+    virtual void finished() override;
     std::tuple<bool,QPointF,int> getCheckCycleLocAndDB();
 private:
 
@@ -97,6 +101,75 @@ private:
     void ProcessAnswer(bool answered);
 
     void waitAndProcessAnswer();
+
+    virtual void setLight(bool onOff) override;
+};
+
+
+class DynamicCheck:public Check
+{
+
+public:
+    QSharedPointer<DynamicCheckResultModel> m_resultModel;
+    QSharedPointer<DynamicProgramModel> m_programModel;
+    DynamicCheck()=default;
+    ~DynamicCheck()=default;
+private:
+    QSharedPointer<UtilitySvc> m_utilitySvc=UtilitySvc::getSingleton();
+    QVector<int> unCheckedIndex;
+
+    virtual void initialize() override;
+
+    virtual void Checkprocess() override;
+
+    // Check interface
+public:
+    virtual void finished() override;
+
+private:
+    virtual void setLight(bool onOff) override;
+};
+
+
+class CheckSvcWorker : public QObject
+{
+    Q_OBJECT
+public:
+    QTimer m_timer;
+    int m_time=0;
+    int* m_checkState;
+    PatientVm* m_patientVm;
+    ProgramVm* m_programVm;
+    CheckResultVm* m_checkResultVm;
+
+private:
+    QSharedPointer<Check> m_check;
+public:
+    explicit CheckSvcWorker(){m_timer.setInterval(1000);connect(&m_timer,&QTimer::timeout,this,[&](){emit checkTimeChanged(m_time);m_time++;});}
+    virtual ~CheckSvcWorker() Q_DECL_OVERRIDE {}
+    void initialize();
+    void setCheckState(int value)
+    {
+        *m_checkState=value;
+        emit checkStateChanged();
+    }
+public slots:
+    void connectDev()
+    {
+        DevOps::DeviceOperation::getSingleton()->connectDev();    //连接设备
+    }
+    void disconnectDev()
+    {
+        DevOps::DeviceOperation::getSingleton()->disconnectDev();    //连接设备
+    }
+    void doWork();
+
+signals:
+    void checkStateChanged();
+    void checkResultChanged();
+    void checkProcessFinished();
+    void checkedCountChanged(int count);
+    void checkTimeChanged(int secs);
 };
 
 void StaticCheck::initialize()
@@ -183,8 +256,14 @@ void StaticCheck::initialize()
         }
         m_centerDotRecord=DotRecord{m_totalCount*2,QPointF{0,0},{DB},-1,{},false,false,MinDB,MaxDB};
     }
+
+    setLight(true);
+    m_deviceOperation->m_isChecking=true;
+
     if(m_deviceOperation->m_isDeviceReady)
         m_deviceOperation->setCursorColorAndCursorSize(int(cursorColor),int(cursorSize));
+
+
 }
 
 //第一次先跑点,直接刺激,第二次跑点,等待上次刺激的应答,然后再刺激,再跑点,再等待上次的应答.(保证再等待应答的同时跑点.)
@@ -224,6 +303,11 @@ void StaticCheck::Checkprocess()
         if(m_deviceOperation->m_isDeviceReady)
             stimulate();
     }
+}
+
+void StaticCheck::finished()
+{
+    setLight(false);
 }
 
 
@@ -498,10 +582,7 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
         if(m_stimulationCount>UtilitySvc::getSingleton()->m_checkCountBeforeGetBlindDotCheck&&m_blindDot.isEmpty())
         {
             QPoint blindDotLoc;
-            qDebug()<<m_blindDotLocateIndex;
-            qDebug()<<UtilitySvc::getSingleton()->m_left_blindDot;
-            qDebug()<<UtilitySvc::getSingleton()->m_right_blindDot;
-            if(m_resultModel->m_OS_OD)
+            if(m_resultModel->m_OS_OD==0)
                 blindDotLoc=UtilitySvc::getSingleton()->m_left_blindDot[m_blindDotLocateIndex];
             else
                 blindDotLoc=UtilitySvc::getSingleton()->m_right_blindDot[m_blindDotLocateIndex];
@@ -600,10 +681,9 @@ void StaticCheck::ProcessAnswer(bool answered)
     {
     case LastCheckedDotType::locateBlindDot:
     {
-
         if(answered)
         {
-            if(m_resultModel->m_OS_OD) m_blindDot.push_back(UtilitySvc::getSingleton()->m_left_blindDot[m_blindDotLocateIndex]);
+            if(m_resultModel->m_OS_OD==0) m_blindDot.push_back(UtilitySvc::getSingleton()->m_left_blindDot[m_blindDotLocateIndex]);
             else m_blindDot.push_back(UtilitySvc::getSingleton()->m_right_blindDot[m_blindDotLocateIndex]);
         }
         else
@@ -830,68 +910,72 @@ else
 //    QThread::msleep(1000);
     ProcessAnswer(answerResult);
 }
+void StaticCheck::setLight(bool onOff)
+{
+    if(!m_deviceOperation->m_isDeviceReady) return;
+    switch (m_programModel->m_params.commonParams.fixationTarget) {
+    case FixationTarget::centerPoint:m_deviceOperation->setLamp(DevOps::LampId::LampId_centerFixation,0,onOff); break;
+    case FixationTarget::bigDiamond:
+    {
+        for(int i=0;i<4;i++)
+            m_deviceOperation->setLamp(DevOps::LampId::LampId_bigDiamond,i,onOff); break;
+        break;
+    }
+    case FixationTarget::smallDiamond:
+    {
+        for(int i=0;i<4;i++)
+            m_deviceOperation->setLamp(DevOps::LampId::LampId_smallDiamond,i,onOff); break;
+        break;
+    }
+    case FixationTarget::bottomPoint:
+    {
+        m_deviceOperation->setLamp(DevOps::LampId::LampId_bigDiamond,2,onOff); break;
+        break;
+    }
+    }
 
+    if(m_programModel->m_params.commonParams.backGroundColor==BackGroundColor::white)
+    {
+        m_deviceOperation->setWhiteLamp(onOff);
+    }
+    else
+        m_deviceOperation->setLamp(DevOps::LampId::LampId_yellowBackground,0,onOff);
+}
 
-class DynamicCheck:public Check
+void DynamicCheck::initialize()
+{
+    m_resultModel->m_patient_id=m_patientModel->m_id;
+    m_resultModel->m_program_id=m_programModel->m_id;
+    m_checkedCount=0;
+    m_totalCount=m_programModel->m_data.dots.size();
+    for(int i=0;i<m_totalCount;i++)
+    {
+        unCheckedIndex.push_back(i);
+        m_resultModel->m_data.checkData.push_back(DynamicDataNode{std::to_string('A'+i),m_programModel->m_data.dots[i],{0,0},false});
+    }
+}
+
+void DynamicCheck::Checkprocess()
+{
+    if(m_programModel->m_params.strategy==DynamicParams::Strategy::standard)
+    {
+        int dotIndex=unCheckedIndex.takeAt(qrand()%unCheckedIndex.size());
+        auto dataNode=m_resultModel->m_data.checkData[dotIndex];
+//        deviceSvc->dynamicStimulate(QPointF{dataNode.start.x,dataNode.start.y},QPointF{dataNode.end.x,dataNode.end.y},1);
+//        bool isSeen=deviceSvc->waitForAnswer({4,5});             //TODO 填入motorIDS
+        //            if(isSeen)
+    }
+}
+
+void DynamicCheck::finished()
 {
 
-public:
-    QSharedPointer<DynamicCheckResultModel> m_resultModel;
-    QSharedPointer<DynamicProgramModel> m_programModel;
-    DynamicCheck()=default;
-    ~DynamicCheck()=default;
-private:
-    QSharedPointer<UtilitySvc> m_utilitySvc=UtilitySvc::getSingleton();
-    QVector<int> unCheckedIndex;
+}
 
-    virtual void initialize() override;
-
-    virtual void Checkprocess() override;
-};
-
-
-class CheckSvcWorker : public QObject
+void DynamicCheck::setLight(bool onOff)
 {
-    Q_OBJECT
-public:
-    QTimer m_timer;
-    int m_time=0;
-    int* m_checkState;
-    PatientVm* m_patientVm;
-    ProgramVm* m_programVm;
-    CheckResultVm* m_checkResultVm;
 
-private:
-    QSharedPointer<Check> m_check;
-public:
-    explicit CheckSvcWorker(){m_timer.setInterval(1000);connect(&m_timer,&QTimer::timeout,this,[&](){emit checkTimeChanged(m_time);m_time++;});}
-    virtual ~CheckSvcWorker() Q_DECL_OVERRIDE {}
-    void initialize();
-    void setCheckState(int value)
-    {
-        *m_checkState=value;
-        emit checkStateChanged();
-    }
-public slots:
-    void connectDev()
-    {
-        qDebug()<<"connect dev";
-        DevOps::DeviceOperation::getSingleton()->connectDev();    //连接设备
-    }
-    void disconnectDev()
-    {
-        qDebug()<<"disconnect dev";
-        DevOps::DeviceOperation::getSingleton()->disconnectDev();    //连接设备
-    }
-    void doWork();
-
-signals:
-    void checkStateChanged();
-    void checkResultChanged();
-    void checkProcessFinished();
-    void checkedCountChanged(int count);
-    void checkTimeChanged(int secs);
-};
+}
 
 void CheckSvcWorker::initialize()
 {
@@ -959,12 +1043,14 @@ void CheckSvcWorker::doWork()
         {
             qDebug()<<("stopped");
             m_timer.stop();
+            m_check->finished();
 //            m_checkResultVm->insert();
             return;
         }
         case 4:                                             //finish
         {
             int type=m_programVm->getType();
+            m_check->finished();
             m_timer.stop();
             if(type!=2)
             {
@@ -983,10 +1069,6 @@ void CheckSvcWorker::doWork()
 //        UtilitySvc::wait(1000);
     }
 }
-
-
-
-
 CheckSvc::CheckSvc(QObject *parent)
 {
     m_worker = new CheckSvcWorker();
@@ -1120,32 +1202,6 @@ float CheckSvc::getPupilDiameter()
 
 
 
-
-
-void DynamicCheck::initialize()
-{
-    m_resultModel->m_patient_id=m_patientModel->m_id;
-    m_resultModel->m_program_id=m_programModel->m_id;
-    m_checkedCount=0;
-    m_totalCount=m_programModel->m_data.dots.size();
-    for(int i=0;i<m_totalCount;i++)
-    {
-        unCheckedIndex.push_back(i);
-        m_resultModel->m_data.checkData.push_back(DynamicDataNode{std::to_string('A'+i),m_programModel->m_data.dots[i],{0,0},false});
-    }
-}
-
-void DynamicCheck::Checkprocess()
-{
-    if(m_programModel->m_params.strategy==DynamicParams::Strategy::standard)
-    {
-        int dotIndex=unCheckedIndex.takeAt(qrand()%unCheckedIndex.size());
-        auto dataNode=m_resultModel->m_data.checkData[dotIndex];
-//        deviceSvc->dynamicStimulate(QPointF{dataNode.start.x,dataNode.start.y},QPointF{dataNode.end.x,dataNode.end.y},1);
-//        bool isSeen=deviceSvc->waitForAnswer({4,5});             //TODO 填入motorIDS
-        //            if(isSeen)
-    }
-}
 }
 #include "check_svc.moc"
 

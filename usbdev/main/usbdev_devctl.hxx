@@ -48,7 +48,7 @@ public:
         LampId_centerInfrared,
         LampId_borderInfrared,
         LampId_eyeglassInfrared,
-        LampId_whiteBackground
+        LampId_castLight
     };
 
     //! the motor ID

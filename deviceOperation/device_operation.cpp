@@ -113,6 +113,40 @@ void DeviceOperation::setCursorColorAndCursorSize(int color, int spot)
     }
 }
 
+void DeviceOperation::setLamp(LampId id, int index, bool onOff)
+{
+    int da=0;
+    if(onOff)
+    {
+        auto config=DeviceData::getSingleton()->m_config;
+        switch (id)
+        {
+        case LampId::LampId_centerFixation:da=config.centerFixationLampDARef();break;
+        case LampId::LampId_bigDiamond:da=config.bigDiamondfixationLampDAPtr()[index];break;
+        case LampId::LampId_smallDiamond:da=config.smallDiamondFixationLampDAPtr()[index];break;
+        case LampId::LampId_yellowBackground:da=config.yellowBackgroundLampDARef();break;
+        case LampId::LampId_centerInfrared:da=config.centerFixationLampDARef();break;
+        case LampId::LampId_borderInfrared:da=config.borderInfraredLampDARef();break;
+        case LampId::LampId_eyeglassInfrared:da=config.eyeglassFrameLampDARef();break;
+        case LampId::LampId_castLight:da=config.castLightADPresetRef();break;
+        }
+    }
+    m_devCtl->setLamp(UsbDev::DevCtl::LampId(id),index,da);
+}
+
+
+void DeviceOperation::setWhiteLamp(bool onOff)
+{
+    auto config=DeviceData::getSingleton()->m_config;
+    auto whiteLampDaPtr=config.whiteBackgroundLampDAPtr();
+    if(onOff)
+        m_devCtl->setWhiteLamp(whiteLampDaPtr[0],whiteLampDaPtr[1],whiteLampDaPtr[2]);
+    else
+        m_devCtl->setWhiteLamp(0,0,0);
+}
+
+
+
 bool DeviceOperation::getAnswerPadStatus()
 {
     return m_statusData.answerpadStatus();
@@ -136,7 +170,7 @@ void DeviceOperation::connectDev()
     quint32 vid_pid=deviceSettings->m_VID.toInt(nullptr,16)<<16|deviceSettings->m_PID.toInt(nullptr,16);
     m_devCtl.reset(UsbDev::DevCtl::createInstance(vid_pid));
     qDebug()<<QString::number(vid_pid,16);
-    connect(m_devCtl.data(),&UsbDev::DevCtl::workStatusChanged,this,&DeviceOperation::workOnWorkStatusChanged);
+//    connect(m_devCtl.data(),&UsbDev::DevCtl::workStatusChanged,this,&DeviceOperation::workOnWorkStatusChanged);
     connect(m_devCtl.data(),&UsbDev::DevCtl::updateInfo,this,&DeviceOperation::updateDevInfo);
     connect(m_devCtl.data(),&UsbDev::DevCtl::newStatusData,this,&DeviceOperation::workOnNewStatuData);
     connect(m_devCtl.data(),&UsbDev::DevCtl::newFrameData,this,&DeviceOperation::workOnNewFrameData);
@@ -183,7 +217,7 @@ void DeviceOperation::connectDev()
 
 void DeviceOperation::disconnectDev()
 {
-    disconnect(m_devCtl.data(),&UsbDev::DevCtl::workStatusChanged,this,&DeviceOperation::workOnWorkStatusChanged);
+//    disconnect(m_devCtl.data(),&UsbDev::DevCtl::workStatusChanged,this,&DeviceOperation::workOnWorkStatusChanged);
     disconnect(m_devCtl.data(),&UsbDev::DevCtl::updateInfo,this,&DeviceOperation::updateDevInfo);
     disconnect(m_devCtl.data(),&UsbDev::DevCtl::newStatusData,this,&DeviceOperation::workOnNewStatuData);
     disconnect(m_devCtl.data(),&UsbDev::DevCtl::newFrameData,this,&DeviceOperation::workOnNewFrameData);
@@ -416,6 +450,17 @@ void DeviceOperation::workOnNewStatuData()
 //    //主
 //    m_statusLock.lock();
     m_statusData=m_devCtl->takeNextPendingStatusData();
+    auto eyeglassStatus=m_statusData.eyeglassStatus();
+    if(m_isChecking)
+    {
+        setLamp(LampId::LampId_eyeglassInfrared,0,eyeglassStatus);
+        setLamp(LampId::LampId_borderInfrared,0,!eyeglassStatus);
+    }
+    else
+    {
+        setLamp(LampId::LampId_eyeglassInfrared,0,false);
+        setLamp(LampId::LampId_borderInfrared,0,false);
+    }
 //    m_statusLock.unlock();
 //    static int count=1;
 //    count++;
@@ -497,13 +542,13 @@ void DeviceOperation::workOnNewConfig()
 //    if(!m_profile.isEmpty()/*&&m_config.isEmpty()*/){setIsDeviceReady(true);}
 }
 
-void DeviceOperation::workOnWorkStatusChanged()
-{
-    if(m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_Disconnected)
-    {
-        connectDev();
-    }
-    emit workStatusChanged();
-}
+//void DeviceOperation::workOnWorkStatusChanged()
+//{
+//    if(m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_Disconnected)
+//    {
+//        connectDev();
+//    }
+//    emit workStatusChanged();
+//}
 }
 
