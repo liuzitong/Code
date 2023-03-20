@@ -1,0 +1,6 @@
+{
+    "checkCountBeforeGetBlindDotCheck":6,
+    "blindDotTestDB":10,
+    "falsePositiveDecDB":10,
+    "VFImultiplier":1.0
+}

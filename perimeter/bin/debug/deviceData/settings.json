@@ -1,0 +1,27 @@
+{
+    "VID": "ffff",
+    "PID": "b0b0",
+    "pupilAutoAlignPixelTolerance": 5,
+    "localConfigPath": "./deviceData/config.dat",
+    "localDataPath": "./deviceData/data.dat",
+    "pupilGreyLimit":40,
+    "pupilPixelDiameterLimit":40,
+    "pupilDiameterPixelToMillimeterConstant":0.171875,
+    "pupilDiameterPixelToFixationDeviationConstant":0.25,
+    "motorSpeed":[1,1,1,1,1,1,1],
+    "colorToSlot": [
+        {"Color": 0,"Slot": 1},
+        {"Color": 0,"Slot": 1},
+        {"Color": 1,"Slot": 2},
+        {"Color": 0,"Slot": 1},
+        {"Color": 2,"Slot": 4}
+    ],
+    "spotSizeToSlot": [
+        {"spotSize": 5,"Slot": 0},
+        {"spotSize": 4,"Slot": 1},
+        {"spotSize": 3,"Slot": 2},
+        {"spotSize": 2,"Slot": 3},
+        {"spotSize": 1,"Slot": 4},
+        {"spotSize": 0,"Slot": 5}
+    ]
+}
