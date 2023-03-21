@@ -195,12 +195,10 @@ Item {id:root; width: 1366;height: 691; visible: true;anchors.fill:parent;
                                 function currentProgramChanged()
                                 {
                                     strategyNames=[];
-//                                    console.log("currentProgram.type"+currentProgram.type);
                                     switch(currentProgram.type)
                                     {
                                         case 0:strategyNames=[{name:lt+qsTr("Full threshold"),strategy:0},{name:lt+qsTr("Fast threshold"),strategy:1},{name:lt+qsTr("Smart interactive"),strategy:1},{name:lt+qsTr("Fast interactive"),strategy:2}];break;
-                                        case 1:strategyNames=[{name:lt+qsTr("One stage"),strategy:3},{name:lt+qsTr("Two stages"),strategy:4},{name:lt+qsTr("Quantify defects"),strategy:5}];break;
-//                                        case 2:strategyNames=[];break;
+                                        case 1:strategyNames=[{name:lt+qsTr("One stage"),strategy:3},{name:lt+qsTr("Two stages"),strategy:4},{name:lt+qsTr("Quantify defects"),strategy:5},{name:lt+qsTr("Single stimulation"),strategy:6}];break;
                                         default:break;
                                     }
                                 }

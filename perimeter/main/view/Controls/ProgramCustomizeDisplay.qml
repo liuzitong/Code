@@ -1,4 +1,4 @@
-import QtQuick 2.0
+﻿import QtQuick 2.0
 
 Item{
     id:root;
@@ -177,7 +177,7 @@ Item{
             var x_pix=(orthCoord.x/degreeRange)*(diameter*0.5)+width/2;
             var y_pix=(-orthCoord.y/degreeRange)*(diameter*0.5)+height/2;
 
-            var dotRadius=diameter/180*1.5;
+            var dotRadius=diameter/180*1;
             var ctx = getContext("2d");
             ctx.lineWidth = 0;
             ctx.strokeStyle = "red";

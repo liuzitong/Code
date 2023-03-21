@@ -29,7 +29,7 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
         Rectangle
         {
         // [HINT] Popup element need implicitWidth & implicitHeight to calc. the right position
-            id: menu; width:idPopup.width*0.2; height: idPopup.height*0.5;color: "#dcdee0";radius: 5;/*width:480; height:480;*/
+            id: menu; width:idPopup.width*0.23; height: idPopup.height*0.55;color: "#dcdee0";radius: 5;/*width:480; height:480;*/
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
             border.color: "#7C7C7C";
@@ -79,7 +79,7 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                 CusComboBox{
                                     id:stratComboBox
                                     property var strategies:
-                                        [[lt+qsTr("Full threshold"),lt+qsTr("Smart interactive"),lt+qsTr("Fast interactive")],
+                                        [[lt+qsTr("Full threshold"),lt+qsTr("Fast threshold"),lt+qsTr("Smart interactive"),lt+qsTr("Fast interactive")],
                                         [lt+qsTr("One stage"),lt+qsTr("Two stages"),lt+qsTr("Quantify defects"),lt+qsTr("Single stimulus")],
                                         [lt+qsTr("Standard"),lt+qsTr("Blind area"),lt+qsTr("Dark area"),lt+qsTr("Straight line")]];
                                     width: parent.width*0.7;
