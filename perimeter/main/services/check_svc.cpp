@@ -86,6 +86,8 @@ public:
     virtual void Checkprocess() override;
     virtual void finished() override;
     std::tuple<bool,QPointF,int> getCheckCycleLocAndDB();
+
+
 private:
 
     DotRecord& getCheckDotRecordRef();
@@ -228,6 +230,7 @@ void StaticCheck::initialize()
         {
             bool isBaseDot=false;
             auto dot=m_programModel->m_data.dots[i];
+            if(m_resultModel->m_OS_OD!=0) dot.x=-dot.x;
             if(m_isStartWithBaseDots)
             {
                 auto baseDots=m_programModel->m_data.baseDots;
@@ -241,6 +244,7 @@ void StaticCheck::initialize()
             {
                 stimulationDBs={m_utilitySvc->getExpectedDB(m_value_30d,{dot.x,dot.y},m_resultModel->m_OS_OD)+DBChanged};
             }
+
             m_dotRecords.push_back(DotRecord{i,QPointF{dot.x,dot.y},stimulationDBs,-1,{},isBaseDot,false,MinDB,MaxDB});
         }
 
@@ -252,6 +256,7 @@ void StaticCheck::initialize()
         for(int i=0;i<m_totalCount;i++)
         {
             auto dot=m_programModel->m_data.dots[i];
+            if(m_resultModel->m_OS_OD!=0) dot.x=-dot.x;
             m_dotRecords.push_back(DotRecord{i,QPointF{dot.x,dot.y},{DB},-1, {},false,false,MinDB,MaxDB});
         }
         m_centerDotRecord=DotRecord{m_totalCount*2,QPointF{0,0},{DB},-1,{},false,false,MinDB,MaxDB};
@@ -645,6 +650,7 @@ bool StaticCheck::waitForAnswer()
     {
         auto fixedParams=m_resultModel->m_params.fixedParams;
         waitTime=fixedParams.stimulationTime+fixedParams.intervalTime;
+        qDebug()<<"fixxed wait Time is:"+QString::number(waitTime);
     }
     else
     {
@@ -654,20 +660,23 @@ bool StaticCheck::waitForAnswer()
             sum+=i;
         }
         waitTime=sum/(m_answeredTimes.size())+commonParams.responseDelayTime;
+        qDebug()<<"autoAdapt wait Time is:"+QString::number(waitTime);
     }
-//    qDebug()<<"wait Time is:"+QString::number(waitTime);
 
 
+    bool answer=false;
     while(elapsedTimer.elapsed()<waitTime)   //应答时间内
     {
         if(m_deviceOperation->getAnswerPadStatus())
         {
-            m_answeredTimes.append(elapsedTimer.elapsed());
-            return true;                    //时间内应答
+            answer=true;
+            break;                    //时间内应答
         }
         else QApplication::processEvents();
     }
-    return false;                       //超出时间应答
+    m_answeredTimes.append(elapsedTimer.elapsed());
+    qDebug()<<"answer Time is:"+QString::number(elapsedTimer.elapsed());
+    return answer;                       //超出时间应答
 }
 
 void StaticCheck::ProcessAnswer(bool answered)
@@ -1015,8 +1024,6 @@ void CheckSvcWorker::doWork()
             initialize();
             m_check->initialize();
             m_timer.start();
-//            setCheckState(3);
-//            return;
             if(*m_checkState==0)                              //防止其它主线程选择退出,之后被覆盖
                 setCheckState(1);
             break;
@@ -1025,12 +1032,10 @@ void CheckSvcWorker::doWork()
         {
             qDebug()<<("Checking");
             m_check->Checkprocess();
-
-//            qDebug()<<m_check->m_checkedCount;
-//            qDebug()<<m_check->m_totalCount;
             if(m_check->m_checkedCount==m_check->m_totalCount) setCheckState(4);
             emit checkedCountChanged(m_check->m_checkedCount);
             emit checkResultChanged();
+            QApplication::processEvents();
             break;
         }
         case 2:                                             //pause
@@ -1044,7 +1049,6 @@ void CheckSvcWorker::doWork()
             qDebug()<<("stopped");
             m_timer.stop();
             m_check->finished();
-//            m_checkResultVm->insert();
             return;
         }
         case 4:                                             //finish

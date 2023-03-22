@@ -221,10 +221,10 @@ void DeviceOperation::disconnectDev()
     disconnect(m_devCtl.data(),&UsbDev::DevCtl::updateInfo,this,&DeviceOperation::updateDevInfo);
     disconnect(m_devCtl.data(),&UsbDev::DevCtl::newStatusData,this,&DeviceOperation::workOnNewStatuData);
     disconnect(m_devCtl.data(),&UsbDev::DevCtl::newFrameData,this,&DeviceOperation::workOnNewFrameData);
-    setIsDeviceReady(false);
 //    disconnect(m_devCtl.data(),&UsbDev::DevCtl::newProfile,this,[&](){updateDevInfo("Profile updated successfully.");m_isProfileUpdate=true;});
 //    disconnect(m_devCtl.data(),&UsbDev::DevCtl::newConfig,this,[&](){updateDevInfo("Config updated successfully.");m_isConfigUpdated=true;});
     m_devCtl.reset(nullptr);
+    setIsDeviceReady(false);
 }
 
 void DeviceOperation::staticStimulate(QPointF loc,int spotSize,int DB,int durationTime)

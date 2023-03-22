@@ -1,4 +1,4 @@
-import QtQuick 2.9
+﻿import QtQuick 2.9
 import QtQml   2.2
 import QtQuick.Controls 2.2
 import qxpack.indcom.ui_qml_base  1.0
@@ -9,6 +9,8 @@ Item {
     // ////////////////////////////////////////////////////////////////////////
     //  export property & functions
     // ////////////////////////////////////////////////////////////////////////
+
+
     function open( )
     {
         if ( backgroundVisible ) { idPopupBg.open(); }

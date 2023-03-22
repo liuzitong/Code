@@ -1045,7 +1045,10 @@ void AnalysisSvc::drawScreening(QVector<int> values, QVector<QPointF> locs, int 
     QImage screenImageSE1(":/grays/SE1.bmp");
     QImage screenImageSE2(":/grays/SE2.bmp");
     int scale=img.width()<=900?1:2;
-    int fontPixSize=qMin(int(img.width()/17*minificationFactor),!isReport?16:32);
+    int fontPixSize=qMin(int(img.width()/17*minificationFactor),!isReport?12:24);
+    QFont font("consolas");
+    font.setPixelSize(fontPixSize);
+    painter.setFont(font);
 //    int scale;
 //    if(m_isPreview)
 //    {
@@ -1059,21 +1062,63 @@ void AnalysisSvc::drawScreening(QVector<int> values, QVector<QPointF> locs, int 
     screenImageSE2=screenImageSE2.scaled(screenImageSE2.width()*scale,screenImageSE2.height()*scale);
     blindImage=blindImage.scaled(blindImage.width()*scale,blindImage.height()*scale);
     painter.drawImage(QPoint{pixLoc.x()-blindImage.width()/2,pixLoc.y()-blindImage.height()/2},blindImage);
-    for(int i=0;i<locs.length()&&i<values.length();i++)
+    for(int i=0;i<values.length();i++)
     {
-        auto pixLoc=convertDegLocToPixLoc(locs[i],range,img);
-        auto imageLoc=QPoint{pixLoc.x()-screenImageSE0.width()/2,pixLoc.y()-screenImageSE0.height()/2};
-        switch (values[i])
+        if(i<locs.length())
         {
-        case 0:painter.drawImage(imageLoc,screenImageSE2);break;
-        case 1:painter.drawImage(imageLoc,screenImageSE1);break;
-        case 2:painter.drawImage(imageLoc,screenImageSE0);break;
-        default:                                                                                    //量化缺损
-        {
-            const QRect rectangle = QRect(pixLoc.x()-fontPixSize*1.6*0.45, pixLoc.y()-fontPixSize*0.8/2, fontPixSize*1.6,fontPixSize*0.8);
-            painter.drawText(rectangle,Qt::AlignCenter,QString::number(values[i]));
-            break;
+            auto pixLoc=convertDegLocToPixLoc(locs[i],range,img);
+            auto imageLoc=QPoint{pixLoc.x()-screenImageSE0.width()/2,pixLoc.y()-screenImageSE0.height()/2};
+            switch (values[i])
+            {
+            case 0:painter.drawImage(imageLoc,screenImageSE2);break;
+            case 1:painter.drawImage(imageLoc,screenImageSE1);break;
+            case 2:painter.drawImage(imageLoc,screenImageSE0);break;
+            default:
+            {
+                const QRect rectangle = QRect(pixLoc.x()-fontPixSize*1.6*0.45, pixLoc.y()-fontPixSize*0.8/2, fontPixSize*1.6,fontPixSize*0.8);
+                painter.drawText(rectangle,Qt::AlignCenter,QString::number(values[i]));
+                break;
+            }
+            }
         }
+        else if(i<2*locs.length())
+        {
+            auto pixLoc=convertDegLocToPixLoc(locs[i-locs.length()],range,img);
+            auto imageLoc=QPoint{pixLoc.x()-screenImageSE0.width()/2,int(pixLoc.y()-screenImageSE0.height()/2+0.8*fontPixSize)};
+            const QRect rectangle = QRect(pixLoc.x()-fontPixSize*2.0*0.47, pixLoc.y()-fontPixSize*0.8/2+0.6*fontPixSize, fontPixSize*2.0,fontPixSize*1.2);
+
+            switch (values[i])
+            {
+            case -1:break;
+            case 0:painter.drawText(rectangle,Qt::AlignCenter,"( )");painter.drawImage(imageLoc,screenImageSE2);break;
+            case 1:painter.drawText(rectangle,Qt::AlignCenter,"( )");painter.drawImage(imageLoc,screenImageSE1);break;
+            case 2:painter.drawText(rectangle,Qt::AlignCenter,"( )");painter.drawImage(imageLoc,screenImageSE0);break;
+            default:
+            {
+//                const QRect rectangle = QRect(pixLoc.x()-fontPixSize*2.0*0.45, pixLoc.y()-fontPixSize*0.8/2+1.5*fontPixSize, fontPixSize*2.0,fontPixSize*0.8);
+                painter.drawText(rectangle,Qt::AlignCenter,"( )");
+                painter.drawText(rectangle,Qt::AlignCenter,QString::number(values[i]));
+                break;
+            }
+            }
+        }
+        else if(i==2*locs.length())
+        {
+            QPoint pixLoc=convertDegLocToPixLoc({0,0},range,img);
+            auto imageLoc=QPoint{pixLoc.x()-screenImageSE0.width()/2,pixLoc.y()-screenImageSE0.height()/2};
+            switch (values[i])
+            {
+            case -1:break;
+            case 0:painter.drawImage(imageLoc,screenImageSE2);break;
+            case 1:painter.drawImage(imageLoc,screenImageSE1);break;
+            case 2:painter.drawImage(imageLoc,screenImageSE0);break;
+            default:
+            {
+                const QRect rectangle = QRect(pixLoc.x()-fontPixSize*1.6*0.45, pixLoc.y()-fontPixSize*0.8/2, fontPixSize*1.6,fontPixSize*0.8);
+                painter.drawText(rectangle,Qt::AlignCenter,QString::number(values[i]));
+                break;
+            }
+            }
         }
     }
 }

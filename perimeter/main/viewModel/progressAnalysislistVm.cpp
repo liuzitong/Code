@@ -73,6 +73,7 @@ QObject *ProgressAnalysisListVm::getProgressBaseLinePreview(int imageSize)
         locs=m_currentDataList[index].locs;
         peDev=m_currentDataList[index].peDev;
         peMDev=m_currentDataList[index].peMDev;
+        if(m_OS_OD!=0){for(auto&i:locs)  i.rx()=-i.rx();}
 
         analysisSvc->drawGray(values,locs,range,innerRange,img);img.save(m_previewFolder+"baseLine_gray"+QString::number(index)+".bmp");
         analysisSvc->drawText(values,locs,range,OS_OD,img,{-1});img.save(m_previewFolder+"baseLine_dBDiagram"+QString::number(index)+".bmp");
@@ -125,6 +126,7 @@ QVariantList ProgressAnalysisListVm::getThreeFollowUpsPreview(int index,int imag
         mDev.append(m_currentDataList[i].mDev);
         locs.append(m_currentDataList[i].locs);
     }
+    if(m_OS_OD!=0){for(auto &loc:locs){for(auto&i:loc)  i.rx()=-i.rx();}}
     analysisSvc->ProgressAnalysis(mDev,locs,m_OS_OD,progressLocs,progressVal,progressPicVal,progress);
     QImage img=QImage({imageSize,imageSize}, QImage::Format_RGB32);
     for(int i=0;i<progressVal.length();i++)
@@ -166,6 +168,7 @@ QVariant Perimeter::ProgressAnalysisListVm::getSingleProgressPreview(int index,i
         mDev.append(m_currentDataList[i].mDev);
         locs.append(m_currentDataList[i].locs);
     }
+    if(m_OS_OD!=0){for(auto &loc:locs){for(auto&i:loc)  i.rx()=-i.rx();}}
 
     analysisSvc->ProgressAnalysis(mDev,locs,m_OS_OD,progressLocs,progressVal,progressPicVal,progress);
 
@@ -199,6 +202,8 @@ void ProgressAnalysisListVm::getProgressBaseLineReport(QString diagnosis)
         locs=m_currentDataList[index].locs;
         peDev=m_currentDataList[index].peDev;
         peMDev=m_currentDataList[index].peMDev;
+
+        if(m_OS_OD!=0){for(auto&i:locs)  i.rx()=-i.rx();}
 
         analysisSvc->drawGray(values,locs,range,innerRange,img);img.save(m_reportFolder+"baseLine_gray"+QString::number(index)+".bmp");
         analysisSvc->drawText(values,locs,range,OS_OD,img,{-1},1.0,true);img.save(m_reportFolder+"baseLine_dBDiagram"+QString::number(index)+".bmp");
@@ -299,6 +304,7 @@ void Perimeter::ProgressAnalysisListVm::getThreeFollowUpsReport(int index,QStrin
         mDev.append(m_currentDataList[i].mDev);
         locs.append(m_currentDataList[i].locs);
     }
+    if(m_OS_OD!=0){for(auto &loc:locs){for(auto&i:loc)  i.rx()=-i.rx();}}
 
     analysisSvc->ProgressAnalysis(mDev,locs,m_OS_OD,progressLocs,progressVal,progressPicVal,progress);
 
@@ -399,6 +405,8 @@ void Perimeter::ProgressAnalysisListVm::getSingleProgressReport(int index,QStrin
         locs.append(m_currentDataList[i].locs);
     }
 
+    if(m_OS_OD!=0){for(auto &loc:locs){for(auto&i:loc)  i.rx()=-i.rx();}}
+
     analysisSvc->ProgressAnalysis(mDev,locs,m_OS_OD,progressLocs,progressVal,progressPicVal,progress);
 
     QImage img=QImage({480,480}, QImage::Format_RGB32);
@@ -468,7 +476,7 @@ void Perimeter::ProgressAnalysisListVm::getSingleProgressReport(int index,QStrin
     QString cursorColor;switch(int(commomParams.cursorColor)){case 0:cursorColor=tr("White");break;case 1:cursorColor=tr("Red");break;case 2:cursorColor=tr("Blue");break;}
     manager->setReportVariable("stimCursor",tr("Stimulus cursor")+QString(": ")+cursorSize+","+cursorColor);
     manager->setReportVariable("backgroundColor",tr("Background color")+QString(": ")+QString(int(commomParams.backGroundColor)==0?"31.5":"315")+" ASB");
-    QString strategy;switch(int(commomParams.strategy)){case 0:strategy=tr("Full threshold");break;case 1:strategy=tr("Smart interactive");break;case 2:strategy=tr("Fast interactive");break;case 3:strategy=tr("One stage");break;case 4:strategy=tr("Two stages");break;case 5:strategy=tr("Quantify defects");break;case 6:strategy=tr("Single stimulation");break;}
+    QString strategy;switch(int(commomParams.strategy)){case 0:strategy=tr("Full threshold");break;case 1:strategy=tr("Fast threshold");break;case 2:strategy=tr("Smart interactive");break;case 3:strategy=tr("Fast interactive");break;case 4:strategy=tr("One stage");break;case 5:strategy=tr("Two stages");break;case 6:strategy=tr("Quantify defects");break;case 7:strategy=tr("Single stimulation");break;}
     manager->setReportVariable("Strategy",tr("Strategy")+QString(": ")+strategy);
     manager->setReportVariable("VFI",QString(tr("VFI"))+": "+QString::number(qRound(VFI*100))+"%");
     QString GHTstr[]={tr("Out of limits"),tr("Low sensitivity"),tr("Border of limits"),tr("Within normal limits")};
@@ -535,7 +543,7 @@ void ProgressAnalysisListVm::generateDataList()
     CheckResult_List checkResult_List;
 //    query.where("patient_id").isEqualTo(patientId).orderAsc("time");
 //    query.where("patient_id").isEqualTo(patientId)/*.where("program_id").in({1,4})*/;
-    query.where("patient_id").isEqualTo(int(m_patient.m_id)).and_("program_id").in({1,4}).and_("OS_OD").isEqualTo(m_OS_OD).orderAsc("time");
+    query.where("patient_id").isEqualTo(int(m_patient.m_id)).and_("program_id").in({101,104}).and_("OS_OD").isEqualTo(m_OS_OD).orderAsc("time");
     qx::dao::fetch_by_query(query,checkResult_List);
 //    m_mDevList.resize(checkResult_List.size());
 

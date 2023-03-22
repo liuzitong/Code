@@ -160,7 +160,10 @@ QString AnalysisLobbyListVm::drawImage(CheckResult_ptr checkResult_ptr)
         locs.resize(program.m_data.dots.size());
         for(int i=0;i<int(program.m_data.dots.size());i++)
         {
-            locs[i]={program.m_data.dots[i].x,program.m_data.dots[i].y};
+            if(OS_OD==0)
+                locs[i]={program.m_data.dots[i].x,program.m_data.dots[i].y};
+            else
+                locs[i]={-program.m_data.dots[i].x,program.m_data.dots[i].y};
         }
         int resultId=checkResult.m_id;
 

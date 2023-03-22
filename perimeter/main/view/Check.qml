@@ -291,7 +291,10 @@ Item {id:root; width: 1366;height: 691
                             id:os_od;font.pointSize: fontPointSize*2;
                             property int value: 0;
                             text:value===0?lt+qsTr("Left eye"):lt+qsTr("Right eye"); z: 1; anchors.top: parent.top; anchors.topMargin: 0.05*parent.height; anchors.left: parent.left; anchors.leftMargin: 0.05*parent.width;height: parent.height*0.05;}
-                        CheckDisplay{id:checkDisplay; currentProgram:root.currentProgram;currentCheckResult:root.currentCheckResult;
+                        CheckDisplay{
+                            id:checkDisplay;
+                            os_od:os_od.value;
+                            currentProgram:root.currentProgram;currentCheckResult:root.currentCheckResult;
                             onClickedDotIndexChanged: {
                                 if(currentCheckResult==null) return;
                                 realTimeDBRec.visible=true;
@@ -338,7 +341,20 @@ Item {id:root; width: 1366;height: 691
                 Item{height: parent.height;width:parent.width*0.25;
                     Item{anchors.fill: parent;anchors.margins:parent.height*0.15;
                         Flow{height: parent.height;spacing: height*0.8;anchors.horizontalCenter: parent.horizontalCenter;
-                            CusButton{enabled:IcUiQmlApi.appCtrl.checkSvc.checkState>=3;text:lt+qsTr("Select program");width:IcUiQmlApi.appCtrl.settings.isRuntimeLangEng?height*4:height*2.5;onClicked: chooseProgram.open();}
+                            CusButton{enabled:IcUiQmlApi.appCtrl.checkSvc.checkState>=3;text:lt+qsTr("Select program");width:IcUiQmlApi.appCtrl.settings.isRuntimeLangEng?height*4:height*2.5;
+                                onClicked:
+                                {
+                                    if(currentCheckResult!==null)
+                                    {
+                                        if(currentCheckResult.type!==2)
+                                            IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::StaticCheckResultVm",currentCheckResult);
+
+                                        else
+                                            IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::DynamicCheckResultVm",currentCheckResult);
+                                        currentCheckResult=null;
+                                    }
+                                    chooseProgram.open();
+                                }}
                             CusButton{id:paramsSetting;text:lt+qsTr("Params setting");enabled:(currentProgram!==null&&IcUiQmlApi.appCtrl.checkSvc.checkState>=3);width:IcUiQmlApi.appCtrl.settings.isRuntimeLangEng?height*4:height*2.5;onClicked:if(currentProgram.type!==2){ staticParamsSetting.open();} else  { dynamicParamsSetting.open();}}
                         }
                     }
@@ -433,8 +449,20 @@ Item {id:root; width: 1366;height: 691
                                     }
                                 }}
                             CusButton{
-                                text:lt+qsTr("Switch eye");onClicked:os_od.value=(os_od.value+1)%2;
-                                enabled:IcUiQmlApi.appCtrl.checkSvc.checkState>=3;
+                                text:lt+qsTr("Switch eye");
+                                enabled: IcUiQmlApi.appCtrl.checkSvc.checkState>2;
+                                onClicked:
+                                {
+                                    if(currentCheckResult!=null)
+                                    {
+                                        if(currentProgram.type!==2)
+                                            IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::StaticCheckResultVm",currentCheckResult);
+                                        else
+                                            IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::DynamicCheckResultVm",currentCheckResult);
+                                        currentCheckResult=null;
+                                    }
+                                    os_od.value=(os_od.value+1)%2;
+                                }
                             }
                         }
 

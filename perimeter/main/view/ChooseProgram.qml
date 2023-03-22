@@ -23,6 +23,8 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
         ltChanged.connect(function(){console.log("programlist");});
     }
 
+    onOpened:{programLists.refreshData();}
+
 
    contentItem:
    Rectangle{

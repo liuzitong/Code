@@ -9,9 +9,13 @@ Item{
     property var currentCheckResult:null;
     property int clickedDotIndex: -1;
     property alias testOver:displayCanvas.testOver;
+    property int os_od: 0;
+    property var dotList:[];
+
 //    function testOver() {displayCanvas.testOver=true;displayCanvas.requestPaint();}
 
     onCurrentProgramChanged: displayCanvas.requestPaint();
+    onOs_odChanged: displayCanvas.requestPaint();
 
     onCurrentCheckResultChanged: {
 //        clickedDotIndex=-1;
@@ -225,14 +229,14 @@ Item{
         function drawShortFlucUnseen(dot)
         {
             var pixDot=dotToPixCoord(dot);
+            drawText("(  )",pixDot.x,pixDot.y+fontPointSize*1.5);
             var ctx = getContext("2d");
             var recHeight=diameter/180*2;
             var recWidth=diameter/180*1.5;
             ctx.lineWidth = 0;
             ctx.beginPath();
-            ctx.fillRect(pixDot.x-recWidth/2, pixDot.y-recHeight/2-fontPointSize*1.5,recWidth, recHeight);
+            ctx.fillRect(pixDot.x-recWidth/2, pixDot.y-recHeight/2+fontPointSize*1.5,recWidth, recHeight);
             ctx.closePath();
-            drawText("(  )",pixDot.x,pixDot.y+fontPointSize*1.5);
 
         }
 
@@ -242,14 +246,15 @@ Item{
             var ctx = getContext("2d");
             var recHeight=diameter/180*1.72;
             var recWidth=diameter/180*1.72;
+            drawText("(  )",pixDot.x,pixDot.y+fontPointSize*1.5);
             ctx.lineWidth = 0;
             ctx.beginPath();
             ctx.moveTo(pixDot.x-recWidth/2, pixDot.y-recHeight/2+fontPointSize*1.5);
             ctx.lineTo(pixDot.x+recWidth/2, pixDot.y+recHeight/2+fontPointSize*1.5);
             ctx.moveTo(pixDot.x-recWidth/2, pixDot.y+recHeight/2+fontPointSize*1.5);
             ctx.lineTo(pixDot.x+recWidth/2, pixDot.y-recHeight/2+fontPointSize*1.5);
+            ctx.stroke();
             ctx.closePath();
-            drawText("(  )",pixDot.x,pixDot.y+fontPointSize*1.5);
         }
 
         function drawShortFlucSeen(dot)
@@ -258,13 +263,13 @@ Item{
             var ctx = getContext("2d");
             var recHeight=diameter/180*2;
             var recWidth=diameter/180*1.5;
+            drawText("(  )",pixDot.x,pixDot.y+fontPointSize*1.5);
             ctx.lineWidth = 0;
             ctx.strokeStyle = "black";
             ctx.beginPath();
-            ctx.rect(pixDot.x-recWidth/2, pixDot.y-recHeight/2-fontPointSize*1.5,recWidth, recHeight);
+            ctx.rect(pixDot.x-recWidth/2, pixDot.y-recHeight/2+fontPointSize*1.5,recWidth, recHeight);
             ctx.stroke();
             ctx.closePath();
-            drawText("(  )",pixDot.x,pixDot.y+fontPointSize*1.5);
         }
 
         function drawAxisEndText(string,x_pix,y_pix,size)
@@ -356,10 +361,39 @@ Item{
             }
 
             var dBList;
-            var dotList;
+            var programdotList;
+            if(currentProgram.type!==2)
+            {
+                programdotList=currentProgram.data.dots;
+            }
+            else
+            {
+                programdotList=currentCheckResult.resultData.checkData;
+            }
+
+            if(os_od==0)
+            {
+
+                dotList=programdotList;
+            }
+            else
+            {
+                dotList=[]
+                for(i=0;i<programdotList.length;i++)
+                {
+                    var dot=programdotList[i];
+                    dot.x=-dot.x;
+                    console.log(dot)
+                    dotList.push(dot);
+
+                }
+            }
+
+
+
             if(root.currentCheckResult==null)                       //结果为空的时候按照程序画圆点
             {
-                currentProgram.data.dots.forEach(function(item)
+                dotList.forEach(function(item)
                 {
                     drawDot(item);
                 })
@@ -369,7 +403,6 @@ Item{
                 if(currentProgram.type===0)                                     //阈值,静态是结果-1(表示没测到)画点,其它画值
                 {
                     dBList=currentCheckResult.resultData.checkData;
-                    dotList=currentProgram.data.dots;
                     for(i=0;i<dBList.length;i++)
                     {
                         if(i<dotList.length)                                            //一般结果,和中心点
@@ -394,7 +427,6 @@ Item{
                 else if(currentProgram.type===1)                                // 筛选
                 {
                     dBList=currentCheckResult.resultData.checkData;
-                    dotList=currentProgram.data.dots;
                     for(i=0;i<dBList.length;i++)
                     {
                         if(i<dotList.length)
@@ -434,10 +466,8 @@ Item{
                     }
 
                 }
-
                 else                                                        //动态
                 {
-                    dotList=currentCheckResult.resultData.checkData;
                     var dotRadius=diameter/180*1;
 
 //                    ctx.beginPath();

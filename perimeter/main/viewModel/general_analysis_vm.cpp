@@ -90,6 +90,7 @@ StaticAnalysisVm::StaticAnalysisVm(const QVariantList &args)
     m_innerRange=m_program.m_params.commonParams.Range[0];
     m_range=m_program.m_params.commonParams.Range[1];
     m_OS_OD=m_checkResult.m_OS_OD;
+    if(m_OS_OD!=0){for(auto&i:m_locs)  i.rx()=-i.rx();}
     m_fixationValues.resize(m_checkResult.m_data.fixationDeviation.size());
     for(int i=0;i<int(m_checkResult.m_data.fixationDeviation.size());i++)
     {
@@ -310,7 +311,7 @@ void StaticAnalysisVm::showReport(int report)
     QString cursorColor;switch(int(commomParams.cursorColor)){case 0:cursorColor=tr("White");break;case 1:cursorColor=tr("Red");break;case 2:cursorColor=tr("Blue");break;}
     manager->setReportVariable("stimCursor",tr("Stimulus cursor")+QString(": ")+cursorSize+","+cursorColor);
     manager->setReportVariable("backgroundColor",tr("Background color")+QString(": ")+QString(int(commomParams.backGroundColor)==0?"31.5":"315")+" ASB");
-    QString strategy;switch(int(commomParams.strategy)){case 0:strategy=tr("Full threshold");break;case 1:strategy=tr("Smart interactive");break;case 2:strategy=tr("Fast interactive");break;case 3:strategy=tr("One stage");break;case 4:strategy=tr("Two stages");break;case 5:strategy=tr("Quantify defects");break;case 6:strategy=tr("Single stimulation");break;}
+    QString strategy;switch(int(commomParams.strategy)){case 0:strategy=tr("Full threshold");break;case 1:strategy=tr("Fast threshold");break;case 2:strategy=tr("Smart interactive");break;case 3:strategy=tr("Fast interactive");break;case 4:strategy=tr("One stage");break;case 5:strategy=tr("Two stages");break;case 6:strategy=tr("Quantify defects");break;case 7:strategy=tr("Single stimulation");break;}
     manager->setReportVariable("Strategy",tr("Strategy")+QString(": ")+strategy);
     manager->setReportVariable("VFI",QString(tr("VFI"))+": "+QString::number(qRound(m_VFI*100))+"%");
     QString GHT;switch (m_GHT){case 0:GHT=tr("Out of limits");break;case 1:GHT=tr("Low sensitivity");break;case 2:GHT=tr("Border of limits");break;case 3:GHT=tr("Within normal limits");break;}
