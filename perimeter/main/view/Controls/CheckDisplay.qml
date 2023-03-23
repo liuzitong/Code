@@ -383,7 +383,6 @@ Item{
                 {
                     var dot=programdotList[i];
                     dot.x=-dot.x;
-                    console.log(dot)
                     dotList.push(dot);
 
                 }

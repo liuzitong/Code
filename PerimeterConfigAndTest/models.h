@@ -50,9 +50,10 @@ public:
     SingleTableData m_dbAngleDampingTableData;  //DB角度衰减表
     SingleTableData m_xyDistTableData;          //焦距参数表
     SingleTableData m_focalLengthMotorPosMappingData;    //光斑在不同焦距对应的电机焦距步  25种焦距 6种光斑
+    SingleTableData m_dynamicLenAndTimeData;    //投射表 不同速度对应步长和时间  一共9对
 //    int* m_data;
     QSharedPointer<int> m_data;
-    const int dataLen=(31*31*3*2+46+25*2+25*6)*sizeof(int);     //正副表，DB角度衰减表，焦距参数表
+    const int dataLen=(31*31*3*2+46+25*2+25*6+9*2)*sizeof(int);     //正副表，DB角度衰减表，焦距参数表,投射表
 };
 
 #endif // MODELS_H

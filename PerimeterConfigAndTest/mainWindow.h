@@ -180,7 +180,7 @@ private:
     //获取XY电机位置还有焦距
     bool getXYMotorPosAndFocalDistFromCoord(const CoordSpacePosInfo& coordSpacePosInfo,CoordMotorPosFocalDistInfo& coordMotorPosFocalDistInfo);
     void staticCastTest(const CoordMotorPosFocalDistInfo& dot,int focalMotorPos,int db,quint8* sps,int durationTime,int shutterPos);
-    void moveCastTest(const CoordSpacePosInfo& dotBegin,const CoordSpacePosInfo& dotEnd,int spotSlot ,int colorSlot,float stepLength,int db,quint8* sps);
+    void dynamicCastTest(const CoordSpacePosInfo& dotSpaceBegin,const CoordSpacePosInfo& dotSpaceEnd,int spotSlot,float stepLength,quint8* sps);
     void init();
     void initDevCtl();
     void uninitDevCtl();
@@ -200,6 +200,7 @@ private:
     TableModel *m_diamondCenterSpotFocalPosTableModel;      //菱形中心点时测试时, 焦距电机所需走动的步数 7个光斑
     TableModel *m_xyDistTableModel;                         //xy桌标对应的距离 本机数据
     TableModel *m_dbAngleDampingTableModel;                 //DB离心度衰减参数表 本机数据
+    TableModel *m_dynamicLenAndTimeModel;
     Status m_status={-1,-1,-1};
     UsbDev::DevCtl *m_devCtl=NULL;
     UsbDev::Config m_config;

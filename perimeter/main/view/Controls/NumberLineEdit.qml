@@ -1,5 +1,5 @@
-import QtQuick 2.0
-
+﻿import QtQuick 2.0
+import perimeter.main.view.Utils 1.0
 import QtQuick.Controls 2.0
 
 Item{
@@ -30,7 +30,7 @@ Item{
         horizontalAlignment: Text.AlignLeft
         renderType: Text.NativeRendering
         verticalAlignment: Text.AlignVCenter
-        font.pointSize: parent.height*0.30
+        font.pointSize: CommonSettings.fontPointSize
         font.family:"Microsoft YaHei"
         selectByMouse: true;
         selectionColor: "yellow"

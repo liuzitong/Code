@@ -13,8 +13,8 @@ LocalTableData::LocalTableData()
     m_dbAngleDampingTableData=SingleTableData(46,1,m_data.data()+31*3*31*2);
     m_xyDistTableData=SingleTableData(25,2,m_data.data()+31*3*31*2+46);
     m_focalLengthMotorPosMappingData=SingleTableData(25,6,m_data.data()+31*3*31*2+46+25*2);
+    m_dynamicLenAndTimeData=SingleTableData(9,2,m_data.data()+31*3*31*2+46+25*2+25*6);
 }
-
 
 
 QSharedPointer<DeviceData> DeviceData::m_singleton=nullptr;
@@ -24,8 +24,8 @@ DeviceData::DeviceData()
     auto settings=DeviceSettings::getSingleton();
     QString configPath=settings->localConfigPath;
     QString dataPath=settings->localDataPath;
-    readLocalConfig(configPath);
-    readLocalData(dataPath);
+    if(!readLocalConfig(configPath)) qDebug()<<"read config error!";
+    if(!readLocalData(dataPath)) qDebug()<<"read local data error!";
 //    qDebug()<<m_config.shutterOpenPosRef();
 //    qDebug()<<m_config.DbPosMappingPtr()[0][0];
 //    qDebug()<<m_config.DbPosMappingPtr()[0][1];

@@ -6,6 +6,7 @@
 namespace DevOps{
 
 QSharedPointer<DeviceDataProcesser> DeviceDataProcesser::m_singleton=nullptr;
+bool DeviceDataProcesser::isMainDotInfoTable=true;
 
 int DeviceDataProcesser::interpolation(int value[], QPointF loc)
 {
@@ -33,7 +34,6 @@ int DeviceDataProcesser::getFocusMotorPosByDist(int focalDist, int spotSlot)
 CoordMotorPosFocalDistInfo DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoord(const QPointF loc)
 {
     CoordMotorPosFocalDistInfo coordSpacePosInfo;
-    static bool isMainDotInfoTable=true;
     if(loc.x()<-30)
     {
         isMainDotInfoTable=true;

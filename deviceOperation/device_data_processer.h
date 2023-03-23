@@ -17,8 +17,8 @@ public:
     static QSharedPointer<DeviceDataProcesser> getSingleton();
 
 private:
-    float m_pupilDiameter;
-    QVector<float> m_pupilDiameters;
+//    float m_pupilDiameter;
+//    QVector<float> m_pupilDiameters;
     static QSharedPointer<DeviceDataProcesser> m_singleton;
     /**
      * @brief interPolation
@@ -27,6 +27,7 @@ private:
      * @return      所在位置的值
      */
     static int interpolation(int value[],QPointF loc);
+    static bool isMainDotInfoTable;
 };
 }
 

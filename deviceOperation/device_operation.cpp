@@ -305,9 +305,78 @@ void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB)
 //    m_devCtl->move5Motors(sps,motorPos);
 }
 
-void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int speedLevel)
+void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int spotSlot,int speedLevel)
 {
+    auto data=DeviceData::getSingleton()->m_localTableData.m_dynamicLenAndTimeData;
+    auto stepLength=data(speedLevel,0);
+    auto stepTime=data(speedLevel,1);
+    float stepLengthX,stepLengthY;
+    float distX=end.x()-begin.x();
+    float distY=end.y()-begin.y();
+    int stepCount;
+    if(std::abs(distX)>std::abs(distY))
+    {
+        distX>0?stepLengthX=stepLength:stepLengthX=-stepLength;
+        stepCount=distX/stepLengthX;
+        stepLengthY=distY/stepCount;
+    }
 
+    else
+    {
+        distY>0?stepLengthY=stepLength:stepLengthY=-stepLength;
+        stepCount=distY/stepLength;
+        stepLengthX=distX/stepCount;
+    }
+
+    int* dotArr=new int[stepCount*3];
+    QPointF coordSpacePosInfoTemp=begin;
+    CoordMotorPosFocalDistInfo coordMotorPosFocalDistInfoTemp;
+    qDebug()<<stepCount;
+    qDebug()<<QString("分割为%1个点,X步长为%2,Y步长为%3.").arg(QString::number(stepCount)).
+                arg(QString::number(stepLengthX)).arg(QString::number(stepLengthY));
+
+    m_lastDynamicCoordAndXYMotorPos.resize(stepCount);
+    for(int i=0;i<stepCount;i++)
+    {
+        coordSpacePosInfoTemp.rx()+=stepLengthX;
+        coordSpacePosInfoTemp.ry()+=stepLengthY;
+        coordMotorPosFocalDistInfoTemp=DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoord(coordSpacePosInfoTemp);
+        dotArr[i*3+0]=coordMotorPosFocalDistInfoTemp.motorX;
+        dotArr[i*3+1]=coordMotorPosFocalDistInfoTemp.motorY;
+        dotArr[i*3+2]=DeviceDataProcesser::getFocusMotorPosByDist(coordMotorPosFocalDistInfoTemp.focalDist,spotSlot);
+        m_lastDynamicCoordAndXYMotorPos[i]={coordSpacePosInfoTemp,{coordMotorPosFocalDistInfoTemp.motorX,coordMotorPosFocalDistInfoTemp.motorY}};
+        qDebug()<<(QString("第%1个点,X电机坐标%2,Y电机坐标%3,焦距电机坐标%4.").arg(QString::number(i)).arg(QString::number( dotArr[i*3+0])).
+                    arg(QString::number( dotArr[i*3+1])).arg(QString::number( dotArr[i*3+2])));
+    }
+
+    qDebug()<<("发送移动数据");
+    constexpr int stepPerFrame=(512-8)/(4*3);
+    int totalframe=ceil((float)stepCount/stepPerFrame);
+    for(int i=0;i<totalframe-1;i++)
+    {
+        qDebug()<<QString::pointer(&dotArr[stepPerFrame*3*i]);
+        qDebug()<<dotArr[stepPerFrame*3*i];
+        qDebug()<<dotArr[stepPerFrame*3*i+1];
+        qDebug()<<dotArr[stepPerFrame*3*i+2];
+
+        qDebug()<<dotArr[stepPerFrame*3*(i+1)-3];
+        qDebug()<<dotArr[stepPerFrame*3*(i+1)-2];
+        qDebug()<<dotArr[stepPerFrame*3*(i+1)-1];
+        m_devCtl->sendDynamicData(totalframe,i,512,&dotArr[stepPerFrame*3*i]);                        //一般帧
+
+    }
+
+    qDebug()<<dotArr[(stepCount-1)*3];
+    qDebug()<<dotArr[(stepCount-1)*3+1];
+    qDebug()<<dotArr[(stepCount-1)*3+2];
+
+    int dataLen= (stepCount%stepPerFrame)*3*4+8;
+    m_devCtl->sendDynamicData(totalframe,totalframe-1,dataLen,&dotArr[stepPerFrame*3*(totalframe-1)]);     //最后一帧
+    qDebug()<<("开始移动");
+    auto config=DeviceData::getSingleton()->m_config;
+//    auto stepTime=config.
+    m_devCtl->startDynamic(speedLevel,speedLevel,speedLevel,stepTime);    //开始
+    delete[] dotArr;
 }
 
 //bool DeviceOperation::waitForAnswer(int msecs)

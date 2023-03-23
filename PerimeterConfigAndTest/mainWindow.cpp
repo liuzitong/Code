@@ -200,6 +200,18 @@ void MainWindow::initTable()
     ui->tableView_dbAngleDampingTable->setCornerName("离心度");
     ui->tableView_dbAngleDampingTable->verticalHeader()->setVisible(true);
 
+    tableData=m_localTableData.m_dynamicLenAndTimeData;
+    m_dynamicLenAndTimeModel=new TableModel();
+    m_dynamicLenAndTimeModel->m_column=tableData.m_column;
+    m_dynamicLenAndTimeModel->m_row=tableData.m_row;
+    m_dynamicLenAndTimeModel->m_hozHeader<<"步长"<<"时间";
+    for(int i=1;i<=9;i+=1){m_dynamicLenAndTimeModel->m_vertHeader<<QString::number(i);}
+    m_dynamicLenAndTimeModel->m_modelData=tableData.m_data;
+    ui->tableView_dynamicSteplenAndTime->setModel(m_dynamicLenAndTimeModel);
+    ui->tableView_dynamicSteplenAndTime->setCornerName("速度等级");
+    ui->tableView_dynamicSteplenAndTime->verticalHeader()->setVisible(true);
+
+
     ui->tableView_mainMotorPosTable->setData(m_localTableData.m_mainPosTableData.m_data);
     ui->tableView_secondaryPosTable->setData(m_localTableData.m_secondaryPosTableData.m_data);
 }
@@ -687,10 +699,11 @@ void MainWindow::on_pushButton_testStart_clicked()
             dotEnd.coordX=ui->spinBox_endCoordX->text().toInt();
             dotEnd.coordY=ui->spinBox_endCoordY->text().toInt();
 
-            quint8 db=ui->spinBox_DbSetting->value();
+//            quint8 db=ui->spinBox_DbSetting->value();
             int spotSlot=ui->spinBox_spotSlot->value();
-            int colorSlot=ui->spinBox_colorSlot->value();
-            moveCastTest(dotBegin,dotEnd,spotSlot,colorSlot,1,db,sps);
+//            int colorSlot=ui->spinBox_colorSlot->value();
+            float stepLength=ui->lineEdit_stepLength->text().toFloat();
+            dynamicCastTest(dotBegin,dotEnd,spotSlot,stepLength,sps);
             break;
         }
     }
@@ -931,13 +944,14 @@ void MainWindow::readLocalData(QString filePath)
             char* destPtr=(char*)m_localTableData.m_data.data();
             int dataLen=m_localTableData.dataLen;
             QByteArray data=file.readAll();
-            if(data.length()!=dataLen)
-            {
-                showDevInfo(QString("文件长度错误:")+QString::number(data.length()));
-                showDevInfo(QString("文件长度应为:")+QString::number(dataLen));
-                return;
-            }
-            memcpy(destPtr,data.data(),data.length());
+//            if(data.length()!=dataLen)
+//            {
+//                showDevInfo(QString("文件长度错误:")+QString::number(data.length()));
+//                showDevInfo(QString("文件长度应为:")+QString::number(dataLen));
+//                return;
+//            }
+            auto len=qMin(dataLen,data.length());
+            memcpy(destPtr,data.data(),len);
         }
         file.flush();
         file.close();
@@ -1464,7 +1478,8 @@ void MainWindow::staticCastTest(const CoordMotorPosFocalDistInfo& coordMotorPosF
     m_devCtl->openShutter(durationTime,shutterPos);
 }
 
-void MainWindow::moveCastTest(const CoordSpacePosInfo& dotSpaceBegin,const CoordSpacePosInfo& dotSpaceEnd,int spotSlot ,int colorSlot,float stepLength,int db,quint8* sps)
+
+void MainWindow::dynamicCastTest(const CoordSpacePosInfo& dotSpaceBegin,const CoordSpacePosInfo& dotSpaceEnd,int spotSlot,float stepLength,quint8* sps)
 {
     if(m_devCtl==NULL) return;
     CoordMotorPosFocalDistInfo dotMotorBegin,dotMotorEnd;
@@ -1487,55 +1502,58 @@ void MainWindow::moveCastTest(const CoordSpacePosInfo& dotSpaceBegin,const Coord
     {QCoreApplication::processEvents();}
 
     //移动焦距电机到调节位置
-    showDevInfo("移动焦距电机到调节位置.");
-    quint8 spsArr[5]={0};
-    qint32 posArr[5]={0};
-    if(!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Focus))
-    {
-        spsArr[2]=sps[2];
-        posArr[2]=m_config.focusPosForSpotAndColorChangeRef();
-        m_devCtl->move5Motors(spsArr,posArr);
-    }
+//    showDevInfo("移动焦距电机到调节位置.");
+//    quint8 spsArr[5]={0};
+//    qint32 posArr[5]={0};
+//    if(!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Focus))
+//    {
+//        spsArr[2]=sps[2];
+//        posArr[2]=m_config.focusPosForSpotAndColorChangeRef();
+//        m_devCtl->move5Motors(spsArr,posArr);
+//    }
 
     //调整颜色和光斑
-    showDevInfo("调整颜色和光斑.");
-    memset(spsArr,0,sizeof(spsArr));
-    memset(posArr,0,sizeof(posArr));
-    spsArr[3]=sps[3];
-    spsArr[4]=sps[4];
-    posArr[3]=m_config.switchColorMotorPosPtr()[colorSlot];
-    posArr[4]=m_config.switchLightSpotMotorPosPtr()[spotSlot];
+//    showDevInfo("调整颜色和光斑.");
+//    memset(spsArr,0,sizeof(spsArr));
+//    memset(posArr,0,sizeof(posArr));
+//    spsArr[3]=sps[3];
+//    spsArr[4]=sps[4];
+//    posArr[3]=m_config.switchColorMotorPosPtr()[colorSlot];
+//    posArr[4]=m_config.switchLightSpotMotorPosPtr()[spotSlot];
 
-    while(m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Focus))
-    {QCoreApplication::processEvents();}
-    m_devCtl->move5Motors(spsArr,posArr);
+//    while(m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Focus))
+//    {QCoreApplication::processEvents();}
+//    m_devCtl->move5Motors(spsArr,posArr);
 
 
     //调整焦距
-    showDevInfo("调整焦距.");
-    memset(spsArr,0,sizeof(spsArr));
-    memset(posArr,0,sizeof(posArr));
-    spsArr[2]=sps[2];
-    posArr[2]=getFocusMotorPosByDist(dotMotorBegin.focalDist,spotSlot);
+//    showDevInfo("调整焦距.");
+//    memset(spsArr,0,sizeof(spsArr));
+//    memset(posArr,0,sizeof(posArr));
+//    spsArr[2]=sps[2];
+//    posArr[2]=getFocusMotorPosByDist(dotMotorBegin.focalDist,spotSlot);
 
-    while(m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Color)||m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Light_Spot))
-    {QCoreApplication::processEvents();}
-    m_devCtl->move5Motors(spsArr,posArr);
+//    while(m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Color)||m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Light_Spot))
+//    {QCoreApplication::processEvents();}
+//    m_devCtl->move5Motors(spsArr,posArr);
 
-    //调整DB同时移动到指定位置
-    showDevInfo("调整DB同时移动到指定位置.");
-    memset(spsArr,0,sizeof(spsArr));
-    memset(posArr,0,sizeof(posArr));
-    spsArr[0]=sps[0];spsArr[1]=sps[1];spsArr[3]=sps[3];spsArr[4]=sps[4];
-    posArr[0]=dotMotorBegin.motorX;
-    posArr[1]=dotMotorBegin.motorY;
-    posArr[3]=m_config.DbPosMappingPtr()[db][0];
-    posArr[4]=m_config.DbPosMappingPtr()[db][1];
-    while(m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Focus))
-    {QCoreApplication::processEvents();}
-    m_devCtl->move5Motors(spsArr,posArr);
+//    //调整DB同时移动到指定位置
+//    showDevInfo("调整DB同时移动到指定位置.");
+//    memset(spsArr,0,sizeof(spsArr));
+//    memset(posArr,0,sizeof(posArr));
+//    spsArr[0]=sps[0];spsArr[1]=sps[1];spsArr[3]=sps[3];spsArr[4]=sps[4];
+//    posArr[0]=dotMotorBegin.motorX;
+//    posArr[1]=dotMotorBegin.motorY;
+//    posArr[3]=m_config.DbPosMappingPtr()[db][0];
+//    posArr[4]=m_config.DbPosMappingPtr()[db][1];
+//    while(m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Focus))
+//    {QCoreApplication::processEvents();}
+//    m_devCtl->move5Motors(spsArr,posArr);
 
 
+
+//    quint8 spsArr[5]={0};
+//    qint32 posArr[5]={0};
     float stepLengthX,stepLengthY;
     float distX=dotSpaceEnd.coordX-dotSpaceBegin.coordX;
     float distY=dotSpaceEnd.coordY-dotSpaceBegin.coordY;
@@ -1590,7 +1608,7 @@ void MainWindow::moveCastTest(const CoordSpacePosInfo& dotSpaceBegin,const Coord
         qDebug()<<dotArr[stepPerFrame*3*(i+1)-3];
         qDebug()<<dotArr[stepPerFrame*3*(i+1)-2];
         qDebug()<<dotArr[stepPerFrame*3*(i+1)-1];
-        m_devCtl->sendCastMoveData(totalframe,i,512,&dotArr[stepPerFrame*3*i]);                        //一般帧
+        m_devCtl->sendDynamicData(totalframe,i,512,&dotArr[stepPerFrame*3*i]);                        //一般帧
 
     }
 
@@ -1599,9 +1617,9 @@ void MainWindow::moveCastTest(const CoordSpacePosInfo& dotSpaceBegin,const Coord
     qDebug()<<dotArr[(stepCount-1)*3+2];
 
     int dataLen= (stepCount%stepPerFrame)*3*4+8;
-    m_devCtl->sendCastMoveData(totalframe,totalframe-1,dataLen,&dotArr[stepPerFrame*3*(totalframe-1)]);     //最后一帧
+    m_devCtl->sendDynamicData(totalframe,totalframe-1,dataLen,&dotArr[stepPerFrame*3*(totalframe-1)]);     //最后一帧
     showDevInfo("开始移动");
-    m_devCtl->startCastMove(sps[0],sps[1],sps[2],stepSpeed);    //开始
+    m_devCtl->startDynamic(sps[0],sps[1],sps[2],stepSpeed);    //开始
     delete[] dotArr;
 
 

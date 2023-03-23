@@ -58,7 +58,7 @@ public:
     void disconnectDev();
     void staticStimulate(QPointF loc,int spotSize,int DB,int durationTime);
     void getReadyToStimulate(QPointF loc,int spotSize,int DB);
-    void dynamicStimulate(QPointF begin, QPointF end, int speedLevel);
+    void dynamicStimulate(QPointF begin, QPointF end, int spotSlot,int speedLevel);
     QByteArray getRealTimeStimulationEyeImage();
     void openShutter(int durationTime);
     void move5Motors(bool isMotorMove[],int MotorPoses[]);
@@ -115,6 +115,7 @@ public:
 private:
     float m_pupilDiameter=-1;
     QVector<float> m_pupilDiameterArr;
+    QVector<QPair<QPointF,QPoint>> m_lastDynamicCoordAndXYMotorPos;
     static QSharedPointer<DeviceOperation> m_singleton;
 
 //    QTimer m_statusTimer;

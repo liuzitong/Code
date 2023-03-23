@@ -1049,7 +1049,7 @@ void   DevCtl :: move5Motors( quint8*  sps, qint32*  dist,MoveMethod method)
                 );
 }
 
-void DevCtl::sendCastMoveData(quint8 totalFrame, quint8 frameNumber, quint32 dataLen, qint32 *posData)
+void DevCtl::sendDynamicData(quint8 totalFrame, quint8 frameNumber, quint32 dataLen, qint32 *posData)
 {
     QByteArray ba(512,0);ba.fill(0);
     unsigned char* ptr=reinterpret_cast<unsigned char*>(ba.data());
@@ -1062,7 +1062,7 @@ void DevCtl::sendCastMoveData(quint8 totalFrame, quint8 frameNumber, quint32 dat
                 );
 }
 
-void DevCtl::startCastMove(quint8 spsX, quint8 spsY, quint8 spsF, quint32 stepTime)
+void DevCtl::startDynamic(quint8 spsX, quint8 spsY, quint8 spsF, quint32 stepTime)
 {
     QByteArray ba(512,0);ba.fill(0);
     unsigned char* ptr=reinterpret_cast<unsigned char*>(ba.data());
