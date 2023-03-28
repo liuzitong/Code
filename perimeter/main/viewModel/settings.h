@@ -54,9 +54,7 @@ private:
     bool m_isRuntimeLangEng;
     int m_defaultProgramId;
     int m_defaultProgramType;
-
-
-
+    QList<QList<int>> m_boundaries;
 
 };
 }

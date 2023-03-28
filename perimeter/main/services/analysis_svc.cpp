@@ -322,12 +322,14 @@ void AnalysisSvc::ThresholdAnalysis(int resultId,QVector<int>& dev,QVector<int>&
     else if(psd>3.2) p_psd=2;
     else if(psd>2.5) p_psd=5;
     else if(psd>2.0) p_psd=10;
+    else p_psd=10;
 
     if(md<-5.5)  p_md=0.5;
     else if(md<-3.5) p_md=1;
     else if(md<-2.6) p_md=2;
     else if(md<-2.0) p_md=5;
     else if(md<-1.5) p_md=10;
+    else p_md=10;
 
 //    qDebug()<<m_psd;
 

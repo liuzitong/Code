@@ -12,8 +12,9 @@
 namespace Perimeter{
 constexpr int MaxDB=51;
 constexpr int MinDB=0;
-class Check
+class Check:public QObject
 {
+    Q_OBJECT
 public:
     Check()=default;
     ~Check()=default;
@@ -31,6 +32,7 @@ private:
 
 class StaticCheck:public Check
 {
+    Q_OBJECT
 private:
     enum class LastCheckedDotType
     {
@@ -110,26 +112,43 @@ private:
 
 class DynamicCheck:public Check
 {
-
+    Q_OBJECT
+    struct PathRecord
+    {
+        int index;
+        QPointF beginLoc;
+        QPointF endLoc;
+        QPoint answeredLoc;
+        bool checked;
+    };
 public:
     QSharedPointer<DynamicCheckResultModel> m_resultModel;
     QSharedPointer<DynamicProgramModel> m_programModel;
     DynamicCheck()=default;
     ~DynamicCheck()=default;
+
 private:
     QSharedPointer<UtilitySvc> m_utilitySvc=UtilitySvc::getSingleton();
-    QVector<int> unCheckedIndex;
+
+    QVector<PathRecord> m_records;
+
+    QVector<QPointF> m_inputDots;
 
     virtual void initialize() override;
 
     virtual void Checkprocess() override;
 
+    QPair<QPoint,QPoint> getPath();
+
+    void stimulate(QPoint begin,QPoint end);
+
+    QPair<QPoint,QPoint> waitForAnswer();
+
+    virtual void setLight(bool onOff) override;
+
     // Check interface
 public:
     virtual void finished() override;
-
-private:
-    virtual void setLight(bool onOff) override;
 };
 
 
@@ -143,6 +162,7 @@ public:
     PatientVm* m_patientVm;
     ProgramVm* m_programVm;
     CheckResultVm* m_checkResultVm;
+    QList<QPoint> m_dynamicSelectedDots;
 
 private:
     QSharedPointer<Check> m_check;
@@ -172,6 +192,7 @@ signals:
     void checkProcessFinished();
     void checkedCountChanged(int count);
     void checkTimeChanged(int secs);
+
 };
 
 void StaticCheck::initialize()
@@ -951,29 +972,48 @@ void StaticCheck::setLight(bool onOff)
         m_deviceOperation->setLamp(DevOps::LampId::LampId_yellowBackground,0,onOff);
 }
 
+
 void DynamicCheck::initialize()
 {
     m_resultModel->m_patient_id=m_patientModel->m_id;
     m_resultModel->m_program_id=m_programModel->m_id;
     m_checkedCount=0;
     m_totalCount=m_programModel->m_data.dots.size();
-    for(int i=0;i<m_totalCount;i++)
+    if(m_programModel->m_params.strategy!=DynamicParams::Strategy::straightLine)
     {
-        unCheckedIndex.push_back(i);
-        m_resultModel->m_data.checkData.push_back(DynamicDataNode{std::to_string('A'+i),m_programModel->m_data.dots[i],{0,0},false});
+
     }
+//    for(int i=0;i<m_totalCount;i++)
+//    {
+//        m_resultModel->m_data.checkData.push_back(DynamicDataNode{std::to_string('A'+i),m_programModel->m_data.dots[i],{0,0},false});
+//    }
 }
 
 void DynamicCheck::Checkprocess()
 {
+    auto path=getPath();
+//    stimulate()
+}
+
+QPair<QPoint, QPoint> DynamicCheck::getPath()
+{
+
+    switch (m_programModel->m_params.strategy)
+    {
+    case DynamicParams::Strategy::standard:
+    {
+
+    }
+
+    }
+
+
     if(m_programModel->m_params.strategy==DynamicParams::Strategy::standard)
     {
-        int dotIndex=unCheckedIndex.takeAt(qrand()%unCheckedIndex.size());
-        auto dataNode=m_resultModel->m_data.checkData[dotIndex];
-//        deviceSvc->dynamicStimulate(QPointF{dataNode.start.x,dataNode.start.y},QPointF{dataNode.end.x,dataNode.end.y},1);
-//        bool isSeen=deviceSvc->waitForAnswer({4,5});             //TODO 填入motorIDS
-        //            if(isSeen)
+//        int dotIndex=unCheckedIndex.takeAt(qrand()%unCheckedIndex.size());
+//        auto dataNode=m_resultModel->m_data.checkData[dotIndex];
     }
+    return {{},{}};
 }
 
 void DynamicCheck::finished()
@@ -1070,7 +1110,6 @@ void CheckSvcWorker::doWork()
             return;
         }
         };
-//        UtilitySvc::wait(1000);
     }
 }
 CheckSvc::CheckSvc(QObject *parent)
@@ -1099,14 +1138,15 @@ CheckSvc::~CheckSvc()
 
 void CheckSvc::start()
 {
-    if(m_checkResultVm==nullptr)
-    {
-        qDebug()<<QString::number(m_checkResultVm->getPatient_id());
-    }
+//    if(m_checkResultVm==nullptr)
+//    {
+//        qDebug()<<QString::number(m_checkResultVm->getPatient_id());
+//    }
     m_worker->m_patientVm=m_patientVm;
     m_worker->m_programVm=m_programVm;
     m_worker->m_checkResultVm=m_checkResultVm;
     m_worker->m_checkState=&m_checkState;
+    m_worker->m_dynamicSelectedDots=m_dynamicSelectedDots;
     setCheckState(0);
     qDebug()<<"start command";
     QMetaObject::invokeMethod(m_worker,"doWork",Qt::QueuedConnection);
@@ -1204,8 +1244,16 @@ float CheckSvc::getPupilDiameter()
     return DevOps::DeviceOperation::getSingleton()->getPupilDiameter();
 }
 
-
-
+void Perimeter::CheckSvc::setInputDots(QVariantList value)
+{
+    m_dynamicSelectedDots.clear();
+    for(auto&i:value)
+    {
+        auto radius=i.toMap()["x"].toInt();
+        auto angle=i.toMap()["y"].toInt();
+        m_dynamicSelectedDots.push_back({radius,angle});
+    }
+}
 }
 #include "check_svc.moc"
 

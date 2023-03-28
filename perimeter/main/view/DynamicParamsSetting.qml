@@ -92,13 +92,11 @@ ModalPopupDialog/* Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                         width: parent.width; height:parent.parent.rowHeight;
                                         CusText{text:lt+qsTr("Check range"); anchors.left: parent.left; anchors.leftMargin: 0;width: parent.width*0.4;horizontalAlignment: Text.AlignLeft;font.pointSize: fontPointSize;}
                                         LineEdit{width: parent.width*0.5; anchors.right: parent.right;readOnly: true;text:currentProgram===null?0:currentProgram.params.Range[1];}
-
-
                                     }
                                     Item{
                                         width: parent.width; height:parent.parent.rowHeight;
                                         CusText{text:lt+qsTr("Dots count"); anchors.left: parent.left; anchors.leftMargin: 0;width: parent.width*0.4;horizontalAlignment: Text.AlignLeft;font.pointSize: fontPointSize;}
-                                        LineEdit{width: parent.width*0.5; anchors.right: parent.right;readOnly: true;text:currentProgram===null?0:currentProgram.dots.length;}
+                                        LineEdit{enabled:currentProgram.params.strategy===0;width: parent.width*0.5; anchors.right: parent.right;readOnly: true;text:currentProgram===null?0:currentProgram.data.dots.length;}
                                     }
                                     Item{
                                         width: parent.width; height:parent.parent.rowHeight;
@@ -165,6 +163,7 @@ ModalPopupDialog/* Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                        width: parent.width; height:parent.parent.rowHeight;
                                        CusText{text:lt+qsTr("Move method"); anchors.left: parent.left; anchors.leftMargin: 0;width: parent.width*0.4;horizontalAlignment: Text.AlignLeft;font.pointSize: fontPointSize;}
                                        CusComboBox{
+                                           enabled: currentProgram.params.strategy===1||currentProgram.params.strategy===2
                                            width: parent.width*0.5; anchors.right: parent.right;model:["4","6","8"];
                                            currentIndex:currentProgram===null?0:currentProgram.params.dynamicMethod;
                                            Component.onCompleted: {idPopup.ok.connect(function(){currentProgram.params.dynamicMethod=currentIndex;})}
@@ -174,6 +173,7 @@ ModalPopupDialog/* Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                        width: parent.width; height:parent.parent.rowHeight;
                                        CusText{text:lt+qsTr("Move distance"); anchors.left: parent.left; anchors.leftMargin: 0;width: parent.width*0.4;horizontalAlignment: Text.AlignLeft;font.pointSize: fontPointSize;}
                                        CusComboBox{
+                                           enabled: currentProgram.params.strategy===1||currentProgram.params.strategy===2
                                            width: parent.width*0.5; anchors.right: parent.right;model:["5","10","15"];
                                            currentIndex:currentProgram===null?0:currentProgram.params.dynamicDistance;
                                            Component.onCompleted: {idPopup.ok.connect(function(){currentProgram.params.dynamicDistance=currentIndex;})}

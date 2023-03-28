@@ -211,8 +211,8 @@ bool    DevCtl_Worker :: cmdComm_bulkOutSync( const unsigned char *buff, int buf
     SciPack::NwkUsbObj2::DataPacket  pkg;
     pkg.dat_id = 0; pkg.dat_ptr = const_cast<unsigned char*>( buff ); pkg.dat_size = buff_sz;
     bool ret=m_usb_dev->bulkTransSync( SciPack::NwkUsbObj2::PipeTypeID_BlkBulkOut, & pkg ) == SCIPACK_S_OK;
-    QString msg="cmdComm_bulkOutSync:\n"+buffToQStr(reinterpret_cast<const char*>(buff),buff_sz);
-    logger->info(msg.toStdString());
+//    QString msg="cmdComm_bulkOutSync:\n"+buffToQStr(reinterpret_cast<const char*>(buff),buff_sz);
+//    logger->info(msg.toStdString());
     return ret;
 }
 

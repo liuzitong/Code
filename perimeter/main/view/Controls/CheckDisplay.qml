@@ -10,20 +10,62 @@ Item{
     property int clickedDotIndex: -1;
     property alias testOver:displayCanvas.testOver;
     property int os_od: 0;
-    property var dotList:[];
+    property var dynamicSelectedDots:[];
+    property var dynamicSelectedDotLen;
+    property bool dynamicSelectedDotsReady:false;
+    property int type;
 
-//    function testOver() {displayCanvas.testOver=true;displayCanvas.requestPaint();}
 
-    onCurrentProgramChanged: displayCanvas.requestPaint();
-    onOs_odChanged: displayCanvas.requestPaint();
+    function resetInputDot()
+    {
+        type=currentProgram.type;
+        if(type==2)
+        {
+            dynamicSelectedDots=[];
+            var strategy=currentProgram.params.strategy;
+            if(strategy===0)
+            {
+                dynamicSelectedDots.push({x:0,y:0});
+                dynamicSelectedDotLen=1;
+                dynamicSelectedDotsReady=true;
+            }
+            if(strategy===1)
+            {
+/*                if(os_od==0)*/ dynamicSelectedDots.push(displayCanvas.orthToPolar({x:-15,y:0}));
+//                else dynamicSelectedDots.push(displayCanvas.orthToPolar({x:-15,y:0}));
+                dynamicSelectedDotLen=1;
+                dynamicSelectedDotsReady=true;
+            }
+            else if(strategy===2)
+            {
+                dynamicSelectedDotLen=1;
+                dynamicSelectedDotsReady=false;
+            }
+            else if(strategy===3)
+            {
+                dynamicSelectedDotLen=2;
+                dynamicSelectedDotsReady=false;
+            }
+        }
+    }
 
-    onCurrentCheckResultChanged: {
-//        clickedDotIndex=-1;
+    onCurrentProgramChanged:
+    {
+        resetInputDot();
+        displayCanvas.requestPaint();
+    }
+    onOs_odChanged:
+    {
+//        resetInputDot();
         displayCanvas.requestPaint();
     }
 
+    onCurrentCheckResultChanged: { displayCanvas.requestPaint();}
+
     signal painted();
     antialiasing: true
+
+    CusText{id:dotPosDisplay;text:lt+qsTr(""); horizontalAlignment: Text.AlignLeft;z:1; anchors.top: parent.top; anchors.topMargin: 0.07*parent.height; anchors.left: parent.left; anchors.leftMargin: 0.03*parent.width;width: parent.width*0.06;height: parent.height*0.05;}
 
     Canvas{
         id:displayCanvas;
@@ -37,25 +79,81 @@ Item{
         smooth: false;
         MouseArea{
             anchors.fill: parent;
-            onClicked:{
-                if(currentCheckResult===null) return;
-                var dotClicked=displayCanvas.pixCoordToDot({x:mouseX,y:mouseY});
-                var dotList=currentProgram.data.dots;
-                var dist=Math.pow(10,6);
-                var index;
-                for(var i=0;i<dotList.length;i++)
+            hoverEnabled:range!==0;
+            acceptedButtons: Qt.LeftButton | Qt.RightButton;
+            onPositionChanged:
+            {
+                var dot;
+                dot = displayCanvas.pixCoordToDot({x:mouseX,y:mouseY})
+                if(type!==2)
                 {
-                    var dot=dotList[i];
-                    var temp=Math.pow(dot.x-dotClicked.x,2)+Math.pow(dot.y-dotClicked.y,2)
-                    if(temp<dist)
+                    dotPosDisplay.text="x:"+Math.round(dot.x)+" y:"+Math.round(dot.y);
+                }
+                else
+                {
+                    dot=displayCanvas.orthToPolar(dot)
+                    dotPosDisplay.text="radius:"+Math.round(dot.x)+" angle:"+Math.round(dot.y);
+                }
+            }
+            onClicked:{
+                if(type!==2)
+                {
+                    if(currentCheckResult===null) return;
+                    var dotClicked=displayCanvas.pixCoordToDot({x:mouseX,y:mouseY});
+                    var dotList=currentProgram.data.dots;
+                    var dist=Math.pow(10,6);
+                    var index;
+                    for(var i=0;i<dotList.length;i++)
                     {
-                        dist=temp;
-                        index=i;
+                        var dot=dotList[i];
+                        var temp=Math.pow(dot.x-dotClicked.x,2)+Math.pow(dot.y-dotClicked.y,2)
+                        if(temp<dist)
+                        {
+                            dist=temp;
+                            index=i;
+                        }
+                    }
+                    clickedDotIndex=index;
+                    displayCanvas.requestPaint();
+                }
+                else
+                {
+                    dot = displayCanvas.pixCoordToDot({x:mouseX,y:mouseY})
+                    if(os_od==1)
+                    {
+                        dot.x=-dot.x;
+                    }
+                    if (mouse.button === Qt.RightButton)
+                    {
+                        if(dynamicSelectedDots.length===0) return;
+                        var distance=1000*1000;
+                        var nearestDot;
+                        dynamicSelectedDots.forEach(function(item){
+                            var tempDot;
+                            tempDot =displayCanvas.polarToOrth(item);
+                            var newDist=Math.pow(tempDot.x-dot.x,2)+Math.pow(tempDot.y-dot.y,2);
+                            if (newDist<distance) {nearestDot=item;distance=newDist;}
+                        })
+
+                        for(i=0;i<dynamicSelectedDots.length;i++)
+                        {
+                            if(dynamicSelectedDots[i].x===nearestDot.x&&dynamicSelectedDots[i].y===nearestDot.y)
+                            {
+                                dynamicSelectedDots.splice(i,1);
+                                break;
+                            }
+                        }
+                        dynamicSelectedDotsReady=(dynamicSelectedDotLen===dynamicSelectedDots.length);
+                        displayCanvas.requestPaint();
+                    }
+                    else{
+                        if(dynamicSelectedDots.length>=dynamicSelectedDotLen) return;
+                        dot=displayCanvas.orthToPolar(dot);
+                        dynamicSelectedDots.push(dot);
+                        displayCanvas.requestPaint();
+                        dynamicSelectedDotsReady=(dynamicSelectedDotLen===dynamicSelectedDots.length);
                     }
                 }
-                clickedDotIndex=index;
-                console.log(clickedDotIndex);
-                displayCanvas.requestPaint();
             }
         }
 
@@ -113,8 +211,8 @@ Item{
         {
             var pix_coordX=pix.x-width/2;
             var pix_coordY=-(pix.y-height/2);
-            var dot_x=Math.round(pix_coordX/(diameter/2)*degreeRange);
-            var dot_y=Math.round(pix_coordY/(diameter/2)*degreeRange);
+            var dot_x=pix_coordX/(diameter/2)*degreeRange;
+            var dot_y=pix_coordY/(diameter/2)*degreeRange;
             return {x:dot_x,y:dot_y};
         }
 
@@ -162,6 +260,27 @@ Item{
             ctx.stroke();
             ctx.closePath();
         }
+
+        function dynamicInputDots(dot)
+        {
+            var orthCoord;
+            orthCoord=polarToOrth(dot);
+            var x_pix=(orthCoord.x/degreeRange)*(diameter*0.5)+width/2;
+            var y_pix=(-orthCoord.y/degreeRange)*(diameter*0.5)+height/2;
+
+            var dotRadius=diameter/180*1;
+            var ctx = getContext("2d");
+            ctx.lineWidth = 0;
+            ctx.strokeStyle = "red";
+            ctx.beginPath();
+            ctx.arc(x_pix, y_pix, dotRadius, 0, Math.PI*2);
+            ctx.stroke();
+            ctx.closePath();
+            ctx.fillStyle = "green";
+            ctx.fill();
+        }
+
+
 
         function drawDB(db,dot)
         {
@@ -361,30 +480,25 @@ Item{
             }
 
             var dBList;
-            var programdotList;
-            if(currentProgram.type!==2)
+            var dotList=currentProgram.data.dots;
+            var inputdotList=new Array(dynamicSelectedDots.length);
+            for(i=0;i<dynamicSelectedDots.length;i++)
             {
-                programdotList=currentProgram.data.dots;
+                inputdotList[i]={x:dynamicSelectedDots[i].x,y:dynamicSelectedDots[i].y};
             }
-            else
+            if(os_od==1)
             {
-                programdotList=currentCheckResult.resultData.checkData;
-            }
-
-            if(os_od==0)
-            {
-
-                dotList=programdotList;
-            }
-            else
-            {
-                dotList=[]
-                for(i=0;i<programdotList.length;i++)
+                for(i=0;i<dotList.length;i++)
                 {
-                    var dot=programdotList[i];
-                    dot.x=-dot.x;
-                    dotList.push(dot);
-
+                    dotList[i].x=-dotList[i].x;
+                }
+                for(i=0;i<inputdotList.length;i++)
+                {
+                    var tempDot=polarToOrth(inputdotList[i]);
+                    tempDot.x=-tempDot.x;
+                    tempDot=orthToPolar(tempDot);
+                    inputdotList[i].x=tempDot.x;
+                    inputdotList[i].y=tempDot.y;
                 }
             }
 
@@ -394,7 +508,16 @@ Item{
             {
                 dotList.forEach(function(item)
                 {
+                    if(type==2)
+                    {
+                        item=polarToOrth(item);
+                    }
                     drawDot(item);
+                })
+                inputdotList.forEach(function(item)
+                {
+
+                    dynamicInputDots(item);
                 })
             }
             else
@@ -476,9 +599,18 @@ Item{
 //                    ctx.stroke();
 
 //                    console.log(dotList[0].end.x);
+                    inputdotList.forEach(function(item)
+                    {
+                        console.log(item.x);
+                        console.log(item.y);
+                        dynamicInputDots(item);
+                    })
+
+
+
                     for(i=0;i<dotList.length;i++)                               //画点
                     {
-                        var dot=dotToPixCoord(polarToOrth(dotList[i].end));
+                        dot=dotToPixCoord(polarToOrth(dotList[i].end));
                         ctx.lineWidth = 0;
                         ctx.strokeStyle = "black";
                         ctx.beginPath();
@@ -514,7 +646,6 @@ Item{
                 }
             }
 
-
             if(currentProgram.type!==2&clickedDotIndex!=-1)                                     //选择点--实时图片用
             {
                 var clickedDot=currentProgram.data.dots[clickedDotIndex];
@@ -529,6 +660,7 @@ Item{
                 ctx.stroke();
                 root.painted();
             }
+            delete inputdotList;
         }
     }
 }

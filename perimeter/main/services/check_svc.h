@@ -5,7 +5,7 @@
 #include <perimeter/main/viewModel/programVm.h>
 #include <perimeter/main/viewModel/checkResultVm.h>
 #include <perimeter/main/model/patientModel.h>
-
+#include <QVariantList>
 namespace Perimeter{
 class CheckSvcWorker;
 class CheckSvc: public QObject
@@ -20,6 +20,7 @@ class CheckSvc: public QObject
     Q_PROPERTY(bool devReady READ getDevReady NOTIFY devReadyChanged)
     Q_PROPERTY(bool autoAlignPupil READ getAutoAlignPupil WRITE setAutoAlignPupil NOTIFY autoAlignPupilChanged)
     Q_PROPERTY(bool pupilDiameter READ getPupilDiameter NOTIFY pupilDiameterChanged)
+    Q_PROPERTY(QVariantList dynamicSelectedDots WRITE setInputDots)
 
 //    Q_PROPERTY(CheckSvcWorker* worker READ getWorker)
 public:
@@ -53,6 +54,7 @@ public:
     bool getDevReady();Q_SIGNAL void devReadyChanged();
     bool getAutoAlignPupil();void setAutoAlignPupil(bool autoAlign);Q_SIGNAL void autoAlignPupilChanged();
     float getPupilDiameter();Q_SIGNAL void pupilDiameterChanged();
+    void setInputDots(QVariantList value);
 //    CheckSvcWorker* getWorker(){return m_worker;}
 
 private:
@@ -61,6 +63,7 @@ private:
     int m_checkState=3;                        //0:start,1:checking,2:pausing,3:stopped,4:finished
     int m_checkedCount=0;
     int m_checkTime=0;
+    QList<QPoint> m_dynamicSelectedDots;
     PatientVm* m_patientVm;
     ProgramVm* m_programVm;
     CheckResultVm* m_checkResultVm;

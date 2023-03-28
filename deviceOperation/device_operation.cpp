@@ -305,6 +305,7 @@ void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB)
 //    m_devCtl->move5Motors(sps,motorPos);
 }
 
+
 void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int spotSlot,int speedLevel)
 {
     auto data=DeviceData::getSingleton()->m_localTableData.m_dynamicLenAndTimeData;
@@ -374,20 +375,11 @@ void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int spotSlot,
     m_devCtl->sendDynamicData(totalframe,totalframe-1,dataLen,&dotArr[stepPerFrame*3*(totalframe-1)]);     //最后一帧
     qDebug()<<("开始移动");
     auto config=DeviceData::getSingleton()->m_config;
-//    auto stepTime=config.
     m_devCtl->startDynamic(speedLevel,speedLevel,speedLevel,stepTime);    //开始
     delete[] dotArr;
 }
 
-//bool DeviceOperation::waitForAnswer(int msecs)
-//{
-//    QElapsedTimer elapsedTimer;
-//    while(!m_statusData.answerpadStatus()&&elapsedTimer.elapsed()<msecs)
-//    {
-//        QApplication::
-//    }
-//    return false;
-//}
+
 
 QByteArray DeviceOperation::getRealTimeStimulationEyeImage()
 {

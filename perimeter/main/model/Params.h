@@ -215,6 +215,10 @@ struct StaticParams/*:public QObject*/
 
 struct DynamicParams
 {
+    /**
+     * @brief The Strategy enum
+     *
+     */
     enum class Strategy{standard,blindArea,darkArea,straightLine};
     enum class DynamicMethod{_4Lines,_6Lines,_8Lines};
     enum class DynamicDistance{_5,_10,_15};

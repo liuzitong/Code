@@ -29,6 +29,7 @@ Item {id:root; width: 1366;height: 691
     Component.onCompleted:{
         frameProvidSvc=IcUiQmlApi.appCtrl.frameProvidSvc;
         checkSvc.checkResultChanged.connect(currentCheckResultChanged);
+
         refresh();
     }
 
@@ -294,7 +295,8 @@ Item {id:root; width: 1366;height: 691
                         CheckDisplay{
                             id:checkDisplay;
                             os_od:os_od.value;
-                            currentProgram:root.currentProgram;currentCheckResult:root.currentCheckResult;
+                            currentProgram:root.currentProgram;
+                            currentCheckResult:root.currentCheckResult;
                             onClickedDotIndexChanged: {
                                 if(currentCheckResult==null) return;
                                 realTimeDBRec.visible=true;
@@ -365,34 +367,11 @@ Item {id:root; width: 1366;height: 691
                             id:checkControl
                             height: parent.height;spacing: height*0.8;anchors.horizontalCenter: parent.horizontalCenter;
                             CusButton{
-//                                enabled: IcUiQmlApi.appCtrl.checkSvc.devReady;
+                                enabled: /*IcUiQmlApi.appCtrl.checkSvc.devReady&&*/(currentProgram.type!==2||checkDisplay.dynamicSelectedDotsReady);
                                 property int checkState: IcUiQmlApi.appCtrl.checkSvc.checkState;
                                 text:{if(checkState>2) return lt+qsTr("Start");if(checkState===2) return lt+qsTr("Resume");if(checkState===0||checkState===1) return lt+qsTr("Pause")}
                                 onClicked:{
-//                                    if(currentCheckResult!=null)
-//                                    {
-//                                        if(currentCheckResult.type!==2)
-//                                            IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::StaticCheckResultVm",currentCheckResult);
-
-//                                        else
-//                                            IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::DynamicCheckResultVm",currentCheckResult);
-//                                        currentCheckResult=null;
-//                                    }
-
-//                                    if(currentProgram.type===0)
-//                                    {
-//                                        currentCheckResult=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::StaticCheckResultVm", false,[1]);
-//                                        console.log(currentCheckResult.resultData.testTimespan);
-//                                    }
-//                                    else if(currentProgram.type===1)
-//                                    {
-//                                        currentCheckResult=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::StaticCheckResultVm", false,[200]);
-//                                    }
-//                                    else
-//                                    {
-//                                        currentCheckResult=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::DynamicCheckResultVm", false,[300]);
-//                                    }
-
+                                    if(currentProgram.type===2) IcUiQmlApi.appCtrl.checkSvc.dynamicSelectedDots=checkDisplay.dynamicSelectedDots;     //动态输入点
                                     if(checkState>2)
                                     {
                                         if(currentCheckResult!=null)
@@ -414,6 +393,7 @@ Item {id:root; width: 1366;height: 691
                                         currentCheckResult.OS_OD=os_od.value;
                                         currentCheckResult.type=currentProgram.type;
                                         currentCheckResult.params=currentProgram.params;
+
                                         IcUiQmlApi.appCtrl.checkSvc.program=currentProgram;
                                         IcUiQmlApi.appCtrl.checkSvc.patient=currentPatient;
                                         IcUiQmlApi.appCtrl.checkSvc.checkResult=currentCheckResult;
@@ -428,11 +408,7 @@ Item {id:root; width: 1366;height: 691
                                     {
                                         IcUiQmlApi.appCtrl.checkSvc.pause();
                                     }
-
                                 }
-//                                Component.onCompleted: {
-//                                    IcUiQmlApi.appCtrl.checkSvc.checkResultChanged.connect(function(){console.log("checkResultChanged.")});
-//                                }
                             }
                             CusButton{
                                 text:lt+qsTr("Stop");enabled: IcUiQmlApi.appCtrl.checkSvc.checkState<=2;
@@ -461,7 +437,8 @@ Item {id:root; width: 1366;height: 691
                                             IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::DynamicCheckResultVm",currentCheckResult);
                                         currentCheckResult=null;
                                     }
-                                    os_od.value=(os_od.value+1)%2;
+                                    os_od.value=os_od.value==0?1:0;
+
                                 }
                             }
                         }

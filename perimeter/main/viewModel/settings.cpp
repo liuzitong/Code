@@ -10,7 +10,7 @@ namespace Perimeter
 {
 Settings::Settings()
 {
-    QFile jsonFile("./Settings.json");
+    QFile jsonFile("./UserSettings.json");
     if(jsonFile.open(QIODevice::ReadOnly))
     {
         QJsonParseError jsonParserError;
@@ -20,24 +20,44 @@ Settings::Settings()
         m_language=jo["language"].toString();
         m_version=jo["version"].toString();
         m_deviceInfo=jo["deviceInfo"].toString();
-        m_programUnlockPwd=jo["programUnlockPwd"].toString();
         m_defaultProgramId=jo["defaultProgramId"].toInt();
         m_defaultProgramType=jo["defaultProgramType"].toInt();
         changeLang();
         jsonFile.close();
     }
+
+    jsonFile.setFileName("./FactorySettings.json");
+    if(jsonFile.open(QIODevice::ReadOnly))
+    {
+        QJsonParseError jsonParserError;
+        auto JsonDoc = QJsonDocument::fromJson(jsonFile.readAll(),&jsonParserError);
+        auto jo=JsonDoc.object();
+        {
+            m_programUnlockPwd=jo["programUnlockPwd"].toString();
+            auto boundary=jo["boundaryOne"].toObject();
+            auto center=boundary["center"].toObject();
+            auto radius=boundary["radius"].toInt();
+            m_boundaries.append({center["x"].toInt(),center["y"].toInt(),radius});
+        }
+        {
+            auto boundary=jo["boundaryTwo"].toObject();
+            auto center=boundary["center"].toObject();
+            auto radius=boundary["radius"].toInt();
+            m_boundaries.append({center["x"].toInt(),center["y"].toInt(),radius});
+            jsonFile.close();
+        }
+    }
 }
 
 void Settings::save()
 {
-    QFile jsonFile("./Settings.json");
+    QFile jsonFile("./UserSettings.json");
     jsonFile.open(QIODevice::WriteOnly);
     QJsonObject jo{
         {"hospitalName",m_hospitalName},
         {"language",m_language},
         {"version",m_version},
         {"deviceInfo",m_deviceInfo},
-        {"programUnlockPwd",m_programUnlockPwd},
         {"defaultProgramId",m_defaultProgramId},
         {"defaultProgramType",m_defaultProgramType}
     };

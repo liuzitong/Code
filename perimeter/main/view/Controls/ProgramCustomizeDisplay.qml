@@ -33,7 +33,7 @@ Item{
             {
                 var dot;
 //                if(category!==4&&locked==true) return;
-                dot = displayCanvas.pixCoordToDot(mouseX,mouseY)
+                dot = displayCanvas.pixCoordToDot(mouseX,mouseY);
                 if(type!==2)
                 {
                     dot.x=Math.round(dot.x);dot.y=Math.round(dot.y);
@@ -41,7 +41,7 @@ Item{
                 }
                 else
                 {
-                    dot=displayCanvas.orthToPolar(dot)
+                    dot=displayCanvas.orthToPolar(dot);
                     dot.x=Math.round(dot.x);dot.y=Math.round(dot.y);
                     dotPosDisplay.text="radius:"+dot.x+" angle:"+dot.y;
                 }
@@ -54,7 +54,6 @@ Item{
                 var dot = displayCanvas.pixCoordToDot(mouseX,mouseY)
                 if (mouse.button === Qt.RightButton)
                 {
-                    console.log("right clicked aa");
                     var distance=1000*1000;
                     var nearestDot;
                     dotList.forEach(function(item){
