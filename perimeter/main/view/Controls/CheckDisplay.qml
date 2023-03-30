@@ -37,7 +37,7 @@ Item{
             }
             if(strategy===1)
             {
-/*                if(os_od==0)*/ dynamicSelectedDots.push(displayCanvas.orthToPolar({x:-15,y:0}));
+/*                if(os_od==0)*/ dynamicSelectedDots.push({x:-15,y:0});
 //                else dynamicSelectedDots.push(displayCanvas.orthToPolar({x:-15,y:0}));
                 dynamicSelectedDotLen=1;
                 dynamicSelectedDotsReady=true;
@@ -143,9 +143,7 @@ Item{
                         var distance=1000*1000;
                         var nearestDot;
                         dynamicSelectedDots.forEach(function(item){
-                            var tempDot;
-                            tempDot =displayCanvas.polarToOrth(item);
-                            var newDist=Math.pow(tempDot.x-dot.x,2)+Math.pow(tempDot.y-dot.y,2);
+                            var newDist=Math.pow(dot.x-item.x,2)+Math.pow(dot.y-item.y,2);
                             if (newDist<distance) {nearestDot=item;distance=newDist;}
                         })
 
@@ -180,7 +178,7 @@ Item{
                             }
                             else
                             {
-                                var selectedDot=displayCanvas.polarToOrth(dynamicSelectedDots[0]);
+                                var selectedDot=dynamicSelectedDots[0];
                                 var zone1,zone2;
                                 if(Math.pow(selectedDot.x-boundaries[0].x,2)+Math.pow(selectedDot.y-boundaries[0].y,2)<Math.pow(boundaries[0].radius,2)) zone1=true;
                                 if(Math.pow(selectedDot.x-boundaries[1].x,2)+Math.pow(selectedDot.y-boundaries[1].y,2)<Math.pow(boundaries[1].radius,2)) zone2=true;
@@ -190,7 +188,6 @@ Item{
                             }
                         }
 
-                        dot=displayCanvas.orthToPolar(dot);
                         dynamicSelectedDots.push(dot);
                         displayCanvas.requestPaint();
                     }
@@ -306,10 +303,8 @@ Item{
 
         function dynamicInputDots(dot)
         {
-            var orthCoord;
-            orthCoord=polarToOrth(dot);
-            var x_pix=(orthCoord.x/degreeRange)*(diameter*0.5)+width/2;
-            var y_pix=(-orthCoord.y/degreeRange)*(diameter*0.5)+height/2;
+            var x_pix=(dot.x/degreeRange)*(diameter*0.5)+width/2;
+            var y_pix=(-dot.y/degreeRange)*(diameter*0.5)+height/2;
 
             var dotRadius=diameter/180*1;
             var ctx = getContext("2d");
@@ -561,7 +556,6 @@ Item{
 
             if(root.currentCheckResult==null)                       //结果为空的时候按照程序画圆点
             {
-                if(type!==2)
                 dotList.forEach(function(item)
                 {
                     if(os_od==1){
@@ -569,28 +563,11 @@ Item{
                     }
                     drawDot(item);
                 })
-                else
+                if(type==2)
                 {
-                    dotList.forEach(function(item)
-                    {
-                        if(os_od==1){
-                            var tempDot=polarToOrth(item);
-                            tempDot.x=-tempDot.x;
-                            tempDot=orthToPolar(tempDot);
-                            item.x=tempDot.x;
-                            item.y=tempDot.y;
-                        }
-                        drawDot(polarToOrth(item));
-                    })
                     inputdotList.forEach(function(item)
                     {
-                        if(os_od==1){
-                            var tempDot=polarToOrth(item);
-                            tempDot.x=-tempDot.x;
-                            tempDot=orthToPolar(tempDot);
-                            item.x=tempDot.x;
-                            item.y=tempDot.y;
-                        }
+                        if(os_od==1){item.x=-item.x;}
                         dynamicInputDots(item);
                     })
                     if(currentProgram.params.strategy===1||currentProgram.params.strategy===2)   //画周围放射点
@@ -604,7 +581,7 @@ Item{
                         for(var i=0;i<lines;i++)
                         {
                             var angle=Math.PI*2/lines*i;
-                            var selectedDot=polarToOrth(dynamicSelectedDots[0]);
+                            var selectedDot=dynamicSelectedDots[0];
                             var x=Math.cos(angle)*dynamicCircleRadius+selectedDot.x;
                             if(os_od==1) x=-x;
                             var y=Math.sin(angle)*dynamicCircleRadius+selectedDot.y;
@@ -701,7 +678,7 @@ Item{
 
                     for(i=0;i<dotList.length;i++)                               //画点
                     {
-                        dot=dotToPixCoord(polarToOrth(dotList[i].end));
+                        dot=dotToPixCoord(dotList[i].end);
                         ctx.lineWidth = 0;
                         ctx.strokeStyle = "black";
                         ctx.beginPath();
@@ -713,8 +690,8 @@ Item{
 
                     for(i=1;i<dotList.length-1;i++)                                 //连线
                     {
-                        var dot_Begin=dotToPixCoord(polarToOrth(dotList[i].end));
-                        var dot_End=dotToPixCoord(polarToOrth(dotList[i+1].end));
+                        var dot_Begin=dotToPixCoord(dotList[i].end);
+                        var dot_End=dotToPixCoord(dotList[i+1].end);
                         console.log(dot_Begin.x+" "+dot_Begin.y);
                         console.log(dot_End.x+" "+dot_End.y);
                         ctx.beginPath();
@@ -726,8 +703,8 @@ Item{
 
                     if(testOver===true)                                                 //检查完之后连接
                     {
-                        dot_Begin=dotToPixCoord(polarToOrth(dotList[dotList.length-1].end));
-                        dot_End=dotToPixCoord(polarToOrth(dotList[0].end));
+                        dot_Begin=dotToPixCoord(dotList[dotList.length-1].end);
+                        dot_End=dotToPixCoord(dotList[0].end);
                         ctx.beginPath();
                         ctx.moveTo(dot_Begin.x,dot_Begin.y);
                         ctx.lineTo(dot_End.x,dot_End.y);

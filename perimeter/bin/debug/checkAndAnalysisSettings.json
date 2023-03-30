@@ -6,12 +6,12 @@
     "boundaryOne":
     {
         "center":{"x":-30,"y":0},
-        "radius":60
+        "radius":65
     },
     "boundaryTwo":
     {
         "center":{"x":30,"y":0},
-        "radius":60
+        "radius":65
     },
     "boundaryShowRange":60
 }

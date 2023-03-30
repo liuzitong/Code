@@ -58,14 +58,9 @@ Item{
                     var distance=1000*1000;
                     var nearestDot;
                     dotList.forEach(function(item){
-                        var tempDot;
-                        if(type==2){tempDot =displayCanvas.polarToOrth(item);}else{tempDot=item;}
-                        console.log("tempDot:"+tempDot.x+"  "+tempDot.y);
-                        var newDist=Math.pow(tempDot.x-dot.x,2)+Math.pow(tempDot.y-dot.y,2);
-                        console.log("newDist:"+newDist);
+                        var newDist=Math.pow(item.x-dot.x,2)+Math.pow(item.y-dot.y,2);
                         if (newDist<distance) {nearestDot=item;distance=newDist;}
                     })
-                    console.log("nearestDot:"+nearestDot.x+"  "+nearestDot.y)
 
                     for(var i=0;i<dotList.length;i++)
                     {
@@ -82,9 +77,10 @@ Item{
                     var dist1=Math.sqrt(Math.pow(boundaries[0].x-dot.x,2)+Math.pow(boundaries[0].y-dot.y,2));
                     var dist2=Math.sqrt(Math.pow(boundaries[1].x-dot.x,2)+Math.pow(boundaries[1].y-dot.y,2));
                     if(dist1>boundaries[0].radius&&dist2>boundaries[1].radius) return;
-                    if(type==2){dot=displayCanvas.orthToPolar(dot)}
+                    dot=displayCanvas.orthToPolar(dot);
                     dot.x=Math.round(dot.x);
                     dot.y=Math.round(dot.y);
+                    dot=displayCanvas.polarToOrth(dot);
                     dotList.push(dot);
                     root.refreshProgramDots();
                     displayCanvas.requestPaint();
@@ -193,15 +189,15 @@ Item{
             ctx.arc(x_pix, y_pix,radius_pix, 0, Math.PI*2);
             ctx.stroke();
             ctx.closePath();
+
+
         }
 
         function drawDot(dot)
         {
-            var orthCoord;
-            if(type===2) {orthCoord=polarToOrth(dot)}else{orthCoord=dot}
 
-            var x_pix=(orthCoord.x/degreeRange)*(diameter*0.5)+width/2;
-            var y_pix=(-orthCoord.y/degreeRange)*(diameter*0.5)+height/2;
+            var x_pix=(dot.x/degreeRange)*(diameter*0.5)+width/2;
+            var y_pix=(-dot.y/degreeRange)*(diameter*0.5)+height/2;
 
             var dotRadius=diameter/180*1;
             var ctx = getContext("2d");
