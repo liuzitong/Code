@@ -1,5 +1,5 @@
 ﻿import QtQuick 2.0
-
+import qxpack.indcom.ui_qml_base 1.0
 Item{
     id:root;
     anchors.fill: parent;anchors.margins: parent.height*0.03;
@@ -12,8 +12,14 @@ Item{
     property int os_od: 0;
     property var dynamicSelectedDots:[];
     property var dynamicSelectedDotLen;
+    property var dynamicCheckDots;
     property bool dynamicSelectedDotsReady:false;
     property int type;
+    property var boundaries:IcUiQmlApi.appCtrl.utilitySvc.boundaries;
+    property int boundaryShowRange:IcUiQmlApi.appCtrl.utilitySvc.boundaryShowRange;
+    property int dynamicCircleRadius: 0;
+    property int lastStrategy;
+
 
 
     function resetInputDot()
@@ -21,8 +27,8 @@ Item{
         type=currentProgram.type;
         if(type==2)
         {
-            dynamicSelectedDots=[];
             var strategy=currentProgram.params.strategy;
+            if(lastStrategy!==strategy) dynamicSelectedDots=[];
             if(strategy===0)
             {
                 dynamicSelectedDots.push({x:0,y:0});
@@ -46,11 +52,19 @@ Item{
                 dynamicSelectedDotLen=2;
                 dynamicSelectedDotsReady=false;
             }
+            lastStrategy=strategy;
         }
     }
 
     onCurrentProgramChanged:
     {
+        dynamicCircleRadius=0;
+        if(currentProgram.type===2&&(currentProgram.params.strategy===1||currentProgram.params.strategy===2))
+        {
+            if(currentProgram.params.dynamicDistance===0) dynamicCircleRadius=5;
+            if(currentProgram.params.dynamicDistance===1) dynamicCircleRadius=10;
+            if(currentProgram.params.dynamicDistance===2) dynamicCircleRadius=15;
+        }
         resetInputDot();
         displayCanvas.requestPaint();
     }
@@ -118,7 +132,7 @@ Item{
                 }
                 else
                 {
-                    dot = displayCanvas.pixCoordToDot({x:mouseX,y:mouseY})
+                    dot = displayCanvas.pixCoordToDot({x:mouseX,y:mouseY});
                     if(os_od==1)
                     {
                         dot.x=-dot.x;
@@ -147,11 +161,38 @@ Item{
                         displayCanvas.requestPaint();
                     }
                     else{
-                        if(dynamicSelectedDots.length>=dynamicSelectedDotLen) return;
+                        if(dynamicSelectedDots.length>=dynamicSelectedDotLen)
+                            return;
+                        var strategy=currentProgram.params.strategy;
+                        if(strategy===2)                                    //暗区在两个坐标系中任意一个都可
+                        {
+                            if(Math.pow(dot.x-boundaries[0].x,2)+Math.pow(dot.y-boundaries[0].y,2)>Math.pow(boundaries[0].radius,2)
+                             &&Math.pow(dot.x-boundaries[1].x,2)+Math.pow(dot.y-boundaries[1].y,2)>Math.pow(boundaries[1].radius,2))
+                                return;
+                        }
+                        else if(strategy===3)                               //直线必须在同一坐标系内
+                        {
+                            if(dynamicSelectedDots.length===0)
+                            {
+                                if(Math.pow(dot.x-boundaries[0].x,2)+Math.pow(dot.y-boundaries[0].y,2)>Math.pow(boundaries[0].radius,2)
+                                 &&Math.pow(dot.x-boundaries[1].x,2)+Math.pow(dot.y-boundaries[1].y,2)>Math.pow(boundaries[1].radius,2))
+                                    return;
+                            }
+                            else
+                            {
+                                var selectedDot=displayCanvas.polarToOrth(dynamicSelectedDots[0]);
+                                var zone1,zone2;
+                                if(Math.pow(selectedDot.x-boundaries[0].x,2)+Math.pow(selectedDot.y-boundaries[0].y,2)<Math.pow(boundaries[0].radius,2)) zone1=true;
+                                if(Math.pow(selectedDot.x-boundaries[1].x,2)+Math.pow(selectedDot.y-boundaries[1].y,2)<Math.pow(boundaries[1].radius,2)) zone2=true;
+                                if(!((zone1&&Math.pow(dot.x-boundaries[0].x,2)+Math.pow(dot.y-boundaries[0].y,2)<Math.pow(boundaries[0].radius,2))
+                                 ||(zone2&&Math.pow(dot.x-boundaries[1].x,2)+Math.pow(dot.y-boundaries[1].y,2)<Math.pow(boundaries[1].radius,2))))
+                                    return;
+                            }
+                        }
+
                         dot=displayCanvas.orthToPolar(dot);
                         dynamicSelectedDots.push(dot);
                         displayCanvas.requestPaint();
-                        dynamicSelectedDotsReady=(dynamicSelectedDotLen===dynamicSelectedDots.length);
                     }
                 }
             }
@@ -235,12 +276,13 @@ Item{
         function orthToPolar(dot)
         {
             var radius=Math.sqrt(Math.pow(dot.x,2)+Math.pow(dot.y,2));
+            if(radius===0) return {x:0,y:0}
             var rad=Math.asin(dot.y/radius);
             var angle=rad*(180/Math.PI);
             if(dot.x<0)
             {
-                if(dot.y>=0){angle=90+(90-angle)}
-                if(dot.y<0){angle=-90-(90+angle)}
+                if(dot.y>=0){angle=90+(90-angle);}
+                if(dot.y<0){angle=-90-(90+angle);}
             }
             if(angle<0) angle+=360;
             return {x:radius,y:angle}
@@ -249,7 +291,6 @@ Item{
         function drawDot(dot)
         {
             var orthCoord;
-            if(currentProgram.type===2) {orthCoord=polarToOrth(dot)}else{orthCoord=dot}
             var pixDot=dotToPixCoord(dot);
             var dotRadius=diameter/180*1;
             var ctx = getContext("2d");
@@ -259,6 +300,8 @@ Item{
             ctx.arc(pixDot.x, pixDot.y, dotRadius, 0, Math.PI*2);
             ctx.stroke();
             ctx.closePath();
+            ctx.fillStyle = "white";
+            ctx.fill();
         }
 
         function dynamicInputDots(dot)
@@ -278,8 +321,8 @@ Item{
             ctx.closePath();
             ctx.fillStyle = "green";
             ctx.fill();
-        }
 
+        }
 
 
         function drawDB(db,dot)
@@ -408,6 +451,29 @@ Item{
             ctx.stroke();
         }
 
+        function drawBoundaries()
+        {
+            var ctx = getContext("2d");
+            ctx.lineWidth = 0;
+            ctx.strokeStyle = "green";
+            ctx.beginPath();
+            var x_pix=(boundaries[0].x/degreeRange)*(diameter*0.5)+width/2;
+            var y_pix=(- boundaries[0].y/degreeRange)*(diameter*0.5)+height/2;
+            var radius_pix=((boundaries[0].radius-dynamicCircleRadius)/degreeRange)*(diameter*0.5);
+            ctx.arc(x_pix, y_pix,radius_pix, 0, Math.PI*2);
+            ctx.stroke();
+            ctx.closePath();
+
+            x_pix=(boundaries[1].x/degreeRange)*(diameter*0.5)+width/2;
+            y_pix=(- boundaries[1].y/degreeRange)*(diameter*0.5)+height/2;
+            radius_pix=((boundaries[1].radius-dynamicCircleRadius)/degreeRange)*(diameter*0.5);
+            ctx.strokeStyle = "blue";
+            ctx.beginPath();
+            ctx.arc(x_pix, y_pix,radius_pix, 0, Math.PI*2);
+            ctx.stroke();
+            ctx.closePath();
+        }
+
         onPaint:
         {
             if(degreeRange==0) return;
@@ -457,7 +523,12 @@ Item{
                         drawDashLine({x:width/2,y:height/2},diameter/2,Math.PI/6*i,3)
                     }
                 }
+                if(currentProgram.params.strategy===2||currentProgram.params.strategy===3)
+                {
+                    drawBoundaries()                                //画坐标系圈圈
+                }
             }
+
 
             for(i=-3;i<=3;i++)                                  //画轴线角度标记
             {
@@ -486,39 +557,61 @@ Item{
             {
                 inputdotList[i]={x:dynamicSelectedDots[i].x,y:dynamicSelectedDots[i].y};
             }
-            if(os_od==1)
-            {
-                for(i=0;i<dotList.length;i++)
-                {
-                    dotList[i].x=-dotList[i].x;
-                }
-                for(i=0;i<inputdotList.length;i++)
-                {
-                    var tempDot=polarToOrth(inputdotList[i]);
-                    tempDot.x=-tempDot.x;
-                    tempDot=orthToPolar(tempDot);
-                    inputdotList[i].x=tempDot.x;
-                    inputdotList[i].y=tempDot.y;
-                }
-            }
-
 
 
             if(root.currentCheckResult==null)                       //结果为空的时候按照程序画圆点
             {
+                if(type!==2)
                 dotList.forEach(function(item)
                 {
-                    if(type==2)
-                    {
-                        item=polarToOrth(item);
+                    if(os_od==1){
+                        item.x=-item.x;
                     }
                     drawDot(item);
                 })
-                inputdotList.forEach(function(item)
+                else
                 {
+                    dotList.forEach(function(item)
+                    {
+                        if(os_od==1){
+                            var tempDot=polarToOrth(item);
+                            tempDot.x=-tempDot.x;
+                            tempDot=orthToPolar(tempDot);
+                            item.x=tempDot.x;
+                            item.y=tempDot.y;
+                        }
+                        drawDot(polarToOrth(item));
+                    })
+                    inputdotList.forEach(function(item)
+                    {
+                        if(os_od==1){
+                            var tempDot=polarToOrth(item);
+                            tempDot.x=-tempDot.x;
+                            tempDot=orthToPolar(tempDot);
+                            item.x=tempDot.x;
+                            item.y=tempDot.y;
+                        }
+                        dynamicInputDots(item);
+                    })
+                    if(currentProgram.params.strategy===1||currentProgram.params.strategy===2)   //画周围放射点
+                    {
+                        var method=currentProgram.params.dynamicMethod;
+                        var lines;
+                        if(method===0) lines=4;
+                        if(method===1) lines=6;
+                        if(method===2) lines=8;
 
-                    dynamicInputDots(item);
-                })
+                        for(var i=0;i<lines;i++)
+                        {
+                            var angle=Math.PI*2/lines*i;
+                            var selectedDot=polarToOrth(dynamicSelectedDots[0]);
+                            var x=Math.cos(angle)*dynamicCircleRadius+selectedDot.x;
+                            if(os_od==1) x=-x;
+                            var y=Math.sin(angle)*dynamicCircleRadius+selectedDot.y;
+                            drawDot({x:x,y:y});
+                        }
+                    }
+                }
             }
             else
             {
@@ -601,8 +694,6 @@ Item{
 //                    console.log(dotList[0].end.x);
                     inputdotList.forEach(function(item)
                     {
-                        console.log(item.x);
-                        console.log(item.y);
                         dynamicInputDots(item);
                     })
 

@@ -26,6 +26,7 @@ class PERIMETER_API  AppCtrl : public QxPack::IcAppCtrlBase {
     Q_PROPERTY( QObject* checkSvc  READ getCheckSvc CONSTANT)
 //    Q_PROPERTY( QObject* deviceOperation  READ getDeviceOperation CONSTANT)
     Q_PROPERTY( QObject* settings READ getSettings)
+    Q_PROPERTY( QObject* utilitySvc READ getUtilitySvc)
     Q_PROPERTY( QObject* frameProvidSvc READ getFrameProvidSvc CONSTANT)
 
 public:
@@ -49,7 +50,8 @@ public:
     QObject*    getCheckSvc() const;
     QObject*    getSettings() ;
     QObject*    getFrameProvidSvc() const;
-    QObject*    getDeviceOperation() const;
+    QObject*    getUtilitySvc() const;
+//    QObject*    getDeviceOperation() const;
 
 
 //    Q_INVOKABLE void Quit();

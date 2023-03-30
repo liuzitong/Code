@@ -43,6 +43,7 @@ public:
         Down,
         Stop,
     };
+
     DeviceOperation();
     ~DeviceOperation();
 //    static void Initialize();

@@ -1508,7 +1508,7 @@ void MainWindow::dynamicCastTest(const CoordSpacePosInfo& dotSpaceBegin,const Co
     int* dotArr=new int[stepCount*3];
     CoordSpacePosInfo coordSpacePosInfoTemp=dotSpaceBegin;
     CoordMotorPosFocalDistInfo coordMotorPosFocalDistInfoTemp;
-    updateInfo(QString("分割为%1个点,X步长为%2,Y步长为%3.").arg(QString::number(stepCount)).arg(QString::number(stepLengthX)).arg(QString::number(stepLengthY)));
+    updateInfo(QString("分割为%1步,X步长为%2,Y步长为%3.").arg(QString::number(stepCount)).arg(QString::number(stepLengthX)).arg(QString::number(stepLengthY)));
 
     for(int i=0;i<stepCount;i++)
     {
@@ -1547,7 +1547,7 @@ void MainWindow::dynamicCastTest(const CoordSpacePosInfo& dotSpaceBegin,const Co
     int dataLen= (stepCount%stepPerFrame)*3*4+8;
     m_devCtl->sendDynamicData(totalframe,totalframe-1,dataLen,&dotArr[stepPerFrame*3*(totalframe-1)]);     //最后一帧
     updateInfo(("开始移动"));
-    m_devCtl->startDynamic(speedLevel,speedLevel,speedLevel,stepTime);    //开始
+    m_devCtl->startDynamic(speedLevel,speedLevel,speedLevel,stepTime,stepCount);    //开始
     delete[] dotArr;
 }
 

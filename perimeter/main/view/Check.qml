@@ -29,7 +29,6 @@ Item {id:root; width: 1366;height: 691
     Component.onCompleted:{
         frameProvidSvc=IcUiQmlApi.appCtrl.frameProvidSvc;
         checkSvc.checkResultChanged.connect(currentCheckResultChanged);
-
         refresh();
     }
 

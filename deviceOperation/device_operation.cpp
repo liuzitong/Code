@@ -375,7 +375,7 @@ void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int spotSlot,
     m_devCtl->sendDynamicData(totalframe,totalframe-1,dataLen,&dotArr[stepPerFrame*3*(totalframe-1)]);     //最后一帧
     qDebug()<<("开始移动");
     auto config=DeviceData::getSingleton()->m_config;
-    m_devCtl->startDynamic(speedLevel,speedLevel,speedLevel,stepTime);    //开始
+    m_devCtl->startDynamic(speedLevel,speedLevel,speedLevel,stepTime,stepCount);    //开始
     delete[] dotArr;
 }
 

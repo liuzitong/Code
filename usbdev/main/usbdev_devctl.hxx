@@ -117,7 +117,7 @@ public:
 
     void sendDynamicData(quint8 totalFrame,quint8 frameNumber,quint32 dataLen,qint32* posData);
 
-    void startDynamic(quint8 spsX,quint8 spsY,quint8 spsF,quint32 stepTime);
+    void startDynamic(quint8 spsX,quint8 spsY,quint8 spsF,quint32 stepTime,quint32 totalStepCount);
     /*!
      * \brief reset Motor, the motor moved to reset position
      * \param mot      [in]  the motor id pre-defined

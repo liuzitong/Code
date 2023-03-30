@@ -1,5 +1,5 @@
 ﻿import QtQuick 2.0
-
+import qxpack.indcom.ui_qml_base 1.0
 Item{
     id:root;
     anchors.fill: parent;anchors.margins: parent.height*0.03;
@@ -12,6 +12,8 @@ Item{
     signal refreshProgramDots;
     signal painted();
     onDotListChanged: {displayCanvas.requestPaint();dotPosDisplay.text="";}
+    property var boundaries:IcUiQmlApi.appCtrl.utilitySvc.boundaries;
+    property int boundaryShowRange:IcUiQmlApi.appCtrl.utilitySvc.boundaryShowRange;
 
     CusText{id:dotPosDisplay;text:lt+qsTr(""); horizontalAlignment: Text.AlignLeft;z:1; anchors.top: parent.top; anchors.topMargin: 0.05*parent.height; anchors.left: parent.left; anchors.leftMargin: 0.05*parent.width;width: parent.width*0.06;height: parent.height*0.05;}
 
@@ -50,7 +52,6 @@ Item{
             onClicked:
             {
                 if(category!==4&&locked==true) return;
-                newDotList=[];
                 var dot = displayCanvas.pixCoordToDot(mouseX,mouseY)
                 if (mouse.button === Qt.RightButton)
                 {
@@ -78,6 +79,9 @@ Item{
                     displayCanvas.requestPaint();
                 }
                 else{
+                    var dist1=Math.sqrt(Math.pow(boundaries[0].x-dot.x,2)+Math.pow(boundaries[0].y-dot.y,2));
+                    var dist2=Math.sqrt(Math.pow(boundaries[1].x-dot.x,2)+Math.pow(boundaries[1].y-dot.y,2));
+                    if(dist1>boundaries[0].radius&&dist2>boundaries[1].radius) return;
                     if(type==2){dot=displayCanvas.orthToPolar(dot)}
                     dot.x=Math.round(dot.x);
                     dot.y=Math.round(dot.y);
@@ -168,6 +172,29 @@ Item{
             return {x:radius,y:angle}
         }
 
+        function drawBoundaries()
+        {
+            var ctx = getContext("2d");
+            ctx.lineWidth = 0;
+            ctx.strokeStyle = "green";
+            ctx.beginPath();
+            var x_pix=(boundaries[0].x/degreeRange)*(diameter*0.5)+width/2;
+            var y_pix=(- boundaries[0].y/degreeRange)*(diameter*0.5)+height/2;
+            var radius_pix=(boundaries[0].radius/degreeRange)*(diameter*0.5);
+            ctx.arc(x_pix, y_pix,radius_pix, 0, Math.PI*2);
+            ctx.stroke();
+            ctx.closePath();
+
+            x_pix=(boundaries[1].x/degreeRange)*(diameter*0.5)+width/2;
+            y_pix=(- boundaries[1].y/degreeRange)*(diameter*0.5)+height/2;
+            radius_pix=(boundaries[1].radius/degreeRange)*(diameter*0.5);
+            ctx.strokeStyle = "blue";
+            ctx.beginPath();
+            ctx.arc(x_pix, y_pix,radius_pix, 0, Math.PI*2);
+            ctx.stroke();
+            ctx.closePath();
+        }
+
         function drawDot(dot)
         {
             var orthCoord;
@@ -234,7 +261,12 @@ Item{
                     ctx.fill();
                 }
             }
+            console.log(boundaryShowRange);
 
+            if(degreeRange>=boundaryShowRange)
+                drawBoundaries()
+
+            ctx.strokeStyle = "black";
             ctx.beginPath();
             ctx.moveTo(widthMargin,height/2);
             ctx.lineTo(widthMargin+diameter,height/2);

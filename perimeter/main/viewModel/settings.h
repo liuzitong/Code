@@ -2,6 +2,7 @@
 #define SETTINGS_H
 
 #include <QObject>
+#include <QVariant>
 
 namespace Perimeter
 {
@@ -18,7 +19,7 @@ class Settings :public QObject
     Q_PROPERTY(int defaultProgramType READ defaultProgramType WRITE setDefaultProgramType)
 //    Q_PROPERTY(QString trigger READ getTrigger NOTIFY triggerChanged)
     Q_PROPERTY(QString langTrigger READ langTrigger /*WRITE setLangTrigger*/ NOTIFY langTriggerChanged)
-
+//    Q_PROPERTY(QVariantList boundaries READ getBoundaries)
 
 
 
@@ -34,6 +35,8 @@ public:
     int defaultProgramId(){return m_defaultProgramId;}void setDefaultProgramId(int value){m_defaultProgramId=value;}
     int defaultProgramType(){return m_defaultProgramType;}void setDefaultProgramType(int value){m_defaultProgramType=value;}
     QString langTrigger(){return "";}Q_SIGNAL void langTriggerChanged();
+//    QVariantList getBoundaries(){return m_boundaries;}
+
     //    QString getTrigger(){return "";} Q_SIGNAL void triggerChanged();
 //    void setLangTrigger(QString langTrigger)
 //    {
@@ -54,7 +57,7 @@ private:
     bool m_isRuntimeLangEng;
     int m_defaultProgramId;
     int m_defaultProgramType;
-    QList<QList<int>> m_boundaries;
+    QVariantList m_boundaries;
 
 };
 }

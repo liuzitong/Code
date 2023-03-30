@@ -12,7 +12,6 @@
 namespace Perimeter
 {
 
-
 UtilitySvc::UtilitySvc()
 {
     {
@@ -105,6 +104,22 @@ UtilitySvc::UtilitySvc()
         m_falsePositiveDecDB=jo["falsePositiveAddDB"].toInt();
         m_VFImultiplier=jo["VFImultiplier"].toDouble();
 
+        {
+            auto boundary=jo["boundaryOne"].toObject();
+            auto center=boundary["center"].toObject();
+            auto radius=boundary["radius"].toInt();
+            m_boundaries.append(QMap<QString,QVariant>{{"x",center["x"].toInt()},{"y",center["y"].toInt()},{"radius",radius}});
+        }
+
+        {
+            auto boundary=jo["boundaryTwo"].toObject();
+            auto center=boundary["center"].toObject();
+            auto radius=boundary["radius"].toInt();
+            m_boundaries.append(QMap<QString,QVariant>{{"x",center["x"].toInt()},{"y",center["y"].toInt()},{"radius",radius}});
+        }
+        m_boundaryShowRange=jo["boundaryShowRange"].toInt();
+
+
         std::sort(m_left_blindDot.begin(),m_left_blindDot.end(),[&](QPoint dotFront,QPoint dotBack){
             return (pow(dotFront.x()-m_left_blindDot[0].x(),2)+pow(dotFront.y()-m_left_blindDot[0].y(),2))<
                    (pow(dotBack.x()-m_left_blindDot[0].x(),2)+pow(dotBack.y()-m_left_blindDot[0].y(),2));
@@ -116,6 +131,10 @@ UtilitySvc::UtilitySvc()
         });
     }
 }
+
+QVariantList UtilitySvc::getBoundaries(){return m_boundaries;}
+
+int UtilitySvc::getBoundaryShowRange(){return m_boundaryShowRange;}
 
 QPointF UtilitySvc::convertPolarToOrth(QPointF loc)
 {
@@ -181,6 +200,28 @@ int UtilitySvc::getIndex(const QPointF &dot, const QVector<QPointF> &pointLoc, i
         if(dist<FLT_EPSILON){index=i;break;}
     }
     return index;
+}
+
+QPointF UtilitySvc::PolarToOrth(const QPointF &dot)
+{
+    auto radius=dot.x();
+    auto angle=dot.y();
+    return {radius*qCos(angle/180*M_PI),radius*qSin(angle/180*M_PI)};
+}
+
+QPointF UtilitySvc::OrthToPolar(const QPointF &dot)
+{
+    auto radius=sqrt(pow(dot.x(),2)+pow(dot.y(),2));
+    if(radius<FLT_EPSILON) return {0,0};
+    auto rad=asin(dot.y()/radius);
+    auto angle=rad*(180/M_PI);
+    if(dot.x()<0)
+    {
+        if(dot.y()>=0){angle=90+(90-angle);}
+        if(dot.y()<0){angle=-90-(90+angle);}
+    }
+    if(angle<0) angle+=360;
+    return {radius,angle};
 }
 
 void UtilitySvc::wait(int msecs)

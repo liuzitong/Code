@@ -132,8 +132,6 @@ private:
 
     QVector<PathRecord> m_records;
 
-    QVector<QPointF> m_inputDots;
-
     virtual void initialize() override;
 
     virtual void Checkprocess() override;
@@ -149,6 +147,8 @@ private:
     // Check interface
 public:
     virtual void finished() override;
+
+    QList<QPoint> m_dynamicSelectedDots;
 };
 
 
@@ -978,11 +978,43 @@ void DynamicCheck::initialize()
     m_resultModel->m_patient_id=m_patientModel->m_id;
     m_resultModel->m_program_id=m_programModel->m_id;
     m_checkedCount=0;
-    m_totalCount=m_programModel->m_data.dots.size();
-    if(m_programModel->m_params.strategy!=DynamicParams::Strategy::straightLine)
+    auto& os_od=m_resultModel->m_OS_OD;
+    auto& params=m_programModel->m_params;
+    switch(params.strategy)
+    {
+    case DynamicParams::Strategy::standard:
+    {
+        m_totalCount=m_programModel->m_data.dots.size();
+        m_records.resize(m_totalCount);
+        for(int i=0;i<m_totalCount;i++)
+        {
+            auto& dot=m_programModel->m_data.dots[i];
+            m_records[i].index=i;
+            if(os_od==0)
+                m_records[i].beginLoc={dot.x,dot.y};
+            else
+            {
+                auto tempDot=UtilitySvc::PolarToOrth({dot.x,dot.y});
+                tempDot.rx()=-tempDot.rx();
+//                m_records[i].beginLoc=
+            }
+            m_records[i].endLoc={0,0};
+            m_records[i].checked=false;
+        }
+        break;
+    }
+    case DynamicParams::Strategy::blindArea:
+    case DynamicParams::Strategy::darkArea:
     {
 
+        break;
     }
+    case DynamicParams::Strategy::straightLine:break;
+    }
+//    if(m_programModel->m_params.strategy!=DynamicParams::Strategy::straightLine)
+//    {
+
+//    }
 //    for(int i=0;i<m_totalCount;i++)
 //    {
 //        m_resultModel->m_data.checkData.push_back(DynamicDataNode{std::to_string('A'+i),m_programModel->m_data.dots[i],{0,0},false});
@@ -1046,6 +1078,7 @@ void CheckSvcWorker::initialize()
         m_check->m_patientModel=m_patientVm->getModel();
         ((DynamicCheck*)m_check.data())->m_resultModel=static_cast<DynamicCheckResultVm*>(m_checkResultVm)->getModel();
         ((DynamicCheck*)m_check.data())->m_programModel=static_cast<DynamicProgramVm*>(m_programVm)->getModel();
+        ((DynamicCheck*)m_check.data())->m_dynamicSelectedDots=m_dynamicSelectedDots;
     }
     emit checkedCountChanged(0);
     emit checkResultChanged();
@@ -1146,7 +1179,7 @@ void CheckSvc::start()
     m_worker->m_programVm=m_programVm;
     m_worker->m_checkResultVm=m_checkResultVm;
     m_worker->m_checkState=&m_checkState;
-    m_worker->m_dynamicSelectedDots=m_dynamicSelectedDots;
+    if(m_programVm->getType()==2) m_worker->m_dynamicSelectedDots=m_dynamicSelectedDots;
     setCheckState(0);
     qDebug()<<"start command";
     QMetaObject::invokeMethod(m_worker,"doWork",Qt::QueuedConnection);

@@ -41,11 +41,9 @@ message( $$PERIMETER_CONFIG_DIR_WIN)
 #message( $$CURRENTFILEPATH_WIN)
 
 QMAKE_POST_LINK += copy /Y $$SRCFILE_WIN $$PERIMETER_DIR_WIN & \
-copy /Y $$SRCFILE_WIN $$PERIMETER_CONFIG_DIR_WIN & \
-#copy /Y $$LIB_SRC_DIR_WIN $$LIB_DEST_DIR_WIN & \
-#copy /Y $${CURRENTFILEPATH_WIN}\\deviceoperation.h $${CURRENTFILEPATH_WIN}\\..\\deviceOperation-build\\deviceoperation.h
+#copy to configer
+#copy /Y $$SRCFILE_WIN $$PERIMETER_CONFIG_DIR_WIN & \
 
-#QMAKE_POST_LINK +=copy /Y $$LIB_SRC_DIR_WIN $$LIB_DEST_DIR_WIN
 
 
 

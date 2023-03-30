@@ -4,13 +4,19 @@
 #include <QPointF>
 #include <QVector>
 #include <QSharedPointer>
+#include <QVariant>
 namespace Perimeter
 {
-class UtilitySvc
+class UtilitySvc:public QObject
 {
+    Q_OBJECT
+    Q_PROPERTY(QVariantList boundaries READ getBoundaries)
+    Q_PROPERTY(int boundaryShowRange READ getBoundaryShowRange)
 public:
     UtilitySvc();
 
+    QVariantList getBoundaries();
+    int getBoundaryShowRange();
 
     static QPointF convertPolarToOrth(QPointF loc);
 
@@ -19,6 +25,10 @@ public:
     static int getIndex(const QPointF& dot,const QVector<QPoint>& pointLoc,int OS_OD);
 
     static int getIndex(const QPointF& dot,const QVector<QPointF>& pointLoc,int OS_OD);
+
+    static QPointF PolarToOrth(const QPointF& dot);
+
+    static QPointF OrthToPolar(const QPointF& dot);
 
     static void wait(int msecs);
 
@@ -43,6 +53,8 @@ public:
     QVector<QVector<QVector<int>>> m_value_30d_cursorSize_cursorColor;
     QVector<QVector<int>> m_value_30d_cursorSizeIII_ageCorrection;     //cursorSize!=2 ,it's CursorColor
     QVector<int> m_value_60d;
+    QVariantList m_boundaries;
+    int m_boundaryShowRange;
 
 };
 }

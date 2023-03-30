@@ -6,6 +6,8 @@ import qxpack.indcom.ui_qml_base 1.0
 //    height:300;width:300;
 //}
 Item{
+    property var boundaries:IcUiQmlApi.appCtrl.settings.boundaries;
+
     function rgb(r,g,b){var ret=(r<<16|g<<8|b); return ("#"+ret.toString(16).toUpperCase());}
     function getAge(birthDateStr){
         var birthDate=new Date(Date.parse(birthDateStr));

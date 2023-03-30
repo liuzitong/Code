@@ -1062,15 +1062,16 @@ void DevCtl::sendDynamicData(quint8 totalFrame, quint8 frameNumber, quint32 data
                 );
 }
 
-void DevCtl::startDynamic(quint8 spsX, quint8 spsY, quint8 spsF, quint32 stepTime)
+void DevCtl::startDynamic(quint8 spsX, quint8 spsY, quint8 spsF, quint32 stepTime,quint32 totalStepCount)
 {
     QByteArray ba(512,0);ba.fill(0);
     unsigned char* ptr=reinterpret_cast<unsigned char*>(ba.data());
     ptr[0]=0x5a;ptr[1]=0x55;ptr[5]=spsX;ptr[6]=spsY;ptr[7]=spsF;
     memcpy(ptr+8,&stepTime,4);
+    memcpy(ptr+12,&totalStepCount,12);
     QMetaObject::invokeMethod(
         T_PrivPtr( m_obj )->wkrPtr(), "cmd_GeneralCmd", Qt::QueuedConnection,
-        Q_ARG( QByteArray, ba  ),Q_ARG( QString,QString("开始投射移动")),Q_ARG( quint32, 12 )
+        Q_ARG( QByteArray, ba  ),Q_ARG( QString,QString("开始投射移动")),Q_ARG( quint32, 16 )
                 );
 }
 
