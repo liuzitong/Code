@@ -57,16 +57,20 @@ public:
     static QSharedPointer<DeviceOperation> getSingleton();
     void connectDev();
     void disconnectDev();
-    void staticStimulate(QPointF loc,int spotSize,int DB,int durationTime);
-    void getReadyToStimulate(QPointF loc,int spotSize,int DB);
-    void dynamicStimulate(QPointF begin, QPointF end, int spotSlot,int speedLevel);
+    void getReadyToStimulate(QPointF loc,int spotSize,int DB,bool isMainDotInfoTable);
+    void dynamicStimulate(QPointF begin, QPointF end, int cursorSize,int speedLevel,bool isMainDotInfoTable);
+    void stopDynamic();
     QByteArray getRealTimeStimulationEyeImage();
     void openShutter(int durationTime);
     void move5Motors(bool isMotorMove[],int MotorPoses[]);
     void setCursorColorAndCursorSize(int color, int size);
+    void setDB(int DB);
     void setLamp(LampId id,int index,bool onOff);
     void setWhiteLamp(bool onOff);
     bool getAnswerPadStatus();
+    bool getDynamicMoveStatus();
+    QPointF getDyanmicAnswerPos();
+    bool getMotorsBusy(QVector<UsbDev::DevCtl::MotorId> motorIDs);
     void waitForSomeTime(int time);
     void hello();
 
@@ -74,7 +78,6 @@ public:
 
 
 private:
-    void setDB(int DB);
     void waitMotorStop(QVector<UsbDev::DevCtl::MotorId> motorIDs);
     void moveChin(ChinMoveDirection direction);       //0左,1不动,2右;0上,1不动,2下
 public slots:
@@ -97,7 +100,7 @@ public:
     bool getIsDeviceReady(){return m_isDeviceReady;}void setIsDeviceReady(bool value){m_isDeviceReady=value;emit isDeviceReadyChanged();}Q_SIGNAL void isDeviceReadyChanged();
     float getPupilDiameter(){return m_pupilDiameter;}void setPupilDiameter(float value){m_pupilDiameter=value;emit pupilDiameterChanged();}Q_SIGNAL void pupilDiameterChanged();
 public:
-    Status m_status={-1,-1,-1};
+    Status m_status;
     bool m_isDeviceReady=false,m_autoAlignPupil=true;
     bool m_isChecking=false;
     float m_deviation=0;
@@ -116,6 +119,7 @@ public:
 private:
     float m_pupilDiameter=-1;
     QVector<float> m_pupilDiameterArr;
+    //视岛坐标和电机坐标
     QVector<QPair<QPointF,QPoint>> m_lastDynamicCoordAndXYMotorPos;
     static QSharedPointer<DeviceOperation> m_singleton;
 

@@ -82,8 +82,9 @@ private:
     MoveCache m_moveCache[3];
     SciPack::NwkUsbObj2 *m_usb_dev;
     QElapsedTimer m_elapse_tmr;
-    quint32 m_trg_cntr; quint32 m_vid_pid, m_cfg_id; bool m_is_video_on;
-    QAtomicInt  m_trg_called;
+/*    quint32 m_trg_cntr; */quint32 m_vid_pid, m_cfg_id; bool m_is_video_on;
+    QAtomicInt  m_video_trg_called;
+    QAtomicInt  m_status_trg_called;
     DevCtl::WorkStatus  m_wks;
     quint32 m_key_bmp;
 protected:
@@ -102,7 +103,8 @@ public :
     virtual ~DevCtl_Worker( ) Q_DECL_OVERRIDE;
 
     Q_INVOKABLE void  init( bool req_emit = true );
-    Q_SLOT      void  trigger_di( );
+    Q_SLOT      void  video_trigger_di( );
+    Q_SLOT      void  status_trigger_di( );
     Q_INVOKABLE void  forceReadProfile( void *p ) { Profile *pf = reinterpret_cast<Profile*>(p); *pf = m_profile; }
     Q_INVOKABLE int   forceReadWorkStatus( ) { return m_wks; }  // since 0.2.1  try force check workstatus
     Q_INVOKABLE bool  cmd_ReadProfile( bool req_emit = true );
@@ -137,9 +139,10 @@ public :
 // ============================================================================
 DevCtl_Worker :: DevCtl_Worker ( quint32 vid_pid, quint32 cfg_id, QObject *pa ) : QObject( pa )
 {
-    m_usb_dev = nullptr; m_trg_cntr = 0;
+    m_usb_dev = nullptr; /*m_trg_cntr = 0;*/
     m_vid_pid = vid_pid; m_cfg_id = cfg_id; m_is_video_on = false;
-    m_trg_called.store(0);
+    m_video_trg_called.store(0);
+    m_status_trg_called.store(0);
     m_key_bmp = 0;
     m_wks = DevCtl::WorkStatus_S_Disconnected;
 }
@@ -190,17 +193,21 @@ void   DevCtl_Worker :: init( bool req_emit )
 // ============================================================================
 // method: work trigger   轮询式读取.读取视频和轮询数据.
 // ============================================================================
-void   DevCtl_Worker :: trigger_di( )
+void   DevCtl_Worker :: video_trigger_di( )
 {
-    if ( m_trg_called.loadAcquire() > 5 ) { return; }
-    m_trg_called.fetchAndAddOrdered(1);
+    if ( m_video_trg_called.loadAcquire() > 5 ) { return; }
+    m_video_trg_called.fetchAndAddOrdered(1);
 
-    if ( ( ++ m_trg_cntr ) % 2 == 0 ) {
-        QMetaObject::invokeMethod( this, "cmd_ReadStatusData", Qt::QueuedConnection );
-    } else {
-        QMetaObject::invokeMethod( this, "cmd_ReadFrameData", Qt::QueuedConnection );
-    }
+    QMetaObject::invokeMethod( this, "cmd_ReadFrameData", Qt::QueuedConnection );
 
+}
+
+void   DevCtl_Worker :: status_trigger_di( )
+{
+    if ( m_status_trg_called.loadAcquire() > 5 ) { return; }
+    m_status_trg_called.fetchAndAddOrdered(1);
+
+   QMetaObject::invokeMethod( this, "cmd_ReadStatusData", Qt::QueuedConnection );
 }
 
 // ============================================================================
@@ -363,7 +370,7 @@ MoveCache* DevCtl_Worker::cmd_ReadMoveCache()
 // ============================================================================
 bool   DevCtl_Worker :: cmd_ReadStatusData()
 {
-    if ( m_trg_called.loadAcquire() > 0 ) { m_trg_called.fetchAndSubOrdered(1); }
+    if ( m_status_trg_called.loadAcquire() > 0 ) { m_status_trg_called.fetchAndSubOrdered(1); }
     if ( ! this->isDeviceWork()) {
         updateRefreshInfo("device not working not gonna read StatusData.");
         return false;
@@ -398,7 +405,7 @@ bool   DevCtl_Worker :: cmd_ReadStatusData()
 bool  DevCtl_Worker :: cmd_ReadFrameData()
 {
     static int count=0;
-    if ( m_trg_called.loadAcquire() > 0 ) { m_trg_called.fetchAndSubOrdered(1); }
+    if ( m_video_trg_called.loadAcquire() > 0 ) { m_video_trg_called.fetchAndSubOrdered(1); }
     if ( ! this->isDeviceWork() || ! m_is_video_on || m_profile.isEmpty()) { updateRefreshInfo("no camera."); return false; }
     updateRefreshInfo("读取视频帧:"+QString::number(count));
     bool ret = true;
@@ -631,7 +638,7 @@ class USBDEV_HIDDEN DevCtlPriv : public QObject {
     Q_OBJECT
 private:
     QThread  *m_t_worker; DevCtl_Worker *m_wkr;  // worker thread and worker
-    QThread  *m_t_tmr;    QTimer *m_trg_tmr;     // timer thread and timer
+    QThread  *m_t_tmr;    QTimer *m_video_tmr;  QTimer *m_status_tmr;   // timer thread and timer
     Profile   m_profile;
     Config    m_config;
     DevCtl_StatusDataQueue  m_status_data_queue;
@@ -719,7 +726,9 @@ DevCtlPriv :: DevCtlPriv ( quint32 vid_pid, quint32 cfg )
 {
     // init. all variables
     m_vid_pid = vid_pid; m_cfg_id = cfg;
-    m_trg_tmr = Q_NULLPTR; m_wkr = Q_NULLPTR;
+    m_video_tmr = Q_NULLPTR;
+    m_status_tmr = Q_NULLPTR;
+    m_wkr = Q_NULLPTR;
     m_status_data_emit_cntr = m_frame_data_emit_cntr = 0;
     m_wkr_status = DevCtl::WorkStatus_S_Disconnected;
     m_is_inited  = false;
@@ -752,23 +761,40 @@ void  DevCtlPriv :: ensureTimer( bool sw )
 {
     if ( sw ) {  // create timer in timer thread
         this->ensureTimer( false );
-        m_trg_tmr = qobject_cast<QTimer*>(
+        m_video_tmr = qobject_cast<QTimer*>(
             QxPack::IcRmtObjCreator::createObjInThread (
                 m_t_tmr, []( void *)->QObject*{
                     QTimer *tmr = usbdev_new_qobj( QTimer );
-                    tmr->setInterval( 500/30 );
+                    tmr->setInterval( 1000/30 );
                     tmr->setSingleShot( false );
                     return tmr;
                 },this
             )
         );
-        QMetaObject::invokeMethod( m_trg_tmr, "start" );
+        QMetaObject::invokeMethod( m_video_tmr, "start" );
+
+        m_status_tmr = qobject_cast<QTimer*>(
+            QxPack::IcRmtObjCreator::createObjInThread (
+                m_t_tmr, []( void *)->QObject*{
+                    QTimer *tmr = usbdev_new_qobj( QTimer );
+                    tmr->setInterval( 1000/100 );
+                    tmr->setSingleShot( false );
+                    return tmr;
+                },this
+            )
+        );
+        QMetaObject::invokeMethod( m_status_tmr, "start" );
 
     } else {   // delete timer in timer thread
-        if ( m_trg_tmr != Q_NULLPTR ) {
+        if ( m_video_tmr != Q_NULLPTR ) {
 //            QxPack::IcRmtObjSigBlocker::blockSignals ( m_t_tmr, true );  //影响退出.
-            m_trg_tmr->deleteLater();
-            m_trg_tmr = Q_NULLPTR;
+            m_video_tmr->deleteLater();
+            m_video_tmr = Q_NULLPTR;
+        }
+        if ( m_status_tmr != Q_NULLPTR ) {
+//            QxPack::IcRmtObjSigBlocker::blockSignals ( m_t_tmr, true );  //影响退出.
+            m_status_tmr->deleteLater();
+            m_status_tmr = Q_NULLPTR;
         }
     }
 }
@@ -799,8 +825,12 @@ void  DevCtlPriv :: ensureWorker( bool sw )
         QObject::connect( m_wkr, SIGNAL(updateRefreshInfo(QString)), this, SIGNAL(updateRefreshInfo(QString)));
         QObject::connect( m_wkr, SIGNAL(updateRefreshIOInfo(QString)), this, SIGNAL(updateRefreshIOInfo(QString)));
         //这里导致CPU占用高,注释掉之后,CPU占用为0.
-        if ( m_trg_tmr != Q_NULLPTR ) { // connect the trigger function
-           QObject::connect( m_trg_tmr, SIGNAL(timeout()), m_wkr, SLOT(trigger_di()), Qt::DirectConnection );
+        if ( m_status_tmr != Q_NULLPTR ) { // connect the trigger function
+           QObject::connect( m_status_tmr, SIGNAL(timeout()), m_wkr, SLOT(status_trigger_di()), Qt::DirectConnection );
+        }
+
+        if ( m_video_tmr != Q_NULLPTR ) { // connect the trigger function
+           QObject::connect( m_video_tmr, SIGNAL(timeout()), m_wkr, SLOT(video_trigger_di()), Qt::DirectConnection );
         }
 
     } else {    // delete the worker
@@ -1072,6 +1102,17 @@ void DevCtl::startDynamic(quint8 spsX, quint8 spsY, quint8 spsF, quint32 stepTim
     QMetaObject::invokeMethod(
         T_PrivPtr( m_obj )->wkrPtr(), "cmd_GeneralCmd", Qt::QueuedConnection,
         Q_ARG( QByteArray, ba  ),Q_ARG( QString,QString("开始投射移动")),Q_ARG( quint32, 16 )
+                );
+}
+
+void DevCtl::stopDyanmic()
+{
+    QByteArray ba(512,0);ba.fill(0);
+    unsigned char* ptr=reinterpret_cast<unsigned char*>(ba.data());
+    ptr[0]=0x5a;ptr[1]=0x58;
+    QMetaObject::invokeMethod(
+        T_PrivPtr( m_obj )->wkrPtr(), "cmd_GeneralCmd", Qt::QueuedConnection,
+        Q_ARG( QByteArray, ba  ),Q_ARG( QString,QString("停止投射移动")),Q_ARG( quint32, 16 )
                 );
 }
 

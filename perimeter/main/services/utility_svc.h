@@ -26,9 +26,13 @@ public:
 
     static int getIndex(const QPointF& dot,const QVector<QPointF>& pointLoc,int OS_OD);
 
+    static bool getIsMainTable(const QPointF & loc,bool isMainTable);
+
     static QPointF PolarToOrth(const QPointF& dot);
 
     static QPointF OrthToPolar(const QPointF& dot);
+
+    static QString getDynamicDotEnglishName(int number);
 
     static void wait(int msecs);
 

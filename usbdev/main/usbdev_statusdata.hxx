@@ -55,6 +55,7 @@ public:
    bool answerpadStatus() const;
    bool cameraStatus() const;
    bool eyeglassStatus() const;
+   bool moveStutas() const;
    qint32 envLightDA() const;
    qint32 castLightDA() const;
 private:

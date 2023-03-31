@@ -202,6 +202,21 @@ int UtilitySvc::getIndex(const QPointF &dot, const QVector<QPointF> &pointLoc, i
     return index;
 }
 
+bool UtilitySvc::getIsMainTable(const QPointF &loc,bool isMainTable)
+{
+    auto boundary=UtilitySvc::getSingleton()->m_boundaries[0];
+    QPoint center={boundary.toMap()["x"].toInt(),boundary.toMap()["y"].toInt()};
+    int radius=boundary.toMap()["radius"].toInt();
+
+    auto boundary2=UtilitySvc::getSingleton()->m_boundaries[1];
+    QPoint center2={boundary2.toMap()["x"].toInt(),boundary2.toMap()["y"].toInt()};
+    int radius2=boundary2.toMap()["radius"].toInt();
+
+    if(isMainTable==true) if(pow(loc.x()-center.x(),2)+pow(loc.y()-center.y(),2)>pow(radius,2)){isMainTable=false;}
+    if(isMainTable==false) if(pow(loc.x()-center2.x(),2)+pow(loc.y()-center2.y(),2)>pow(radius2,2)){isMainTable=true;}
+    return isMainTable;
+}
+
 QPointF UtilitySvc::PolarToOrth(const QPointF &dot)
 {
     auto radius=dot.x();
@@ -222,6 +237,24 @@ QPointF UtilitySvc::OrthToPolar(const QPointF &dot)
     }
     if(angle<0) angle+=360;
     return {radius,angle};
+}
+
+QString UtilitySvc::getDynamicDotEnglishName(int number)
+{
+    QVector<char> chars;
+    QString name="";
+    do
+    {
+        auto remain=number%26;
+        char character=remain+'A';
+        chars.push_front(character);
+        number=(number-remain)/26;
+    }while(number!=0);
+    for(auto&i:chars)
+    {
+        name.append(i);
+    }
+    return name;
 }
 
 void UtilitySvc::wait(int msecs)

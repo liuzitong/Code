@@ -6,7 +6,7 @@
 namespace DevOps{
 
 QSharedPointer<DeviceDataProcesser> DeviceDataProcesser::m_singleton=nullptr;
-bool DeviceDataProcesser::isMainDotInfoTable=true;
+//bool DeviceDataProcesser::isMainDotInfoTable=true;
 
 int DeviceDataProcesser::interpolation(int value[], QPointF loc)
 {
@@ -31,17 +31,17 @@ int DeviceDataProcesser::getFocusMotorPosByDist(int focalDist, int spotSlot)
     return focalMotorPos;
 }
 
-CoordMotorPosFocalDistInfo DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoord(const QPointF loc)
+CoordMotorPosFocalDistInfo DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoord(const QPointF loc,bool isMainDotInfoTable)
 {
     CoordMotorPosFocalDistInfo coordSpacePosInfo;
-    if(loc.x()<-30)
-    {
-        isMainDotInfoTable=true;
-    }
-    else if(loc.x()>30)
-    {
-        isMainDotInfoTable=false;
-    }
+//    if(loc.x()<-30)
+//    {
+//        isMainDotInfoTable=true;
+//    }
+//    else if(loc.x()>30)
+//    {
+//        isMainDotInfoTable=false;
+//    }
     //有15格,所以要加15,Y要反号
     int x1=floor(loc.x()/6.0f)+15;int x2=ceil(loc.x()/6.0f)+15;
     int y1=floor(-loc.y()/6.0f)+15;int y2=ceil(-loc.y()/6.0f)+15;

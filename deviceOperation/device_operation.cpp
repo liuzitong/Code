@@ -152,8 +152,49 @@ bool DeviceOperation::getAnswerPadStatus()
     return m_statusData.answerpadStatus();
 }
 
+bool DeviceOperation::getDynamicMoveStatus()
+{
+    return m_statusData.moveStutas();
+}
+
+QPointF DeviceOperation::getDyanmicAnswerPos()
+{
+    int posX=m_statusData.motorPosition(UsbDev::DevCtl::MotorId::MotorId_X);
+    int posY=m_statusData.motorPosition(UsbDev::DevCtl::MotorId::MotorId_Y);
+    int nearestDist=INT32_MAX;
+    QPointF dot;
+    for(auto&i:m_lastDynamicCoordAndXYMotorPos)
+    {
+        auto dist=pow(i.second.x()-posX,2)+pow(i.second.y()-posY,2);
+        if(dist<nearestDist)
+        {
+            dist=nearestDist;
+            dot=i.first;
+        }
+    }
+    return dot;
+}
+
+bool DeviceOperation::getMotorsBusy(QVector<UsbDev::DevCtl::MotorId> motorIDs)
+{
+    //次
+//        m_statusLock.lock();
+//        qDebug()<<"waitMotorStop:"+QString::number(int(thread()->currentThread()),16);
+    for(auto& motorId:motorIDs)
+    {
+        if(m_statusData.isMotorBusy(motorId))
+        {
+//                m_statusLock.unlock();
+            return true;
+        }
+    }
+//        m_statusLock.unlock();
+    return false;
+}
+
 void DeviceOperation::setDB(int DB)
 {
+    if(m_status.DB==DB) return;
     auto config=m_devCtl->config();
     quint8 sps[5]{0};
     int motorPos[5]{0};
@@ -162,10 +203,12 @@ void DeviceOperation::setDB(int DB)
     auto spsConfig=DeviceSettings::getSingleton()->m_5MotorSpeed;
     sps[3]=spsConfig[3];sps[4]=spsConfig[4];
     m_devCtl->move5Motors(sps,motorPos);
+    m_status.DB=DB;
 }
 //被checkSvcWorker 调用
 void DeviceOperation::connectDev()
 {
+    m_status={-1,-1,-1};
     auto deviceSettings=DeviceSettings::getSingleton();
     quint32 vid_pid=deviceSettings->m_VID.toInt(nullptr,16)<<16|deviceSettings->m_PID.toInt(nullptr,16);
     m_devCtl.reset(UsbDev::DevCtl::createInstance(vid_pid));
@@ -227,35 +270,10 @@ void DeviceOperation::disconnectDev()
     setIsDeviceReady(false);
 }
 
-void DeviceOperation::staticStimulate(QPointF loc,int spotSize,int DB,int durationTime)
-{
-    auto coordSpacePosInfo=DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoord(loc);
-    auto spotSizeToSlot=DeviceSettings::getSingleton()->m_spotSizeToSlot;
-    int spotSlot;
-    for(auto&i:spotSizeToSlot)
-    {
-        if(i.first==spotSize)
-            spotSlot=i.second;
-    }
-    auto focalMotorPos=DeviceDataProcesser::getFocusMotorPosByDist(coordSpacePosInfo.focalDist,spotSlot);
-    auto config=m_devCtl->config();
-    int motorPos[5]{0};
-    motorPos[0]=coordSpacePosInfo.motorX;
-    motorPos[1]=coordSpacePosInfo.motorY;
-    motorPos[2]=focalMotorPos;
 
-    motorPos[3]=config.DbPosMappingPtr()[DB][0];
-    motorPos[4]=config.DbPosMappingPtr()[DB][1];
-    bool isMotorMove[5]{true,true,true,true,true};
-    waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y});
-    move5Motors(isMotorMove,motorPos);
-    waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y,UsbDev::DevCtl::MotorId_Shutter});
-    if(durationTime!=0) openShutter(durationTime);
-}
-
-void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB)
+void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB,bool isMainDotInfoTable)
 {
-    auto coordSpacePosInfo=DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoord(loc);
+    auto coordSpacePosInfo=DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoord(loc,isMainDotInfoTable);
     auto spotSizeToSlot=DeviceSettings::getSingleton()->m_spotSizeToSlot;
     int spotSlot;
     for(auto&i:spotSizeToSlot)
@@ -306,8 +324,16 @@ void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB)
 }
 
 
-void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int spotSlot,int speedLevel)
+void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSize,int speedLevel,bool isMainDotInfoTable)
 {
+    auto spotSizeToSlot=DeviceSettings::getSingleton()->m_spotSizeToSlot;
+    int spotSlot;
+    for(auto&i:spotSizeToSlot)
+    {
+        if(i.first==cursorSize)
+            spotSlot=i.second;
+    }
+
     auto data=DeviceData::getSingleton()->m_localTableData.m_dynamicLenAndTimeData;
     auto stepLength=data(speedLevel,0);
     auto stepTime=data(speedLevel,1);
@@ -341,7 +367,7 @@ void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int spotSlot,
     {
         coordSpacePosInfoTemp.rx()+=stepLengthX;
         coordSpacePosInfoTemp.ry()+=stepLengthY;
-        coordMotorPosFocalDistInfoTemp=DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoord(coordSpacePosInfoTemp);
+        coordMotorPosFocalDistInfoTemp=DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoord(coordSpacePosInfoTemp,isMainDotInfoTable);
         dotArr[i*3+0]=coordMotorPosFocalDistInfoTemp.motorX;
         dotArr[i*3+1]=coordMotorPosFocalDistInfoTemp.motorY;
         dotArr[i*3+2]=DeviceDataProcesser::getFocusMotorPosByDist(coordMotorPosFocalDistInfoTemp.focalDist,spotSlot);
@@ -379,7 +405,10 @@ void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int spotSlot,
     delete[] dotArr;
 }
 
-
+void DeviceOperation::stopDynamic()
+{
+    m_devCtl->stopDyanmic();
+}
 
 QByteArray DeviceOperation::getRealTimeStimulationEyeImage()
 {
@@ -424,28 +453,12 @@ void DeviceOperation::hello()
 
 void DeviceOperation::waitMotorStop(QVector<UsbDev::DevCtl::MotorId> motorIDs)
 {
-    //次
-    auto getBusy=[&]()->bool
-    {
-//        m_statusLock.lock();
-//        qDebug()<<"waitMotorStop:"+QString::number(int(thread()->currentThread()),16);
-        for(auto& motorId:motorIDs)
-        {
-            if(m_statusData.isMotorBusy(motorId))
-            {
-//                m_statusLock.unlock();
-                return true;
-            }
-        }
-//        m_statusLock.unlock();
-        return false;
-    };
     QElapsedTimer mstimer;
     mstimer.restart();//必须先等一会儿刷新状态
     do
     {
         QCoreApplication::processEvents();
-    }while(getBusy()||(mstimer.elapsed()<50)); //50ms
+    }while(getMotorsBusy(motorIDs)||(mstimer.elapsed()<50)); //50ms
     //    while(getBusy()){QCoreApplication::processEvents();}
 }
 

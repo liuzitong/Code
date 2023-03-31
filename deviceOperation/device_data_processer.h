@@ -10,7 +10,7 @@ class DeviceDataProcesser
 public:
     DeviceDataProcesser()=default;
     static int getFocusMotorPosByDist(int focalDist,int spotSlot);
-    static CoordMotorPosFocalDistInfo getXYMotorPosAndFocalDistFromCoord(const QPointF loc);
+    static CoordMotorPosFocalDistInfo getXYMotorPosAndFocalDistFromCoord(const QPointF loc,bool isMainDotInfoTable);
     static QVector<QPoint> caculatePupilDeviation(const QByteArray ba,int width,int height,bool& valid);
     static float caculatePupilDiameter(QPoint topLeft,QPoint bottomRight);
     static int caculateFixationDeviation(QPoint point);
@@ -27,7 +27,7 @@ private:
      * @return      所在位置的值
      */
     static int interpolation(int value[],QPointF loc);
-    static bool isMainDotInfoTable;
+//    static bool isMainDotInfoTable;
 };
 }
 

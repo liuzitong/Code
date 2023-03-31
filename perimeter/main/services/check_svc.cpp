@@ -118,7 +118,8 @@ class DynamicCheck:public Check
         int index;
         QPointF beginLoc;
         QPointF endLoc;
-        QPoint answeredLoc;
+        QPointF answeredLoc;
+        bool isAnswered;
         bool checked;
     };
 public:
@@ -132,15 +133,21 @@ private:
 
     QVector<PathRecord> m_records;
 
+    int m_speedLevel;
+
+    int m_cursorSize;
+
     virtual void initialize() override;
 
     virtual void Checkprocess() override;
 
-    QPair<QPoint,QPoint> getPath();
+    int getPathRecordIndex();
 
-    void stimulate(QPoint begin,QPoint end);
+    void stimulate(QPointF begin,QPointF end);
 
-    QPair<QPoint,QPoint> waitForAnswer();
+    QVector<QPointF> waitForAnswer();
+
+    void ProcessAnswer(QVector<QPointF> answerLocs,PathRecord& record);
 
     virtual void setLight(bool onOff) override;
 
@@ -333,6 +340,7 @@ void StaticCheck::Checkprocess()
 
 void StaticCheck::finished()
 {
+    m_deviceOperation->m_isChecking=false;
     setLight(false);
 }
 
@@ -534,11 +542,14 @@ void StaticCheck::stimulate()
 
 void StaticCheck::getReadyToStimulate(QPointF loc, int DB)
 {
+    static bool isMainTable=true;
     if(loc.x()==0&&loc.y()==0&&m_y_offset==0)
     {
         loc.ry()=y_offsetDiamond;                       //固视点为中心点时候的中心点检查
     }
-    m_deviceOperation->getReadyToStimulate({loc.x(),loc.y()+m_y_offset},int(m_resultModel->m_params.commonParams.cursorSize),DB);
+
+    isMainTable=UtilitySvc::getIsMainTable(loc,isMainTable);
+    m_deviceOperation->getReadyToStimulate({loc.x(),loc.y()+m_y_offset},int(m_resultModel->m_params.commonParams.cursorSize),DB,isMainTable);
 }
 
 void StaticCheck::getProperValByRefToNearDotDB(StaticCheck::DotRecord &dotRecord)
@@ -977,9 +988,12 @@ void DynamicCheck::initialize()
 {
     m_resultModel->m_patient_id=m_patientModel->m_id;
     m_resultModel->m_program_id=m_programModel->m_id;
+    qsrand(QTime::currentTime().msec());
     m_checkedCount=0;
     auto& os_od=m_resultModel->m_OS_OD;
     auto& params=m_programModel->m_params;
+    m_speedLevel=params.speed;
+    m_cursorSize=(int)params.cursorSize;
     switch(params.strategy)
     {
     case DynamicParams::Strategy::standard:
@@ -990,78 +1004,232 @@ void DynamicCheck::initialize()
         {
             auto& dot=m_programModel->m_data.dots[i];
             m_records[i].index=i;
-            if(os_od==0)
-                m_records[i].beginLoc={dot.x,dot.y};
-            else
-            {
-                auto tempDot=UtilitySvc::PolarToOrth({dot.x,dot.y});
-                tempDot.rx()=-tempDot.rx();
-//                m_records[i].beginLoc=
-            }
+            if(os_od!=0){dot.x=-dot.x;}
+            m_records[i].beginLoc={dot.x,dot.y};
             m_records[i].endLoc={0,0};
             m_records[i].checked=false;
+            m_records[i].isAnswered=false;
         }
         break;
     }
     case DynamicParams::Strategy::blindArea:
     case DynamicParams::Strategy::darkArea:
     {
-
-        break;
+        switch (params.dynamicMethod)
+        {
+            case DynamicParams::DynamicMethod::_4Lines:m_totalCount=4;break;
+            case DynamicParams::DynamicMethod::_6Lines:m_totalCount=6;break;
+            case DynamicParams::DynamicMethod::_8Lines:m_totalCount=8;break;
+        }
+        m_records.resize(m_totalCount);
+        int distance;
+        switch (params.dynamicDistance)
+        {
+            case DynamicParams::DynamicDistance::_5:distance=5;break;
+            case DynamicParams::DynamicDistance::_10:distance=10;break;
+            case DynamicParams::DynamicDistance::_15:distance=15;break;
+        }
+        auto centerDot=m_dynamicSelectedDots[0];
+        if(os_od!=0){centerDot.rx()=-centerDot.rx();}
+        for(int i=0;i<m_totalCount;i++)
+        {
+            auto angle=2*M_PI*i/m_totalCount;
+            m_records[i].beginLoc={centerDot.x()+distance*qCos(angle),centerDot.y()+distance*qSin(angle)};
+            m_records[i].endLoc=centerDot;
+            m_records[i].index=i;
+            m_records[i].checked=false;
+            m_records[i].isAnswered=false;
+        }
     }
-    case DynamicParams::Strategy::straightLine:break;
+    case DynamicParams::Strategy::straightLine:
+    {
+        m_totalCount=1;
+        auto beginDot=m_dynamicSelectedDots[0];
+        auto endDot=m_dynamicSelectedDots[1];
+        if(os_od!=0)
+        {
+            beginDot.rx()=-beginDot.rx();
+            endDot.rx()=-endDot.rx();
+        }
+        m_records.push_back(PathRecord{1,beginDot,endDot,{0,0},false,false});
     }
-//    if(m_programModel->m_params.strategy!=DynamicParams::Strategy::straightLine)
-//    {
+    }
 
-//    }
-//    for(int i=0;i<m_totalCount;i++)
-//    {
-//        m_resultModel->m_data.checkData.push_back(DynamicDataNode{std::to_string('A'+i),m_programModel->m_data.dots[i],{0,0},false});
-//    }
+    setLight(true);
+    m_deviceOperation->m_isChecking=true;
+    auto cursorSize=m_programModel->m_params.cursorSize;
+    auto cursorColor=m_programModel->m_params.cursorColor;
+    if(m_deviceOperation->m_isDeviceReady)
+    {
+        m_deviceOperation->setCursorColorAndCursorSize(int(cursorColor),int(cursorSize));
+        m_deviceOperation->setDB(m_programModel->m_params.brightness);
+    }
+
 }
 
 void DynamicCheck::Checkprocess()
 {
-    auto path=getPath();
-//    stimulate()
+    auto& record=m_records[getPathRecordIndex()];
+    stimulate(record.beginLoc,record.endLoc);
+    auto answerLoc=waitForAnswer();
+    ProcessAnswer(answerLoc,record);
 }
 
-QPair<QPoint, QPoint> DynamicCheck::getPath()
+int DynamicCheck::getPathRecordIndex()
 {
-
-    switch (m_programModel->m_params.strategy)
+    QVector<int> indexes;
+    for(auto&i:m_records)
     {
-    case DynamicParams::Strategy::standard:
-    {
-
+        if(!i.checked) indexes.push_back(i.index);
     }
-
-    }
-
-
-    if(m_programModel->m_params.strategy==DynamicParams::Strategy::standard)
-    {
-//        int dotIndex=unCheckedIndex.takeAt(qrand()%unCheckedIndex.size());
-//        auto dataNode=m_resultModel->m_data.checkData[dotIndex];
-    }
-    return {{},{}};
+    return indexes[qrand()%indexes.length()];
 }
+
+void DynamicCheck::stimulate(QPointF begin, QPointF end)
+{
+    static bool isMainTable=true;
+    isMainTable=UtilitySvc::getIsMainTable(begin,isMainTable);
+    m_deviceOperation->dynamicStimulate(begin,end,m_cursorSize,m_speedLevel,isMainTable);
+}
+
+QVector<QPointF> DynamicCheck::waitForAnswer()
+{
+    UtilitySvc::wait(50);  //刷新下状态
+    QVector<QPointF> answerLocs;
+    if(m_programModel->m_params.strategy==DynamicParams::Strategy::straightLine)
+    {
+        while(m_deviceOperation->getDynamicMoveStatus())
+        {
+            if(m_deviceOperation->getAnswerPadStatus())
+            {
+                auto answerLoc=m_deviceOperation->getDyanmicAnswerPos();
+                answerLocs.push_back(answerLoc);
+                goto Wait;
+            }
+            QApplication::processEvents();
+        }
+        goto Exit;
+        Wait:
+        while(m_deviceOperation->getDynamicMoveStatus()) //等待松开
+        {
+            if(m_deviceOperation->getAnswerPadStatus())
+            {
+                QApplication::processEvents();
+            }
+            else
+            {
+                goto End;
+            }
+        }
+        goto Exit;
+        End:
+        while(m_deviceOperation->getDynamicMoveStatus())
+        {
+            if(m_deviceOperation->getAnswerPadStatus())
+            {
+                auto answerLoc=m_deviceOperation->getDyanmicAnswerPos();
+                answerLocs.push_back(answerLoc);
+                m_deviceOperation->stopDynamic();
+                goto Exit;
+            }
+            QApplication::processEvents();
+        }
+        goto Exit;
+    }
+    else
+    {
+        while(m_deviceOperation->getDynamicMoveStatus())
+        {
+            if(m_deviceOperation->getAnswerPadStatus())
+            {
+                auto answerLoc=m_deviceOperation->getDyanmicAnswerPos();
+                answerLocs.push_back(answerLoc);
+                m_deviceOperation->stopDynamic();
+                break;
+            }
+            QApplication::processEvents();
+        }
+        answerLocs.push_back({{},false});
+    }
+    Exit:
+    m_checkedCount++;
+    return answerLocs;
+}
+
+void DynamicCheck::ProcessAnswer(QVector<QPointF> answerLoc,PathRecord& record)
+{
+    auto& nodeList=m_resultModel->m_data.checkData;
+    if(m_programModel->m_params.strategy==DynamicParams::Strategy::straightLine)
+    {
+        DynamicDataNode startNode;
+        DynamicDataNode endNode;
+        startNode.name="start";
+        endNode.name="end";
+        startNode.start=m_records[0].beginLoc;
+        endNode.start=m_records[0].beginLoc;
+        if(answerLoc.length()==0)
+        {
+            startNode.isSeen=false;
+            endNode.isSeen=false;
+        }
+        else if(answerLoc.length()==1)
+        {
+            startNode.isSeen=true;
+            endNode.isSeen=false;
+        }
+        else if(answerLoc.length()==2)
+        {
+            startNode.isSeen=true;
+            endNode.isSeen=true;
+            startNode.end=answerLoc[0];
+            endNode.end=answerLoc[1];
+        }
+        nodeList.push_back(startNode);
+        nodeList.push_back(endNode);
+    }
+    else
+    {
+        DynamicDataNode node;
+        if(answerLoc.length()==0)
+        {
+
+        }
+        else if(answerLoc.length()==1)
+        {
+            record.isAnswered=true;
+            record.answeredLoc=answerLoc[0];
+        }
+        record.checked=true;
+        node.name=UtilitySvc::getDynamicDotEnglishName(m_checkedCount-1).toStdString();
+        node.start=record.beginLoc;
+        node.end=record.answeredLoc;
+        node.isSeen=record.isAnswered;
+        nodeList.push_back(node);
+    }
+}
+
+
+
 
 void DynamicCheck::finished()
 {
-
+    m_deviceOperation->m_isChecking=false;
+    setLight(false);
 }
 
 void DynamicCheck::setLight(bool onOff)
 {
-
+    if(m_programModel->m_params.backGroundColor==BackGroundColor::white)
+    {
+        m_deviceOperation->setWhiteLamp(onOff);
+    }
+    else
+        m_deviceOperation->setLamp(DevOps::LampId::LampId_yellowBackground,0,onOff);
 }
 
 void CheckSvcWorker::initialize()
 {
     qDebug()<<("initializing");
-    qsrand(QTime::currentTime().second());
     int type=m_programVm->getType();
     qDebug()<<type;
     if(type!=2)

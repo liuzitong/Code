@@ -69,6 +69,7 @@ private:
                             m_cache_move_flag,
                             m_answerpad_status,
                             m_camera_status,
+                            m_move_status,
                             m_eyeglass_status;
 public :
     explicit StatusDataPriv ( );
@@ -83,6 +84,7 @@ public :
     inline auto  AnswerPadStatusRef()           -> bool& { return m_answerpad_status; }
     inline auto  envLightDARef()                -> int&  { return m_env_light_DA; }
     inline auto  castLightDARef()               -> int&  { return m_cast_light_DA; }
+    inline auto  moveStatusRef()                -> bool& { return m_move_status;}
     inline auto  xMotorRef()                    -> StatusData_MotorItem& { return m_x_motor; }
     inline auto  yMotorRef()                    -> StatusData_MotorItem& { return m_y_motor; }
     inline auto  focusMotorRef()                -> StatusData_MotorItem& { return m_focus_motor; }
@@ -204,6 +206,7 @@ StatusData :: StatusData ( const QByteArray &ba )
     priv->shutterMotorRef().cmdCntrRef()=buff[19];
     priv->hozChinMotorRef().cmdCntrRef()=buff[20];
     priv->vertChinMotorRef().cmdCntrRef()=buff[21];
+    priv->moveStatusRef()=buff[22];
     priv->xMotorRef().positionRef()=gReadData_Le_I32(&buff[24]);
     priv->yMotorRef().positionRef()=gReadData_Le_I32(&buff[28]);
     priv->focusMotorRef().positionRef()=gReadData_Le_I32(&buff[32]);
@@ -294,6 +297,9 @@ bool     StatusData :: cameraStatus() const
 
 bool StatusData::eyeglassStatus() const
 { return ( m_obj != nullptr ? T_PrivPtr( m_obj )->EyeglassStatusRef() : false ); }
+
+bool StatusData::moveStutas() const
+{ return ( m_obj != nullptr ? T_PrivPtr( m_obj )->moveStatusRef() : false );}
 
 qint32     StatusData :: envLightDA() const
 { return ( m_obj != nullptr ? T_PrivPtr( m_obj )->envLightDARef() : false ); }
