@@ -164,8 +164,8 @@ Item{
                         var strategy=currentProgram.params.strategy;
                         if(strategy===2)                                    //暗区在两个坐标系中任意一个都可
                         {
-                            if(Math.pow(dot.x-boundaries[0].x,2)+Math.pow(dot.y-boundaries[0].y,2)>Math.pow(boundaries[0].radius,2)
-                             &&Math.pow(dot.x-boundaries[1].x,2)+Math.pow(dot.y-boundaries[1].y,2)>Math.pow(boundaries[1].radius,2))
+                            if(Math.pow(dot.x-boundaries[0].x,2)+Math.pow(dot.y-boundaries[0].y,2)>Math.pow((boundaries[0].radius-dynamicCircleRadius),2)
+                             &&Math.pow(dot.x-boundaries[1].x,2)+Math.pow(dot.y-boundaries[1].y,2)>Math.pow((boundaries[1].radius-dynamicCircleRadius),2))
                                 return;
                         }
                         else if(strategy===3)                               //直线必须在同一坐标系内
@@ -660,7 +660,7 @@ Item{
                 }
                 else                                                        //动态
                 {
-                    var dotRadius=diameter/180*1;
+//                    var dotRadius=diameter/180*1;
 
 //                    ctx.beginPath();
 //                    ctx.moveTo(100,100);
@@ -674,43 +674,64 @@ Item{
                         dynamicInputDots(item);
                     })
 
+//                    console.log(currentCheckResult.type);
+//                    console.log(currentCheckResult.program_id);
 
+//                    console.log(currentCheckResult.resultData.checkData)
 
-                    for(i=0;i<dotList.length;i++)                               //画点
+//                    console.log(currentCheckResult.resultData.checkData[0].name);
+//                    console.log(currentCheckResult.resultData.checkData[0].start.x);
+
+                    var gg=currentCheckResult.resultData.checkData;
+                    console.log(gg.length);
+                    for(i=0;i<gg.length;i++)                               //画点
                     {
-                        dot=dotToPixCoord(dotList[i].end);
-                        ctx.lineWidth = 0;
-                        ctx.strokeStyle = "black";
-                        ctx.beginPath();
-                        ctx.arc(dot.x, dot.y, dotRadius, 0, Math.PI*2);
-                        ctx.stroke();
-                        ctx.fill();
-                        ctx.closePath();
+                        console.log(gg[i].name);
+                        console.log(gg[i].end.x);
+                        console.log(gg[i].end.y);
+
+                        drawDot(gg[i].end);
                     }
 
-                    for(i=1;i<dotList.length-1;i++)                                 //连线
-                    {
-                        var dot_Begin=dotToPixCoord(dotList[i].end);
-                        var dot_End=dotToPixCoord(dotList[i+1].end);
-                        console.log(dot_Begin.x+" "+dot_Begin.y);
-                        console.log(dot_End.x+" "+dot_End.y);
-                        ctx.beginPath();
-                        ctx.moveTo(dot_Begin.x,dot_Begin.y);
-                        ctx.lineTo(dot_End.x,dot_End.y);
-                        ctx.closePath();
-                        ctx.stroke();
-                    }
 
-                    if(testOver===true)                                                 //检查完之后连接
-                    {
-                        dot_Begin=dotToPixCoord(dotList[dotList.length-1].end);
-                        dot_End=dotToPixCoord(dotList[0].end);
-                        ctx.beginPath();
-                        ctx.moveTo(dot_Begin.x,dot_Begin.y);
-                        ctx.lineTo(dot_End.x,dot_End.y);
-                        ctx.closePath();
-                        ctx.stroke();
-                    }
+
+
+//                    for(i=0;i<dotList.length;i++)                               //画点
+//                    {
+//                        var dot;
+//                        dot=dotToPixCoord(dotList[i].end);
+//                        ctx.lineWidth = 0;
+//                        ctx.strokeStyle = "black";
+//                        ctx.beginPath();
+//                        ctx.arc(dot.x, dot.y, dotRadius, 0, Math.PI*2);
+//                        ctx.stroke();
+//                        ctx.fill();
+//                        ctx.closePath();
+//                    }
+
+//                    for(i=1;i<dotList.length-1;i++)                                 //连线
+//                    {
+//                        var dot_Begin=dotToPixCoord(dotList[i].end);
+//                        var dot_End=dotToPixCoord(dotList[i+1].end);
+//                        console.log(dot_Begin.x+" "+dot_Begin.y);
+//                        console.log(dot_End.x+" "+dot_End.y);
+//                        ctx.beginPath();
+//                        ctx.moveTo(dot_Begin.x,dot_Begin.y);
+//                        ctx.lineTo(dot_End.x,dot_End.y);
+//                        ctx.closePath();
+//                        ctx.stroke();
+//                    }
+
+//                    if(testOver===true)                                                 //检查完之后连接
+//                    {
+//                        dot_Begin=dotToPixCoord(dotList[dotList.length-1].end);
+//                        dot_End=dotToPixCoord(dotList[0].end);
+//                        ctx.beginPath();
+//                        ctx.moveTo(dot_Begin.x,dot_Begin.y);
+//                        ctx.lineTo(dot_End.x,dot_End.y);
+//                        ctx.closePath();
+//                        ctx.stroke();
+//                    }
                 }
             }
 

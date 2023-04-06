@@ -109,7 +109,6 @@ private:
     virtual void setLight(bool onOff) override;
 };
 
-
 class DynamicCheck:public Check
 {
     Q_OBJECT
@@ -121,7 +120,14 @@ class DynamicCheck:public Check
         QPointF answeredLoc;
         bool isAnswered;
         bool checked;
+
+//        void print()
+//        {
+//            qDebug()<<QString("index:%1,beginLoc:%2,endLoc:%3,answeredLoc%4,isAnswered:%5,checked:%6.")
+//                      .arg(QString::number(index).arg(QString(beginLoc.)));
+//        }
     };
+
 public:
     QSharedPointer<DynamicCheckResultModel> m_resultModel;
     QSharedPointer<DynamicProgramModel> m_programModel;
@@ -198,6 +204,7 @@ signals:
     void checkResultChanged();
     void checkProcessFinished();
     void checkedCountChanged(int count);
+    void totalCountChanged(int count);
     void checkTimeChanged(int secs);
 
 };
@@ -292,9 +299,7 @@ void StaticCheck::initialize()
 
     setLight(true);
     m_deviceOperation->m_isChecking=true;
-
-    if(m_deviceOperation->m_isDeviceReady)
-        m_deviceOperation->setCursorColorAndCursorSize(int(cursorColor),int(cursorSize));
+    m_deviceOperation->setCursorColorAndCursorSize(int(cursorColor),int(cursorSize));
 
 
 }
@@ -309,16 +314,14 @@ void StaticCheck::Checkprocess()
     {
         qDebug()<<"checkCycleLocAndDB loc:"<<std::get<1>(checkCycleLocAndDB)<<" DB"<<std::get<2>(checkCycleLocAndDB);
         m_lastCheckDotRecord.push_back(nullptr);
-        if(m_deviceOperation->m_isDeviceReady)
-            getReadyToStimulate(std::get<1>(checkCycleLocAndDB),std::get<2>(checkCycleLocAndDB));
+        getReadyToStimulate(std::get<1>(checkCycleLocAndDB),std::get<2>(checkCycleLocAndDB));
     }
     else
     {
         m_lastCheckDotRecord.push_back(&getCheckDotRecordRef());   //存储lastDotType为commondot 并且存储指针
         auto dotRec=m_lastCheckDotRecord.last();
         qDebug()<<"getCheckDotRecordRef loc:"<<dotRec->loc<<" DB:"<<QString::number(dotRec->StimulationDBs.last())<<"upper:"<<QString::number(dotRec->upperBound)<<"lower:"<<QString::number(dotRec->lowerBound);
-        if(m_deviceOperation->m_isDeviceReady)
-            getReadyToStimulate(m_lastCheckDotRecord.last()->loc,m_lastCheckDotRecord.last()->StimulationDBs.last());
+        getReadyToStimulate(m_lastCheckDotRecord.last()->loc,m_lastCheckDotRecord.last()->StimulationDBs.last());
     }
 //    if(!m_lastCheckeDotType.isEmpty())
 //    {
@@ -333,8 +336,7 @@ void StaticCheck::Checkprocess()
     {
         m_stimulationCount++;
         m_stimulated=true;
-        if(m_deviceOperation->m_isDeviceReady)
-            stimulate();
+        stimulate();
     }
 }
 
@@ -953,7 +955,6 @@ else
 }
 void StaticCheck::setLight(bool onOff)
 {
-    if(!m_deviceOperation->m_isDeviceReady) return;
     switch (m_programModel->m_params.commonParams.fixationTarget) {
     case FixationTarget::centerPoint:m_deviceOperation->setLamp(DevOps::LampId::LampId_centerFixation,0,onOff); break;
     case FixationTarget::bigDiamond:
@@ -1094,6 +1095,36 @@ void DynamicCheck::stimulate(QPointF begin, QPointF end)
 
 QVector<QPointF> DynamicCheck::waitForAnswer()
 {
+    if(!m_deviceOperation->getSingleton()->getIsDeviceReady())
+    {
+        UtilitySvc::wait(50);  //刷新下状态
+        UtilitySvc::wait(200);  //虚拟测试表示耗费时间
+        QVector<QPointF> answerLocs;
+        if(m_programModel->m_params.strategy==DynamicParams::Strategy::straightLine)
+        {
+            int outCome=qrand()%3;
+            if(outCome==0)
+            {
+                goto Exit2;
+            }
+            else if(outCome==1)
+            {
+                answerLocs.push_back(m_deviceOperation->getDyanmicAnswerPos());
+            }
+            else if(outCome==2)
+            {
+                answerLocs.push_back(m_deviceOperation->getDyanmicAnswerPos());
+                answerLocs.push_back(m_deviceOperation->getDyanmicAnswerPos());
+            }
+        }
+        else
+        {
+            answerLocs.push_back(m_deviceOperation->getDyanmicAnswerPos());
+        }
+        Exit2:
+        m_checkedCount++;
+        return answerLocs;
+    }
     UtilitySvc::wait(50);  //刷新下状态
     QVector<QPointF> answerLocs;
     if(m_programModel->m_params.strategy==DynamicParams::Strategy::straightLine)
@@ -1145,11 +1176,10 @@ QVector<QPointF> DynamicCheck::waitForAnswer()
                 auto answerLoc=m_deviceOperation->getDyanmicAnswerPos();
                 answerLocs.push_back(answerLoc);
                 m_deviceOperation->stopDynamic();
-                break;
+                goto Exit;
             }
             QApplication::processEvents();
         }
-        answerLocs.push_back({{},false});
     }
     Exit:
     m_checkedCount++;
@@ -1205,6 +1235,13 @@ void DynamicCheck::ProcessAnswer(QVector<QPointF> answerLoc,PathRecord& record)
         node.end=record.answeredLoc;
         node.isSeen=record.isAnswered;
         nodeList.push_back(node);
+//        qDebug()<<m_resultModel->m_data.checkData.size();
+//        for(auto&i:m_resultModel->m_data.checkData)
+//        {
+//            qDebug()<<i.start.toQPointF();
+//            qDebug()<<i.end.toQPointF();
+//        }
+
     }
 }
 
@@ -1248,8 +1285,6 @@ void CheckSvcWorker::initialize()
         ((DynamicCheck*)m_check.data())->m_programModel=static_cast<DynamicProgramVm*>(m_programVm)->getModel();
         ((DynamicCheck*)m_check.data())->m_dynamicSelectedDots=m_dynamicSelectedDots;
     }
-    emit checkedCountChanged(0);
-    emit checkResultChanged();
 }
 
 void CheckSvcWorker::doWork()
@@ -1264,6 +1299,10 @@ void CheckSvcWorker::doWork()
         {
             initialize();
             m_check->initialize();
+            qDebug()<<m_check->m_totalCount;
+            emit totalCountChanged(m_check->m_totalCount);
+            emit checkedCountChanged(0);
+            emit checkResultChanged();
             m_timer.start();
             if(*m_checkState==0)                              //防止其它主线程选择退出,之后被覆盖
                 setCheckState(1);
@@ -1322,6 +1361,7 @@ CheckSvc::CheckSvc(QObject *parent)
     connect(m_worker,&CheckSvcWorker::checkResultChanged,this, &CheckSvc::checkResultChanged);
     connect(m_worker,&CheckSvcWorker::checkStateChanged,this, &CheckSvc::checkStateChanged);
     connect(m_worker,&CheckSvcWorker::checkedCountChanged,this, &CheckSvc::setCheckedCount);
+    connect(m_worker,&CheckSvcWorker::totalCountChanged,this, &CheckSvc::setTotalCount);
     connect(m_worker,&CheckSvcWorker::checkTimeChanged,this, &CheckSvc::setCheckTime);
 //    connect(m_worker,&CheckSvcWorker::checkProcessFinished,this, [&](){m_checkResultVm->insert();});
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::isDeviceReadyChanged,this,&CheckSvc::devReadyChanged);

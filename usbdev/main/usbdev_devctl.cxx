@@ -1112,7 +1112,7 @@ void DevCtl::stopDyanmic()
     ptr[0]=0x5a;ptr[1]=0x58;
     QMetaObject::invokeMethod(
         T_PrivPtr( m_obj )->wkrPtr(), "cmd_GeneralCmd", Qt::QueuedConnection,
-        Q_ARG( QByteArray, ba  ),Q_ARG( QString,QString("停止投射移动")),Q_ARG( quint32, 16 )
+        Q_ARG( QByteArray, ba  ),Q_ARG( QString,QString("停止投射移动")),Q_ARG( quint32, 4 )
                 );
 }
 

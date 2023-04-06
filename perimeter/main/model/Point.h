@@ -20,11 +20,11 @@ struct Point                         //标准动态程序的测试点的室 x表
         archive & BOOST_SERIALIZATION_NVP(y);
     }
 
-    Point operator=(QPointF point)
+    void operator=(QPointF point)
     {
-        return {float(point.x()),float(point.y())};
+        x=point.x();
+        y=point.y();
     }
-
 };
 
 

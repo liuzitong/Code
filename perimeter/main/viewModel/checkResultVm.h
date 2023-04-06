@@ -117,20 +117,31 @@ class DynamicResultDataVm:public ResultDataVm
 public:
     Q_INVOKABLE explicit DynamicResultDataVm(DynamicResultData* data):ResultDataVm(data){setData(data);};
     Q_INVOKABLE virtual ~DynamicResultDataVm(){for(auto&i: m_checkData){delete i.value<DynamicDataNodeVm*>();}}
-    QVariantList getCheckData(){return m_checkData;}
-
-    void setData(DynamicResultData* data)
+    QVariantList getCheckData()
     {
-        m_data=data;
+        for(auto&i: m_checkData){delete i.value<DynamicDataNodeVm*>();}
+        m_checkData.clear();
+        if(m_data==nullptr)
+        {
+            qDebug()<<"nullptr";
+        }
         auto& dataList=m_data->checkData;
+        qDebug()<<dataList.size();
         for(auto& data:dataList)
         {
             QObject* vm=new DynamicDataNodeVm(&data);
             m_checkData.append(QVariant::fromValue(vm));
         }
+        qDebug()<<m_data->checkData.size();
+        return m_checkData;
+    }
+
+    void setData(DynamicResultData* data)
+    {
+        m_data=data;
     }
 private:
-    DynamicResultData* m_data;
+    DynamicResultData* m_data=nullptr;
     QVariantList m_checkData;
 };
 

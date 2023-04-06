@@ -160,7 +160,8 @@ Item {id:root; width: 1366;height: 691
                                                 LineEdit{
 //                                                    property int centerDot:  currentProgram.params.commonParams.centerDotCheck?1:0;
                                                     property var checkedDots: IcUiQmlApi.appCtrl.checkSvc.checkedCount;
-                                                    property var totalDots: currentProgram===null?0:currentProgram.data.dots.length/*+centerDot*/;
+                                                    property var totalDots: IcUiQmlApi.appCtrl.checkSvc.totalCount;
+//                                                    property var totalDots: currentProgram===null?0:currentProgram.data.dots.length/*+centerDot*/;
                                                     text:checkedDots+"/"+totalDots;width: parent.width*0.5;textInput.readOnly: true;
                                                 }
                                             }
@@ -389,6 +390,8 @@ Item {id:root; width: 1366;height: 691
                                         {
                                             currentCheckResult=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::DynamicCheckResultVm", false,[]);
                                         }
+                                        console.log(currentCheckResult);
+                                        console.log(currentCheckResult.type);
                                         currentCheckResult.OS_OD=os_od.value;
                                         currentCheckResult.type=currentProgram.type;
                                         currentCheckResult.params=currentProgram.params;

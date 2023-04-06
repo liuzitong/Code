@@ -701,7 +701,7 @@ void MainWindow::on_pushButton_testStart_clicked()
 
 //            quint8 db=ui->spinBox_DbSetting->value();
             int spotSlot=ui->spinBox_spotSlot->value()-1;
-            int speedLevel=ui->spinBox_speedLevel->value()-1;
+            int speedLevel=ui->spinBox_speedLevel->value();
             dynamicCastTest(dotBegin,dotEnd,spotSlot,speedLevel);
             break;
         }
@@ -1186,6 +1186,11 @@ void MainWindow::on_action_disconnect_triggered()
     m_devCtl=NULL;
 }
 
+void MainWindow::on_pushButton_stopDynamic_clicked()
+{
+    m_devCtl->stopDyanmic();
+}
+
 void MainWindow::on_plainTextEdit_rawCommand_textChanged()
 {
     static int previousWordCount=0;
@@ -1484,8 +1489,8 @@ void MainWindow::dynamicCastTest(const CoordSpacePosInfo& dotSpaceBegin,const Co
     qDebug()<<dotSpaceEnd.coordX;
     qDebug()<<dotSpaceEnd.coordY;
     auto data=m_localTableData.m_dynamicLenAndTimeData;
-    auto stepLength=float(data(speedLevel,0))*0.01;
-    auto stepTime=data(speedLevel,1);
+    auto stepLength=float(data(speedLevel-1,0))*0.01;
+    auto stepTime=data(speedLevel-1,1);
     float stepLengthX,stepLengthY;
     float distX=dotSpaceEnd.coordX-dotSpaceBegin.coordX;
     float distY=dotSpaceEnd.coordY-dotSpaceBegin.coordY;
@@ -1493,17 +1498,16 @@ void MainWindow::dynamicCastTest(const CoordSpacePosInfo& dotSpaceBegin,const Co
     if(std::abs(distX)>std::abs(distY))
     {
         distX>0?stepLengthX=stepLength:stepLengthX=-stepLength;
-        stepCount=distX/stepLengthX+1;
-        stepLengthY=distY/distX*stepLengthX;
+        stepCount=qCeil(distX/stepLengthX)+1;
     }
-
     else
     {
         distY>0?stepLengthY=stepLength:stepLengthY=-stepLength;
-        stepCount=distY/stepLength+1;
-        stepLengthX=distX/distY*stepLengthY;
+        stepCount=qCeil(distY/stepLengthY)+1;
     }
 
+    stepLengthX=distX/stepCount;
+    stepLengthY=distY/stepCount;
 
     int* dotArr=new int[stepCount*3];
     CoordSpacePosInfo coordSpacePosInfoTemp=dotSpaceBegin;

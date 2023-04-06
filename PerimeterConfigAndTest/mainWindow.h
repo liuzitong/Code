@@ -170,6 +170,8 @@ private slots:
 
     void on_action_disconnect_triggered();
 
+    void on_pushButton_stopDynamic_clicked();
+
 private:
     void initData();
     void initTable();

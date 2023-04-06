@@ -7,6 +7,8 @@
 #include <array>
 #include <QtMath>
 //#include <QQmlEngine>
+
+#pragma execution_character_set("utf-8")
 namespace DevOps{
 
 QSharedPointer<DeviceOperation> DeviceOperation::m_singleton=nullptr;
@@ -41,6 +43,7 @@ QSharedPointer<DeviceOperation> DeviceOperation::getSingleton()
 void DeviceOperation::setCursorColorAndCursorSize(int color, int spot)
 {
 //    qDebug()<<"setCursorColorAndCursorSize:"+QString::number(int(thread()->currentThread()),16);
+    if(!m_isDeviceReady) return;
     if(m_status.color!=color||m_status.spot!=spot)              //变换到改变光斑颜色位置
     {
         auto profile=m_profile;
@@ -115,6 +118,7 @@ void DeviceOperation::setCursorColorAndCursorSize(int color, int spot)
 
 void DeviceOperation::setLamp(LampId id, int index, bool onOff)
 {
+    if(!m_isDeviceReady) return;
     int da=0;
     if(onOff)
     {
@@ -137,6 +141,7 @@ void DeviceOperation::setLamp(LampId id, int index, bool onOff)
 
 void DeviceOperation::setWhiteLamp(bool onOff)
 {
+    if(!m_isDeviceReady) return;
     auto config=DeviceData::getSingleton()->m_config;
     auto whiteLampDaPtr=config.whiteBackgroundLampDAPtr();
     if(onOff)
@@ -159,10 +164,14 @@ bool DeviceOperation::getDynamicMoveStatus()
 
 QPointF DeviceOperation::getDyanmicAnswerPos()
 {
+    if(!m_isDeviceReady)
+    {
+        return m_lastDynamicCoordAndXYMotorPos[qrand()%m_lastDynamicCoordAndXYMotorPos.size()].first;
+    }
+    QPointF dot;
     int posX=m_statusData.motorPosition(UsbDev::DevCtl::MotorId::MotorId_X);
     int posY=m_statusData.motorPosition(UsbDev::DevCtl::MotorId::MotorId_Y);
     int nearestDist=INT32_MAX;
-    QPointF dot;
     for(auto&i:m_lastDynamicCoordAndXYMotorPos)
     {
         auto dist=pow(i.second.x()-posX,2)+pow(i.second.y()-posY,2);
@@ -194,6 +203,7 @@ bool DeviceOperation::getMotorsBusy(QVector<UsbDev::DevCtl::MotorId> motorIDs)
 
 void DeviceOperation::setDB(int DB)
 {
+    if(!m_isDeviceReady) return;
     if(m_status.DB==DB) return;
     auto config=m_devCtl->config();
     quint8 sps[5]{0};
@@ -273,6 +283,7 @@ void DeviceOperation::disconnectDev()
 
 void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB,bool isMainDotInfoTable)
 {
+    if(!m_isDeviceReady) return;
     auto coordSpacePosInfo=DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoord(loc,isMainDotInfoTable);
     auto spotSizeToSlot=DeviceSettings::getSingleton()->m_spotSizeToSlot;
     int spotSlot;
@@ -341,24 +352,24 @@ void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSiz
     float distX=end.x()-begin.x();
     float distY=end.y()-begin.y();
     int stepCount;
+
     if(std::abs(distX)>std::abs(distY))
     {
         distX>0?stepLengthX=stepLength:stepLengthX=-stepLength;
-        stepCount=distX/stepLengthX;
-        stepLengthY=distY/stepCount;
+        stepCount=qCeil(distX/stepLengthX)+1;
     }
-
     else
     {
         distY>0?stepLengthY=stepLength:stepLengthY=-stepLength;
-        stepCount=distY/stepLength;
-        stepLengthX=distX/stepCount;
+        stepCount=qCeil(distY/stepLengthY)+1;
     }
+
+    stepLengthX=distX/stepCount;
+    stepLengthY=distY/stepCount;
 
     int* dotArr=new int[stepCount*3];
     QPointF coordSpacePosInfoTemp=begin;
     CoordMotorPosFocalDistInfo coordMotorPosFocalDistInfoTemp;
-    qDebug()<<stepCount;
     qDebug()<<QString("分割为%1个点,X步长为%2,Y步长为%3.").arg(QString::number(stepCount)).
                 arg(QString::number(stepLengthX)).arg(QString::number(stepLengthY));
 
@@ -372,41 +383,48 @@ void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSiz
         dotArr[i*3+1]=coordMotorPosFocalDistInfoTemp.motorY;
         dotArr[i*3+2]=DeviceDataProcesser::getFocusMotorPosByDist(coordMotorPosFocalDistInfoTemp.focalDist,spotSlot);
         m_lastDynamicCoordAndXYMotorPos[i]={coordSpacePosInfoTemp,{coordMotorPosFocalDistInfoTemp.motorX,coordMotorPosFocalDistInfoTemp.motorY}};
-        qDebug()<<(QString("第%1个点,X电机坐标%2,Y电机坐标%3,焦距电机坐标%4.").arg(QString::number(i)).arg(QString::number( dotArr[i*3+0])).
-                    arg(QString::number( dotArr[i*3+1])).arg(QString::number( dotArr[i*3+2])));
+//        qDebug()<<m_lastDynamicCoordAndXYMotorPos[i];
     }
+
+
+
+
 
     qDebug()<<("发送移动数据");
     constexpr int stepPerFrame=(512-8)/(4*3);
     int totalframe=ceil((float)stepCount/stepPerFrame);
     for(int i=0;i<totalframe-1;i++)
     {
-        qDebug()<<QString::pointer(&dotArr[stepPerFrame*3*i]);
-        qDebug()<<dotArr[stepPerFrame*3*i];
-        qDebug()<<dotArr[stepPerFrame*3*i+1];
-        qDebug()<<dotArr[stepPerFrame*3*i+2];
+//        qDebug()<<QString::pointer(&dotArr[stepPerFrame*3*i]);
+//        qDebug()<<dotArr[stepPerFrame*3*i];
+//        qDebug()<<dotArr[stepPerFrame*3*i+1];
+//        qDebug()<<dotArr[stepPerFrame*3*i+2];
 
-        qDebug()<<dotArr[stepPerFrame*3*(i+1)-3];
-        qDebug()<<dotArr[stepPerFrame*3*(i+1)-2];
-        qDebug()<<dotArr[stepPerFrame*3*(i+1)-1];
-        m_devCtl->sendDynamicData(totalframe,i,512,&dotArr[stepPerFrame*3*i]);                        //一般帧
+//        qDebug()<<dotArr[stepPerFrame*3*(i+1)-3];
+//        qDebug()<<dotArr[stepPerFrame*3*(i+1)-2];
+//        qDebug()<<dotArr[stepPerFrame*3*(i+1)-1];
+        if(m_isDeviceReady)
+            m_devCtl->sendDynamicData(totalframe,i,512,&dotArr[stepPerFrame*3*i]);                        //一般帧
 
     }
 
-    qDebug()<<dotArr[(stepCount-1)*3];
-    qDebug()<<dotArr[(stepCount-1)*3+1];
-    qDebug()<<dotArr[(stepCount-1)*3+2];
+//    qDebug()<<dotArr[(stepCount-1)*3];
+//    qDebug()<<dotArr[(stepCount-1)*3+1];
+//    qDebug()<<dotArr[(stepCount-1)*3+2];
 
     int dataLen= (stepCount%stepPerFrame)*3*4+8;
-    m_devCtl->sendDynamicData(totalframe,totalframe-1,dataLen,&dotArr[stepPerFrame*3*(totalframe-1)]);     //最后一帧
+    if(m_isDeviceReady)
+        m_devCtl->sendDynamicData(totalframe,totalframe-1,dataLen,&dotArr[stepPerFrame*3*(totalframe-1)]);     //最后一帧
     qDebug()<<("开始移动");
     auto config=DeviceData::getSingleton()->m_config;
-    m_devCtl->startDynamic(speedLevel,speedLevel,speedLevel,stepTime,stepCount);    //开始
+    if(m_isDeviceReady)
+        m_devCtl->startDynamic(speedLevel,speedLevel,speedLevel,stepTime,stepCount);    //开始
     delete[] dotArr;
 }
 
 void DeviceOperation::stopDynamic()
 {
+    if(!m_isDeviceReady) return;
     m_devCtl->stopDyanmic();
 }
 
@@ -422,6 +440,7 @@ QByteArray DeviceOperation::getRealTimeStimulationEyeImage()
 
 void DeviceOperation::openShutter(int durationTime)
 {
+    if(!m_isDeviceReady) return;
 //    auto config=m_devCtl->config();
     auto shutterPos=m_config.shutterOpenPosRef();
     waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y,UsbDev::DevCtl::MotorId_Shutter});
@@ -474,6 +493,7 @@ void DeviceOperation::waitForSomeTime(int time)
 
 void DeviceOperation::moveChin(ChinMoveDirection direction)
 {
+    if(!m_isDeviceReady) return;
     auto profile=m_devCtl->profile();
     auto spsConfig=DeviceSettings::getSingleton()->m_motorChinSpeed;
 

@@ -2896,7 +2896,7 @@
              <item>
               <widget class="QStackedWidget" name="stackedWidget">
                <property name="currentIndex">
-                <number>0</number>
+                <number>1</number>
                </property>
                <widget class="QWidget" name="page">
                 <layout class="QHBoxLayout" name="horizontalLayout_7">
@@ -3427,6 +3427,13 @@
                         </property>
                         <property name="maximum">
                          <number>9</number>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QPushButton" name="pushButton_stopDynamic">
+                        <property name="text">
+                         <string>停止移动</string>
                         </property>
                        </widget>
                       </item>
