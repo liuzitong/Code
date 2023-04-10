@@ -19,6 +19,7 @@ ModalPopupDialog/* Rectangle*/{   // this is the wrapped Popup element in ui_qml
     signal ok();
     signal dataRefreshed();
     signal cancel();
+    signal clearResult();
 
     property var currentProgram:null;
     property int fontPointSize: CommonSettings.fontPointSize;
@@ -166,7 +167,7 @@ ModalPopupDialog/* Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                            enabled: currentProgram.params.strategy===1||currentProgram.params.strategy===2
                                            width: parent.width*0.5; anchors.right: parent.right;model:["4","6","8"];
                                            currentIndex:currentProgram===null?0:currentProgram.params.dynamicMethod;
-                                           Component.onCompleted: {idPopup.ok.connect(function(){currentProgram.params.dynamicMethod=currentIndex;})}
+                                           Component.onCompleted: {idPopup.ok.connect(function(){if(currentProgram.params.dynamicMethod!==currentIndex) idPopup.clearResult();currentProgram.params.dynamicMethod=currentIndex;})}
                                        }
                                    }
                                    Item{
@@ -176,7 +177,7 @@ ModalPopupDialog/* Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                            enabled: currentProgram.params.strategy===1||currentProgram.params.strategy===2
                                            width: parent.width*0.5; anchors.right: parent.right;model:["5","10","15"];
                                            currentIndex:currentProgram===null?0:currentProgram.params.dynamicDistance;
-                                           Component.onCompleted: {idPopup.ok.connect(function(){currentProgram.params.dynamicDistance=currentIndex;})}
+                                           Component.onCompleted: {idPopup.ok.connect(function(){if(currentProgram.params.dynamicDistance!==currentIndex) idPopup.clearResult();currentProgram.params.dynamicDistance=currentIndex;})}
                                        }
                                    }
                                    Item{

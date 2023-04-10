@@ -73,7 +73,21 @@ Item {id:root; width: 1366;height: 691
                     currentCheckResult=null;
                 }
             }
-            DynamicParamsSetting{id:dynamicParamsSetting;anchors.fill: parent;onDataRefreshed:root.currentProgramChanged();}
+            DynamicParamsSetting{id:dynamicParamsSetting;anchors.fill: parent;
+                onDataRefreshed:
+                {
+                    root.currentProgramChanged();
+                }
+                onClearResult:
+                {
+                    if(root.currentCheckResult.type!==2)
+                        IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::StaticCheckResultVm",root.currentCheckResult);
+                    else
+                        IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::DynamicCheckResultVm",root.currentCheckResult);
+                    root.currentCheckResult=null;
+                }
+
+            }
             StaticParamsSetting{id:staticParamsSetting;anchors.fill: parent;isCustomProg:true; onDataRefreshed:{root.currentProgramChanged();}}
             Item{anchors.fill: parent;anchors.margins: 2;
                 Row{anchors.fill: parent;spacing: 2;
@@ -130,7 +144,7 @@ Item {id:root; width: 1366;height: 691
                                                 LineEdit{
                                                     property var checkedDots:currentCheckResult===null?0:currentCheckResult.type===2?0:currentCheckResult.resultData.falsePositiveCount;
                                                     property var totalDots: currentCheckResult===null?0:currentCheckResult.type===2?0:currentCheckResult.resultData.falsePositiveTestCount;
-                                                    text:currentCheckResult===null?"":currentCheckResult.type!==2?checkedDots+"/"+totalDots:"";width: parent.width*0.5;textInput.readOnly: true;
+                                                    text:currentCheckResult===null?"":currentCheckResult.type===2?"":checkedDots+"/"+totalDots;width: parent.width*0.5;textInput.readOnly: true;
                                                 }
                                             }
                                             Row{width:parent.width;height: parent.height*0.65/3;spacing: width*0.05;
@@ -138,7 +152,10 @@ Item {id:root; width: 1366;height: 691
                                                 LineEdit{
                                                     property var checkedDots: currentCheckResult===null?0:currentCheckResult.type===2?0:currentCheckResult.resultData.falseNegativeCount;
                                                     property var totalDots: currentCheckResult===null?0:currentCheckResult.type===2?0:currentCheckResult.resultData.falseNegativeTestCount;
-                                                    text:currentCheckResult===null?"":currentCheckResult.type!==2?checkedDots+"/"+totalDots:"";width: parent.width*0.5;textInput.readOnly: true;
+                                                    text:currentCheckResult===null?"":currentCheckResult.type===2?"":checkedDots+"/"+totalDots;
+//                                                    text:if(currentCheckResult!==null&&currentCheckResult.type!==2) {return checkedDots+"/"+totalDots;} else {return "";}
+                                                    width: parent.width*0.5;
+                                                    textInput.readOnly: true;
                                                 }
                                             }
                                             Row{ width:parent.width;height: parent.height*0.65/3;spacing: width*0.05;
@@ -146,7 +163,7 @@ Item {id:root; width: 1366;height: 691
                                                 LineEdit{
                                                     property var checkedDots: currentCheckResult===null?0:currentCheckResult.type===2?0:currentCheckResult.resultData.fixationLostCount;
                                                     property var totalDots: currentCheckResult===null?0:currentCheckResult.type===2?0:currentCheckResult.resultData.fixationLostTestCount;
-                                                    text:currentCheckResult===null?"":currentCheckResult.type!==2?checkedDots+"/"+totalDots:"";width: parent.width*0.5;textInput.readOnly: true;
+                                                    text:currentCheckResult===null?"":currentCheckResult.type===2?"":checkedDots+"/"+totalDots;width: parent.width*0.5;textInput.readOnly: true;
                                                 }
                                             }
                                         }
@@ -291,7 +308,8 @@ Item {id:root; width: 1366;height: 691
                         CusText{
                             id:os_od;font.pointSize: fontPointSize*2;
                             property int value: 0;
-                            text:value===0?lt+qsTr("Left eye"):lt+qsTr("Right eye"); z: 1; anchors.top: parent.top; anchors.topMargin: 0.05*parent.height; anchors.left: parent.left; anchors.leftMargin: 0.05*parent.width;height: parent.height*0.05;}
+                            text:value===0?qsTr("Left eye")+lt:qsTr("Right eye")+lt; verticalAlignment: Text.AlignVCenter; horizontalAlignment: Text.AlignLeft; z: 1; anchors.top: parent.top; anchors.topMargin: 0.05*parent.height; anchors.left: parent.left; anchors.leftMargin: 0.055*parent.width;height: parent.height*0.05;
+                        }
                         CheckDisplay{
                             id:checkDisplay;
                             os_od:os_od.value;
@@ -302,6 +320,14 @@ Item {id:root; width: 1366;height: 691
                                 realTimeDBRec.visible=true;
                                 var count=currentCheckResult.drawRealTimeEyePosPic(clickedDotIndex);
                                 realTimePicRefresh(count);
+                            }
+                            onClearResult:
+                            {
+                                if(root.currentCheckResult.type!==2)
+                                    IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::StaticCheckResultVm",root.currentCheckResult);
+                                else
+                                    IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::DynamicCheckResultVm",root.currentCheckResult);
+                                root.currentCheckResult=null;
                             }
                         }
                         Row{
@@ -371,7 +397,7 @@ Item {id:root; width: 1366;height: 691
                                 property int checkState: IcUiQmlApi.appCtrl.checkSvc.checkState;
                                 text:{if(checkState>2) return lt+qsTr("Start");if(checkState===2) return lt+qsTr("Resume");if(checkState===0||checkState===1) return lt+qsTr("Pause")}
                                 onClicked:{
-                                    if(currentProgram.type===2) IcUiQmlApi.appCtrl.checkSvc.dynamicSelectedDots=checkDisplay.dynamicSelectedDots;     //动态输入点
+                                    IcUiQmlApi.appCtrl.checkSvc.dynamicSelectedDots=checkDisplay.dynamicSelectedDots;     //动态输入点
                                     if(checkState>2)
                                     {
                                         if(currentCheckResult!=null)

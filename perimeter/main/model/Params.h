@@ -183,6 +183,8 @@ struct StaticParams/*:public QObject*/
          */
         int blindDotStimulationDB;
         int shortTermFluctuationCount;
+        int leastWaitingTime;
+
 
         template<class Archive>
         void serialize(Archive& archive, const unsigned int version)
@@ -195,6 +197,7 @@ struct StaticParams/*:public QObject*/
             archive & BOOST_SERIALIZATION_NVP(singleStimulationDB);
             archive & BOOST_SERIALIZATION_NVP(blindDotStimulationDB);
             archive & BOOST_SERIALIZATION_NVP(shortTermFluctuationCount);
+            archive & BOOST_SERIALIZATION_NVP(leastWaitingTime);
         }
 
     };

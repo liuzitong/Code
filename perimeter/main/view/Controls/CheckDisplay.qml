@@ -19,6 +19,7 @@ Item{
     property int boundaryShowRange:IcUiQmlApi.appCtrl.utilitySvc.boundaryShowRange;
     property int dynamicCircleRadius: 0;
     property int lastStrategy;
+    signal clearResult();
 
 
 
@@ -45,12 +46,12 @@ Item{
             else if(strategy===2)
             {
                 dynamicSelectedDotLen=1;
-                dynamicSelectedDotsReady=false;
+                dynamicSelectedDotsReady=(dynamicSelectedDotLen===dynamicSelectedDots.length);
             }
             else if(strategy===3)
             {
                 dynamicSelectedDotLen=2;
-                dynamicSelectedDotsReady=false;
+                dynamicSelectedDotsReady=(dynamicSelectedDotLen===dynamicSelectedDots.length);
             }
             lastStrategy=strategy;
         }
@@ -79,7 +80,7 @@ Item{
     signal painted();
     antialiasing: true
 
-    CusText{id:dotPosDisplay;text:lt+qsTr(""); horizontalAlignment: Text.AlignLeft;z:1; anchors.top: parent.top; anchors.topMargin: 0.07*parent.height; anchors.left: parent.left; anchors.leftMargin: 0.03*parent.width;width: parent.width*0.06;height: parent.height*0.05;}
+    CusText{id:dotPosDisplay;text:""; horizontalAlignment: Text.AlignLeft;z:1; anchors.top: parent.top; anchors.topMargin: 0.07*parent.height; anchors.left: parent.left; anchors.leftMargin: 0.03*parent.width;width: parent.width*0.06;height: parent.height*0.05;}
 
     Canvas{
         id:displayCanvas;
@@ -106,7 +107,7 @@ Item{
                 else
                 {
                     dot=displayCanvas.orthToPolar(dot)
-                    dotPosDisplay.text="radius:"+Math.round(dot.x)+" angle:"+Math.round(dot.y);
+                    dotPosDisplay.text=qsTr("radius")+":"+Math.round(dot.x)+" "+qsTr("angle")+":"+Math.round(dot.y);
                 }
             }
             onClicked:{
@@ -156,6 +157,7 @@ Item{
                             }
                         }
                         dynamicSelectedDotsReady=(dynamicSelectedDotLen===dynamicSelectedDots.length);
+                        clearResult();
                         displayCanvas.requestPaint();
                     }
                     else{
@@ -187,8 +189,8 @@ Item{
                                     return;
                             }
                         }
-
                         dynamicSelectedDots.push(dot);
+                        dynamicSelectedDotsReady=(dynamicSelectedDotLen===dynamicSelectedDots.length);
                         displayCanvas.requestPaint();
                     }
                 }
@@ -285,7 +287,23 @@ Item{
             return {x:radius,y:angle}
         }
 
-        function drawDot(dot)
+//        function drawDot(dot)
+//        {
+//            var orthCoord;
+//            var pixDot=dotToPixCoord(dot);
+//            var dotRadius=diameter/180*1;
+//            var ctx = getContext("2d");
+//            ctx.lineWidth = 0;
+//            ctx.strokeStyle = "black";
+//            ctx.beginPath();
+//            ctx.arc(pixDot.x, pixDot.y, dotRadius, 0, Math.PI*2);
+//            ctx.stroke();
+//            ctx.closePath();
+//            ctx.fillStyle = "white";
+//            ctx.fill();
+//        }
+
+        function drawDot(dot,color)
         {
             var orthCoord;
             var pixDot=dotToPixCoord(dot);
@@ -297,15 +315,15 @@ Item{
             ctx.arc(pixDot.x, pixDot.y, dotRadius, 0, Math.PI*2);
             ctx.stroke();
             ctx.closePath();
-            ctx.fillStyle = "white";
+            ctx.fillStyle = color;
             ctx.fill();
         }
+
 
         function dynamicInputDots(dot)
         {
             var x_pix=(dot.x/degreeRange)*(diameter*0.5)+width/2;
             var y_pix=(-dot.y/degreeRange)*(diameter*0.5)+height/2;
-
             var dotRadius=diameter/180*1;
             var ctx = getContext("2d");
             ctx.lineWidth = 0;
@@ -561,7 +579,7 @@ Item{
                     if(os_od==1){
                         item.x=-item.x;
                     }
-                    drawDot(item);
+                    drawDot(item,"white");
                 })
                 if(type==2)
                 {
@@ -585,7 +603,7 @@ Item{
                             var x=Math.cos(angle)*dynamicCircleRadius+selectedDot.x;
                             if(os_od==1) x=-x;
                             var y=Math.sin(angle)*dynamicCircleRadius+selectedDot.y;
-                            drawDot({x:x,y:y});
+                            drawDot({x:x,y:y},"white");
                         }
                     }
                 }
@@ -600,7 +618,7 @@ Item{
                         if(i<dotList.length)                                            //一般结果,和中心点
                         {
                             if(dBList[i]===-1)
-                                drawDot(dotList[i]);
+                                drawDot(dotList[i],"white");
                             else
                                 drawDB(dBList[i],dotList[i]);
                         }
@@ -625,7 +643,7 @@ Item{
                         {
                             switch (dBList[i])
                             {
-                            case -1:drawDot(dotList[i]);break;
+                            case -1:drawDot(dotList[i],"white");break;
                             case 0:drawUnseen(dotList[i]);break;
                             case 1:drawWeakSeen(dotList[i]);break;
                             case 2:drawSeen(dotList[i]);break;
@@ -681,59 +699,65 @@ Item{
 
 //                    console.log(currentCheckResult.resultData.checkData[0].name);
 //                    console.log(currentCheckResult.resultData.checkData[0].start.x);
-
-                    var gg=currentCheckResult.resultData.checkData;
-                    console.log(gg.length);
-                    for(i=0;i<gg.length;i++)                               //画点
+                    dotList=currentCheckResult.resultData.checkData;
+                    if(currentProgram.params.strategy!==3)
                     {
-                        console.log(gg[i].name);
-                        console.log(gg[i].end.x);
-                        console.log(gg[i].end.y);
+                        for(i=0;i<dotList.length;i++)                                 //连线
+                        {
+                            if(dotList[i%dotList.length].isChecked)
+                                var dot_Begin=dotToPixCoord(dotList[i%dotList.length].end);
+                            else
+                                dot_Begin=dotToPixCoord(dotList[i%dotList.length].start);
+                            if(dotList[(i+1)%dotList.length].isChecked)
+                                var dot_End=dotToPixCoord(dotList[(i+1)%dotList.length].end);
+                            else
+                                dot_End=dotToPixCoord(dotList[(i+1)%dotList.length].start);
+                            ctx.beginPath();
+                            ctx.moveTo(dot_Begin.x,dot_Begin.y);
+                            ctx.lineTo(dot_End.x,dot_End.y);
+                            ctx.closePath();
+                            ctx.strokeStyle = "green";
+                            ctx.stroke();
+                        }
 
-                        drawDot(gg[i].end);
+                        for(i=0;i<dotList.length;i++)                               //画点
+                        {
+                            if(dotList[i].isChecked)
+                            {
+                                if(dotList[i].isSeen)
+                                     drawDot(dotList[i].end,"yellow");
+                            }
+                            else
+                                drawDot(dotList[i].start,"blue");
+                        }
+
                     }
-
-
-
-
-//                    for(i=0;i<dotList.length;i++)                               //画点
-//                    {
-//                        var dot;
-//                        dot=dotToPixCoord(dotList[i].end);
-//                        ctx.lineWidth = 0;
-//                        ctx.strokeStyle = "black";
-//                        ctx.beginPath();
-//                        ctx.arc(dot.x, dot.y, dotRadius, 0, Math.PI*2);
-//                        ctx.stroke();
-//                        ctx.fill();
-//                        ctx.closePath();
-//                    }
-
-//                    for(i=1;i<dotList.length-1;i++)                                 //连线
-//                    {
-//                        var dot_Begin=dotToPixCoord(dotList[i].end);
-//                        var dot_End=dotToPixCoord(dotList[i+1].end);
-//                        console.log(dot_Begin.x+" "+dot_Begin.y);
-//                        console.log(dot_End.x+" "+dot_End.y);
-//                        ctx.beginPath();
-//                        ctx.moveTo(dot_Begin.x,dot_Begin.y);
-//                        ctx.lineTo(dot_End.x,dot_End.y);
-//                        ctx.closePath();
-//                        ctx.stroke();
-//                    }
-
-//                    if(testOver===true)                                                 //检查完之后连接
-//                    {
-//                        dot_Begin=dotToPixCoord(dotList[dotList.length-1].end);
-//                        dot_End=dotToPixCoord(dotList[0].end);
-//                        ctx.beginPath();
-//                        ctx.moveTo(dot_Begin.x,dot_Begin.y);
-//                        ctx.lineTo(dot_End.x,dot_End.y);
-//                        ctx.closePath();
-//                        ctx.stroke();
-//                    }
+                    else
+                    {
+                        if(dotList[0].isSeen&&dotList[1].isSeen)
+                        {
+                            ctx.beginPath();
+                            dot_Begin=dotToPixCoord((dotList[0].end));
+                            dot_End=dotToPixCoord((dotList[1].end));
+                            ctx.moveTo(dot_Begin.x,dot_Begin.y);
+                            ctx.lineTo(dot_End.x,dot_End.y);
+                            ctx.closePath();
+                            ctx.strokeStyle = "green";
+                            ctx.stroke();
+                        }
+                        if(dotList[0].isSeen)
+                        {
+                            drawDot(dotList[0].end,"yellow");
+                        }
+                        if(dotList[1].isSeen)
+                        {
+                            drawDot(dotList[1].end,"yellow");
+                        }
+                    }
                 }
+                 delete inputdotList;
             }
+
 
             if(currentProgram.type!==2&clickedDotIndex!=-1)                                     //选择点--实时图片用
             {
@@ -749,8 +773,8 @@ Item{
                 ctx.stroke();
                 root.painted();
             }
-            delete inputdotList;
         }
+
     }
 }
 

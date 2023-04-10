@@ -60,6 +60,7 @@ class FixedParamsVM:public QObject
     Q_PROPERTY(int singleStimulationDB READ getSingleStimulationDB WRITE setSingleStimulationDB)
     Q_PROPERTY(int blindDotStimulationDB READ getBlindDotStimulationDB WRITE setBlindDotStimulationDB)
     Q_PROPERTY(int shortTermFluctuationCount READ getShortTermFluctuationCount WRITE setShortTermFluctuationCount)
+    Q_PROPERTY(int leastWaitingTime READ getLeastWaitingTime WRITE setLeastWaitingTime)
 public:
     FixedParamsVM()=default;
     FixedParamsVM(StaticParams::FixedParams* data){m_data=data;}
@@ -76,6 +77,7 @@ public:
     int getSingleStimulationDB(){return m_data->singleStimulationDB;}void setSingleStimulationDB(int value){m_data->singleStimulationDB=value;}
     int getBlindDotStimulationDB(){return m_data->blindDotStimulationDB;}void setBlindDotStimulationDB(int value){m_data->blindDotStimulationDB=value;}
     int getShortTermFluctuationCount(){return m_data->shortTermFluctuationCount;}void setShortTermFluctuationCount(int value){m_data->shortTermFluctuationCount=value;}
+    int getLeastWaitingTime(){return m_data->leastWaitingTime;}void setLeastWaitingTime(int value){m_data->leastWaitingTime=value;}
 private:
     StaticParams::FixedParams* m_data;
 };

@@ -9,6 +9,7 @@
 #include <tuple>
 #include "frame_provid_svc.h"
 #include <array>
+#include <QMessageBox>
 namespace Perimeter{
 constexpr int MaxDB=51;
 constexpr int MinDB=0;
@@ -20,6 +21,8 @@ public:
     ~Check()=default;
     QSharedPointer<PatientModel> m_patientModel;
     int m_checkedCount,m_totalCount;   //只计算通常点数,短周期,中心点,以及周期测试不计入内.m_checkedCount=m_totalCount就测试完成.在doWork里面结束测试循环.
+    bool m_error=false;
+    QString m_errorInfo;
     QSharedPointer<UtilitySvc> m_utilitySvc=UtilitySvc::getSingleton();
     QSharedPointer<DevOps::DeviceOperation> m_deviceOperation=DevOps::DeviceOperation::getSingleton();
     static constexpr int y_offsetDiamond=-8,y_offsetBottomPoint=-12;
@@ -74,7 +77,6 @@ private:
     QVector<DotRecord*> m_lastCheckDotRecord;
     QVector<LastCheckedDotType> m_lastCheckeDotType;
     bool m_alreadyChecked;
-
 
 public:
     QSharedPointer<StaticCheckResultModel> m_resultModel;
@@ -206,6 +208,7 @@ signals:
     void checkedCountChanged(int count);
     void totalCountChanged(int count);
     void checkTimeChanged(int secs);
+    void sendErrorInfo(QString error);
 
 };
 
@@ -310,6 +313,7 @@ void StaticCheck::Checkprocess()
 
     m_alreadyChecked=false;
     auto checkCycleLocAndDB=getCheckCycleLocAndDB();                //存储LastdotType为各种检查
+    if(m_error==true) return;                                       //找不到盲点 退出检查
     if(std::get<0>(checkCycleLocAndDB))
     {
         qDebug()<<"checkCycleLocAndDB loc:"<<std::get<1>(checkCycleLocAndDB)<<" DB"<<std::get<2>(checkCycleLocAndDB);
@@ -615,7 +619,13 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
     //测试盲点
     auto commomParams=m_resultModel->m_params.commonParams;
     auto fixedParams=m_resultModel->m_params.fixedParams;
-    if(commomParams.blindDotTest==true)                 //盲点测试
+    if(m_blindDotLocateIndex>=UtilitySvc::getSingleton()->m_left_blindDot.size())
+    {
+        m_error=true;
+        m_errorInfo=tr("Cant't locate blind dot.Turn off blindDot check.");
+        return {};
+    }
+    if(commomParams.blindDotTest==true)                 //盲点测试,size过大表示盲点寻找失败
     {
         //确定盲点,条件是要经历一点测试次数,而且盲为空
         if(m_stimulationCount>UtilitySvc::getSingleton()->m_checkCountBeforeGetBlindDotCheck&&m_blindDot.isEmpty())
@@ -670,7 +680,6 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
 bool StaticCheck::waitForAnswer()
 {
     qDebug()<<"waitForAnswer";
-
     while(m_deviceOperation->getAnswerPadStatus())   //一直按着算暂停
     {
         qDebug()<<"pausing";
@@ -698,6 +707,7 @@ bool StaticCheck::waitForAnswer()
     }
 
 
+    UtilitySvc::wait(m_programModel->m_params.fixedParams.leastWaitingTime);                //最小等待时间
     bool answer=false;
     while(elapsedTimer.elapsed()<waitTime)   //应答时间内
     {
@@ -724,7 +734,7 @@ void StaticCheck::ProcessAnswer(bool answered)
     {
     case LastCheckedDotType::locateBlindDot:
     {
-        if(answered)
+        if(!answered)
         {
             if(m_resultModel->m_OS_OD==0) m_blindDot.push_back(UtilitySvc::getSingleton()->m_left_blindDot[m_blindDotLocateIndex]);
             else m_blindDot.push_back(UtilitySvc::getSingleton()->m_right_blindDot[m_blindDotLocateIndex]);
@@ -1001,6 +1011,7 @@ void DynamicCheck::initialize()
     {
         m_totalCount=m_programModel->m_data.dots.size();
         m_records.resize(m_totalCount);
+        m_resultModel->m_data.checkData.resize(m_totalCount);
         for(int i=0;i<m_totalCount;i++)
         {
             auto& dot=m_programModel->m_data.dots[i];
@@ -1010,6 +1021,11 @@ void DynamicCheck::initialize()
             m_records[i].endLoc={0,0};
             m_records[i].checked=false;
             m_records[i].isAnswered=false;
+
+            auto& checkData=m_resultModel->m_data.checkData[i];
+            checkData.start=dot;
+            checkData.isSeen=false;
+            checkData.isChecked=false;
         }
         break;
     }
@@ -1032,6 +1048,8 @@ void DynamicCheck::initialize()
         }
         auto centerDot=m_dynamicSelectedDots[0];
         if(os_od!=0){centerDot.rx()=-centerDot.rx();}
+
+        m_resultModel->m_data.checkData.resize(m_totalCount);
         for(int i=0;i<m_totalCount;i++)
         {
             auto angle=2*M_PI*i/m_totalCount;
@@ -1040,11 +1058,18 @@ void DynamicCheck::initialize()
             m_records[i].index=i;
             m_records[i].checked=false;
             m_records[i].isAnswered=false;
+
+            auto& checkData=m_resultModel->m_data.checkData[i];
+            checkData.start=m_records[i].beginLoc;
+            checkData.isSeen=false;
+            checkData.isChecked=false;
         }
+        break;
     }
     case DynamicParams::Strategy::straightLine:
     {
         m_totalCount=1;
+        m_resultModel->m_data.checkData.resize(2);
         auto beginDot=m_dynamicSelectedDots[0];
         auto endDot=m_dynamicSelectedDots[1];
         if(os_od!=0)
@@ -1052,9 +1077,11 @@ void DynamicCheck::initialize()
             beginDot.rx()=-beginDot.rx();
             endDot.rx()=-endDot.rx();
         }
-        m_records.push_back(PathRecord{1,beginDot,endDot,{0,0},false,false});
+        m_records.push_back(PathRecord{0,beginDot,endDot,{0,0},false,false});
+        break;
     }
     }
+
 
     setLight(true);
     m_deviceOperation->m_isChecking=true;
@@ -1070,6 +1097,7 @@ void DynamicCheck::initialize()
 
 void DynamicCheck::Checkprocess()
 {
+    qDebug()<<m_records.length();
     auto& record=m_records[getPathRecordIndex()];
     stimulate(record.beginLoc,record.endLoc);
     auto answerLoc=waitForAnswer();
@@ -1083,6 +1111,7 @@ int DynamicCheck::getPathRecordIndex()
     {
         if(!i.checked) indexes.push_back(i.index);
     }
+    qDebug()<<indexes[qrand()%indexes.length()];
     return indexes[qrand()%indexes.length()];
 }
 
@@ -1098,20 +1127,17 @@ QVector<QPointF> DynamicCheck::waitForAnswer()
     if(!m_deviceOperation->getSingleton()->getIsDeviceReady())
     {
         UtilitySvc::wait(50);  //刷新下状态
-        UtilitySvc::wait(200);  //虚拟测试表示耗费时间
+        UtilitySvc::wait(1000);  //虚拟测试表示耗费时间
         QVector<QPointF> answerLocs;
         if(m_programModel->m_params.strategy==DynamicParams::Strategy::straightLine)
         {
-            int outCome=qrand()%3;
-            if(outCome==0)
-            {
-                goto Exit2;
-            }
-            else if(outCome==1)
+            int outCome=qrand()%10;
+            if(outCome==0){}
+            else if(outCome==1||outCome==2)
             {
                 answerLocs.push_back(m_deviceOperation->getDyanmicAnswerPos());
             }
-            else if(outCome==2)
+            else
             {
                 answerLocs.push_back(m_deviceOperation->getDyanmicAnswerPos());
                 answerLocs.push_back(m_deviceOperation->getDyanmicAnswerPos());
@@ -1119,9 +1145,10 @@ QVector<QPointF> DynamicCheck::waitForAnswer()
         }
         else
         {
-            answerLocs.push_back(m_deviceOperation->getDyanmicAnswerPos());
+            int outCome=qrand()%20;
+            if(outCome>1)
+                answerLocs.push_back(m_deviceOperation->getDyanmicAnswerPos());
         }
-        Exit2:
         m_checkedCount++;
         return answerLocs;
     }
@@ -1205,6 +1232,7 @@ void DynamicCheck::ProcessAnswer(QVector<QPointF> answerLoc,PathRecord& record)
         else if(answerLoc.length()==1)
         {
             startNode.isSeen=true;
+            startNode.end=answerLoc[0];
             endNode.isSeen=false;
         }
         else if(answerLoc.length()==2)
@@ -1214,15 +1242,18 @@ void DynamicCheck::ProcessAnswer(QVector<QPointF> answerLoc,PathRecord& record)
             startNode.end=answerLoc[0];
             endNode.end=answerLoc[1];
         }
-        nodeList.push_back(startNode);
-        nodeList.push_back(endNode);
+        nodeList[0]=startNode;
+        nodeList[1]=endNode;
+        qDebug()<<nodeList[0].end.toQPointF();
+        qDebug()<<nodeList[1].end.toQPointF();
     }
     else
     {
         DynamicDataNode node;
         if(answerLoc.length()==0)
         {
-
+            record.isAnswered=false;
+            record.answeredLoc=record.endLoc;
         }
         else if(answerLoc.length()==1)
         {
@@ -1234,7 +1265,8 @@ void DynamicCheck::ProcessAnswer(QVector<QPointF> answerLoc,PathRecord& record)
         node.start=record.beginLoc;
         node.end=record.answeredLoc;
         node.isSeen=record.isAnswered;
-        nodeList.push_back(node);
+        node.isChecked=true;
+        nodeList[record.index]=node;
 //        qDebug()<<m_resultModel->m_data.checkData.size();
 //        for(auto&i:m_resultModel->m_data.checkData)
 //        {
@@ -1312,6 +1344,11 @@ void CheckSvcWorker::doWork()
         {
             qDebug()<<("Checking");
             m_check->Checkprocess();
+            if(m_check->m_error)
+            {
+                setCheckState(3);
+                emit sendErrorInfo(m_check->m_errorInfo);
+            }
             if(m_check->m_checkedCount==m_check->m_totalCount) setCheckState(4);
             emit checkedCountChanged(m_check->m_checkedCount);
             emit checkResultChanged();
@@ -1363,6 +1400,12 @@ CheckSvc::CheckSvc(QObject *parent)
     connect(m_worker,&CheckSvcWorker::checkedCountChanged,this, &CheckSvc::setCheckedCount);
     connect(m_worker,&CheckSvcWorker::totalCountChanged,this, &CheckSvc::setTotalCount);
     connect(m_worker,&CheckSvcWorker::checkTimeChanged,this, &CheckSvc::setCheckTime);
+    connect(m_worker,&CheckSvcWorker::sendErrorInfo,this, [](QString errorInfo)
+    {
+        QMessageBox msgBox;
+        msgBox.setText(errorInfo);
+        msgBox.exec();
+    });
 //    connect(m_worker,&CheckSvcWorker::checkProcessFinished,this, [&](){m_checkResultVm->insert();});
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::isDeviceReadyChanged,this,&CheckSvc::devReadyChanged);
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::pupilDiameterChanged,this,&CheckSvc::pupilDiameterChanged);

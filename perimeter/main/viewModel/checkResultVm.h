@@ -97,6 +97,7 @@ class DynamicDataNodeVm:public QObject
     Q_PROPERTY(QPointF start READ getStart)
     Q_PROPERTY(QPointF end READ getEnd)
     Q_PROPERTY(bool isSeen READ getIsSeen)
+    Q_PROPERTY(bool isChecked READ getIsChecked)
 public:
     DynamicDataNodeVm(DynamicDataNode* data){setData(data);}
     ~DynamicDataNodeVm()=default;
@@ -104,6 +105,7 @@ public:
     QPointF getStart(){return QPointF{m_data->start.x,m_data->start.y};}
     QPointF getEnd(){return QPointF{m_data->end.x,m_data->end.y};}
     bool getIsSeen(){return m_data->isSeen;}
+    bool getIsChecked(){return m_data->isChecked;}
 
     void setData(DynamicDataNode* data){m_data=data;}
 private:

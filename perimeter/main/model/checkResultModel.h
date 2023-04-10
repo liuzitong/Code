@@ -54,6 +54,7 @@ struct DynamicDataNode
     Point start;
     Point end;
     bool isSeen;
+    bool isChecked;
 
     template<class Archive>
     void serialize(Archive& archive, const unsigned int version)
