@@ -314,20 +314,20 @@ Item{
                                 width: parent.width;height:patientInfo.rowHight;spacing: parent.width*0.02
                                 CusText{text:"*"+lt+qsTr("Patient ID")+" "; horizontalAlignment: Text.AlignRight ;width:parent.width*0.20;font.pointSize: fontPointSize;}
                                 LineEdit{id:newPatientId;width: parent.width*0.6;}
-                                CusButton{height: parent.height;width: height;imageSrc:"qrc:/Pics/base-svg/btn_find.svg"}
+                                CusButton{height: parent.height;width: height;imageSrc:"qrc:/Pics/base-svg/btn_find.svg";onClicked:{patientInfoListView.patientListModelVm.getPatientListByPatientId(newPatientId.text);}}
                             }
                             Row{
                                 id:newChineseNameRow;visible:false;width: parent.width;height:patientInfo.rowHight;spacing: parent.width*0.02
                                 CusText{text:"*"+lt+qsTr("Name")+" "; horizontalAlignment: Text.AlignRight ;width:parent.width*0.20;font.pointSize: fontPointSize;}
                                 LineEdit{id:newChineseName;width: parent.width*0.6}
-                                CusButton{height: parent.height;width: height;imageSrc:"qrc:/Pics/base-svg/btn_find.svg"}
+                                CusButton{height: parent.height;width: height;imageSrc:"qrc:/Pics/base-svg/btn_find.svg";onClicked:{patientInfoListView.patientListModelVm.getPatientListByName(newChineseName.text,dateFrom.text,dateTo.text);}}
                             }
 
                             Row{
                                 id:newEnglishFirstNameRow;visible:false;width: parent.width;height:patientInfo.rowHight;spacing: parent.width*0.02
                                 CusText{text:"*"+lt+qsTr("First name")+" "; horizontalAlignment: Text.AlignRight ;width:parent.width*0.20;font.pointSize: fontPointSize;}
                                 LineEdit{id:newEnglishFirstName;width: parent.width*0.6}
-                                CusButton{height: parent.height;width: height;imageSrc:"qrc:/Pics/base-svg/btn_find.svg"}
+                                CusButton{height: parent.height;width: height;imageSrc:"qrc:/Pics/base-svg/btn_find.svg";onClicked:{patientInfoListView.patientListModelVm.getPatientListByName(newEnglishFirstName.text+" "+newEnglishLastNameRow.text,dateFrom.text,dateTo.text);}}
                             }
 
                             Row{

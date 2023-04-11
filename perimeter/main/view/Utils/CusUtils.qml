@@ -30,4 +30,26 @@ Item{
         else
             return previousStr;
     }
+
+    function polarToOrth(dot)
+    {
+        var radius=dot.x;
+        var angle=dot.y;
+        return {x:radius*Math.cos(angle/180*Math.PI),y:radius*Math.sin(angle/180*Math.PI)}
+    }
+
+    function orthToPolar(dot)
+    {
+        var radius=Math.sqrt(Math.pow(dot.x,2)+Math.pow(dot.y,2));
+        if(radius===0) return {x:0,y:0}
+        var rad=Math.asin(dot.y/radius);
+        var angle=rad*(180/Math.PI);
+        if(dot.x<0)
+        {
+            if(dot.y>=0){angle=90+(90-angle);}
+            if(dot.y<0){angle=-90-(90+angle);}
+        }
+        if(angle<0) angle+=360;
+        return {x:radius,y:angle}
+    }
 }

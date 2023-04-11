@@ -500,10 +500,10 @@ void DynamicAnalysisVm::showReport(int report)
         for(int i=0;i<int(data.size());i++)
         {
             model->setData( model->index(i,0),data[i].name.c_str());
-            model->setData( model->index(i,1),QString::number(data[i].start.x,'f',0));
-            model->setData( model->index(i,2),QString::number(data[i].start.y,'f',0));
-            model->setData( model->index(i,3),QString::number(data[i].end.x,'f',0));
-            model->setData( model->index(i,4),QString::number(data[i].end.y,'f',0));
+            model->setData( model->index(i,1),QString::number(UtilitySvc::OrthToPolar(data[i].start.toQPointF()).x(),'f',0));
+            model->setData( model->index(i,2),QString::number(UtilitySvc::OrthToPolar(data[i].start.toQPointF()).y(),'f',0));
+            model->setData( model->index(i,3),QString::number(UtilitySvc::OrthToPolar(data[i].end.toQPointF()).x(),'f',0));
+            model->setData( model->index(i,4),QString::number(UtilitySvc::OrthToPolar(data[i].end.toQPointF()).y(),'f',0));
             model->setData( model->index(i,5),data[i].isSeen?tr("Seen"):tr("Unseen"));
         }
     }

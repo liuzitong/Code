@@ -1144,8 +1144,9 @@ void AnalysisSvc::drawDynamic(QVector<QPointF> values,QVector<QString> dotNames,
 
     for(int i=0;i<values.length();i++)
     {
-        auto begin=convertDegLocToPixLoc(UtilitySvc::getSingleton()->convertPolarToOrth(values[i]),range,img);
-        auto end=convertDegLocToPixLoc(UtilitySvc::getSingleton()->convertPolarToOrth(values[(i+1)%values.length()]),range,img);
+
+        auto begin=convertDegLocToPixLoc((values[i]),range,img);
+        auto end=convertDegLocToPixLoc((values[(i+1)%values.length()]),range,img);
         if(!dotNames.isEmpty())
         {
             painter.drawText(QPoint{begin.x()+fontPixSize/4,begin.y()-fontPixSize/4},dotNames[i]);

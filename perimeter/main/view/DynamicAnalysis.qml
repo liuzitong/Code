@@ -143,7 +143,12 @@ Item
                                         width:parent.width;height:scrollView.height/20;
                                         Repeater
                                         {
-                                            model:[modelData.name,modelData.start.x,modelData.start.y,modelData.end.x,modelData.end.y,modelData.isSeen?(lt+qsTr("Seen")):(lt+qsTr("UnSeen"))]
+                                            model:[modelData.name,
+                                                Math.round(CusUtils.orthToPolar(modelData.start).x),
+                                                Math.round(CusUtils.orthToPolar(modelData.start).y),
+                                                Math.round(CusUtils.orthToPolar(modelData.end).x),
+                                                Math.round(CusUtils.orthToPolar(modelData.end).y),
+                                                modelData.isSeen?(lt+qsTr("Seen")):(lt+qsTr("UnSeen"))]
                                             CusText{width:parent.width/6;height: parent.height;font.pointSize:fontPointSize;text:modelData;}
                                         }
                                     }
