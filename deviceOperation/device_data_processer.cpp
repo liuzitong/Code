@@ -59,10 +59,8 @@ CoordMotorPosFocalDistInfo DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoo
 
     Q_ASSERT((fourDots[0].motorX!=-1)&&(fourDots[1].motorX!=-1)&&(fourDots[2].motorX!=-1)&&(fourDots[3].motorX!=-1));
     isMainDotInfoTable?tableData=data.m_mainPosTableData:tableData=data.m_secondaryPosTableData;
-    fourDots[0]={tableData(y1*3,x1),tableData(y1*3+1,x1),tableData(y1*3+2,x1)};
-    fourDots[1]={tableData(y2*3,x1),tableData(y2*3+1,x1),tableData(y2*3+2,x1)};
-    fourDots[2]={tableData(y1*3,x2),tableData(y1*3+1,x2),tableData(y1*3+2,x2)};
-    fourDots[3]={tableData(y2*3,x2),tableData(y2*3+1,x2),tableData(y2*3+2,x2)};
+    fourDots[0]={tableData(y1*3,x1),tableData(y1*3+1,x1),tableData(y1*3+2,x1)};fourDots[1]={tableData(y1*3,x2),tableData(y1*3+1,x2),tableData(y1*3+2,x2)};
+    fourDots[2]={tableData(y2*3,x1),tableData(y2*3+1,x1),tableData(y2*3+2,x1)};fourDots[3]={tableData(y2*3,x2),tableData(y2*3+1,x2),tableData(y2*3+2,x2)};
     QPointF locInterpol(loc.x()-(x1-15)*6,-loc.y()-(y1-15)*6);         //算出比格子位置多多少
 //    qDebug()<<"loc is:"<<locInterpol;
     int arr[4];

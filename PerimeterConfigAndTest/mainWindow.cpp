@@ -119,9 +119,8 @@ void MainWindow::initDevCtl()
     ui->checkBox_IO->setChecked(m_settings.m_updateIOInfo);
     ui->checkBox_startRefreshInfo->setChecked(m_settings.m_updateRefreshIOInfo);
     ui->checkBox_RefreshIO->setChecked(m_settings.m_updateRefreshIOInfo);
-
-    connect(this,&MainWindow::updateInfo,this,&MainWindow::showDevInfo);
 }
+
 
 void MainWindow::initData()
 {
@@ -703,6 +702,7 @@ void MainWindow::on_pushButton_testStart_clicked()
             int spotSlot=ui->spinBox_spotSlot->value()-1;
             int speedLevel=ui->spinBox_speedLevel->value();
             dynamicCastTest(dotBegin,dotEnd,spotSlot,speedLevel);
+            if(waitForAnswer()) {showDevInfo("dynamic answered.");}
             break;
         }
     }
@@ -1494,43 +1494,63 @@ void MainWindow::dynamicCastTest(const CoordSpacePosInfo& dotSpaceBegin,const Co
     float stepLengthX,stepLengthY;
     float distX=dotSpaceEnd.coordX-dotSpaceBegin.coordX;
     float distY=dotSpaceEnd.coordY-dotSpaceBegin.coordY;
+    CoordSpacePosInfo coordSpacePosInfoTemp=dotSpaceBegin;
+    CoordMotorPosFocalDistInfo coordMotorPosFocalDistInfoTemp;
+    getXYMotorPosAndFocalDistFromCoord(dotSpaceBegin,coordMotorPosFocalDistInfoTemp);
+    auto focalMotorPos=getFocusMotorPosByDist(coordMotorPosFocalDistInfoTemp.focalDist,spotSlot);
+    int motorPos[5];
+    motorPos[0]=coordMotorPosFocalDistInfoTemp.motorX;
+    motorPos[1]=coordMotorPosFocalDistInfoTemp.motorY;
+    motorPos[2]=focalMotorPos;
+    waitMotorStop({UsbDev::DevCtl::MotorId_Color,
+                   UsbDev::DevCtl::MotorId_Light_Spot,
+                   UsbDev::DevCtl::MotorId_Focus,
+                   UsbDev::DevCtl::MotorId_X,
+                   UsbDev::DevCtl::MotorId_Y
+                   });
+    quint8 sps[5];
+    sps[0]=ui->spinBox_XMotorSpeed_2->value();
+    sps[1]=ui->spinBox_YMotorSpeed_2->value();
+    sps[2]=ui->spinBox_focalMotorSpeed_2->value();
+    sps[3]=0;
+    sps[4]=0;
+    m_devCtl->move5Motors(sps,motorPos);
     int stepCount;
     if(std::abs(distX)>std::abs(distY))
     {
         distX>0?stepLengthX=stepLength:stepLengthX=-stepLength;
-        stepCount=qCeil(distX/stepLengthX)+1;
+        stepCount=qCeil(distX/stepLengthX);
     }
     else
     {
         distY>0?stepLengthY=stepLength:stepLengthY=-stepLength;
-        stepCount=qCeil(distY/stepLengthY)+1;
+        stepCount=qCeil(distY/stepLengthY);
     }
 
     stepLengthX=distX/stepCount;
     stepLengthY=distY/stepCount;
 
     int* dotArr=new int[stepCount*3];
-    CoordSpacePosInfo coordSpacePosInfoTemp=dotSpaceBegin;
-    CoordMotorPosFocalDistInfo coordMotorPosFocalDistInfoTemp;
-    updateInfo(QString("分割为%1步,X步长为%2,Y步长为%3.").arg(QString::number(stepCount)).arg(QString::number(stepLengthX)).arg(QString::number(stepLengthY)));
+
+    showDevInfo(QString("分割为%1步,X步长为%2,Y步长为%3.").arg(QString::number(stepCount)).arg(QString::number(stepLengthX)).arg(QString::number(stepLengthY)));
 
     for(int i=0;i<stepCount;i++)
     {
+        coordSpacePosInfoTemp.coordX+=stepLengthX;
+        coordSpacePosInfoTemp.coordY+=stepLengthY;
         getXYMotorPosAndFocalDistFromCoord(coordSpacePosInfoTemp,coordMotorPosFocalDistInfoTemp);
         dotArr[i*3+0]=coordMotorPosFocalDistInfoTemp.motorX;
         dotArr[i*3+1]=coordMotorPosFocalDistInfoTemp.motorY;
         dotArr[i*3+2]=getFocusMotorPosByDist(coordMotorPosFocalDistInfoTemp.focalDist,spotSlot);
-        updateInfo((QString("第%1个点,X坐标:%2,Y坐标:%3,X电机坐标%4,Y电机坐标%5,焦距电机坐标%6.")
+        showDevInfo((QString("第%1个点,X坐标:%2,Y坐标:%3,X电机坐标%4,Y电机坐标%5,焦距电机坐标%6.")
                    .arg(QString::number(i)).arg(QString::number(coordSpacePosInfoTemp.coordX)).arg(QString::number(coordSpacePosInfoTemp.coordY)).arg(QString::number( dotArr[i*3+0])).
                     arg(QString::number( dotArr[i*3+1])).arg(QString::number( dotArr[i*3+2]))));
-        coordSpacePosInfoTemp.coordX+=stepLengthX;
-        coordSpacePosInfoTemp.coordY+=stepLengthY;
     }
 
-    updateInfo(("发送移动数据"));
+    showDevInfo(("发送移动数据"));
     constexpr int stepPerFrame=(512-8)/(4*3);
     int totalframe=ceil((float)stepCount/stepPerFrame);
-    updateInfo(QString("分割为%1帧").arg(QString::number(totalframe)));
+    showDevInfo(QString("分割为%1帧").arg(QString::number(totalframe)));
     for(int i=0;i<totalframe-1;i++)
     {
 //        qDebug()<<QString::pointer(&dotArr[stepPerFrame*3*i]);
@@ -1550,9 +1570,31 @@ void MainWindow::dynamicCastTest(const CoordSpacePosInfo& dotSpaceBegin,const Co
 
     int dataLen= (stepCount%stepPerFrame)*3*4+8;
     m_devCtl->sendDynamicData(totalframe,totalframe-1,dataLen,&dotArr[stepPerFrame*3*(totalframe-1)]);     //最后一帧
-    updateInfo(("开始移动"));
+    showDevInfo(("开始移动"));
+    waitMotorStop({UsbDev::DevCtl::MotorId_Color,
+                   UsbDev::DevCtl::MotorId_Light_Spot,
+                   UsbDev::DevCtl::MotorId_Focus,
+                   UsbDev::DevCtl::MotorId_X,
+                   UsbDev::DevCtl::MotorId_Y
+                   });
     m_devCtl->startDynamic(speedLevel,speedLevel,speedLevel,stepTime,stepCount);    //开始
     delete[] dotArr;
+}
+
+bool MainWindow::waitForAnswer()
+{
+    while(!m_statusData.moveStutas())
+        QApplication::processEvents();          //等待刷新状态
+    while(m_statusData.moveStutas())
+    {
+        if(m_statusData.answerpadStatus())
+        {
+            m_devCtl->stopDyanmic();
+            return true;
+        }
+        QApplication::processEvents();
+    }
+    return false;
 }
 
 

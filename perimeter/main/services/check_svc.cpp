@@ -707,17 +707,19 @@ bool StaticCheck::waitForAnswer()
     }
 
 
-    UtilitySvc::wait(m_programModel->m_params.fixedParams.leastWaitingTime);                //最小等待时间
+
     bool answer=false;
     while(elapsedTimer.elapsed()<waitTime)   //应答时间内
     {
         if(m_deviceOperation->getAnswerPadStatus())
         {
             answer=true;
+            UtilitySvc::wait(m_programModel->m_params.fixedParams.leastWaitingTime);                //最小等待时间
             break;                    //时间内应答
         }
         else QApplication::processEvents();
     }
+
     m_answeredTimes.append(elapsedTimer.elapsed());
     qDebug()<<"answer Time is:"+QString::number(elapsedTimer.elapsed());
     return answer;                       //超出时间应答
@@ -799,7 +801,7 @@ void StaticCheck::ProcessAnswer(bool answered)
         {
             if(boundDistance>6)
             {
-                answered?lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->lowerBound+6):lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->upperBound-6);
+                answered?lastCheckedDot->StimulationDBs.push_back(qMin(lastCheckedDot->lowerBound+6,MaxDB)):lastCheckedDot->StimulationDBs.push_back(qMax(lastCheckedDot->upperBound-6,MinDB));
             }
             else if(boundDistance<=6&&boundDistance>3)
             {
@@ -816,7 +818,7 @@ void StaticCheck::ProcessAnswer(bool answered)
         {
             if(boundDistance>4)
             {
-                answered?lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->lowerBound+4):lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->upperBound-4);
+                answered?lastCheckedDot->StimulationDBs.push_back(qMin(lastCheckedDot->lowerBound+4,MaxDB)):lastCheckedDot->StimulationDBs.push_back(qMax(lastCheckedDot->upperBound-4,MinDB));
             }
             else if(boundDistance<=4&&boundDistance>2)
             {
@@ -844,7 +846,7 @@ void StaticCheck::ProcessAnswer(bool answered)
         {
             if(boundDistance>3)
             {
-                answered?lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->lowerBound+3):lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->upperBound-3);
+                answered?lastCheckedDot->StimulationDBs.push_back(qMin(lastCheckedDot->lowerBound+3,MaxDB)):lastCheckedDot->StimulationDBs.push_back(qMax(lastCheckedDot->upperBound-3,MinDB));
             }
             else if(boundDistance<=3)
             {
@@ -893,7 +895,7 @@ void StaticCheck::ProcessAnswer(bool answered)
                 }
                 else
 //                    lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->lowerBound+3);
-                    answered?lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->lowerBound+3):lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->upperBound-3);
+                    answered?lastCheckedDot->StimulationDBs.push_back(qMin(lastCheckedDot->lowerBound+3,MaxDB)):lastCheckedDot->StimulationDBs.push_back(qMax(lastCheckedDot->upperBound-3,MinDB));
             }
             if(boundDistance<=3)
             {
@@ -1087,6 +1089,7 @@ void DynamicCheck::initialize()
     m_deviceOperation->m_isChecking=true;
     auto cursorSize=m_programModel->m_params.cursorSize;
     auto cursorColor=m_programModel->m_params.cursorColor;
+    qDebug()<<m_programModel->m_params.brightness;
     if(m_deviceOperation->m_isDeviceReady)
     {
         m_deviceOperation->setCursorColorAndCursorSize(int(cursorColor),int(cursorSize));
@@ -1152,7 +1155,8 @@ QVector<QPointF> DynamicCheck::waitForAnswer()
         m_checkedCount++;
         return answerLocs;
     }
-    UtilitySvc::wait(50);  //刷新下状态
+    while(!m_deviceOperation->getDynamicMoveStatus())
+        QApplication::processEvents();          //等待刷新状态
     QVector<QPointF> answerLocs;
     if(m_programModel->m_params.strategy==DynamicParams::Strategy::straightLine)
     {
@@ -1205,10 +1209,13 @@ QVector<QPointF> DynamicCheck::waitForAnswer()
                 m_deviceOperation->stopDynamic();
                 goto Exit;
             }
+//            qDebug()<<"events in";
             QApplication::processEvents();
+//            qDebug()<<"events out";
         }
     }
     Exit:
+    m_deviceOperation->openShutter(0);
     m_checkedCount++;
     return answerLocs;
 }
@@ -1319,6 +1326,12 @@ void CheckSvcWorker::initialize()
     }
 }
 
+//void CheckSvcWorker::doWork()
+//{
+//    initialize();
+//    m_check->initialize();
+//}
+
 void CheckSvcWorker::doWork()
 {
     *m_checkState=0;
@@ -1389,6 +1402,8 @@ void CheckSvcWorker::doWork()
         };
     }
 }
+
+
 CheckSvc::CheckSvc(QObject *parent)
 {
     m_worker = new CheckSvcWorker();

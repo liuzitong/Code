@@ -3,7 +3,7 @@ include( $$PWD/../usbdev-build/usbdev/usbdev.pri )
 #include( $$PWD/defines.pri )
 QT       += core
 QT *= gui
-
+QT += widgets
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
     DESTDIR =$$PWD/bin/debug

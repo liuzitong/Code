@@ -52,7 +52,7 @@ public:
     int getCheckState(){return m_checkState;} void setCheckState(int value){m_checkState=value;emit checkStateChanged();}Q_SIGNAL void checkStateChanged();
     int getCheckedCount(){return m_checkedCount;}void setCheckedCount(int value){m_checkedCount=value;emit checkedCountChanged();}Q_SIGNAL void checkedCountChanged();
     int getTotalCount(){return m_totalCount;}void setTotalCount(int value){m_totalCount=value;emit totalCountChanged();}Q_SIGNAL void totalCountChanged();
-    int getCheckTime(){return m_checkTime;}void setCheckTime(int value){m_checkTime=value;qDebug()<<"checkTime:"+QString::number(m_checkTime);emit checkTimeChanged();}Q_SIGNAL void checkTimeChanged();
+    int getCheckTime(){return m_checkTime;}void setCheckTime(int value){m_checkTime=value;/*qDebug()<<"checkTime:"+QString::number(m_checkTime);*/emit checkTimeChanged();}Q_SIGNAL void checkTimeChanged();
     bool getDevReady();Q_SIGNAL void devReadyChanged();
     bool getAutoAlignPupil();void setAutoAlignPupil(bool autoAlign);Q_SIGNAL void autoAlignPupilChanged();
     float getPupilDiameter();Q_SIGNAL void pupilDiameterChanged();

@@ -32,9 +32,13 @@ void TestClass::test()
 //    serialization();
 //    DevOps::DeviceOperation::getSingleton()->hello();
 
-    QMessageBox msgBox;
-     msgBox.setText("The document has been modified.");
-     msgBox.exec();
+//    QMessageBox msgBox;
+//     msgBox.setText("The document has been modified.");
+//     msgBox.exec();
+
+     DevOps::DeviceOperation::getSingleton()->dynamicStimulate({-8,20},{0,0},1,1,true);
+//    DevOps::DeviceOperation::getSingleton()->dynamicStimulate({0,0},{30,30},1,1,true);
+
 
 }
 

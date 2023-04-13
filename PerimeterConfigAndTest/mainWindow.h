@@ -32,7 +32,6 @@ public:
 
 private:signals:
     void updateRefreshInfo(QString str);
-    void updateInfo(QString str);
 
 private slots:
     void showDevInfo(QString);
@@ -183,6 +182,7 @@ private:
     bool getXYMotorPosAndFocalDistFromCoord(const CoordSpacePosInfo& coordSpacePosInfo,CoordMotorPosFocalDistInfo& coordMotorPosFocalDistInfo);
     void staticCastTest(const CoordMotorPosFocalDistInfo& dot,int focalMotorPos,int db,quint8* sps,int durationTime,int shutterPos);
     void dynamicCastTest(const CoordSpacePosInfo& dotSpaceBegin,const CoordSpacePosInfo& dotSpaceEnd,int spotSlot,int speedLevel);
+    bool waitForAnswer();
     void init();
     void initDevCtl();
     void uninitDevCtl();

@@ -156,8 +156,15 @@ ModalPopupDialog/* Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                        width: parent.width; height:parent.parent.rowHeight;
                                        CusText{text:lt+qsTr("Move brightness"); anchors.left: parent.left; anchors.leftMargin: 0;width: parent.width*0.4;horizontalAlignment: Text.AlignLeft;font.pointSize: fontPointSize;}
                                        NumberLineEdit{
-                                           width: parent.width*0.5; anchors.right: parent.right;readOnly: false;step:1;max:51;min:0;value:currentProgram===null?0:currentProgram.params.brightness;
-                                           Component.onCompleted: {idPopup.ok.connect(function(){currentProgram.params.brightness=value;idPopup.currentProgramChanged.connect(function(){value=currentProgram.params.brightness;});}) }
+                                           width: parent.width*0.5; anchors.right: parent.right;step:1;max:51;min:0;value:currentProgram.params.brightness;
+                                           Component.onCompleted:
+                                           {
+                                               idPopup.ok.connect(function(){currentProgram.params.brightness=value;});
+                                               idPopup.currentProgramChanged.connect(function(){
+                                                   value=currentProgram.params.brightness
+                                                   console.log(value);
+                                                   ;})
+                                           }
                                        }
                                    }
                                    Item{

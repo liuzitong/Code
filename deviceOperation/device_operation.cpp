@@ -6,6 +6,7 @@
 #include <QtCore>
 #include <array>
 #include <QtMath>
+#include <QApplication>
 //#include <QQmlEngine>
 
 #pragma execution_character_set("utf-8")
@@ -154,12 +155,14 @@ void DeviceOperation::setWhiteLamp(bool onOff)
 
 bool DeviceOperation::getAnswerPadStatus()
 {
-    return m_statusData.answerpadStatus();
+        return m_statusData.answerpadStatus();
+//    return m_devCtl->takeNextPendingStatusData().answerpadStatus();
 }
 
 bool DeviceOperation::getDynamicMoveStatus()
 {
     return m_statusData.moveStutas();
+//    return m_devCtl->takeNextPendingStatusData().moveStutas();
 }
 
 QPointF DeviceOperation::getDyanmicAnswerPos()
@@ -177,7 +180,7 @@ QPointF DeviceOperation::getDyanmicAnswerPos()
         auto dist=pow(i.second.x()-posX,2)+pow(i.second.y()-posY,2);
         if(dist<nearestDist)
         {
-            dist=nearestDist;
+            nearestDist=dist;
             dot=i.first;
         }
     }
@@ -205,13 +208,16 @@ void DeviceOperation::setDB(int DB)
 {
     if(!m_isDeviceReady) return;
     if(m_status.DB==DB) return;
-    auto config=m_devCtl->config();
+//    auto config=m_devCtl->config();
+    UsbDev::Config config;
+    config=m_config;
     quint8 sps[5]{0};
     int motorPos[5]{0};
     motorPos[3]=config.DbPosMappingPtr()[DB][0];
     motorPos[4]=config.DbPosMappingPtr()[DB][1];
     auto spsConfig=DeviceSettings::getSingleton()->m_5MotorSpeed;
     sps[3]=spsConfig[3];sps[4]=spsConfig[4];
+    waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_Light_Spot});
     m_devCtl->move5Motors(sps,motorPos);
     m_status.DB=DB;
 }
@@ -337,6 +343,7 @@ void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB,bool
 
 void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSize,int speedLevel,bool isMainDotInfoTable)
 {
+    isMainDotInfoTable=true;
     auto spotSizeToSlot=DeviceSettings::getSingleton()->m_spotSizeToSlot;
     int spotSlot;
     for(auto&i:spotSizeToSlot)
@@ -345,8 +352,22 @@ void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSiz
             spotSlot=i.second;
     }
 
+    auto beginPos=DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoord(begin,isMainDotInfoTable);
+    auto focalMotorPos=DeviceDataProcesser::getFocusMotorPosByDist(beginPos.focalDist,spotSlot);
+    bool isMotorMove[5]{true,true,true,false,false};
+    int motorPos[5];
+    motorPos[0]=beginPos.motorX;
+    motorPos[1]=beginPos.motorY;
+    motorPos[2]=focalMotorPos;
+    waitMotorStop({UsbDev::DevCtl::MotorId_Color,
+                   UsbDev::DevCtl::MotorId_Light_Spot,
+                   UsbDev::DevCtl::MotorId_Focus,
+                   UsbDev::DevCtl::MotorId_X,
+                   UsbDev::DevCtl::MotorId_Y
+                   });
+    move5Motors(isMotorMove,motorPos);
     auto data=DeviceData::getSingleton()->m_localTableData.m_dynamicLenAndTimeData;
-    auto stepLength=data(speedLevel,0);
+    auto stepLength=data(speedLevel,0)*0.01;
     auto stepTime=data(speedLevel,1);
     float stepLengthX,stepLengthY;
     float distX=end.x()-begin.x();
@@ -356,12 +377,12 @@ void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSiz
     if(std::abs(distX)>std::abs(distY))
     {
         distX>0?stepLengthX=stepLength:stepLengthX=-stepLength;
-        stepCount=qCeil(distX/stepLengthX)+1;
+        stepCount=qCeil(distX/stepLengthX);
     }
     else
     {
         distY>0?stepLengthY=stepLength:stepLengthY=-stepLength;
-        stepCount=qCeil(distY/stepLengthY)+1;
+        stepCount=qCeil(distY/stepLengthY);
     }
 
     stepLengthX=distX/stepCount;
@@ -370,10 +391,20 @@ void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSiz
     int* dotArr=new int[stepCount*3];
     QPointF coordSpacePosInfoTemp=begin;
     CoordMotorPosFocalDistInfo coordMotorPosFocalDistInfoTemp;
-    qDebug()<<QString("分割为%1个点,X步长为%2,Y步长为%3.").arg(QString::number(stepCount)).
-                arg(QString::number(stepLengthX)).arg(QString::number(stepLengthY));
+
+//    if(isMainDotInfoTable)
+//    {
+//        qDebug()<<"正表";
+//    }
+//    else
+//    {
+//        qDebug()<<"附表";
+//    }
+    qDebug()<<QString("分割为%1个点,X步长为%2,Y步长为%3.").arg(QString::number(stepCount)).arg(QString::number(stepLengthX)).arg(QString::number(stepLengthY));
 
     m_lastDynamicCoordAndXYMotorPos.resize(stepCount);
+
+
     for(int i=0;i<stepCount;i++)
     {
         coordSpacePosInfoTemp.rx()+=stepLengthX;
@@ -382,8 +413,12 @@ void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSiz
         dotArr[i*3+0]=coordMotorPosFocalDistInfoTemp.motorX;
         dotArr[i*3+1]=coordMotorPosFocalDistInfoTemp.motorY;
         dotArr[i*3+2]=DeviceDataProcesser::getFocusMotorPosByDist(coordMotorPosFocalDistInfoTemp.focalDist,spotSlot);
+        qDebug()<<QString("第%1个点,X坐标:%2,Y坐标:%3,X电机坐标%4,Y电机坐标%5,焦距电机坐标%6.")
+                   .arg(QString::number(i)).arg(QString::number( coordSpacePosInfoTemp.x())).arg(QString::number(coordSpacePosInfoTemp.y())).
+                    arg(QString::number( dotArr[i*3+0])).arg(QString::number( dotArr[i*3+1])).arg(QString::number( dotArr[i*3+2]));
         m_lastDynamicCoordAndXYMotorPos[i]={coordSpacePosInfoTemp,{coordMotorPosFocalDistInfoTemp.motorX,coordMotorPosFocalDistInfoTemp.motorY}};
 //        qDebug()<<m_lastDynamicCoordAndXYMotorPos[i];
+
     }
 
 
@@ -413,18 +448,40 @@ void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSiz
 //    qDebug()<<dotArr[(stepCount-1)*3+2];
 
     int dataLen= (stepCount%stepPerFrame)*3*4+8;
+    constexpr int openForever=65535;
     if(m_isDeviceReady)
+    {
+        waitMotorStop({UsbDev::DevCtl::MotorId_Color,
+                       UsbDev::DevCtl::MotorId_Light_Spot,
+                       UsbDev::DevCtl::MotorId_Focus,
+                       UsbDev::DevCtl::MotorId_X,
+                       UsbDev::DevCtl::MotorId_Y
+                       });
+        openShutter(openForever);
         m_devCtl->sendDynamicData(totalframe,totalframe-1,dataLen,&dotArr[stepPerFrame*3*(totalframe-1)]);     //最后一帧
+    }
+    waitForSomeTime(1000);
+
     qDebug()<<("开始移动");
     auto config=DeviceData::getSingleton()->m_config;
     if(m_isDeviceReady)
+    {
+        waitMotorStop({UsbDev::DevCtl::MotorId_Color,
+                       UsbDev::DevCtl::MotorId_Light_Spot,
+                       UsbDev::DevCtl::MotorId_Focus,
+                       UsbDev::DevCtl::MotorId_X,
+                       UsbDev::DevCtl::MotorId_Y
+                       });
+
         m_devCtl->startDynamic(speedLevel,speedLevel,speedLevel,stepTime,stepCount);    //开始
+    }
     delete[] dotArr;
 }
 
 void DeviceOperation::stopDynamic()
 {
     if(!m_isDeviceReady) return;
+    qDebug()<<"stop Dynamic";
     m_devCtl->stopDyanmic();
 }
 
@@ -460,7 +517,8 @@ void DeviceOperation::move5Motors(bool isMotorMove[], int MotorPoses[])
             sps[i]=spsConfig[i];
         }
     }
-    m_devCtl->move5Motors(sps,MotorPoses);
+    if(m_isDeviceReady)
+        m_devCtl->move5Motors(sps,MotorPoses);
 }
 
 void DeviceOperation::hello()
@@ -472,11 +530,12 @@ void DeviceOperation::hello()
 
 void DeviceOperation::waitMotorStop(QVector<UsbDev::DevCtl::MotorId> motorIDs)
 {
+    if(!m_isDeviceReady) return;
     QElapsedTimer mstimer;
     mstimer.restart();//必须先等一会儿刷新状态
     do
     {
-        QCoreApplication::processEvents();
+        QApplication::processEvents();
     }while(getMotorsBusy(motorIDs)||(mstimer.elapsed()<50)); //50ms
     //    while(getBusy()){QCoreApplication::processEvents();}
 }
@@ -487,7 +546,7 @@ void DeviceOperation::waitForSomeTime(int time)
     mstimer.restart();
     do
     {
-        QCoreApplication::processEvents();
+        QApplication::processEvents();
     }while(mstimer.elapsed()<time);
 }
 
@@ -555,12 +614,18 @@ void DeviceOperation::workOnNewStatuData()
         setLamp(LampId::LampId_eyeglassInfrared,0,false);
         setLamp(LampId::LampId_borderInfrared,0,false);
     }
+//    qDebug()<<m_statusData.answerpadStatus();
 //    m_statusLock.unlock();
 //    static int count=1;
 //    count++;
 //    if(count%50==0)
 //    {
 //        qDebug()<<"workOnNewStatusData:"+QString::number(int(thread()->currentThread()),16);
+//    }
+
+//    if(m_statusData.answerpadStatus()==true){
+
+//        stopDynamic();
 //    }
     emit newStatusData();
 }

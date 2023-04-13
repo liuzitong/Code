@@ -44,8 +44,10 @@ Item {id:root; width: 1366;height: 691
             else
                 currentProgram=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::DynamicProgramVM", false,[program_id]);
         }
-        currentProgramChanged();         //不知道为毛需要主动触发,还必须放外面
         program_type!==2?staticParamsSetting.currentProgram=currentProgram:dynamicParamsSetting.currentProgram=currentProgram;
+        dynamicParamsSetting.currentProgramChanged();                       //不知道为毛这里要触发一次
+        staticParamsSetting.currentProgramChanged();
+        root.currentProgramChanged();
         if(currentCheckResult!=null)
         {
             if(currentProgram.type!==2)
@@ -71,6 +73,8 @@ Item {id:root; width: 1366;height: 691
                     else
                         IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::DynamicCheckResultVm",currentCheckResult);
                     currentCheckResult=null;
+
+
                 }
             }
             DynamicParamsSetting{id:dynamicParamsSetting;anchors.fill: parent;
@@ -383,7 +387,13 @@ Item {id:root; width: 1366;height: 691
                                     }
                                     chooseProgram.open();
                                 }}
-                            CusButton{id:paramsSetting;text:lt+qsTr("Params setting");enabled:(currentProgram!==null&&IcUiQmlApi.appCtrl.checkSvc.checkState>=3);width:IcUiQmlApi.appCtrl.settings.isRuntimeLangEng?height*4:height*2.5;onClicked:if(currentProgram.type!==2){ staticParamsSetting.open();} else  { dynamicParamsSetting.open();}}
+                            CusButton{
+                                id:paramsSetting;
+                                text:lt+qsTr("Params setting");
+                                enabled:(currentProgram!==null&&IcUiQmlApi.appCtrl.checkSvc.checkState>=3);
+                                width:IcUiQmlApi.appCtrl.settings.isRuntimeLangEng?height*4:height*2.5;
+                                onClicked:if(currentProgram.type!==2){ staticParamsSetting.open();} else {/*dynamicParamsSetting.currentProgramChanged();console.log(currentProgram.params.brightness);*/dynamicParamsSetting.open();}
+                            }
                         }
                     }
                 }

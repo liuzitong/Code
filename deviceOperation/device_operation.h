@@ -116,6 +116,7 @@ public:
     QByteArray m_frameRawData;
     QElapsedTimer m_shutterElapsedTimer;
     int m_shutterElapsedTime;
+
 private:
     float m_pupilDiameter=-1;
     QVector<float> m_pupilDiameterArr;

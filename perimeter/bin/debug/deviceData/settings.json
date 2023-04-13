@@ -9,7 +9,7 @@
     "pupilPixelDiameterLimit":40,
     "pupilDiameterPixelToMillimeterConstant":0.171875,
     "pupilDiameterPixelToFixationDeviationConstant":0.25,
-    "motorSpeed":[1,1,1,1,1,1,1],
+    "motorSpeed":[3,3,1,1,1,1,1],
     "colorToSlot": [
         {"Color": 0,"Slot": 1},
         {"Color": 0,"Slot": 1},
