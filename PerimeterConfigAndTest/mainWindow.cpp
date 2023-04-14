@@ -1166,13 +1166,18 @@ void MainWindow::on_checkBox_RefreshIO_stateChanged(int arg1)
 void MainWindow::on_rawComand_clicked()
 {
     auto text=ui->plainTextEdit_rawCommand->toPlainText();
-    text.remove(QRegExp("\\s* +$"));
+    text=text.trimmed();
     auto strings=text.split(" ");
     QByteArray ba;
     bool ok;
     for(auto&i:strings)
     {
-        quint8 byte=i.toUInt(&ok,16);
+        auto locAndValue=i.split(':');
+        quint8 byte;
+        if(locAndValue.length()==2)
+            byte=locAndValue[1].toUInt(&ok,16);
+        else
+            byte=i.toUInt(&ok,16);
         ba.append(byte);
     }
     if(ok)
@@ -1548,28 +1553,23 @@ void MainWindow::dynamicCastTest(const CoordSpacePosInfo& dotSpaceBegin,const Co
     }
 
     showDevInfo(("发送移动数据"));
-    constexpr int stepPerFrame=(512-8)/(4*3);
+    constexpr int maxPackageLen=512;
+    constexpr int stepPerFrame=(maxPackageLen-8)/(4*3);
     int totalframe=ceil((float)stepCount/stepPerFrame);
     showDevInfo(QString("分割为%1帧").arg(QString::number(totalframe)));
     for(int i=0;i<totalframe-1;i++)
-    {
-//        qDebug()<<QString::pointer(&dotArr[stepPerFrame*3*i]);
-//        qDebug()<<dotArr[stepPerFrame*3*i];
-//        qDebug()<<dotArr[stepPerFrame*3*i+1];
-//        qDebug()<<dotArr[stepPerFrame*3*i+2];
-
-//        qDebug()<<dotArr[stepPerFrame*3*(i+1)-3];
-//        qDebug()<<dotArr[stepPerFrame*3*(i+1)-2];
-//        qDebug()<<dotArr[stepPerFrame*3*(i+1)-1];
         m_devCtl->sendDynamicData(totalframe,i,512,&dotArr[stepPerFrame*3*i]);                        //一般帧
-    }
 
 //    qDebug()<<dotArr[(stepCount-1)*3];
 //    qDebug()<<dotArr[(stepCount-1)*3+1];
 //    qDebug()<<dotArr[(stepCount-1)*3+2];
 
-    int dataLen= (stepCount%stepPerFrame)*3*4+8;
+    int remainStep=stepCount-stepPerFrame*(totalframe-1);
+    int dataLen= remainStep*3*4+8;
+    qDebug()<<dataLen;
     m_devCtl->sendDynamicData(totalframe,totalframe-1,dataLen,&dotArr[stepPerFrame*3*(totalframe-1)]);     //最后一帧
+
+//    m_devCtl->sendDynamicData(1,0,512,&dotArr[0]);     //最后一帧
     showDevInfo(("开始移动"));
     waitMotorStop({UsbDev::DevCtl::MotorId_Color,
                    UsbDev::DevCtl::MotorId_Light_Spot,

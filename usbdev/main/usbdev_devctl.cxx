@@ -1247,7 +1247,7 @@ void DevCtl::openShutter(quint16 durationTime, qint32 coord_shutter)
     gPutInt32(&ptr[4],coord_shutter);
     QMetaObject::invokeMethod(
         T_PrivPtr( m_obj )->wkrPtr(), "cmd_GeneralCmd", Qt::QueuedConnection,
-        Q_ARG( QByteArray, ba),Q_ARG( QString,QString("打开快门")),Q_ARG( quint32, 5 )
+        Q_ARG( QByteArray, ba),Q_ARG( QString,QString("打开快门")),Q_ARG( quint32, 8 )
                 );
 }
 
