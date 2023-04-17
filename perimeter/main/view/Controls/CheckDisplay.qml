@@ -347,6 +347,8 @@ Item{
         function drawShortFlucDB(db,dot)
         {
             var pixDot=dotToPixCoord(dot);
+            if(db===-999) db="<0";
+            if(db===999) db=">51";
             drawText("("+db+")",pixDot.x,pixDot.y+fontPointSize*1.5);
         }
 
@@ -615,10 +617,19 @@ Item{
                     dBList=currentCheckResult.resultData.checkData;
                     for(i=0;i<dBList.length;i++)
                     {
-                        if(i<dotList.length)                                            //一般结果,和中心点
+                        if(i<dotList.length)                                            //一般结果
                         {
                             if(dBList[i]===-1)
                                 drawDot(dotList[i],"white");
+                            else if(dBList[i]===-999)
+                            {
+                                console.log("haha");
+                                 drawText("<0",dotToPixCoord(dotList[i]).x,dotToPixCoord(dotList[i]).y)
+
+                            }
+
+                            else if(dBList[i]===999)
+                                drawText(">51",dotToPixCoord(dotList[i]).x,dotToPixCoord(dotList[i]).y)
                             else
                                 drawDB(dBList[i],dotList[i]);
                         }
@@ -628,8 +639,12 @@ Item{
                         }
                         else if(i===dotList.length*2)                           //中心点
                         {
-                            if(dBList[i]!==-1)
-                                drawDB(dBList[i],{x:0,y:0});
+                            if(dBList[i]===-999)
+                                drawText("<0",dotToPixCoord(dotList[i]).x,dotToPixCoord(dotList[i]).y)
+                            else if(dBList[i]===999)
+                                drawText(">51",dotToPixCoord(dotList[i]).x,dotToPixCoord(dotList[i]).y)
+                            else  if(dBList[i]!==-1)
+                                drawDB(dBList[i],dotList[i]);
                         }
 
                     }

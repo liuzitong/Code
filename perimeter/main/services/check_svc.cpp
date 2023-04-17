@@ -283,10 +283,10 @@ void StaticCheck::initialize()
                 stimulationDBs={m_utilitySvc->getExpectedDB(m_value_30d,{dot.x,dot.y},m_resultModel->m_OS_OD)+DBChanged};
             }
 
-            m_dotRecords.push_back(DotRecord{i,QPointF{dot.x,dot.y},stimulationDBs,-1,{},isBaseDot,false,MinDB,MaxDB});
+            m_dotRecords.push_back(DotRecord{i,QPointF{dot.x,dot.y},stimulationDBs,-1,{},isBaseDot,false,-999,999});
         }
 
-        m_centerDotRecord=DotRecord{m_totalCount*2,QPointF{0,0},{m_utilitySvc->getExpectedDB(m_value_30d,{0,0},m_resultModel->m_OS_OD)+DBChanged},-1,{},false,false,MinDB,MaxDB};
+        m_centerDotRecord=DotRecord{m_totalCount*2,QPointF{0,0},{m_utilitySvc->getExpectedDB(m_value_30d,{0,0},m_resultModel->m_OS_OD)+DBChanged},-1,{},false,false,-999,999};
     }
     else                            //单刺激
     {
@@ -295,9 +295,9 @@ void StaticCheck::initialize()
         {
             auto dot=m_programModel->m_data.dots[i];
             if(m_resultModel->m_OS_OD!=0) dot.x=-dot.x;
-            m_dotRecords.push_back(DotRecord{i,QPointF{dot.x,dot.y},{DB},-1, {},false,false,MinDB,MaxDB});
+            m_dotRecords.push_back(DotRecord{i,QPointF{dot.x,dot.y},{DB},-1, {},false,false,-999,999});
         }
-        m_centerDotRecord=DotRecord{m_totalCount*2,QPointF{0,0},{DB},-1,{},false,false,MinDB,MaxDB};
+        m_centerDotRecord=DotRecord{m_totalCount*2,QPointF{0,0},{DB},-1,{},false,false,-999,999};
     }
 
     setLight(true);
@@ -530,6 +530,7 @@ void StaticCheck::stimulate()
     auto lastCheckedDotType=m_lastCheckeDotType.last();
     if(lastCheckedDotType!=LastCheckedDotType::falseNegativeTest)               //假阴不开快门
     {
+        m_deviceOperation->waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y,UsbDev::DevCtl::MotorId_Shutter});
         m_deviceOperation->openShutter(durationTime);
         switch (lastCheckedDotType)
         {
@@ -555,6 +556,8 @@ void StaticCheck::getReadyToStimulate(QPointF loc, int DB)
     }
 
     isMainTable=UtilitySvc::getIsMainTable(loc,isMainTable);
+    if(DB<MinDB) DB=MinDB;
+    if(DB>MaxDB) DB=MaxDB;
     m_deviceOperation->getReadyToStimulate({loc.x(),loc.y()+m_y_offset},int(m_resultModel->m_params.commonParams.cursorSize),DB,isMainTable);
 }
 
@@ -782,9 +785,19 @@ void StaticCheck::ProcessAnswer(bool answered)
 //        case StaticParams::CommonParams::Strategy::smartInteractive:
         case StaticParams::CommonParams::Strategy::fullThreshold:
         {
-            if(boundDistance>4)
+            if(answered&&dotDB>MaxDB)
             {
-                answered?lastCheckedDot->StimulationDBs.push_back(qMin((lastCheckedDot->lowerBound+4),MaxDB)):lastCheckedDot->StimulationDBs.push_back(qMax(lastCheckedDot->upperBound-4,MinDB));
+                lastCheckedDot->DB=999;
+                lastCheckedDot->checked=true;
+            }
+            else if(!answered&&dotDB<MinDB)
+            {
+                lastCheckedDot->DB=-999;
+                lastCheckedDot->checked=true;
+            }
+            else if(boundDistance>4)
+            {
+                answered?lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->lowerBound+4):lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->upperBound-4);
             }
             else if(boundDistance<=4&&boundDistance>2)
             {
@@ -799,9 +812,19 @@ void StaticCheck::ProcessAnswer(bool answered)
         }
         case StaticParams::CommonParams::Strategy::fastThreshold:
         {
-            if(boundDistance>6)
+            if(answered&&dotDB>MaxDB)
             {
-                answered?lastCheckedDot->StimulationDBs.push_back(qMin(lastCheckedDot->lowerBound+6,MaxDB)):lastCheckedDot->StimulationDBs.push_back(qMax(lastCheckedDot->upperBound-6,MinDB));
+                lastCheckedDot->DB=999;
+                lastCheckedDot->checked=true;
+            }
+            else if(!answered&&dotDB<MinDB)
+            {
+                lastCheckedDot->DB=-999;
+                lastCheckedDot->checked=true;
+            }
+            else if(boundDistance>6)
+            {
+                answered?lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->lowerBound+6):lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->upperBound-6);
             }
             else if(boundDistance<=6&&boundDistance>3)
             {
@@ -816,9 +839,19 @@ void StaticCheck::ProcessAnswer(bool answered)
         }
         case StaticParams::CommonParams::Strategy::smartInteractive:
         {
-            if(boundDistance>4)
+            if(answered&&dotDB>MaxDB)
             {
-                answered?lastCheckedDot->StimulationDBs.push_back(qMin(lastCheckedDot->lowerBound+4,MaxDB)):lastCheckedDot->StimulationDBs.push_back(qMax(lastCheckedDot->upperBound-4,MinDB));
+                lastCheckedDot->DB=999;
+                lastCheckedDot->checked=true;
+            }
+            else if(!answered&&dotDB<MinDB)
+            {
+                lastCheckedDot->DB=-999;
+                lastCheckedDot->checked=true;
+            }
+            else if(boundDistance>4)
+            {
+                answered?lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->lowerBound+4):lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->upperBound-4);
             }
             else if(boundDistance<=4&&boundDistance>2)
             {
@@ -844,9 +877,19 @@ void StaticCheck::ProcessAnswer(bool answered)
         }
         case StaticParams::CommonParams::Strategy::fastInterative:
         {
-            if(boundDistance>3)
+            if(answered&&dotDB>MaxDB)
             {
-                answered?lastCheckedDot->StimulationDBs.push_back(qMin(lastCheckedDot->lowerBound+3,MaxDB)):lastCheckedDot->StimulationDBs.push_back(qMax(lastCheckedDot->upperBound-3,MinDB));
+                lastCheckedDot->DB=999;
+                lastCheckedDot->checked=true;
+            }
+            else if(!answered&&dotDB<MinDB)
+            {
+                lastCheckedDot->DB=-999;
+                lastCheckedDot->checked=true;
+            }
+            else if(boundDistance>3)
+            {
+                answered?lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->lowerBound+3):lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->upperBound-3);
             }
             else if(boundDistance<=3)
             {
@@ -885,8 +928,12 @@ void StaticCheck::ProcessAnswer(bool answered)
         }
         case StaticParams::CommonParams::Strategy::quantifyDefects:
         {
-
-            if(boundDistance>3)
+            if(!answered&&dotDB<MinDB)
+            {
+                lastCheckedDot->DB=lastCheckedDot->StimulationDBs.first()+4;
+                lastCheckedDot->checked=true;
+            }
+            else if(boundDistance>3)
             {
                 if(lastCheckedDot->StimulationDBs.size()==1&&answered)    //第一次
                 {
@@ -895,7 +942,7 @@ void StaticCheck::ProcessAnswer(bool answered)
                 }
                 else
 //                    lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->lowerBound+3);
-                    answered?lastCheckedDot->StimulationDBs.push_back(qMin(lastCheckedDot->lowerBound+3,MaxDB)):lastCheckedDot->StimulationDBs.push_back(qMax(lastCheckedDot->upperBound-3,MinDB));
+                    answered?lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->lowerBound+3):lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->upperBound-3);
             }
             if(boundDistance<=3)
             {

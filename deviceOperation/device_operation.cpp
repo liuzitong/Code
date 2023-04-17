@@ -7,6 +7,7 @@
 #include <array>
 #include <QtMath>
 #include <QApplication>
+#include <thread>
 //#include <QQmlEngine>
 
 #pragma execution_character_set("utf-8")
@@ -289,6 +290,7 @@ void DeviceOperation::disconnectDev()
 
 void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB,bool isMainDotInfoTable)
 {
+    m_isMainTable=isMainDotInfoTable;
     if(!m_isDeviceReady) return;
     auto coordSpacePosInfo=DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoord(loc,isMainDotInfoTable);
     auto spotSizeToSlot=DeviceSettings::getSingleton()->m_spotSizeToSlot;
@@ -331,11 +333,12 @@ void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB,bool
                    UsbDev::DevCtl::MotorId_X,
                    UsbDev::DevCtl::MotorId_Y
                    });
-    while(m_shutterElapsedTimer.elapsed()<=m_shutterElapsedTime+100)  //增加100 防止延迟
+    while(m_shutterElapsedTimer.elapsed()<=m_shutterElapsedTime+50)  //增加100 防止延迟,就是关掉了快门才移动
     {
         QCoreApplication::processEvents();
     }
     move5Motors(isMotorMove,motorPos);
+//    emit staticCursorLoc(loc);
 //    quint8 sps[5]={1,1,1,1,1};
 //    m_devCtl->move5Motors(sps,motorPos);
 }
@@ -343,7 +346,7 @@ void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB,bool
 
 void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSize,int speedLevel,bool isMainDotInfoTable)
 {
-    isMainDotInfoTable=true;
+    m_isMainTable=isMainDotInfoTable;
     auto spotSizeToSlot=DeviceSettings::getSingleton()->m_spotSizeToSlot;
     int spotSlot;
     for(auto&i:spotSizeToSlot)
@@ -500,8 +503,14 @@ void DeviceOperation::openShutter(int durationTime)
     if(!m_isDeviceReady) return;
 //    auto config=m_devCtl->config();
     auto shutterPos=m_config.shutterOpenPosRef();
-    waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y,UsbDev::DevCtl::MotorId_Shutter});
+//    emit shutterStatus(true);
     m_devCtl->openShutter(durationTime,shutterPos);
+//    std::thread t([&]()
+//    {
+//        std::this_thread::sleep_for(std::chrono::milliseconds(durationTime));
+//        emit shutterStatus(false);
+//    });
+//    t.detach();
     m_shutterElapsedTimer.restart();
     m_shutterElapsedTime=durationTime;
 }
@@ -626,6 +635,24 @@ void DeviceOperation::workOnNewStatuData()
 //    if(m_statusData.answerpadStatus()==true){
 
 //        stopDynamic();
+//    }
+
+//    if(m_statusData.moveStutas())
+//    {
+//        QPointF dot;
+//        int posX=m_statusData.motorPosition(UsbDev::DevCtl::MotorId::MotorId_X);
+//        int posY=m_statusData.motorPosition(UsbDev::DevCtl::MotorId::MotorId_Y);
+//        int nearestDist=INT32_MAX;
+//        for(auto&i:m_lastDynamicCoordAndXYMotorPos)
+//        {
+//            auto dist=pow(i.second.x()-posX,2)+pow(i.second.y()-posY,2);
+//            if(dist<nearestDist)
+//            {
+//                nearestDist=dist;
+//                dot=i.first;
+//            }
+//        }
+//        emit dynamicCursorLoc(dot);
 //    }
     emit newStatusData();
 }

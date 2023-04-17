@@ -73,12 +73,8 @@ public:
     bool getMotorsBusy(QVector<UsbDev::DevCtl::MotorId> motorIDs);
     void waitForSomeTime(int time);
     void hello();
-
-
-
-
-private:
     void waitMotorStop(QVector<UsbDev::DevCtl::MotorId> motorIDs);
+private:
     void moveChin(ChinMoveDirection direction);       //0左,1不动,2右;0上,1不动,2下
 public slots:
     void workOnNewStatuData();
@@ -93,6 +89,9 @@ signals:
     void newProfile();
     void newConfig();
     void updateDevInfo(QString info);
+//    void staticCursorLoc(QPointF loc);
+//    void dynamicCursorLoc(QPointF loc);
+//    void shutterStatus(bool status);
 //    void devConStatusChanged();
 //    void newFixationDeviation(int deviation)
 public:
@@ -119,6 +118,7 @@ public:
 
 private:
     float m_pupilDiameter=-1;
+    bool m_isMainTable;
     QVector<float> m_pupilDiameterArr;
     //视岛坐标和电机坐标
     QVector<QPair<QPointF,QPoint>> m_lastDynamicCoordAndXYMotorPos;

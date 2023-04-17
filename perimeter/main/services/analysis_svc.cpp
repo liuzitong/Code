@@ -254,7 +254,13 @@ void AnalysisSvc::ThresholdAnalysis(int resultId,QVector<int>& dev,QVector<int>&
         qDebug()<<sv[i];
 
 
-        if(sv[i]>=0)  {dev[i]=checkResult.m_data.checkData[i]-sv[i];}                                                   //dev 盲点
+        if(sv[i]>=0)
+        {
+            auto val=checkResult.m_data.checkData[i];
+            if(val>51) val=51;
+            if(val<0) val=0;
+            dev[i]=val-sv[i];
+        }                                                   //dev 盲点
         else{ dev[i]=-99; }
 
         qDebug()<<dev[i];
@@ -281,7 +287,10 @@ void AnalysisSvc::ThresholdAnalysis(int resultId,QVector<int>& dev,QVector<int>&
             if(ringIndex>4) ringIndex=4;
 
             vfiRingStandard[ringIndex]+=sv[i];
-            vfiRingTest[ringIndex]+=checkResult.m_data.checkData[i];
+            auto val=checkResult.m_data.checkData[i];
+            if(val>51) val=51;
+            if(val<0) val=0;
+            vfiRingTest[ringIndex]+=val;
         }
     }
 
@@ -502,7 +511,13 @@ void AnalysisSvc::ThreeInOneAnalysis(int resultId, QVector<int> &dev)
         }
 //        qDebug()<<sv[i];
 //        qDebug()<<checkResult.m_data.checkData[i];
-        if(sv[i]>0)  {dev[i]=checkResult.m_data.checkData[i]-sv[i];}                                                   //dev 盲点
+        if(sv[i]>0)
+        {
+            auto val=checkResult.m_data.checkData[i];
+            if(val>51) val=51;
+            if(val<0) val=0;
+            dev[i]=val-sv[i];
+        }                                                   //dev 盲点
         else{ dev[i]=-99; }           //盲点
 //        qDebug()<<dev[i];
     }
@@ -801,7 +816,12 @@ void AnalysisSvc::drawText(QVector<int> values,QVector<QPointF> locs,int range,i
         {
             auto pixLoc=convertDegLocToPixLoc(locs[i],range,img);
             const QRect rectangle = QRect(pixLoc.x()-fontPixSize*1.6*0.45, pixLoc.y()-fontPixSize*0.8/2, fontPixSize*1.6,fontPixSize*0.8);
-            painter.drawText(rectangle,Qt::AlignCenter,QString::number(values[i]));
+            if(values[i]==-999)
+                painter.drawText(rectangle,Qt::AlignCenter,"<0");
+            else if(values[i]==999)
+                painter.drawText(rectangle,Qt::AlignCenter,">51");
+            else
+                painter.drawText(rectangle,Qt::AlignCenter,QString::number(values[i]));
 //            img.setPixel(pixLoc.x(),pixLoc.y(),0xFFFF0000); //标个小红点
         }
         else if(i>=locs.length()&&i<2*locs.length())            //短周期
@@ -810,7 +830,12 @@ void AnalysisSvc::drawText(QVector<int> values,QVector<QPointF> locs,int range,i
             const QRect rectangle = QRect(pixLoc.x()-fontPixSize*2.0*0.50, pixLoc.y()-fontPixSize*1.0/2+fontPixSize, fontPixSize*2.0,fontPixSize*1.0);
             if(pixLoc.y()+fontPixSize*1.5>img.height()) continue;  //防止超过图片范围,干脆不显示
             painter.fillRect(rectangle,QBrush{Qt::white});
-            painter.drawText(rectangle,Qt::AlignCenter,"("+QString::number(values[i])+")");
+            if(values[i]==-999)
+                painter.drawText(rectangle,Qt::AlignCenter,"<0");
+            else if(values[i]==999)
+                painter.drawText(rectangle,Qt::AlignCenter,">51");
+            else
+                painter.drawText(rectangle,Qt::AlignCenter,"("+QString::number(values[i])+")");
 //            img.setPixel(pixLoc.x(),pixLoc.y(),0xFFFF0000); //标个小红点
         }
         else if(i==locs.length()*2)                           //中心点
@@ -818,7 +843,12 @@ void AnalysisSvc::drawText(QVector<int> values,QVector<QPointF> locs,int range,i
             auto pixLoc=convertDegLocToPixLoc({0,0},range,img);
             const QRect rectangle = QRect(pixLoc.x()-fontPixSize*1.6*0.45, pixLoc.y()-fontPixSize*0.8/2, fontPixSize*1.6,fontPixSize*0.8);
             painter.fillRect(rectangle,QBrush{Qt::white});
-            painter.drawText(rectangle,Qt::AlignCenter,QString::number(values[i]));
+            if(values[i]==-999)
+                painter.drawText(rectangle,Qt::AlignCenter,"<0");
+            else if(values[i]==999)
+                painter.drawText(rectangle,Qt::AlignCenter,">51");
+            else
+                painter.drawText(rectangle,Qt::AlignCenter,QString::number(values[i]));
         }
     }
 }
@@ -921,13 +951,16 @@ void AnalysisSvc::drawGray(QVector<int> values, QVector<QPointF> locs, int range
         for(int j=0;j<interpolationDots.length();j++)                               //根据插值点算出插值
         {
             int index=interpolationDots[j].first;
+            int tempVal=values[index];
+            if(tempVal==-999) tempVal=0;
+            if(tempVal==999) tempVal=51;
             if(interpolationDots[j].second==0)
             {
-                totalValue=values[index];
+                totalValue=tempVal;
                 totalDist=1;
                 break;
             }
-            totalValue+=(float(values[index])/qSqrt(interpolationDots[j].second));
+            totalValue+=(float(tempVal)/qSqrt(interpolationDots[j].second));
             totalDist+=1.0f/qSqrt(interpolationDots[j].second);
         }
         float interpolVal=totalValue/totalDist;
@@ -1029,7 +1062,7 @@ void AnalysisSvc::drawDefectDepth(QVector<int> values, QVector<QPointF> locs, in
         {
             const QRect rectangle = QRect(pixLoc.x()-fontPixSize*1.6*0.45, pixLoc.y()-fontPixSize*0.8/2, fontPixSize*1.6,fontPixSize*0.8);
             painter.drawText(rectangle,Qt::AlignCenter,QString::number(-values[i]));
-            img.setPixel(pixLoc.x(),pixLoc.y(),0xFFFF0000);   //标个小红点
+//            img.setPixel(pixLoc.x(),pixLoc.y(),0xFFFF0000);   //标个小红点
         }
     }
 }
