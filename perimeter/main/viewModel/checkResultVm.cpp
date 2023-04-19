@@ -3,6 +3,7 @@
 #include <QImage>
 #include <QPainter>
 #include <deviceOperation/device_operation.h>
+#include "perimeter/main/services/utility_svc.h"
 namespace Perimeter
 {
 
@@ -30,13 +31,23 @@ StaticCheckResultVm::StaticCheckResultVm(const QVariantList &args)
 
 void StaticCheckResultVm::insert()
 {
+    static int count=0;
     auto sp=m_data->ModelToDB();
     sp->m_time=QDateTime::currentDateTime();
-    for(auto& dotImgs:m_data->m_imgData)
+    auto realTimeEyePosPicSize=Perimeter::UtilitySvc::getSingleton()->m_realTimeEyePosPicSize;
+    auto imgSize=/*DevOps::DeviceOperation::getSingleton()->m_videoSize;*/m_data->m_videoSize;
+    for(auto& dotImgDatas:m_data->m_imgData)
     {
-        for(auto& img:dotImgs)
+        count=0;
+        for(auto& imgData:dotImgDatas)
         {
-            sp->m_blob.append(img);
+            count++;
+            QImage img((uchar*)imgData.data(),imgSize.width(),imgSize.height(),QImage::Format_Grayscale8);
+            img=img.scaled(realTimeEyePosPicSize.width(),realTimeEyePosPicSize.height());
+//            img.save(R"(./savePics/)"+QString::number(count)+".bmp");
+            const char* data=(char*)(img.bits());
+            QByteArray ba(data,realTimeEyePosPicSize.width()*realTimeEyePosPicSize.height());
+            sp->m_blob.append(ba);
         }
     }
     qx::dao::insert(sp);
@@ -52,42 +63,44 @@ void StaticCheckResultVm::update()
 
 int StaticCheckResultVm::drawRealTimeEyePosPic(int index)
 {
-    auto blob=m_data->m_blob;
     auto realTimeDB=m_data->m_data.realTimeDB;
-    auto imgSize=DevOps::DeviceOperation::getSingleton()->m_videoSize;
+    auto imgSize=/*DevOps::DeviceOperation::getSingleton()->m_videoSize;*/m_data->m_videoSize;
     if(uint(index)>=realTimeDB.size()) return 0;
     int picIndexStart=0;
     for(int i=0;i<index;i++)
     {
         picIndexStart+=realTimeDB[i].size();
     }
-//    int picCount=blob.size()/(320*240);
-    if(m_data->m_imgData.size()>index+1)                    //检查的时候
+    if(m_data->m_imgData.size()>0)                    //检查的时候
     {
         auto imgs=m_data->m_imgData[index];
-        for(int i=0;i<imgs.length();i++)
+        if(imgs.size()>0)
         {
-            QImage img((uchar*)imgs[i].data(),imgSize.width(),imgSize.height(),QImage::Format_Grayscale8);
-//            QImage img((uchar*)imgs[i].data(),320,240,QImage::Format_Grayscale8);
-            img.save(R"(./realTimeEyePosPic/)"+QString::number(i)+".bmp");
+            for(int i=0;i<imgs.length();i++)
+            {
+                QImage img((uchar*)imgs[i].data(),imgSize.width(),imgSize.height(),QImage::Format_Grayscale8);
+                img.save(R"(./realTimeEyePosPic/)"+QString::number(i)+".bmp");
+            }
         }
+        return imgs.size();
     }
     else
     {
+        auto blob=m_data->m_blob;
+        if(blob.size()==0) return 0;
         for(uint i=0;i<realTimeDB[index].size();i++)        //读取结果的时候
         {
             int picIndex=picIndexStart+i;
 //            auto qa=blob.mid(picIndex*imgSize.width()*imgSize.height(),imgSize.width()*imgSize.height());
 //            QImage img((uchar*)qa.data(),imgSize.width(),imgSize.height(),QImage::Format_Grayscale8);
-            auto qa=blob.mid(picIndex*320*240,320*240);
-            QImage img((uchar*)qa.data(),320,240,QImage::Format_Grayscale8);
+            if(picIndex*imgSize.width()*imgSize.height()+imgSize.width()*imgSize.height()>blob.size()) return 0;
+            auto qa=blob.mid(picIndex*imgSize.width()*imgSize.height(),imgSize.width()*imgSize.height());
+            QImage img((uchar*)qa.data(),imgSize.width(),imgSize.height(),QImage::Format_Grayscale8);
             img.save(R"(./realTimeEyePosPic/)"+QString::number(i)+".bmp");
 
         }
+         return realTimeDB[index].size();
     }
-
-
-    return realTimeDB[index].size();
 }
 
 //void StaticCheckResultVm::drawPic(int index)

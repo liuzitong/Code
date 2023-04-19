@@ -70,10 +70,10 @@ void DeviceOperation::setCursorColorAndCursorSize(int color, int spot)
                 break;
             }
         }
-        m_devCtl->resetMotor(UsbDev::DevCtl::MotorId_Focus,sps[2]);
-        m_devCtl->resetMotor(UsbDev::DevCtl::MotorId_Color,sps[3]);
-        m_devCtl->resetMotor(UsbDev::DevCtl::MotorId_Light_Spot,sps[4]);
-        waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
+//        m_devCtl->resetMotor(UsbDev::DevCtl::MotorId_Focus,sps[2]);                                           //不reset了 会出问题
+//        m_devCtl->resetMotor(UsbDev::DevCtl::MotorId_Color,sps[3]);
+//        m_devCtl->resetMotor(UsbDev::DevCtl::MotorId_Light_Spot,sps[4]);
+//        waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
         int colorPos=config.switchColorMotorPosPtr()[colorSlot];
         int sizePos=config.switchLightSpotMotorPosPtr()[spotSlot];
         int  color_Circl_Motor_Steps=profile.motorRange(UsbDev::DevCtl::MotorId_Color).second-profile.motorRange(UsbDev::DevCtl::MotorId_Color).first;
@@ -661,7 +661,7 @@ void DeviceOperation::workOnNewFrameData()
 {
     m_frameData=m_devCtl->takeNextPendingFrameData();
     m_frameRawData=m_frameData.rawData();
-    qDebug()<<"work on new Frame."+QString::number(m_frameRawData.size());
+//    qDebug()<<"work on new Frame."+QString::number(m_frameRawData.size());
     emit newFrameData();
     return;
     auto profile=m_profile;

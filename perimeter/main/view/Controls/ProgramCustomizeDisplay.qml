@@ -74,13 +74,22 @@ Item{
                     displayCanvas.requestPaint();
                 }
                 else{
-                    var dist1=Math.sqrt(Math.pow(boundaries[0].x-dot.x,2)+Math.pow(boundaries[0].y-dot.y,2));
-                    var dist2=Math.sqrt(Math.pow(boundaries[1].x-dot.x,2)+Math.pow(boundaries[1].y-dot.y,2));
-                    if(dist1>boundaries[0].radius&&dist2>boundaries[1].radius) return;
-                    dot=displayCanvas.orthToPolar(dot);
-                    dot.x=Math.round(dot.x);
-                    dot.y=Math.round(dot.y);
-                    dot=displayCanvas.polarToOrth(dot);
+
+                    if(type==2)
+                    {
+                        var dist1=Math.sqrt(Math.pow(boundaries[0].x-dot.x,2)+Math.pow(boundaries[0].y-dot.y,2));
+                        var dist2=Math.sqrt(Math.pow(boundaries[1].x-dot.x,2)+Math.pow(boundaries[1].y-dot.y,2));
+                        if(dist1>boundaries[0].radius&&dist2>boundaries[1].radius) return;
+                        dot=displayCanvas.orthToPolar(dot);
+                        dot.x=Math.round(dot.x);
+                        dot.y=Math.round(dot.y);
+                        dot=displayCanvas.polarToOrth(dot);
+                    }
+                    else
+                    {
+                        dot.x=Math.round(dot.x);
+                        dot.y=Math.round(dot.y);
+                    }
                     dotList.push(dot);
                     root.refreshProgramDots();
                     displayCanvas.requestPaint();

@@ -52,7 +52,6 @@ private:
         QPointF loc;
         QVector<int> StimulationDBs;                     //每次亮灯的DB
         int DB;                                          //最后得到的DB;
-        QVector<QByteArray> realTimeEyePosPic;           //实时眼位
         bool isBaseDot;                                  //fast smart interactive模式的最初4点
         bool checked;
         int lowerBound;
@@ -89,10 +88,9 @@ public:
     virtual void initialize() override;
     virtual void Checkprocess() override;
     virtual void finished() override;
-    std::tuple<bool,QPointF,int> getCheckCycleLocAndDB();
-
 
 private:
+    std::tuple<bool,QPointF,int> getCheckCycleLocAndDB();
 
     DotRecord& getCheckDotRecordRef();
 
@@ -214,6 +212,7 @@ signals:
 
 void StaticCheck::initialize()
 {
+    constexpr int initialNumber=999;
     m_checkedCount=0;
     m_autoAdaptTime=0;
     m_blindDotLocateIndex=0;
@@ -223,9 +222,11 @@ void StaticCheck::initialize()
     m_isDoingBaseDotsCheck=false;
     m_resultModel->m_patient_id=m_patientModel->m_id;
     m_resultModel->m_program_id=m_programModel->m_id;
+    m_resultModel->m_videoSize=m_deviceOperation->m_videoSize;
     m_totalCount=m_programModel->m_data.dots.size();
-    m_resultModel->m_data.checkData=std::vector<int>(m_totalCount*2+1,-1);  //第一段程序点个数为测出点DB,第二段程序点个数为短波周期DB,第三段为中心点DB
+    m_resultModel->m_data.checkData=std::vector<int>(m_totalCount*2+1,-initialNumber);  //第一段程序点个数为测出点DB,第二段程序点个数为短波周期DB,第三段为中心点DB
     m_resultModel->m_data.realTimeDB.resize(m_totalCount*2+1);
+    m_resultModel->m_imgData.resize(m_totalCount*2+1);
     auto cursorSize=m_programModel->m_params.commonParams.cursorSize;
     auto cursorColor=m_programModel->m_params.commonParams.cursorColor;
     m_value_30d=m_utilitySvc->getValue30d(int(cursorSize),int(cursorColor),m_patientModel->m_age);
@@ -262,6 +263,7 @@ void StaticCheck::initialize()
 //    {
 //        centerDotLoc={0,float(y_offsetDiamond)};
 //    }
+
     if(m_programModel->m_params.commonParams.strategy!=StaticParams::CommonParams::Strategy::singleStimulation)
     {
         for(int i=0;i<m_totalCount;i++)
@@ -276,17 +278,17 @@ void StaticCheck::initialize()
                     if((qAbs(dot.x-baseDots[j].x)<FLT_EPSILON)&&(qAbs(dot.y-baseDots[j].y)<FLT_EPSILON))
                         isBaseDot=true;
             }
-            //非参考点初始测试DB设置为-1,之后选点的时候根据周围已经检查出的值赋值
+            //非参考点初始测试DB设置为-999,之后选点的时候根据周围已经检查出的值赋值
             QVector<int> stimulationDBs;
             if(isBaseDot||!m_isStartWithBaseDots)
             {
                 stimulationDBs={m_utilitySvc->getExpectedDB(m_value_30d,{dot.x,dot.y},m_resultModel->m_OS_OD)+DBChanged};
             }
 
-            m_dotRecords.push_back(DotRecord{i,QPointF{dot.x,dot.y},stimulationDBs,-1,{},isBaseDot,false,-999,999});
+            m_dotRecords.push_back(DotRecord{i,QPointF{dot.x,dot.y},stimulationDBs,-initialNumber,isBaseDot,false,-initialNumber,initialNumber});
         }
 
-        m_centerDotRecord=DotRecord{m_totalCount*2,QPointF{0,0},{m_utilitySvc->getExpectedDB(m_value_30d,{0,0},m_resultModel->m_OS_OD)+DBChanged},-1,{},false,false,-999,999};
+        m_centerDotRecord=DotRecord{m_totalCount*2,QPointF{0,0},{m_utilitySvc->getExpectedDB(m_value_30d,{0,0},m_resultModel->m_OS_OD)+DBChanged},-initialNumber,false,false,-initialNumber,initialNumber};
     }
     else                            //单刺激
     {
@@ -295,9 +297,9 @@ void StaticCheck::initialize()
         {
             auto dot=m_programModel->m_data.dots[i];
             if(m_resultModel->m_OS_OD!=0) dot.x=-dot.x;
-            m_dotRecords.push_back(DotRecord{i,QPointF{dot.x,dot.y},{DB},-1, {},false,false,-999,999});
+            m_dotRecords.push_back(DotRecord{i,QPointF{dot.x,dot.y},{DB},-initialNumber, false,false,-initialNumber,initialNumber});
         }
-        m_centerDotRecord=DotRecord{m_totalCount*2,QPointF{0,0},{DB},-1,{},false,false,-999,999};
+        m_centerDotRecord=DotRecord{m_totalCount*2,QPointF{0,0},{DB},-initialNumber,false,false,-initialNumber,initialNumber};
     }
 
     setLight(true);
@@ -455,7 +457,7 @@ StaticCheck::DotRecord &StaticCheck::getCheckDotRecordRef()
         nearestDist=FLT_MAX;
         auto& selectedDot=nearestRecords[qrand()%nearestRecords.count()];
         qDebug()<<"selectedDot loc:"<<selectedDot.loc;
-        if(selectedDot.StimulationDBs.isEmpty())            //第一次检查要根据周围点的结果赋值
+        if(selectedDot.StimulationDBs.isEmpty())            //第一次检查要根据周围点的结果赋值,且说明这个点是非baseDot,baseDot会在开始的时候赋值
         {
             qDebug()<<"empty stimDB";
             for(auto&i:seletedZoneCheckedRecords)
@@ -465,7 +467,8 @@ StaticCheck::DotRecord &StaticCheck::getCheckDotRecordRef()
                 if(dist<nearestDist)
                 {
                     m_dotRecords[selectedDot.index].StimulationDBs.clear();
-                    m_dotRecords[selectedDot.index].StimulationDBs.append(i.DB);
+                    int DB=qMin(qMax(i.DB,0),51);
+                    m_dotRecords[selectedDot.index].StimulationDBs.append(DB);
                     nearestDist=dist;
                     qDebug()<<"appended DB";
                 }
@@ -536,7 +539,15 @@ void StaticCheck::stimulate()
         {
         case LastCheckedDotType::blindDotTest:
         case LastCheckedDotType::falsePositiveTest:m_resultModel->m_data.fixationDeviation.push_back(-m_deviceOperation->m_deviation);break;
-        case LastCheckedDotType::commonCheckDot:m_resultModel->m_data.fixationDeviation.push_back(m_deviceOperation->m_deviation);break;
+        case LastCheckedDotType::commonCheckDot:
+        {
+            m_resultModel->m_data.fixationDeviation.push_back(m_deviceOperation->m_deviation);
+            uint dotIndex=m_lastCheckDotRecord[0]->index;
+            m_resultModel->m_data.realTimeDB[dotIndex]=m_lastCheckDotRecord[0]->StimulationDBs.toStdVector(); //在check初始化的时候扩充了大小.
+            if(dotIndex<m_programModel->m_data.dots.size()||dotIndex==2*m_programModel->m_data.dots.size())
+                m_resultModel->m_imgData[dotIndex].push_back(m_deviceOperation->m_frameRawData);
+            break;
+        }
         default:break;
         }
     }
@@ -646,7 +657,7 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
         //盲点不为空的时候到了周期测试盲点.
         if(!m_blindDot.isEmpty()&&m_stimulationCount%fixedParams.fixationViewLossCycle==qrand()%fixedParams.fixationViewLossCycle)
         {
-            auto blindDB=UtilitySvc::getSingleton()->m_blindDotTestDB;
+            auto blindDB=UtilitySvc::getSingleton()->m_blindDotTestDB+UtilitySvc::getSingleton()->m_blindDotTestIncDB;
             m_lastCheckeDotType.push_back(LastCheckedDotType::blindDotTest);
             return {true,{m_blindDot[0].x(),m_blindDot[0].y()},blindDB};
         }
@@ -776,6 +787,7 @@ void StaticCheck::ProcessAnswer(bool answered)
     case LastCheckedDotType::commonCheckDot:
     {
         int dotDB=lastCheckedDot->StimulationDBs.last();
+//        m_resultModel->m_data.realTimeDB[lastCheckedDot->index]=lastCheckedDot->StimulationDBs.toStdVector(); //在check初始化的时候扩充了大小.
         answered?lastCheckedDot->lowerBound=dotDB:lastCheckedDot->upperBound=dotDB;
         qDebug()<<"upper:"+QString::number(lastCheckedDot->upperBound);
         qDebug()<<"lower:"+QString::number(lastCheckedDot->lowerBound);
@@ -785,19 +797,19 @@ void StaticCheck::ProcessAnswer(bool answered)
 //        case StaticParams::CommonParams::Strategy::smartInteractive:
         case StaticParams::CommonParams::Strategy::fullThreshold:
         {
-            if(answered&&dotDB>MaxDB)
+            if(answered&&(dotDB==MaxDB))
             {
-                lastCheckedDot->DB=999;
+                lastCheckedDot->DB=52;
                 lastCheckedDot->checked=true;
             }
-            else if(!answered&&dotDB<MinDB)
+            else if(!answered&&(dotDB==MinDB))
             {
-                lastCheckedDot->DB=-999;
+                lastCheckedDot->DB=-1;
                 lastCheckedDot->checked=true;
             }
             else if(boundDistance>4)
             {
-                answered?lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->lowerBound+4):lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->upperBound-4);
+                answered?lastCheckedDot->StimulationDBs.push_back(qMin(lastCheckedDot->lowerBound+4,MaxDB)):lastCheckedDot->StimulationDBs.push_back(qMax(lastCheckedDot->upperBound-4,MinDB));
             }
             else if(boundDistance<=4&&boundDistance>2)
             {
@@ -812,19 +824,19 @@ void StaticCheck::ProcessAnswer(bool answered)
         }
         case StaticParams::CommonParams::Strategy::fastThreshold:
         {
-            if(answered&&dotDB>MaxDB)
+            if(answered&&(dotDB==MaxDB))
             {
-                lastCheckedDot->DB=999;
+                lastCheckedDot->DB=52;
                 lastCheckedDot->checked=true;
             }
-            else if(!answered&&dotDB<MinDB)
+            else if(!answered&&(dotDB==MinDB))
             {
-                lastCheckedDot->DB=-999;
+                lastCheckedDot->DB=-1;
                 lastCheckedDot->checked=true;
             }
             else if(boundDistance>6)
             {
-                answered?lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->lowerBound+6):lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->upperBound-6);
+                answered?lastCheckedDot->StimulationDBs.push_back(qMin(lastCheckedDot->lowerBound+6,MaxDB)):lastCheckedDot->StimulationDBs.push_back(qMax(lastCheckedDot->upperBound-6,MinDB));
             }
             else if(boundDistance<=6&&boundDistance>3)
             {
@@ -839,19 +851,19 @@ void StaticCheck::ProcessAnswer(bool answered)
         }
         case StaticParams::CommonParams::Strategy::smartInteractive:
         {
-            if(answered&&dotDB>MaxDB)
+            if(answered&&(dotDB==MaxDB))
             {
-                lastCheckedDot->DB=999;
+                lastCheckedDot->DB=52;
                 lastCheckedDot->checked=true;
             }
-            else if(!answered&&dotDB<MinDB)
+            else if(!answered&&(dotDB==MinDB))
             {
-                lastCheckedDot->DB=-999;
+                lastCheckedDot->DB=-1;
                 lastCheckedDot->checked=true;
             }
             else if(boundDistance>4)
             {
-                answered?lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->lowerBound+4):lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->upperBound-4);
+                answered?lastCheckedDot->StimulationDBs.push_back(qMin(lastCheckedDot->lowerBound+4,MaxDB)):lastCheckedDot->StimulationDBs.push_back(qMax(lastCheckedDot->upperBound-4,MinDB));
             }
             else if(boundDistance<=4&&boundDistance>2)
             {
@@ -877,19 +889,19 @@ void StaticCheck::ProcessAnswer(bool answered)
         }
         case StaticParams::CommonParams::Strategy::fastInterative:
         {
-            if(answered&&dotDB>MaxDB)
+            if(answered&&(dotDB==MaxDB))
             {
-                lastCheckedDot->DB=999;
+                lastCheckedDot->DB=52;
                 lastCheckedDot->checked=true;
             }
-            else if(!answered&&dotDB<MinDB)
+            else if(!answered&&(dotDB==MinDB))
             {
-                lastCheckedDot->DB=-999;
+                lastCheckedDot->DB=-1;
                 lastCheckedDot->checked=true;
             }
             else if(boundDistance>3)
             {
-                answered?lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->lowerBound+3):lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->upperBound-3);
+                answered?lastCheckedDot->StimulationDBs.push_back(qMin(lastCheckedDot->lowerBound+3,MaxDB)):lastCheckedDot->StimulationDBs.push_back(qMax(lastCheckedDot->upperBound-3,MinDB));
             }
             else if(boundDistance<=3)
             {
@@ -928,9 +940,9 @@ void StaticCheck::ProcessAnswer(bool answered)
         }
         case StaticParams::CommonParams::Strategy::quantifyDefects:
         {
-            if(!answered&&dotDB<MinDB)
+            if(!answered&&(dotDB==MinDB))
             {
-                lastCheckedDot->DB=lastCheckedDot->StimulationDBs.first()+4;
+                lastCheckedDot->DB=lastCheckedDot->StimulationDBs.first()+4+1;
                 lastCheckedDot->checked=true;
             }
             else if(boundDistance>3)
@@ -942,7 +954,7 @@ void StaticCheck::ProcessAnswer(bool answered)
                 }
                 else
 //                    lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->lowerBound+3);
-                    answered?lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->lowerBound+3):lastCheckedDot->StimulationDBs.push_back(lastCheckedDot->upperBound-3);
+                    answered?lastCheckedDot->StimulationDBs.push_back(qMin(lastCheckedDot->lowerBound+3,MaxDB)):lastCheckedDot->StimulationDBs.push_back(qMax(lastCheckedDot->upperBound-3,MinDB));
             }
             if(boundDistance<=3)
             {
@@ -968,8 +980,8 @@ void StaticCheck::ProcessAnswer(bool answered)
                 m_lastCheckDotRecord.pop_back();
                 m_lastCheckeDotType.pop_back();
             }          //下次要刺激的点,是已经检查了的,所以要移除所有下次的点
-            m_resultModel->m_data.realTimeDB[lastCheckedDot->index]=lastCheckedDot->StimulationDBs.toStdVector(); //在check初始化的时候扩充了大小.
             m_resultModel->m_data.checkData[lastCheckedDot->index]=lastCheckedDot->DB; //存储结果
+
             if(lastCheckedDot->index<int(m_programModel->m_data.dots.size()))                //非短周期或者中心点
             {
                 m_checkedCount++;
@@ -1006,7 +1018,8 @@ if(m_deviceOperation->m_isDeviceReady)
      answerResult=waitForAnswer();
 else
 {
-    answerResult=qrand()%100<50;
+//    answerResult=qrand()%100<50;
+    answerResult=true;
     UtilitySvc::wait(100);
 }
 //    QThread::msleep(1000);

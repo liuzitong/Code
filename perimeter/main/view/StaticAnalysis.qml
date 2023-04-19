@@ -1,5 +1,6 @@
 ﻿import QtQuick 2.6
 import QtQuick.Controls 2.0
+import QtQuick.Controls 1.0
 import QtQuick.Window 2.3
 import QtQml 2.2
 import QtQuick.Controls.Styles 1.4
@@ -145,43 +146,113 @@ Item
                 }
             }
         }
-        Rectangle{width:parent.width*0.25;height: parent.height;color:"white";
-            Grid{anchors.fill: parent;rows: 3;columns: 2;rowSpacing:(height-width/2*3)/2;columnSpacing: 0;
-                Repeater{id:repeater;model:listModel;
-                    property ListModel listModel:ListModel{}
-                    Item{height: width; width: parent.width/2;
-                        Image{
-                           property string picSource: "/realTimeEyePosPic/"+index+".bmp";
-                           anchors.fill: parent;
-                           fillMode: Image.PreserveAspectCrop;smooth: false;cache: false;        //to refresh image
-                           source: "file:///" + applicationDirPath + picSource;
-                        }
-                        Rectangle
-                        {
-                            opacity: 0.8;radius: 2;color: "grey";width: 16;height: 12;anchors.top: parent.top; anchors.topMargin: parent.height*0.05; anchors.left: parent.left; anchors.leftMargin:parent.width*0.05;
-                            CusText{ anchors.fill: parent;text:index;color: "white";}
-                        }
-                        Rectangle
-                        {
-                            opacity: 0.8;radius: 2;color: "grey";width: 34;height: 12;anchors.bottom: parent.bottom; anchors.bottomMargin: parent.height*0.05; anchors.right: parent.right; anchors.rightMargin:parent.width*0.05;
-                            CusText{ visible:currentProgram.type===0; anchors.fill: parent;text:currentCheckResult.resultData.realTimeDB[selectedDotIndex][index]+"DB";color: "white"; }
-                        }
-                    }
-                }
-                Component.onCompleted:
-                {
-                    root.refresh.connect(function(){visible=false;parent.color="white"});
-                    root.realTimePicRefresh.connect(
-                    function(count){
-                        visible=true;parent.color="grey"
-                        repeater.listModel.clear();
-                        for(var i=0;i<count;i++)
-                        {
-                           repeater.listModel.append({index:i});
-                        }
-                    })
-                }
-            }
-        }
+//        Item
+//        {
+//            id:testRec;
+//            width:parent.width*0.25;height: parent.height;
+//            ScrollView{
+//                anchors.fill: parent;
+//                horizontalScrollBarPolicy:Qt.ScrollBarAlwaysOff;
+//                verticalScrollBarPolicy:Qt.ScrollBarAlwaysOff;
+//                Column{
+//                    width:testRec.width;height: testRec.height*2;
+//                    Rectangle{width:parent.width;height: parent.height*0.5;color:"red";}
+//                    Rectangle{width:parent.width;height: parent.height*0.5;color:"blue";}
+//                }
+//            }
+//        }
+         Rectangle{width:parent.width*0.25;height: parent.height;color:"white";
+             GridView{
+                 property ListModel listModel:ListModel{}
+                 boundsBehavior: Flickable.StopAtBounds
+                 clip: true
+                 id:realTimeEyePosListView
+                 cellWidth: parent.width/2;cellHeight:cellWidth;
+                 anchors.fill: parent;
+                 delegate: realTimeEyePos
+                 model:listModel;
+
+                 Component.onCompleted:
+                 {
+
+                     //靠analysisVm的选择点变化,来触发root.realTimePicRefresh,从而刷新
+                     root.refresh.connect(function(){visible=false;parent.color="white"});
+                     root.realTimePicRefresh.connect(
+                     function(count){
+                         visible=true;parent.color="grey"
+                         listModel.clear();
+                         for(var i=0;i<count;i++)
+                         {
+                            listModel.append({index:i});
+                         }
+                     })
+                 }
+
+                 Component{
+                     id:realTimeEyePos
+                     Item{width: realTimeEyePosListView.width/2;height: width;
+                         Image{
+                            property string picSource: "/realTimeEyePosPic/"+index+".bmp";
+                            anchors.fill: parent;
+                            fillMode: Image.PreserveAspectCrop;smooth: false;cache: false;        //to refresh image
+                            source: "file:///" + applicationDirPath + picSource;
+                         }
+                         Rectangle
+                         {
+                             opacity: 0.8;radius: 2;color: "grey";width:CommonSettings.fontPointSize*2.5;height: CommonSettings.fontPointSize*1.6;anchors.top: parent.top; anchors.topMargin: parent.height*0.05; anchors.left: parent.left; anchors.leftMargin:parent.width*0.05;
+                             CusText{ anchors.fill: parent;text:index; color: "white";}
+                         }
+                         Rectangle
+                         {
+                             opacity: 0.8;radius: 2;color: "grey";width: CommonSettings.fontPointSize*4;height:  CommonSettings.fontPointSize*1.6;anchors.bottom: parent.bottom; anchors.bottomMargin: parent.height*0.05; anchors.right: parent.right; anchors.rightMargin:parent.width*0.05;
+                             CusText{ anchors.fill: parent;text:currentCheckResult.resultData.realTimeDB[selectedDotIndex][index]+"DB";color: "white"; }
+                         }
+                     }
+                 }
+             }
+         }
+
+
+//        Rectangle{width:parent.width*0.25;height: parent.height;color:"white";
+//            Grid{anchors.fill: parent;rows: 4;columns: 2;rowSpacing:0;columnSpacing: 0;
+//                Repeater{id:repeater;model:listModel;
+//                    property ListModel listModel:ListModel{}
+//                    Item{height: width; width: parent.width/2;
+//                        Image{
+//                           property string picSource: "/realTimeEyePosPic/"+index+".bmp";
+//                           anchors.fill: parent;
+//                           fillMode: Image.PreserveAspectCrop;smooth: false;cache: false;        //to refresh image
+//                           source: "file:///" + applicationDirPath + picSource;
+//                        }
+//                        Rectangle
+//                        {
+//                            opacity: 0.8;radius: 2;color: "grey";width:CommonSettings.fontPointSize*2.5;height: CommonSettings.fontPointSize*1.6;anchors.top: parent.top; anchors.topMargin: parent.height*0.05; anchors.left: parent.left; anchors.leftMargin:parent.width*0.05;
+//                            CusText{ anchors.fill: parent;text:index; color: "white";}
+//                        }
+//                        Rectangle
+//                        {
+//                            opacity: 0.8;radius: 2;color: "grey";width: CommonSettings.fontPointSize*4;height:  CommonSettings.fontPointSize*1.6;anchors.bottom: parent.bottom; anchors.bottomMargin: parent.height*0.05; anchors.right: parent.right; anchors.rightMargin:parent.width*0.05;
+//                            CusText{ anchors.fill: parent;text:currentCheckResult.resultData.realTimeDB[selectedDotIndex][index]+"DB";color: "white"; }
+//                            //                            MouseArea{onClicked: console.log(currentCheckResult.resultData.realTimeDB[selectedDotIndex][index]);}
+//                        }
+//                    }
+//                }
+//                Component.onCompleted:
+//                {
+
+//                    //靠analysisVm的选择点变化,来触发root.realTimePicRefresh,从而刷新
+//                    root.refresh.connect(function(){visible=false;parent.color="white"});
+//                    root.realTimePicRefresh.connect(
+//                    function(count){
+//                        visible=true;parent.color="grey"
+//                        repeater.listModel.clear();
+//                        for(var i=0;i<count;i++)
+//                        {
+//                           repeater.listModel.append({index:i});
+//                        }
+//                    })
+//                }
+//            }
+//        }
     }
 }

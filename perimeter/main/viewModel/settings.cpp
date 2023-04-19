@@ -38,7 +38,8 @@ void Settings::save()
         {"version",m_version},
         {"deviceInfo",m_deviceInfo},
         {"defaultProgramId",m_defaultProgramId},
-        {"defaultProgramType",m_defaultProgramType}
+        {"defaultProgramType",m_defaultProgramType},
+        {"programUnlockPwd",m_programUnlockPwd}
     };
     changeLang();
     QJsonDocument jsonDoc;

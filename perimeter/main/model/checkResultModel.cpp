@@ -1,4 +1,5 @@
 ﻿#include "checkResultModel.h"
+#include "perimeter/main/services/utility_svc.h"
 
 CheckResultModel::CheckResultModel(CheckResult_ptr checkResult_ptr)
 {
@@ -30,6 +31,12 @@ StaticCheckResultModel::StaticCheckResultModel(CheckResult_ptr checkResult_ptr):
 {
     m_params=Utility::QStringToEntity<StaticParams>(checkResult_ptr->m_params);
     m_data=Utility::QStringToEntity<StaticResultData>(checkResult_ptr->m_data);
+    auto strings=checkResult_ptr->m_videoSize.split('*');
+    if(strings.size()==2)
+    {
+        m_videoSize.rwidth()=strings[0].toInt();
+        m_videoSize.rheight()=strings[1].toInt();
+    }
     m_blob=checkResult_ptr->m_blob;
 }
 
@@ -38,6 +45,8 @@ CheckResult_ptr StaticCheckResultModel::ModelToDB()
     auto pp=CheckResultModel::ModelToDB();
     pp->m_params=Utility::entityToQString(m_params);
     pp->m_data=Utility::entityToQString(m_data);
+    auto videoSize=Perimeter::UtilitySvc::getSingleton()->m_realTimeEyePosPicSize;
+    pp->m_videoSize=QString::number(videoSize.width())+"*"+QString::number(videoSize.height());
     return pp;
 }
 
@@ -45,6 +54,7 @@ DynamicCheckResultModel::DynamicCheckResultModel(CheckResult_ptr checkResult_ptr
 {
     m_params=Utility::QStringToEntity<DynamicParams>(checkResult_ptr->m_params);
     m_data=Utility::QStringToEntity<DynamicResultData>(checkResult_ptr->m_data);
+
 }
 
 CheckResult_ptr DynamicCheckResultModel::ModelToDB()

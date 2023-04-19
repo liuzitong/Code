@@ -780,7 +780,7 @@ void AnalysisSvc::drawRoundCrossPixScale(int range, QImage &img)
     }
 }
 
-void AnalysisSvc::drawText(QVector<int> values,QVector<QPointF> locs,int range,int OS_OD,QImage& img,QVector<int> hideNumbers,float minificationFactor,bool isReport)
+void AnalysisSvc::drawText(QVector<int> values,QVector<QPointF> locs,int range,int OS_OD,QImage& img,DrawType type,float minificationFactor,bool isReport)
 {
     img.fill(qRgb(255, 255, 255));
     drawPixScale(range,img);
@@ -802,53 +802,59 @@ void AnalysisSvc::drawText(QVector<int> values,QVector<QPointF> locs,int range,i
 
     for(int i=0;i<values.length();i++)             //画DB图
     {
-        bool isHideNumber=false;
-        for(auto& j:hideNumbers)
+        if(type==DrawType::Dev||type==DrawType::MDev)
         {
-            if(values[i]==j)
-            {
-                isHideNumber=true;
-                break;
-            }
+            if(values[i]==-99) continue;
         }
-        if(isHideNumber) continue;
+
         if(i<locs.length())
         {
             auto pixLoc=convertDegLocToPixLoc(locs[i],range,img);
             const QRect rectangle = QRect(pixLoc.x()-fontPixSize*1.6*0.45, pixLoc.y()-fontPixSize*0.8/2, fontPixSize*1.6,fontPixSize*0.8);
-            if(values[i]==-999)
-                painter.drawText(rectangle,Qt::AlignCenter,"<0");
-            else if(values[i]==999)
-                painter.drawText(rectangle,Qt::AlignCenter,">51");
+            if(type==DrawType::DB)
+            {
+                if(values[i]<0)
+                    painter.drawText(rectangle,Qt::AlignCenter,"<0");
+                else if(values[i]>51)
+                    painter.drawText(rectangle,Qt::AlignCenter,">51");
+                else
+                    painter.drawText(rectangle,Qt::AlignCenter,QString::number(values[i]));
+            }
             else
                 painter.drawText(rectangle,Qt::AlignCenter,QString::number(values[i]));
 //            img.setPixel(pixLoc.x(),pixLoc.y(),0xFFFF0000); //标个小红点
         }
         else if(i>=locs.length()&&i<2*locs.length())            //短周期
         {
+            if(values[i]==-999) continue;
             auto pixLoc=convertDegLocToPixLoc(locs[i-locs.length()],range,img);
-            const QRect rectangle = QRect(pixLoc.x()-fontPixSize*2.0*0.50, pixLoc.y()-fontPixSize*1.0/2+fontPixSize, fontPixSize*2.0,fontPixSize*1.0);
+            const QRect rectangle = QRect(pixLoc.x()-fontPixSize*2.4*0.50, pixLoc.y()-fontPixSize*1.0/2+fontPixSize, fontPixSize*2.4,fontPixSize*1.0);
             if(pixLoc.y()+fontPixSize*1.5>img.height()) continue;  //防止超过图片范围,干脆不显示
             painter.fillRect(rectangle,QBrush{Qt::white});
-            if(values[i]==-999)
-                painter.drawText(rectangle,Qt::AlignCenter,"<0");
-            else if(values[i]==999)
-                painter.drawText(rectangle,Qt::AlignCenter,">51");
+
+            if(values[i]<0)
+                painter.drawText(rectangle,Qt::AlignCenter,"(<0)");
+            else if(values[i]>51)
+                painter.drawText(rectangle,Qt::AlignCenter,"(>51)");
             else
                 painter.drawText(rectangle,Qt::AlignCenter,"("+QString::number(values[i])+")");
-//            img.setPixel(pixLoc.x(),pixLoc.y(),0xFFFF0000); //标个小红点
+
+
         }
         else if(i==locs.length()*2)                           //中心点
         {
+            if(values[i]==-999) continue;
             auto pixLoc=convertDegLocToPixLoc({0,0},range,img);
             const QRect rectangle = QRect(pixLoc.x()-fontPixSize*1.6*0.45, pixLoc.y()-fontPixSize*0.8/2, fontPixSize*1.6,fontPixSize*0.8);
             painter.fillRect(rectangle,QBrush{Qt::white});
-            if(values[i]==-999)
+
+            if(values[i]<0)
                 painter.drawText(rectangle,Qt::AlignCenter,"<0");
-            else if(values[i]==999)
+            else if(values[i]>51)
                 painter.drawText(rectangle,Qt::AlignCenter,">51");
             else
                 painter.drawText(rectangle,Qt::AlignCenter,QString::number(values[i]));
+
         }
     }
 }
@@ -952,8 +958,8 @@ void AnalysisSvc::drawGray(QVector<int> values, QVector<QPointF> locs, int range
         {
             int index=interpolationDots[j].first;
             int tempVal=values[index];
-            if(tempVal==-999) tempVal=0;
-            if(tempVal==999) tempVal=51;
+            if(tempVal<0) tempVal=0;
+            if(tempVal>51) tempVal=51;
             if(interpolationDots[j].second==0)
             {
                 totalValue=tempVal;
@@ -1124,7 +1130,7 @@ void AnalysisSvc::drawScreening(QVector<int> values, QVector<QPointF> locs, int 
 
             switch (values[i])
             {
-            case -1:break;
+            case -999:break;
             case 0:painter.drawText(rectangle,Qt::AlignCenter,"( )");painter.drawImage(imageLoc,screenImageSE2);break;
             case 1:painter.drawText(rectangle,Qt::AlignCenter,"( )");painter.drawImage(imageLoc,screenImageSE1);break;
             case 2:painter.drawText(rectangle,Qt::AlignCenter,"( )");painter.drawImage(imageLoc,screenImageSE0);break;
@@ -1143,7 +1149,7 @@ void AnalysisSvc::drawScreening(QVector<int> values, QVector<QPointF> locs, int 
             auto imageLoc=QPoint{pixLoc.x()-screenImageSE0.width()/2,pixLoc.y()-screenImageSE0.height()/2};
             switch (values[i])
             {
-            case -1:break;
+            case -999:break;
             case 0:painter.drawImage(imageLoc,screenImageSE2);break;
             case 1:painter.drawImage(imageLoc,screenImageSE1);break;
             case 2:painter.drawImage(imageLoc,screenImageSE0);break;

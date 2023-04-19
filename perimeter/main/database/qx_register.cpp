@@ -1,4 +1,4 @@
-#include "program.h"
+﻿#include "program.h"
 #include "checkResult.h"
 #include "patient.h"
 
@@ -37,6 +37,7 @@ template <> void qx::register_class(QxClass<CheckResult> &t){
     t.data(&CheckResult::m_params, "params");
     t.data(&CheckResult::m_data,"data");
     t.data(&CheckResult::m_blob,"blob");
+    t.data(&CheckResult::m_videoSize,"video_size");
     t.data(&CheckResult::m_diagnosis,"diagnosis");
     t.data(&CheckResult::m_time,"time");
     t.relationManyToOne(&CheckResult::m_patient,"patient_id");

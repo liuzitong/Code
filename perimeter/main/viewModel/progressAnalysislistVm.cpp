@@ -76,7 +76,7 @@ QObject *ProgressAnalysisListVm::getProgressBaseLinePreview(int imageSize)
         if(m_OS_OD!=0){for(auto&i:locs)  i.rx()=-i.rx();}
 
         analysisSvc->drawGray(values,locs,range,innerRange,img);img.save(m_previewFolder+"baseLine_gray"+QString::number(index)+".bmp");
-        analysisSvc->drawText(values,locs,range,OS_OD,img,{-1});img.save(m_previewFolder+"baseLine_dBDiagram"+QString::number(index)+".bmp");
+        analysisSvc->drawText(values,locs,range,OS_OD,img,DrawType::DB);img.save(m_previewFolder+"baseLine_dBDiagram"+QString::number(index)+".bmp");
         analysisSvc->drawPE(peDev,locs,range,img);img.save(m_previewFolder+"baseLine_TotalPE"+QString::number(index)+".bmp");
         analysisSvc->drawPE(peMDev,locs,range,img);img.save(m_previewFolder+"baseLine_PatternPE"+QString::number(index)+".bmp");
     };
@@ -136,7 +136,7 @@ QVariantList ProgressAnalysisListVm::getThreeFollowUpsPreview(int index,int imag
         analysisSvc->drawPE(mPE[i],locs[i+2],30,img);img.save(m_previewFolder+"threeFollowUps_PatternPE"+QString::number(i)+".bmp");
 //        analysisSvc->drawText(val[i],locs[i+2],30,m_OS_OD,img,1.0,true);img.save(m_previewFolder+"threeFollowUps_PatternPE"+QString::number(i)+".bmp");
 //        analysisSvc->drawText(mDev[i+2],locs[i+2],30,m_OS_OD,img,1.0,true);img.save(m_previewFolder+"threeFollowUps_PatternPE"+QString::number(i)+".bmp");
-        analysisSvc->drawText(progressVal[i],progressLocs[i],30,m_OS_OD,img,{});img.save(m_previewFolder+"threeFollowUps_progressVal"+QString::number(i)+".bmp");
+        analysisSvc->drawText(progressVal[i],progressLocs[i],30,m_OS_OD,img,DrawType::Others);img.save(m_previewFolder+"threeFollowUps_progressVal"+QString::number(i)+".bmp");
         analysisSvc->drawProgess(progressPicVal[i],progressLocs[i],30,img);img.save(m_previewFolder+"threeFollowUps_progressPic"+QString::number(i)+".bmp");
     }
 
@@ -206,7 +206,7 @@ void ProgressAnalysisListVm::getProgressBaseLineReport(QString diagnosis)
         if(m_OS_OD!=0){for(auto&i:locs)  i.rx()=-i.rx();}
 
         analysisSvc->drawGray(values,locs,range,innerRange,img);img.save(m_reportFolder+"baseLine_gray"+QString::number(index)+".bmp");
-        analysisSvc->drawText(values,locs,range,OS_OD,img,{-1},1.0,true);img.save(m_reportFolder+"baseLine_dBDiagram"+QString::number(index)+".bmp");
+        analysisSvc->drawText(values,locs,range,OS_OD,img,DrawType::DB,1.0,true);img.save(m_reportFolder+"baseLine_dBDiagram"+QString::number(index)+".bmp");
         analysisSvc->drawPE(peDev,locs,range,img);img.save(m_reportFolder+"baseLine_TotalPE"+QString::number(index)+".bmp");
         analysisSvc->drawPE(peMDev,locs,range,img);img.save(m_reportFolder+"baseLine_PatternPE"+QString::number(index)+".bmp");
     };
@@ -316,7 +316,7 @@ void Perimeter::ProgressAnalysisListVm::getThreeFollowUpsReport(int index,QStrin
         analysisSvc->drawGray(val[i],locs[i+2],30,m_OS_OD,img);img.save(m_reportFolder+"threeFollowUps_grey"+QString::number(i)+".bmp");
 //        analysisSvc->drawText(val[i],locs[i+2],30,m_OS_OD,img,{-1,-99},1.0,true);img.save(m_reportFolder+"threeFollowUps_PatternPE"+QString::number(i)+".bmp");
         analysisSvc->drawPE(mPE[i],locs[i+2],30,img);img.save(m_reportFolder+"threeFollowUps_PatternPE"+QString::number(i)+".bmp");
-        analysisSvc->drawText(progressVal[i],progressLocs[i],30,m_OS_OD,img,{},1.0,true);img.save(m_reportFolder+"threeFollowUps_progressVal"+QString::number(i)+".bmp");
+        analysisSvc->drawText(progressVal[i],progressLocs[i],30,m_OS_OD,img,DrawType::DB,1.0,true);img.save(m_reportFolder+"threeFollowUps_progressVal"+QString::number(i)+".bmp");
         analysisSvc->drawProgess(progressPicVal[i],progressLocs[i],30,img);img.save(m_reportFolder+"threeFollowUps_progressPic"+QString::number(i)+".bmp");
     }
 
@@ -410,11 +410,11 @@ void Perimeter::ProgressAnalysisListVm::getSingleProgressReport(int index,QStrin
     analysisSvc->ProgressAnalysis(mDev,locs,m_OS_OD,progressLocs,progressVal,progressPicVal,progress);
 
     QImage img=QImage({480,480}, QImage::Format_RGB32);
-    analysisSvc->drawText(val.last(),locs.last(),30,m_OS_OD,img,{-1},1.0,true);img.save(m_reportFolder+"singleProgress_dBDiagram.bmp");
+    analysisSvc->drawText(val.last(),locs.last(),30,m_OS_OD,img,DrawType::DB,1.0,true);img.save(m_reportFolder+"singleProgress_dBDiagram.bmp");
     analysisSvc->drawGray(val.last(),locs.last(),30,0,img);img.save(m_reportFolder+"singleProgress_gray.bmp");
 
-    analysisSvc->drawText(m_currentDataList[index].dev,locs.last(),30,m_OS_OD,img,{-99},1.0,true);img.save(m_reportFolder+"singleProgress_TotalDeviation.bmp");
-    analysisSvc->drawText(m_currentDataList[index].mDev,locs.last(),30,m_OS_OD,img,{-99},1.0,true);img.save(m_reportFolder+"singleProgress_PatternDeviation.bmp");
+    analysisSvc->drawText(m_currentDataList[index].dev,locs.last(),30,m_OS_OD,img,DrawType::Dev,1.0,true);img.save(m_reportFolder+"singleProgress_TotalDeviation.bmp");
+    analysisSvc->drawText(m_currentDataList[index].mDev,locs.last(),30,m_OS_OD,img,DrawType::MDev,1.0,true);img.save(m_reportFolder+"singleProgress_PatternDeviation.bmp");
 
     analysisSvc->drawPE(m_currentDataList[index].peDev,locs.last(),30,img);img.save(m_reportFolder+"singleProgress_TotalPE.bmp");
     analysisSvc->drawPE(m_currentDataList[index].peMDev,locs.last(),30,img);img.save(m_reportFolder+"singleProgress_PatternPE.bmp");

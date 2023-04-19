@@ -101,8 +101,15 @@ UtilitySvc::UtilitySvc()
         auto jo=JsonDoc.object();
         m_checkCountBeforeGetBlindDotCheck=jo["checkCountBeforeGetBlindDotCheck"].toInt();
         m_blindDotTestDB=jo["blindDotTestDB"].toInt();
+        m_blindDotTestIncDB=jo["blindDotTestIncDB"].toInt();
         m_falsePositiveDecDB=jo["falsePositiveAddDB"].toInt();
         m_VFImultiplier=jo["VFImultiplier"].toDouble();
+        QStringList strs=jo["realTimeEyePosPicSize"].toString().split("*");
+        if(strs.size()==2)
+        {
+            m_realTimeEyePosPicSize.rwidth()=strs[0].toInt();
+            m_realTimeEyePosPicSize.rheight()=strs[1].toInt();
+        }
 
         {
             auto boundary=jo["boundaryOne"].toObject();

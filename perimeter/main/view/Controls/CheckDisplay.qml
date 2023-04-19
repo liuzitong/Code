@@ -128,7 +128,18 @@ Item{
                             index=i;
                         }
                     }
-                    clickedDotIndex=index;
+                    if(currentCheckResult.params.centerDotCheck)
+                    {
+                        if(Math.pow(dotClicked.x,2)+Math.pow(dotClicked.y,2)<dist)
+                        {
+                            clickedDotIndex=dotList.length*2;                                   //中心点
+                        }
+                    }
+                    else
+                    {
+                        clickedDotIndex=index;                                             //其它
+                    }
+
                     displayCanvas.requestPaint();
                 }
                 else
@@ -347,8 +358,8 @@ Item{
         function drawShortFlucDB(db,dot)
         {
             var pixDot=dotToPixCoord(dot);
-            if(db===-999) db="<0";
-            if(db===999) db=">51";
+            if(db<-0) db="<0";
+            if(db>51) db=">51";
             drawText("("+db+")",pixDot.x,pixDot.y+fontPointSize*1.5);
         }
 
@@ -612,36 +623,60 @@ Item{
             }
             else
             {
+
+                if(currentProgram.type!==2&clickedDotIndex!=-1)                                     //选择点--实时图片用
+                {
+                    var clickedDot
+                    if(clickedDotIndex<dotList.length)
+                    {
+                         clickedDot=currentProgram.data.dots[clickedDotIndex];
+                    }
+                    else if(clickedDotIndex==2*dotList.length)
+                    {
+                        clickedDot={x:0,y:0};
+                    }
+                    console.log(clickedDot);
+                    var pixLoc=dotToPixCoord(clickedDot);
+                    console.log(pixLoc.x+","+pixLoc.y);
+                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = "blue";
+                    ctx.beginPath();
+                    ctx.arc(pixLoc.x, pixLoc.y, diameter/40, 0, Math.PI*2);
+                    ctx.closePath();
+                    ctx.stroke();
+                    root.painted();
+                }
+
                 if(currentProgram.type===0)                                     //阈值,静态是结果-1(表示没测到)画点,其它画值
                 {
                     dBList=currentCheckResult.resultData.checkData;
+                    console.log(dBList);
                     for(i=0;i<dBList.length;i++)
                     {
                         if(i<dotList.length)                                            //一般结果
                         {
-                            if(dBList[i]===-1)
+                            console.log(dBList[i]);
+                            if(dBList[i]===-999)
                                 drawDot(dotList[i],"white");
-                            else if(dBList[i]===-999)
-                            {
-                                console.log("haha");
+                            else if(dBList[i]<0)
                                  drawText("<0",dotToPixCoord(dotList[i]).x,dotToPixCoord(dotList[i]).y)
-
-                            }
-
-                            else if(dBList[i]===999)
+                            else if(dBList[i]>51)
                                 drawText(">51",dotToPixCoord(dotList[i]).x,dotToPixCoord(dotList[i]).y)
                             else
                                 drawDB(dBList[i],dotList[i]);
                         }
                         else if(dotList.length<=i&&i<2*dotList.length)                                                            //短周期
                         {
-                            if(dBList[i]!==-1) drawShortFlucDB(dBList[i],dotList[i-dotList.length]);
+                            if(dBList[i]!==-999) drawShortFlucDB(dBList[i],dotList[i-dotList.length]);
                         }
                         else if(i===dotList.length*2)                           //中心点
                         {
+
                             if(dBList[i]===-999)
+                                drawDot(dotList[i],"white");
+                            else if(dBList[i]<0)
                                 drawText("<0",dotToPixCoord(dotList[i]).x,dotToPixCoord(dotList[i]).y)
-                            else if(dBList[i]===999)
+                            else if(dBList[i]>51)
                                 drawText(">51",dotToPixCoord(dotList[i]).x,dotToPixCoord(dotList[i]).y)
                             else  if(dBList[i]!==-1)
                                 drawDB(dBList[i],dotList[i]);
@@ -658,7 +693,7 @@ Item{
                         {
                             switch (dBList[i])
                             {
-                            case -1:drawDot(dotList[i],"white");break;
+                            case -999:drawDot(dotList[i],"white");break;
                             case 0:drawUnseen(dotList[i]);break;
                             case 1:drawWeakSeen(dotList[i]);break;
                             case 2:drawSeen(dotList[i]);break;
@@ -670,7 +705,7 @@ Item{
                             var y_offset=-1.5*fontPointSize;
                             switch (dBList[i])
                             {
-                            case -1:;break;
+                            case -999:;break;
                             case 0:drawShortFlucUnseen(dotList[i-dotList.length]);break;
                             case 1:drawShortFlucWeakSeen(dotList[i-dotList.length]);break;
                             case 2:drawShortFlucSeen(dotList[i-dotList.length]);break;
@@ -681,7 +716,7 @@ Item{
                         {
                             switch (dBList[i])
                             {
-                            case -1:break;
+                            case -999:break;
                             case 0:drawUnseen({x:0,y:0});break;
                             case 1:drawWeakSeen({x:0,y:0});break;
                             case 2:drawSeen({x:0,y:0});break;
@@ -770,24 +805,9 @@ Item{
                         }
                     }
                 }
-                 delete inputdotList;
+                delete inputdotList;
             }
 
-
-            if(currentProgram.type!==2&clickedDotIndex!=-1)                                     //选择点--实时图片用
-            {
-                var clickedDot=currentProgram.data.dots[clickedDotIndex];
-                console.log(clickedDot);
-                var pixLoc=dotToPixCoord(clickedDot);
-                console.log(pixLoc.x+","+pixLoc.y);
-                ctx.lineWidth = 1;
-                ctx.strokeStyle = "blue";
-                ctx.beginPath();
-                ctx.arc(pixLoc.x, pixLoc.y, diameter/40, 0, Math.PI*2);
-                ctx.closePath();
-                ctx.stroke();
-                root.painted();
-            }
         }
 
     }

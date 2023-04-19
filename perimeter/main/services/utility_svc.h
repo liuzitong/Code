@@ -5,6 +5,7 @@
 #include <QVector>
 #include <QSharedPointer>
 #include <QVariant>
+#include <QSize>
 namespace Perimeter
 {
 class UtilitySvc:public QObject
@@ -51,8 +52,10 @@ public:
     QVector<QPoint> m_right_blindDot;
     int m_checkCountBeforeGetBlindDotCheck;
     int m_blindDotTestDB;
+    int m_blindDotTestIncDB;
     int m_falsePositiveDecDB;
     double m_VFImultiplier;
+    QSize m_realTimeEyePosPicSize;
 
     QVector<QVector<QVector<int>>> m_value_30d_cursorSize_cursorColor;
     QVector<QVector<int>> m_value_30d_cursorSizeIII_ageCorrection;     //cursorSize!=2 ,it's CursorColor

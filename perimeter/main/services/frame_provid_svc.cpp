@@ -67,7 +67,7 @@ void FrameProvidSvc::setFormat(int width, int heigth, QVideoFrame::PixelFormat f
 void FrameProvidSvc::onNewVideoContentReceived(/*QByteArray qa*/)
 {
     auto rawData=DevOps::DeviceOperation::getSingleton()->m_frameRawData;
-    qDebug()<<"frame provider received "+QString::number(rawData.size());
+//    qDebug()<<"frame provider received "+QString::number(rawData.size());
     if(rawData.size()==640*480)
     {
         QImage img((uchar*)rawData.data(),640,480,QImage::Format::Format_Grayscale8);

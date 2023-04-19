@@ -445,6 +445,19 @@ void MainWindow::refreshStatus()
     ui->label_posChinHoz->setText(QString::number(m_statusData.motorPosition(MotorId::MotorId_Chin_Hoz)));
     ui->label_posChinVert->setText(QString::number(m_statusData.motorPosition(MotorId::MotorId_Chin_Vert)));
 
+    static bool moveCommandSend=false;
+    if(m_statusData.moveStutas()==true)
+    {
+        moveCommandSend=true;
+    }else
+    {
+        if(moveCommandSend)
+        {
+            m_devCtl->openShutter(0,ui->lineEdit_shutterOpen->text().toInt());
+            moveCommandSend=false;
+        }
+    }
+
 }
 
 
@@ -627,9 +640,9 @@ void MainWindow::on_pushButton_testStart_clicked()
     {
         case 0:
         {
-            m_devCtl->resetMotor(UsbDev::DevCtl::MotorId_Color,sps[3]);
-            m_devCtl->resetMotor(UsbDev::DevCtl::MotorId_Light_Spot,sps[4]);
-            waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
+//            m_devCtl->resetMotor(UsbDev::DevCtl::MotorId_Color,sps[3]);
+//            m_devCtl->resetMotor(UsbDev::DevCtl::MotorId_Light_Spot,sps[4]);
+//            waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
             if(m_status.currentColorSlot!=colorSlot||m_status.currentLightSpotPos!=spotSlot)              //变换到改变光斑颜色位置
             {
                 int  color_Circl_Motor_Steps=m_profile.motorRange(UsbDev::DevCtl::MotorId_Color).second-m_profile.motorRange(UsbDev::DevCtl::MotorId_Color).first;
@@ -899,7 +912,6 @@ void MainWindow::on_comboBox_testFucntion_currentIndexChanged(int index)
     else
     {
         ui->stackedWidget->setCurrentIndex(index-1);
-        ui->spinBox_shutterOpenDuration->setEnabled(index==1);
         ui->groupBox_focalTest->setEnabled(index==1);
     }
 //    if(index==2)
@@ -1577,7 +1589,9 @@ void MainWindow::dynamicCastTest(const CoordSpacePosInfo& dotSpaceBegin,const Co
                    UsbDev::DevCtl::MotorId_X,
                    UsbDev::DevCtl::MotorId_Y
                    });
+    m_devCtl->openShutter(65535,ui->lineEdit_shutterOpen->text().toInt());
     m_devCtl->startDynamic(speedLevel,speedLevel,speedLevel,stepTime,stepCount);    //开始
+
     delete[] dotArr;
 }
 
