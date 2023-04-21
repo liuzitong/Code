@@ -679,6 +679,8 @@ void DeviceOperation::workOnNewStatuData()
         setLamp(LampId::LampId_borderInfrared,0,false);
     }
 
+    if(m_videoOnOff!=m_statusData.cameraStatus())
+        m_devCtl->setFrontVideo(m_videoOnOff);
 
     if(!m_isCastLightAdjusted&&m_castLightAdjustElapsedTimer.elapsed()>=100&&m_isDeviceReady)
     {

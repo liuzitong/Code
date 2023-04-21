@@ -1494,11 +1494,13 @@ CheckSvc::CheckSvc(QObject *parent)
 
 //    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::newFrameData,FrameProvidSvc::getSingleton().data(),&FrameProvidSvc::onNewVideoContentReceived);
     m_workerThread.start();
+    connectDev();
 }
 
 CheckSvc::~CheckSvc()
 {
 //    m_workerThread.quit();
+    disconnectDev();
     m_workerThread.terminate();
     m_worker->deleteLater();
 }

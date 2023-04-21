@@ -54,8 +54,8 @@ public:
     void moveChinLeft(){if(m_isDeviceReady) moveChin(ChinMoveDirection::Left);}
     void moveChinRight(){if(m_isDeviceReady) moveChin(ChinMoveDirection::Right);}
     void stopMovingChin(){if(m_isDeviceReady) moveChin(ChinMoveDirection::Stop);}
-    void turnOnVideo(){if(m_isDeviceReady) m_devCtl->setFrontVideo(true);}
-    void turnOffVideo(){if(m_isDeviceReady) m_devCtl->setFrontVideo(false);}
+    void turnOnVideo(){m_videoOnOff=true;}
+    void turnOffVideo(){m_videoOnOff=false;}
     static QSharedPointer<DeviceOperation> getSingleton();
     void connectDev();
     void disconnectDev();
@@ -111,6 +111,7 @@ public:
     float m_deviation=0;
 //    bool m_deviation_valid;
     QSize m_videoSize;
+    bool m_videoOnOff=false;
     QSharedPointer<UsbDev::DevCtl> m_devCtl;
 //    UsbDev::DevCtl* m_devCtl;
     UsbDev::Config m_config;
