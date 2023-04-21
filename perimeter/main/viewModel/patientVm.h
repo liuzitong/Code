@@ -31,6 +31,7 @@ public:
     Q_INVOKABLE virtual ~PatientVm() Q_DECL_OVERRIDE;
     Q_INVOKABLE void update();
     Q_INVOKABLE void insert();
+    Q_INVOKABLE QObject* getLastCheckResult();
 //    Q_INVOKABLE int age();
 //    PatientVm& operator=(const PatientVm& other);
     long getID();void setID(long value);

@@ -5,17 +5,17 @@ namespace Perimeter {
 
 StaticProgramVm::StaticProgramVm(const QVariantList &args)
 {
-    StaticProgramModel* pp;
-    if(args.count()==0)
-    {
-        pp=new StaticProgramModel;
-        using spcp=StaticParams::CommonParams;
-        pp->m_params={StaticParams::CommonParams{{0,30},spcp::Strategy::fastInterative,spcp::StrategyMode::ageRelated,CursorColor::white,CursorSize::I,BackGroundColor::white,
-                                                 true,true,850,true,true,FixationTarget::centerPoint,FixationMonitor::dontAlarm,true},
-                      StaticParams::FixedParams{180,1000,20,20,10,10,10,10}};
-    }
-    else
-    {
+//    StaticProgramModel* pp;
+//    if(args.count()==0)
+//    {
+//        pp=new StaticProgramModel;
+//        using spcp=StaticParams::CommonParams;
+//        pp->m_params={StaticParams::CommonParams{{0,30},spcp::Strategy::fastInterative,spcp::StrategyMode::ageRelated,CursorColor::white,CursorSize::I,BackGroundColor::white,
+//                                                 true,true,850,true,true,FixationTarget::centerPoint,FixationMonitor::dontAlarm,true},
+//                      StaticParams::FixedParams{180,1000,20,20,10,10,10,10}};
+//    }
+//    else
+//    {
 //       int program_id=args[0].toInt();
 //       qx_query query("select * from program where program_id=:program_id");
 //       query.bind(":program_id",program_id);
@@ -23,12 +23,12 @@ StaticProgramVm::StaticProgramVm(const QVariantList &args)
 //       QSqlError daoError = qx::dao::execute_query(query, program_List);
 //       Program_ptr program_ptr=program_List.first();
 
-        Program_ptr program_ptr(new Program);
-        qDebug()<<args[0].toInt();
-        program_ptr->m_id=args[0].toInt();
-        qx::dao::fetch_by_id(program_ptr);
-        pp=new StaticProgramModel(program_ptr);
-    }
+    Program_ptr program_ptr(new Program);
+    qDebug()<<args[0].toInt();
+    program_ptr->m_id=args[0].toInt();
+    qx::dao::fetch_by_id(program_ptr);
+    auto pp=new StaticProgramModel(program_ptr);
+//    }
     m_data.reset(pp);
     ProgramVm::m_data=pp;
     m_staticDataVm.reset(new StaticProgramDataVm(&m_data->m_data));

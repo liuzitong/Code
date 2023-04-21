@@ -17,6 +17,7 @@ Column {
     property int resultId;
     property int os_od;
     property int pageSize: 20
+    property string pageFrom: "";
     signal changePage(var pageName,var params);
     signal refresh()
 

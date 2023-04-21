@@ -25,12 +25,12 @@ Item {id:root; width: 1366;height: 691
     signal realTimePicRefresh(var count);
     property var frameProvidSvc: null;
     property var checkSvc: IcUiQmlApi.appCtrl.checkSvc;
-
+    property string pageFrom: "";
 
     Component.onCompleted:{
         frameProvidSvc=IcUiQmlApi.appCtrl.frameProvidSvc;
         checkSvc.checkResultChanged.connect(currentCheckResultChanged);
-        refresh();
+//        refresh();
     }
 
     onCurrentCheckResultChanged:{if(currentCheckResult==null){checkDisplay.clickedDotIndex=-1;realTimeDBRec.visible=false;}}
@@ -472,7 +472,7 @@ Item {id:root; width: 1366;height: 691
                             id:checkControl
                             height: parent.height;spacing: height*0.8;anchors.horizontalCenter: parent.horizontalCenter;
                             CusButton{
-                                enabled: /*IcUiQmlApi.appCtrl.checkSvc.devReady&&*/(currentProgram.type!==2||checkDisplay.dynamicSelectedDotsReady);
+                                enabled: /*IcUiQmlApi.appCtrl.checkSvc.devReady&&IcUiQmlApi.appCtrl.checkSvc.isCastLightAdjusted&&*/(currentProgram.type!==2||checkDisplay.dynamicSelectedDotsReady);
                                 property int checkState: IcUiQmlApi.appCtrl.checkSvc.checkState;
                                 text:{if(checkState>2) return lt+qsTr("Start");if(checkState===2) return lt+qsTr("Resume");if(checkState===0||checkState===1) return lt+qsTr("Pause")}
                                 onClicked:{

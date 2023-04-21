@@ -29,6 +29,14 @@ StaticCheckResultVm::StaticCheckResultVm(const QVariantList &args)
     }
 }
 
+StaticCheckResultVm::StaticCheckResultVm(const CheckResult_ptr & checkResult_ptr)
+{
+    m_data.reset(new StaticCheckResultModel(checkResult_ptr));
+    CheckResultVm::setData(m_data.data());
+    m_params.reset(new StaticParamsVM(&m_data->m_params));
+    m_resultData.reset(new StaticResultDataVm(&m_data->m_data));
+}
+
 void StaticCheckResultVm::insert()
 {
     static int count=0;
@@ -143,6 +151,14 @@ DynamicCheckResultVm::DynamicCheckResultVm(const QVariantList &args)
         m_resultData.reset(new DynamicResultDataVm(&m_data->m_data));
     }
 
+}
+
+DynamicCheckResultVm::DynamicCheckResultVm(const CheckResult_ptr &checkResult_ptr)
+{
+    m_data.reset(new DynamicCheckResultModel(checkResult_ptr));
+    CheckResultVm::setData(m_data.data());
+    m_params.reset(new DynamicParamsVM(&m_data->m_params));
+    m_resultData.reset(new DynamicResultDataVm(&m_data->m_data));
 }
 
 void DynamicCheckResultVm::insert()

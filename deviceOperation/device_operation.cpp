@@ -8,6 +8,9 @@
 #include <QtMath>
 #include <QApplication>
 #include <thread>
+#include <QtConcurrent/QtConcurrent>
+#include <QtGlobal>
+
 //#include <QQmlEngine>
 
 #pragma execution_character_set("utf-8")
@@ -26,6 +29,7 @@ DeviceOperation::DeviceOperation()
 //    qDebug()<<m_config.DbPosMappingPtr()[0][0];
 //    qDebug()<<DeviceData::getSingleton()->m_config.DbPosMappingPtr()[0][0];
 //    qDebug()<<DeviceData::getSingleton()->m_config.DbPosMappingPtr()[0][1];
+//    m_castLightAdjustElapsedTimer.start();
 }
 
 DeviceOperation::~DeviceOperation()
@@ -134,7 +138,7 @@ void DeviceOperation::setLamp(LampId id, int index, bool onOff)
         case LampId::LampId_centerInfrared:da=config.centerFixationLampDARef();break;
         case LampId::LampId_borderInfrared:da=config.borderInfraredLampDARef();break;
         case LampId::LampId_eyeglassInfrared:da=config.eyeglassFrameLampDARef();break;
-        case LampId::LampId_castLight:da=config.castLightADPresetRef();break;
+        case LampId::LampId_castLight:break;                                                //这个是
         }
     }
     m_devCtl->setLamp(UsbDev::DevCtl::LampId(id),index,da);
@@ -287,6 +291,29 @@ void DeviceOperation::disconnectDev()
     setIsDeviceReady(false);
 }
 
+void DeviceOperation::getReadyToStimulate(int motorPosX,int motorPosY,int motorPosFocal)
+{
+    int motorPos[5];
+    motorPos[0]=motorPosX;
+    motorPos[1]=motorPosY;
+    motorPos[2]=motorPosFocal;
+    motorPos[3]=m_config.DbPosMappingPtr()[0][0];
+    motorPos[4]=m_config.DbPosMappingPtr()[0][1];
+
+    bool isMotorMove[5]{true,true,true,true,true};
+    waitMotorStop({UsbDev::DevCtl::MotorId_Color,
+                   UsbDev::DevCtl::MotorId_Light_Spot,
+                   UsbDev::DevCtl::MotorId_Focus,
+                   UsbDev::DevCtl::MotorId_X,
+                   UsbDev::DevCtl::MotorId_Y
+                   });
+    while(m_shutterElapsedTimer.elapsed()<=m_shutterElapsedTime+50)  //增加100 防止延迟,就是关掉了快门才移动
+    {
+        QCoreApplication::processEvents();
+    }
+    move5Motors(isMotorMove,motorPos);
+}
+
 
 void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB,bool isMainDotInfoTable)
 {
@@ -340,7 +367,23 @@ void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB,bool
     move5Motors(isMotorMove,motorPos);
 //    emit staticCursorLoc(loc);
 //    quint8 sps[5]={1,1,1,1,1};
-//    m_devCtl->move5Motors(sps,motorPos);
+    //    m_devCtl->move5Motors(sps,motorPos);
+}
+
+void DeviceOperation::adjustCastLight()
+{
+    qDebug()<<"adjustCastLightStart";
+    int color=DeviceSettings::getSingleton()->m_castLightTargetColor;
+    int size=DeviceSettings::getSingleton()->m_castLightTargetSize;
+    setCursorColorAndCursorSize(color,size);
+    getReadyToStimulate(m_config.xMotorPosForLightCorrectionRef(),m_config.yMotorPosForLightCorrectionRef(),m_config.focalLengthMotorPosForLightCorrectionRef());
+    waitMotorStop({UsbDev::DevCtl::MotorId_Color,
+                   UsbDev::DevCtl::MotorId_Light_Spot,
+                   UsbDev::DevCtl::MotorId_Focus,
+                   UsbDev::DevCtl::MotorId_X,
+                   UsbDev::DevCtl::MotorId_Y
+                   });
+    m_castLightAdjustElapsedTimer.start();
 }
 
 
@@ -606,6 +649,18 @@ void DeviceOperation::moveChin(ChinMoveDirection direction)
     }
 }
 
+void DeviceOperation::lightUpCastLight()
+{
+    if(m_isDeviceReady)
+        m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA);
+}
+
+void DeviceOperation::dimDownCastLight()
+{
+    if(m_isDeviceReady)
+        m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA*0.3);
+}
+
 
 void DeviceOperation::workOnNewStatuData()
 {
@@ -623,6 +678,35 @@ void DeviceOperation::workOnNewStatuData()
         setLamp(LampId::LampId_eyeglassInfrared,0,false);
         setLamp(LampId::LampId_borderInfrared,0,false);
     }
+
+
+    if(!m_isCastLightAdjusted&&m_castLightAdjustElapsedTimer.elapsed()>=100&&m_isDeviceReady)
+    {
+        qDebug()<<"keep adjust castLightDa";
+        int tagetDA=DeviceSettings::getSingleton()->m_castLightTagetDA;
+        int DADiff=DeviceSettings::getSingleton()->m_castLightDADifference;
+        int step=DeviceSettings::getSingleton()->m_castLightDAChangeStep;
+        int currentDA=m_statusData.castLightDA();
+        if(qAbs(tagetDA-currentDA)>DADiff)
+        {
+
+            if(tagetDA>currentDA)
+            {
+                m_currentCastLightDA-=step;
+            }
+            else
+            {
+                m_currentCastLightDA+=step;
+            }
+            m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA);
+            m_castLightAdjustElapsedTimer.restart();
+        }
+        else
+        {
+            setIsCastLightAdjusted(true);
+        }
+    }
+    emit newStatusData();
 //    qDebug()<<m_statusData.answerpadStatus();
 //    m_statusLock.unlock();
 //    static int count=1;
@@ -654,7 +738,7 @@ void DeviceOperation::workOnNewStatuData()
 //        }
 //        emit dynamicCursorLoc(dot);
 //    }
-    emit newStatusData();
+
 }
 
 void DeviceOperation::workOnNewFrameData()
@@ -717,24 +801,75 @@ void DeviceOperation::workOnNewFrameData()
 void DeviceOperation::workOnNewProfile()
 {
     m_profile=m_devCtl->profile();
-
-    if(!m_profile.isEmpty()/*&&!m_config.isEmpty()*/){ waitForSomeTime(2000);setIsDeviceReady(true);}
     m_videoSize=m_profile.videoSize();
+    if(!m_profile.isEmpty()&&!m_config.isEmpty())
+    {
+        waitForSomeTime(2000);
+        setIsDeviceReady(true);
+        if(m_isCastLightAdjusted)
+        {
+            adjustCastLight();
+        }
+    }
 }
 
 void DeviceOperation::workOnNewConfig()
 {
     m_config=m_devCtl->config();
-//    if(!m_profile.isEmpty()/*&&m_config.isEmpty()*/){setIsDeviceReady(true);}
+    if(!m_profile.isEmpty()&&!m_config.isEmpty())
+    {
+        waitForSomeTime(2000);
+        setIsDeviceReady(true);
+        if(m_isCastLightAdjusted)
+        {
+            adjustCastLight();
+        }
+    }
 }
 
-//void DeviceOperation::workOnWorkStatusChanged()
-//{
-//    if(m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_Disconnected)
+
+
+void DeviceOperation::workOnWorkStatusChanged()
+{
+    if(m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_Disconnected)
+    {
+        setIsDeviceReady(false);
+        connectDev();
+    }
+//    if(m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus_S_OK)
 //    {
-//        connectDev();
+//        qDebug()<<"setCastLightDAToRightValue";
+//        int predefDA=m_config.castLightADPresetRef();
+//        int currentDA=predefDA;
+//        m_devCtl->setLamp(LampId::LampId_castLight,0,predefDA);
+//        while (m_statusData.isEmpty()) {QApplication::processEvents();}
+//        QtConcurrent::run([&](){
+//            auto DADiff=DeviceSettings::getSingleton()->m_castLightDADifference;
+//            QThread::msleep(100);
+//            m_statusLock.lock();
+//            int castLightDA=m_statusData.castLightDA();
+//            m_statusLock.unlock();
+//            while(qAbs(predefDA-castLightDA)>DADiff)
+//            {
+//                if(predefDA>castLightDA)
+//                {
+
+//                    m_devCtl->setLamp(LampId::LampId_castLight,0,currentDA-=DADiff);
+//                }
+//                else
+//                {
+//                    m_devCtl->setLamp(LampId::LampId_castLight,0,currentDA+=DADiff);
+//                }
+
+//                QThread::msleep(100);
+//                m_statusLock.lock();
+//                castLightDA=m_statusData.castLightDA();
+//                m_statusLock.unlock();
+//            }
+//            m_adjustedCastLightDA=currentDA;
+//        });
 //    }
-//    emit workStatusChanged();
-//}
+    emit workStatusChanged();
+}
 }
 

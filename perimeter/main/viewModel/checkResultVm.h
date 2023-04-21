@@ -185,6 +185,7 @@ class StaticCheckResultVm:public CheckResultVm
 
 public:
     Q_INVOKABLE explicit StaticCheckResultVm(const QVariantList &);
+    Q_INVOKABLE explicit StaticCheckResultVm(const CheckResult_ptr &);
     Q_INVOKABLE virtual ~StaticCheckResultVm()=default;
     Q_INVOKABLE void insert() override;
     Q_INVOKABLE void update() override;
@@ -209,6 +210,7 @@ class DynamicCheckResultVm:public CheckResultVm
 
 public:
     Q_INVOKABLE explicit DynamicCheckResultVm(const QVariantList &);
+    Q_INVOKABLE explicit DynamicCheckResultVm(const CheckResult_ptr &);
     Q_INVOKABLE virtual ~DynamicCheckResultVm()=default;
     Q_INVOKABLE void insert() override;
     Q_INVOKABLE void update() override;

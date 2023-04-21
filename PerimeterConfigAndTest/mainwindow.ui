@@ -172,7 +172,7 @@
                  </property>
                  <property name="sizeHint" stdset="0">
                   <size>
-                   <width>66</width>
+                   <width>30</width>
                    <height>20</height>
                   </size>
                  </property>
@@ -188,18 +188,18 @@
                  </property>
                  <property name="minimumSize">
                   <size>
-                   <width>25</width>
+                   <width>30</width>
                    <height>0</height>
                   </size>
                  </property>
                  <property name="maximumSize">
                   <size>
-                   <width>25</width>
+                   <width>30</width>
                    <height>16777215</height>
                   </size>
                  </property>
                  <property name="text">
-                  <string>DA:</string>
+                  <string>强度:</string>
                  </property>
                 </widget>
                </item>
@@ -4318,6 +4318,21 @@
            <string>一般配置</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_8">
+           <property name="spacing">
+            <number>2</number>
+           </property>
+           <property name="leftMargin">
+            <number>2</number>
+           </property>
+           <property name="topMargin">
+            <number>2</number>
+           </property>
+           <property name="rightMargin">
+            <number>2</number>
+           </property>
+           <property name="bottomMargin">
+            <number>2</number>
+           </property>
            <item>
             <layout class="QVBoxLayout" name="verticalLayout_19">
              <item>
@@ -4383,7 +4398,7 @@
                   </sizepolicy>
                  </property>
                  <property name="title">
-                  <string>固视灯DA</string>
+                  <string>固视灯强度</string>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_46">
                   <property name="leftMargin">
@@ -4778,7 +4793,7 @@
                   </sizepolicy>
                  </property>
                  <property name="title">
-                  <string>红外灯DA</string>
+                  <string>红外灯强度</string>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_36">
                   <property name="leftMargin">
@@ -5379,6 +5394,22 @@
                 </property>
                </widget>
               </item>
+              <item row="0" column="5">
+               <widget class="QLineEdit" name="lineEdit_lightCorrectionFocus">
+                <property name="minimumSize">
+                 <size>
+                  <width>50</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>50</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
               <item row="0" column="8">
                <widget class="QLabel" name="label_357">
                 <property name="minimumSize">
@@ -5408,35 +5439,6 @@
                 </property>
                </widget>
               </item>
-              <item row="0" column="5">
-               <widget class="QLineEdit" name="lineEdit_lightCorrectionFocus">
-                <property name="minimumSize">
-                 <size>
-                  <width>50</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>50</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="0">
-               <widget class="QLabel" name="label_131">
-                <property name="minimumSize">
-                 <size>
-                  <width>50</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>投射光DA:</string>
-                </property>
-               </widget>
-              </item>
               <item row="0" column="7">
                <widget class="QLineEdit" name="lineEdit_lightCorrectionX">
                 <property name="sizePolicy">
@@ -5456,6 +5458,19 @@
                   <width>50</width>
                   <height>16777215</height>
                  </size>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_131">
+                <property name="minimumSize">
+                 <size>
+                  <width>30</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>强度:</string>
                 </property>
                </widget>
               </item>
@@ -5493,6 +5508,19 @@
                  <string>X:</string>
                 </property>
                </widget>
+              </item>
+              <item row="0" column="10">
+               <spacer name="horizontalSpacer_31">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
               </item>
              </layout>
             </widget>

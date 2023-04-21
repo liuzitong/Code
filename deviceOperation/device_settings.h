@@ -19,6 +19,11 @@ public:
     QString m_VID,m_PID;
     QJsonObject m_rootObj;
     int m_pupilAutoAlignPixelTolerance;
+    int m_castLightDADifference;
+    int m_castLightTagetDA;
+    int m_castLightDAChangeStep;
+    int m_castLightTargetColor;
+    int m_castLightTargetSize;
     int m_pupilAutoAlignStep;
     quint8 m_5MotorSpeed[5];
     quint8 m_motorChinSpeed[2];

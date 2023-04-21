@@ -303,6 +303,7 @@ void StaticCheck::initialize()
     }
 
     setLight(true);
+    m_deviceOperation->lightUpCastLight();
     m_deviceOperation->m_isChecking=true;
     m_deviceOperation->setCursorColorAndCursorSize(int(cursorColor),int(cursorSize));
 
@@ -349,6 +350,7 @@ void StaticCheck::Checkprocess()
 void StaticCheck::finished()
 {
     m_deviceOperation->m_isChecking=false;
+    m_deviceOperation->dimDownCastLight();
     setLight(false);
 }
 
@@ -533,11 +535,13 @@ void StaticCheck::stimulate()
     auto lastCheckedDotType=m_lastCheckeDotType.last();
     if(lastCheckedDotType!=LastCheckedDotType::falseNegativeTest)               //假阴不开快门
     {
+        qDebug()<<QString("deviation is:")+QString::number(m_deviceOperation->m_deviation);
         m_deviceOperation->waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y,UsbDev::DevCtl::MotorId_Shutter});
         m_deviceOperation->openShutter(durationTime);
         switch (lastCheckedDotType)
         {
         case LastCheckedDotType::blindDotTest:
+        case LastCheckedDotType::locateBlindDot:
         case LastCheckedDotType::falsePositiveTest:m_resultModel->m_data.fixationDeviation.push_back(-m_deviceOperation->m_deviation);break;
         case LastCheckedDotType::commonCheckDot:
         {
@@ -1018,8 +1022,8 @@ if(m_deviceOperation->m_isDeviceReady)
      answerResult=waitForAnswer();
 else
 {
-//    answerResult=qrand()%100<50;
-    answerResult=true;
+    answerResult=qrand()%100<50;
+//    answerResult=true;
     UtilitySvc::wait(100);
 }
 //    QThread::msleep(1000);
@@ -1146,6 +1150,7 @@ void DynamicCheck::initialize()
 
 
     setLight(true);
+    m_deviceOperation->lightUpCastLight();
     m_deviceOperation->m_isChecking=true;
     auto cursorSize=m_programModel->m_params.cursorSize;
     auto cursorColor=m_programModel->m_params.cursorColor;
@@ -1351,6 +1356,7 @@ void DynamicCheck::finished()
 {
     m_deviceOperation->m_isChecking=false;
     setLight(false);
+    m_deviceOperation->dimDownCastLight();
 }
 
 void DynamicCheck::setLight(bool onOff)
@@ -1483,7 +1489,9 @@ CheckSvc::CheckSvc(QObject *parent)
     });
 //    connect(m_worker,&CheckSvcWorker::checkProcessFinished,this, [&](){m_checkResultVm->insert();});
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::isDeviceReadyChanged,this,&CheckSvc::devReadyChanged);
+    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::isCastLightAdjustedChanged,this,&CheckSvc::isCastLightAdjustedChanged);
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::pupilDiameterChanged,this,&CheckSvc::pupilDiameterChanged);
+
 //    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::newFrameData,FrameProvidSvc::getSingleton().data(),&FrameProvidSvc::onNewVideoContentReceived);
     m_workerThread.start();
 }
@@ -1585,6 +1593,11 @@ void CheckSvc::turnOffVideo()
 bool CheckSvc::getDevReady()
 {
     return DevOps::DeviceOperation::getSingleton()->getIsDeviceReady();
+}
+
+bool CheckSvc::getIsCastLightAdjusted()
+{
+    return DevOps::DeviceOperation::getSingleton()->getIsCastLightAdjusted();
 }
 
 bool CheckSvc::getAutoAlignPupil()

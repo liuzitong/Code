@@ -15,6 +15,7 @@ Column {
     property var analysisLobbyListVm: null;
     property var currentProgram: null;
     property var analysisVm: null;
+    property string pageFrom: "";
     signal changePage(var pageName,var params);
     signal refresh()
     property int fontPointSize: CommonSettings.fontPointSize;

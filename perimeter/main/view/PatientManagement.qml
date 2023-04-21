@@ -14,8 +14,11 @@ Item{
     property string backGroundColor:"#dcdee0"
     property string backGroundBorderColor:"#bdc0c6"
     property var currentPatient:null;
+    property var lastProgram:null;
+//    property var lastCheckResult: null;
     property int pageSize: 10;
     property int fontPointSize: CommonSettings.fontPointSize;
+    property string pageFrom: "";
     signal queryStarted;
     signal changePage(var pageName,var params);
     width: 1440
@@ -25,10 +28,10 @@ Item{
 //    onLanguageChanged: console.log("haha");
 //    onDoubleNameChanged: console.log("dogdog");
 
-    Component.onCompleted:
-    {
-        currentPatient=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::PatientVm", false,[1]);
-    }
+//    Component.onCompleted:
+//    {
+//        currentPatient=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::PatientVm", false,[1]);
+//    }
 
 
     function createNewPatient(){
@@ -208,6 +211,35 @@ Item{
                                                         var firstName ="";var lastName="";
                                                         if(currentPatient!==null) IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::PatientVm", currentPatient);
                                                         currentPatient=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::PatientVm", false,[model.Id]);
+                                                        if(lastProgram!==null)
+                                                        {
+                                                            if(lastProgram.type!==2)
+                                                            {IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::StaticProgramVM", lastProgram);}
+                                                            else{IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::DynamicProgramVM", lastProgram);}
+                                                        }
+                                                        var lastCheckResult=currentPatient.getLastCheckResult();
+                                                        if(lastCheckResult!==null)
+                                                        {
+                                                            if(lastCheckResult.type!==2)
+                                                                lastProgram=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::StaticProgramVM", false,[lastCheckResult.program_id]);
+                                                            else
+                                                                lastProgram=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::DynamicProgramVM", false,[lastCheckResult.program_id]);
+
+                                                            console.log(lastCheckResult.program_id);
+                                                            console.log(lastProgram.params.fixedParams.stimulationTime);
+                                                            lastProgram.params=lastCheckResult.params;
+                                                            console.log(lastProgram.params.fixedParams.stimulationTime);
+                                                            console.log(lastProgram.params.fixedParams.stimulationTime);
+                                                            console.log(lastProgram.params.commonParams.strategy);
+
+                                                            if(lastCheckResult.type!==2)
+                                                                IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::StaticCheckResultVm", lastCheckResult);
+                                                            else
+                                                                IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::DynamicCheckResultVm", lastCheckResult);
+                                                            lastCheckResult=null;
+                                                        }
+
+
                                                         console.log(currentPatient.name);
                                                         if(currentPatient.name.indexOf(" ")>-1){ firstName =currentPatient.name.split(" ")[0]; lastName=currentPatient.name.split(" ")[1];};
                                                         newPatientId.text=currentPatient.patientId;newChineseName.text=currentPatient.name;genderSelect.selectGender(currentPatient.sex);newBirthDate.text=currentPatient.birthDate;newEnglishFirstName.text=firstName;newEnglishLastName.text=lastName
@@ -467,7 +499,7 @@ Item{
             Item{height: parent.height;width:parent.width*0.6;
                 CusButton{text:lt+qsTr("Exit");onClicked:Qt.quit()}
                 Flow{height: parent.height;spacing: height*0.8;anchors.horizontalCenter: parent.horizontalCenter
-                    CusButton{text:lt+qsTr("Recheck")}
+                    CusButton{enabled:currentPatient!==null&&lastProgram!==null;text:lt+qsTr("Recheck");onClicked:root.changePage("check",{lastProgram:lastProgram})}
                     CusButton{id:patientReviseButton;enabled: false;text:lt+qsTr("Modify");
                         onClicked:
                         {
@@ -501,11 +533,16 @@ Item{
                             query.startQuery();
                         }
                     }
-                    CusButton{text:lt+qsTr("View reports");enabled:currentPatient!==null;onClicked: {root.changePage("analysisLobby","patientManagement");}}
+                    CusButton{text:lt+qsTr("View reports");enabled:currentPatient!==null;onClicked: {root.changePage("analysisLobby",{});}}
                 }
             }
             Flow{height:parent.height; layoutDirection: Qt.RightToLeft;width:parent.width*0.4;spacing: height*0.8;
-                CusButton{text:lt+qsTr("Check");enabled:!(currentPatient===null);onClicked: {root.changePage("check",{pageFrom:"patientManagement"});}}
+                CusButton{text:lt+qsTr("Check");enabled:!(currentPatient===null);
+                    onClicked:
+                    {
+                        root.changePage("check",{lastProgram:null});
+                    }
+                }
                 CusButton{id:patientSaveButton;text:lt+qsTr("Save");enabled: false;
                     onClicked:{
                         var name="";

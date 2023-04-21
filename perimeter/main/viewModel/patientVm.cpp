@@ -2,7 +2,8 @@
 #include "perimeter/main/database/patient.h"
 #include "perimeter/base/common/perimeter_def.h"
 #include "perimeter/base/common/perimeter_memcntr.hxx"
-
+#include "checkResultVm.h"
+#include "perimeter/main/database/checkResult.h"
 #include "perimeter/main/model/utility.h"
 #include <QDate>
 #define T_PrivPtr( o )  perimeter_objcast( Patient*, o )
@@ -99,6 +100,30 @@ void PatientVm::insert()
 {
     auto patient_ptr=getPatientData();
     qx::dao::insert(patient_ptr);
+}
+
+QObject *PatientVm::getLastCheckResult()
+{
+    qDebug()<<"getLastCHeckres";
+    CheckResult_List checkResult_list;
+    qx_query query("select * from checkResult where patient_id=:patientId ORDER BY time DESC LIMIT 1");
+    query.bind(":patientId",int(m_data->m_id));
+    qx::dao::execute_query(query, checkResult_list);
+    if(checkResult_list.size()==0) return nullptr;
+    else
+    {
+        auto checkResult_ptr=checkResult_list.last();
+        qDebug()<<checkResult_ptr->m_id;
+        if(checkResult_ptr->m_type!=2)
+        {
+            return new StaticCheckResultVm(checkResult_ptr);
+        }
+        else
+        {
+            return new DynamicCheckResultVm(checkResult_ptr);
+        }
+    }
+
 }
 
 

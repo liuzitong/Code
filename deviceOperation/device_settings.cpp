@@ -50,6 +50,11 @@ DeviceSettings::DeviceSettings()
     m_pupilPixelDiameterLimit=m_rootObj.value("pupilPixelDiameterLimit").toInt();
     m_pupilDiameterPixelToMillimeterConstant=m_rootObj.value("pupilDiameterPixelToMillimeterConstant").toDouble();
     m_pupilDiameterPixelToFixationDeviationConstant=m_rootObj.value("pupilDiameterPixelToFixationDeviationConstant").toDouble();
+    m_castLightDADifference=m_rootObj.value("castLightDADifference").toInt();
+    m_castLightTagetDA=m_rootObj.value("castLightTargetDA").toInt();
+    m_castLightDAChangeStep=m_rootObj.value("castLightDAChangeStep").toInt();
+    m_castLightTargetColor=m_rootObj.value("castLightTargetColor").toInt();
+     m_castLightTargetSize=m_rootObj.value("castLightTargetSize").toInt();
     auto motorSpeed=m_rootObj.value("motorSpeed").toArray();
     for(int i=0;i<motorSpeed.count();i++)
     {
@@ -74,6 +79,13 @@ DeviceSettings::DeviceSettings()
         int slot=obj["Slot"].toInt();
         m_colorToSlot.append({color,slot});
     }
+
+
+
+//    QJsonDocument doc(m_rootObj);
+//    auto data=doc.toJson();
+//    loadFile.write(data);
+
 }
 
 QSharedPointer<DeviceSettings> DeviceSettings::getSingleton()

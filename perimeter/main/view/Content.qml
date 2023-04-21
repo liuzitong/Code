@@ -112,14 +112,14 @@ Rectangle {
 
         Item{
             id:contentPage;width:parent.width;height: parent.height*0.90;
-            PatientManagement{id:patientPage;anchors.fill:parent;visible: true; onChangePage: contentPage.changePage(pageName,params);}
-            Check{id:checkPage;anchors.fill: parent;visible: false;currentPatient: root.currentPatient;onChangePage: contentPage.changePage(pageName,params);}
-            ProgramCustomize{id:programPage;anchors.fill: parent;visible: false;onChangePage: contentPage.changePage(pageName,params);}
-            AnalysisLobby{id:analysisLobbypage;anchors.fill: parent;visible: false;currentPatient: root.currentPatient;onChangePage: contentPage.changePage(pageName,params);}
-            Analysis{id:analysisPage;anchors.fill: parent;visible: false;currentPatient: root.currentPatient;onChangePage: contentPage.changePage(pageName,params);}
-            ProgressAnalysisLobby{id:progressAnalysisLobbyPage;anchors.fill: parent;visible: false;currentPatient: root.currentPatient;onChangePage: contentPage.changePage(pageName,params);}
-            ProgressAnalysis{id:progressAnalysisPage;anchors.fill: parent;visible: false;currentPatient: root.currentPatient;onChangePage: contentPage.changePage(pageName,params);}
-            VisionFieldIsland{id:visionFieldIslandPage;anchors.fill: parent;visible: false;onChangePage: contentPage.changePage(pageName,params);}
+            PatientManagement{id:patientPage;anchors.fill:parent;visible: true; onChangePage: contentPage.changePage(pageName,"patientManagement",params);}
+            Check{id:checkPage;anchors.fill: parent;visible: false;currentPatient: root.currentPatient;onChangePage: contentPage.changePage(pageName,"check",params);}
+            ProgramCustomize{id:programPage;anchors.fill: parent;visible: false;onChangePage: contentPage.changePage(pageName,"programCustomize",params);}
+            AnalysisLobby{id:analysisLobbypage;anchors.fill: parent;visible: false;currentPatient: root.currentPatient;onChangePage: contentPage.changePage(pageName,"analysisLobby",params);}
+            Analysis{id:analysisPage;anchors.fill: parent;visible: false;currentPatient: root.currentPatient;onChangePage: contentPage.changePage(pageName,"analysis",params);}
+            ProgressAnalysisLobby{id:progressAnalysisLobbyPage;anchors.fill: parent;visible: false;currentPatient: root.currentPatient;onChangePage: contentPage.changePage(pageName,"progressAnalysisLobby",params);}
+            ProgressAnalysis{id:progressAnalysisPage;anchors.fill: parent;visible: false;currentPatient: root.currentPatient;onChangePage: contentPage.changePage(pageName,"progressAnalysis",params);}
+            VisionFieldIsland{id:visionFieldIslandPage;anchors.fill: parent;visible: false;onChangePage: contentPage.changePage(pageName,"visionFieldIsland",params);}
 //            Component.onCompleted: {
 //                IcUiQmlApi.appCtrl.changePage.connect(changePage);
 //                patientPage.changePage.connect(contentPage.changePage);
@@ -129,7 +129,7 @@ Rectangle {
 //                singleAnalysisPage.changePage.conect(contentPage.changePage);
 //            }
 
-            function changePage(pageName,params)
+            function changePage(pageTo,pageFrom,params)
             {
                 patientPage.visible=false;
                 checkPage.visible=false;
@@ -139,11 +139,14 @@ Rectangle {
                 analysisLobbypage.visible=false;
                 analysisPage.visible=false;
                 visionFieldIslandPage.visible=false;
-                switch(pageName)
+                console.log(pageTo);
+                console.log(pageFrom);
+                switch(pageTo)
                 {
                     case "patientManagement":
-                        if(params==="createNewPatient") patientPage.createNewPatient();
+                        if(pageFrom==="createNewPatient") patientPage.createNewPatient();
                         patientPage.visible=true;
+                        patientPage.pageFrom=pageFrom;
                         checkContentButton.image.source=checkContentButton.imageSrc;
                         patientContentButton.image.source=patientContentButton.pressImageSrc;
                         seperator1.opacity=1;
@@ -153,23 +156,26 @@ Rectangle {
                         break;
                     case "analysisLobby":
                         analysisLobbypage.visible=true;
+                        analysisLobbypage.pageFrom=pageFrom;
                         checkContentButton.image.source=checkContentButton.imageSrc;
                         patientContentButton.image.source=patientContentButton.pressImageSrc;
                         seperator1.opacity=1;
                         seperator2.opacity=1;
                         seperator3.opacity=0;
                         patientInfo.visible=true;
-                        if(params==="patientManagement") analysisLobbypage.refresh();
+                        if(pageFrom==="patientManagement") analysisLobbypage.refresh();
                         break;
                     case "progressAnalysisLobby":
                         progressAnalysisLobbyPage.visible=true;
-                        if(params!==null){
+                        progressAnalysisLobbyPage.pageFrom=pageFrom;
+                        if(pageFrom!==null){
                             progressAnalysisLobbyPage.os_od=params;
                             progressAnalysisLobbyPage.refresh();
                         }
                         break;
                     case "progressAnalysis":
                         progressAnalysisPage.visible=true;
+                        progressAnalysisPage.pageFrom=pageFrom;
                         progressAnalysisPage.progressAnalysisListVm=params.progressAnalysisListVm;
                         progressAnalysisPage.report=params.report;
                         progressAnalysisPage.progressAnalysisResult=params.result;
@@ -181,8 +187,14 @@ Rectangle {
                         break;
                     case "check":
                         checkPage.visible=true;
+                        checkPage.pageFrom=pageFrom;
 //                        checkPage.rePaintCanvas();
-                        if(params.pageFrom==="patientManagement") checkPage.refresh();          //区别是从其它页面返回
+                        if(pageFrom==="patientManagement")
+                        {
+                            checkPage.currentProgram=params.lastProgram;
+                            if(params.lastProgram===null)
+                                checkPage.refresh();          //区别是从其它页面返回
+                        }
                         else {checkPage.currentProgram=params.currentProgram;}
                         patientContentButton.image.source=patientContentButton.imageSrc;
                         checkContentButton.image.source=checkContentButton.pressImageSrc;
@@ -192,6 +204,7 @@ Rectangle {
                         patientInfo.visible=true;
                         break;
                     case "programCustomize":
+                        programPage.pageFrom=pageFrom;
                         programPage.visible=true;
                         seperator1.opacity=0;
                         seperator2.opacity=0;
@@ -201,17 +214,18 @@ Rectangle {
 //                        patientInfo.visible=false;
                         break;
                     case "analysis":
+                        analysisPage.pageFrom=pageFrom;
                         analysisPage.currentCheckResult=params.checkResult;
                         analysisPage.currentProgram=params.program;
                         if(analysisPage.analysisResult!==null){analysisPage.analysisResult.destroy();}
                         analysisPage.analysisResult=params.analysisResult;
                         analysisPage.visible=true;
-                        analysisPage.lastPage=params.pageFrom;
                         analysisPage.report=params.report;
                         analysisPage.analysisVm=params.analysisVm;
                         analysisPage.refresh();
                         break;
                     case "visionFieldIsland":
+                        visionFieldIslandPage.pageFrom=pageFrom;
                         visionFieldIslandPage.visible=true;
                         visionFieldIslandPage.refresh();
                         break;

@@ -44,7 +44,7 @@ Column {
 
     signal changePage(var pageName,var params);
     signal refresh;
-
+    property string pageFrom: "";
     onRefresh: {
 //        if(heightMapSurfaceDataProxy1==null) {
 //            heightMapSurfaceDataProxy1=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::QHeightMapSurfaceDataProxyWrapper", false,["D:/perimeterProject/perimeter/bin/debug/visionFieldIsland/layer_1.png"]);

@@ -19,6 +19,7 @@ class CheckSvc: public QObject
     Q_PROPERTY(int totalCount READ getTotalCount WRITE setTotalCount NOTIFY totalCountChanged)
     Q_PROPERTY(int checkTime READ getCheckTime WRITE setCheckTime NOTIFY checkTimeChanged)
     Q_PROPERTY(bool devReady READ getDevReady NOTIFY devReadyChanged)
+    Q_PROPERTY(bool isCastLightAdjusted READ getIsCastLightAdjusted NOTIFY isCastLightAdjustedChanged)
     Q_PROPERTY(bool autoAlignPupil READ getAutoAlignPupil WRITE setAutoAlignPupil NOTIFY autoAlignPupilChanged)
     Q_PROPERTY(bool pupilDiameter READ getPupilDiameter NOTIFY pupilDiameterChanged)
     Q_PROPERTY(QVariantList dynamicSelectedDots WRITE setInputDots)
@@ -54,6 +55,7 @@ public:
     int getTotalCount(){return m_totalCount;}void setTotalCount(int value){m_totalCount=value;emit totalCountChanged();}Q_SIGNAL void totalCountChanged();
     int getCheckTime(){return m_checkTime;}void setCheckTime(int value){m_checkTime=value;/*qDebug()<<"checkTime:"+QString::number(m_checkTime);*/emit checkTimeChanged();}Q_SIGNAL void checkTimeChanged();
     bool getDevReady();Q_SIGNAL void devReadyChanged();
+    bool getIsCastLightAdjusted();Q_SIGNAL void isCastLightAdjustedChanged();
     bool getAutoAlignPupil();void setAutoAlignPupil(bool autoAlign);Q_SIGNAL void autoAlignPupilChanged();
     float getPupilDiameter();Q_SIGNAL void pupilDiameterChanged();
     void setInputDots(QVariantList value);

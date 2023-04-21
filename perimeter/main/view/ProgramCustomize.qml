@@ -14,7 +14,7 @@ Item {id:root; width: 1366;height: 691; visible: true;anchors.fill:parent;
     property var content;
     property bool locked: true;
     property int fontPointSize: CommonSettings.fontPointSize;
-
+    property string pageFrom: "";
 
 //    onCurrentProgramChanged: {
 //        if(currentProgram.type!==2){staticParamsSetting.currentProgram=currentProgram;}else{dynamicParamsSetting.currentProgram=currentProgram;}}

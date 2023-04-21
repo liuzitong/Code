@@ -10,13 +10,14 @@ import perimeter.main.view.Utils 1.0
 Column {
     id:root
     anchors.fill:parent;
-    property string lastPage: "";
     property var currentPatient: null;
     property var currentProgram: null;
     property var currentCheckResult: null;
     property var analysisResult: null;
     property var analysisVm: null;
     property int report;
+    property string pageFrom: "";
+
 //    property int textHeight: height*0.05;
 
 
@@ -74,13 +75,13 @@ Column {
         Row{anchors.fill: parent;
             Item{height: parent.height;width:parent.width*0.20;
                 Item{anchors.fill: parent;anchors.margins:parent.height*0.15;
-                    CusButton{text:lt+qsTr("Back");onClicked:{root.changePage(lastPage,null);}}}
+                    CusButton{text:lt+qsTr("Back");onClicked:{root.changePage(pageFrom,{});}}}
                 }
             Item{height: parent.height;width:parent.width*0.52;
                 Item{anchors.fill: parent;anchors.margins:parent.height*0.15;
                     Flow{height: parent.height;spacing: height*0.8;width: parent.width;anchors.horizontalCenter: parent.horizontalCenter
                         CusButton{text:lt+qsTr("Recheck");onClicked:{root.changePage("check",{currentProgram:currentProgram});}}
-                        CusButton{text:lt+qsTr("New patient");onClicked:{;root.changePage("patientManagement","createNewPatient");}}
+                        CusButton{text:lt+qsTr("New patient");onClicked:{root.changePage("patientManagement",{});}}
                     }
                 }
             }

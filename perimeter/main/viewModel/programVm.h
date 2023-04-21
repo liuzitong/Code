@@ -210,7 +210,7 @@ protected:
 class StaticProgramVm:public ProgramVm
 {
     Q_OBJECT
-    Q_PROPERTY(QObject* params READ getParams)
+    Q_PROPERTY(QObject* params READ getParams WRITE setParams NOTIFY paramsChanged)
     Q_PROPERTY(QObject* data READ getData)
 public:
     Q_INVOKABLE explicit StaticProgramVm(const QVariantList &);
@@ -222,7 +222,7 @@ public:
     Q_INVOKABLE void rectangleDots(int x0,int y0,int x1,int y1,int gap);
 
 
-    StaticParamsVM* getParams(){return m_staticParamsVm.data();}
+    StaticParamsVM* getParams(){return m_staticParamsVm.data();}void setParams(QObject* value){*m_staticParamsVm=*(StaticParamsVM*)value;emit paramsChanged();}Q_SIGNAL void paramsChanged();
     StaticProgramDataVm* getData(){return m_staticDataVm.data();}
 
     QSharedPointer<StaticProgramModel> getModel(){return m_data;}
@@ -237,7 +237,7 @@ private:
 class DynamicProgramVm:public ProgramVm
 {
     Q_OBJECT
-    Q_PROPERTY(QObject* params READ getParams);
+    Q_PROPERTY(QObject* params READ getParams WRITE setParams NOTIFY paramsChanged)
     Q_PROPERTY(QObject* data READ getData)
 
 public:
@@ -247,7 +247,8 @@ public:
     Q_INVOKABLE void insertProgram();
     Q_INVOKABLE void deleteProgram();
 
-    DynamicParamsVM* getParams(){return m_dynamicParamsVm.data();}
+    DynamicParamsVM* getParams(){return m_dynamicParamsVm.data();}void setParams(QObject* value){*m_dynamicParamsVm=*(DynamicParamsVM*)value;emit paramsChanged();}Q_SIGNAL void paramsChanged();
+//    DynamicParamsVM* getParams(){return m_dynamicParamsVm.data();}
     DynamicProgramDataVm* getData(){return m_dynamicDataVm.data();}
 
     QSharedPointer<DynamicProgramModel> getModel(){return m_data;}

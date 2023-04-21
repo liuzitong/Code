@@ -16,7 +16,7 @@ Column {
     property var currentPatient: null;
 
     property int report;
-
+    property string pageFrom: "";
 
 
     signal refresh();
