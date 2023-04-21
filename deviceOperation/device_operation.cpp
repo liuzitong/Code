@@ -615,28 +615,28 @@ void DeviceOperation::moveChin(ChinMoveDirection direction)
     case ChinMoveDirection::Left:
     {
         sps[0]=spsConfig[0];
-        motorPos[0]=profile.motorRange(UsbDev::DevCtl::MotorId_Chin_Hoz).first;
+        motorPos[0]=profile.motorRange(UsbDev::DevCtl::MotorId_Chin_Hoz).second;
         m_devCtl->moveChinMotors(sps,motorPos);
         break;
     }
     case ChinMoveDirection::Right:
     {
         sps[0]=spsConfig[0];
-        motorPos[0]=profile.motorRange(UsbDev::DevCtl::MotorId_Chin_Hoz).second;
+        motorPos[0]=profile.motorRange(UsbDev::DevCtl::MotorId_Chin_Hoz).first;
         m_devCtl->moveChinMotors(sps,motorPos);
         break;
     }
     case ChinMoveDirection::Up:
     {
         sps[1]=spsConfig[1];
-        motorPos[1]=profile.motorRange(UsbDev::DevCtl::MotorId_Chin_Vert).first;
+        motorPos[1]=profile.motorRange(UsbDev::DevCtl::MotorId_Chin_Vert).second;
         m_devCtl->moveChinMotors(sps,motorPos);
         break;
     }
     case ChinMoveDirection::Down:
     {
         sps[1]=spsConfig[1];
-        motorPos[1]=profile.motorRange(UsbDev::DevCtl::MotorId_Chin_Vert).second;
+        motorPos[1]=profile.motorRange(UsbDev::DevCtl::MotorId_Chin_Vert).first;
         m_devCtl->moveChinMotors(sps,motorPos);
         break;
     }
