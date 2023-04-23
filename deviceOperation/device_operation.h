@@ -63,7 +63,6 @@ public:
     void adjustCastLight();
     void dynamicStimulate(QPointF begin, QPointF end, int cursorSize,int speedLevel,bool isMainDotInfoTable);
     void stopDynamic();
-    QByteArray getRealTimeStimulationEyeImage();
     void openShutter(int durationTime);
     void move5Motors(bool isMotorMove[],int MotorPoses[]);
     void setCursorColorAndCursorSize(int color, int size);
@@ -75,7 +74,6 @@ public:
     QPointF getDyanmicAnswerPos();
     bool getMotorsBusy(QVector<UsbDev::DevCtl::MotorId> motorIDs);
     void waitForSomeTime(int time);
-    void hello();
     void waitMotorStop(QVector<UsbDev::DevCtl::MotorId> motorIDs);
     void lightUpCastLight();
     void dimDownCastLight();
@@ -94,11 +92,6 @@ signals:
     void newProfile();
     void newConfig();
     void updateDevInfo(QString info);
-//    void staticCursorLoc(QPointF loc);
-//    void dynamicCursorLoc(QPointF loc);
-//    void shutterStatus(bool status);
-//    void devConStatusChanged();
-//    void newFixationDeviation(int deviation)
 public:
     bool getAutoAlignPupil(){return m_autoAlignPupil;}void setAutoAlignPupil(bool value){m_autoAlignPupil=value;emit autoAlignPupilChanged();}Q_SIGNAL void autoAlignPupilChanged();
     bool getIsDeviceReady(){return m_isDeviceReady;}void setIsDeviceReady(bool value){if(m_isDeviceReady!=value){m_isDeviceReady=value;emit isDeviceReadyChanged();}}Q_SIGNAL void isDeviceReadyChanged();

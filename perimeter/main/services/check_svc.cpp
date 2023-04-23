@@ -1472,6 +1472,7 @@ void CheckSvcWorker::doWork()
 
 CheckSvc::CheckSvc(QObject *parent)
 {
+    m_workerThread.start();
     m_worker = new CheckSvcWorker();
     m_worker->moveToThread(&m_workerThread);
     m_worker->m_timer.moveToThread(&m_workerThread);
@@ -1487,13 +1488,9 @@ CheckSvc::CheckSvc(QObject *parent)
         msgBox.setText(errorInfo);
         msgBox.exec();
     });
-//    connect(m_worker,&CheckSvcWorker::checkProcessFinished,this, [&](){m_checkResultVm->insert();});
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::isDeviceReadyChanged,this,&CheckSvc::devReadyChanged);
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::isCastLightAdjustedChanged,this,&CheckSvc::isCastLightAdjustedChanged);
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::pupilDiameterChanged,this,&CheckSvc::pupilDiameterChanged);
-
-//    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::newFrameData,FrameProvidSvc::getSingleton().data(),&FrameProvidSvc::onNewVideoContentReceived);
-    m_workerThread.start();
     connectDev();
 }
 

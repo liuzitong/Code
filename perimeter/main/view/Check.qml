@@ -36,6 +36,11 @@ Item {id:root; width: 1366;height: 691
     }
 
     onCurrentCheckResultChanged:{if(currentCheckResult==null){checkDisplay.clickedDotIndex=-1;realTimeDBRec.visible=false;}}
+    onCurrentProgramChanged: {
+        currentProgram.type!==2?staticParamsSetting.currentProgram=currentProgram:dynamicParamsSetting.currentProgram=currentProgram;
+        dynamicParamsSetting.currentProgramChanged();                       //不知道为毛这里要触发一次
+        staticParamsSetting.currentProgramChanged();
+    }
 
     onRefresh: {
         if (currentProgram==null)
@@ -48,10 +53,10 @@ Item {id:root; width: 1366;height: 691
             else
                 currentProgram=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::DynamicProgramVM", false,[program_id]);
         }
-        program_type!==2?staticParamsSetting.currentProgram=currentProgram:dynamicParamsSetting.currentProgram=currentProgram;
-        dynamicParamsSetting.currentProgramChanged();                       //不知道为毛这里要触发一次
-        staticParamsSetting.currentProgramChanged();
-        root.currentProgramChanged();
+//        program_type!==2?staticParamsSetting.currentProgram=currentProgram:dynamicParamsSetting.currentProgram=currentProgram;
+//        dynamicParamsSetting.currentProgramChanged();                       //不知道为毛这里要触发一次
+//        staticParamsSetting.currentProgramChanged();
+//        root.currentProgramChanged();
         if(currentCheckResult!=null)
         {
             if(currentProgram.type!==2)
@@ -71,7 +76,7 @@ Item {id:root; width: 1366;height: 691
             ChooseProgram{id:chooseProgram;anchors.fill: parent;
                 onOk:{
                     root.currentProgram=currentProgram;
-                    currentProgram.type!==2?staticParamsSetting.currentProgram=currentProgram:dynamicParamsSetting.currentProgram=currentProgram;
+//                    currentProgram.type!==2?staticParamsSetting.currentProgram=currentProgram:dynamicParamsSetting.currentProgram=currentProgram;
                     if(currentCheckResult.type!==2)
                         IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::StaticCheckResultVm",currentCheckResult);
                     else

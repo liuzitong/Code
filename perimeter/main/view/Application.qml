@@ -13,7 +13,7 @@ Window {
     id: window;visible: true;width: 1366;height: 768;title: lt+qsTr("Perimeter");
     minimumWidth: 1366;minimumHeight: 768;property string currentpage: "Login";
     Content{id:content;anchors.fill: parent;}
-    Login{id:login;visible: false;anchors.fill: parent;}
+//    Login{id:login;visible: false;anchors.fill: parent;}
     property bool isEng: IcUiQmlApi.appCtrl.settings.isRuntimeLangEng;
     property string lt:"";
     Component.onCompleted: {
@@ -23,14 +23,14 @@ Window {
 
     onHeightChanged: {CommonSettings.windowHeight=height;console.log(height);console.log(CommonSettings.textHeight);console.log(CommonSettings.fontPointSize);}
 
-    function changePage(pageName)
-    {
-        switch(pageName)
-        {
-            case "main":content.visible=true;login.visible=false;break;
-            case "login":content.visible=false;login.visible=true;break;
-        }
-    }
+//    function changePage(pageName)
+//    {
+//        switch(pageName)
+//        {
+//            case "main":content.visible=true;login.visible=false;break;
+//            case "login":content.visible=false;login.visible=true;break;
+//        }
+//    }
 
 
 //    Loader {

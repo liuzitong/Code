@@ -233,7 +233,7 @@ public:
     Q_SIGNAL void updateRefreshIOInfo(QString);
 
 
-    static DevCtl*  createInstance( quint32 vid_pid = 0xffffa60e, quint32 cfg_id = 1 );
+    static DevCtl*  createInstance( quint32 vid_pid, quint32 cfg_id = 1 );
 
     //! @brief create the instance ( wait version )
     //!
@@ -242,7 +242,7 @@ public:
     //! @param cfg_id  [in] optional configuration id. current is 0x01
     //! @note  the default VID_PID is pre-defined by user, current is \n
     //!    0xffffa60e
-    static  DevCtl*  createInstanceSync( quint32 vid_pid = 0xffffa60e, quint32 cfg_id = 1 );
+    static  DevCtl*  createInstanceSync( quint32 vid_pid, quint32 cfg_id = 1 );
 
 
 

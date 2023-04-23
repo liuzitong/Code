@@ -598,7 +598,7 @@ auto     DevCtl_Worker :: cmd_readUsbEEPROM ( char *buff, int size, int eeprom_a
     data_pkg.dat_ptr = buff; data_pkg.dat_size = size;
     intptr_t bytes_trans;
     auto ret = ( m_usb_dev->ctlTransSync( & setup_pkg, & data_pkg, & bytes_trans ) == SCIPACK_S_OK );
-    if ( ! ret ) { spdlog::warn("read USB EEPROM cmd failed!"); }
+//    if ( ! ret ) { spdlog::warn("read USB EEPROM cmd failed!"); }
     if ( ret ) {
         qDebug( "readEEPROM: %d address OK", eeprom_addr );
     }
@@ -617,7 +617,7 @@ auto     DevCtl_Worker :: cmd_writeUsbEEPROM( const char *buff, int size, int ee
     data_pkg.dat_ptr = const_cast<void*>( reinterpret_cast<const void*>( buff )); data_pkg.dat_size = size;
     intptr_t bytes_trans;
     auto ret = ( m_usb_dev->ctlTransSync( & setup_pkg, & data_pkg, & bytes_trans ) == SCIPACK_S_OK );
-    if ( ! ret ) { spdlog::warn("write USB EEPROM cmd failed!"); }
+//    if ( ! ret ) { spdlog::warn("write USB EEPROM cmd failed!"); }
     if ( ret ) {
         qDebug( "writeEEPROM: %d address OK", eeprom_addr );
     }
@@ -1296,10 +1296,12 @@ auto     DevCtl :: writeUsbEEPROM( const char *buff_ptr, int size, int eeprom_ad
 // ============================================================================
 UsbDev::DevCtl* DevCtl :: createInstance( quint32 vid_pid, quint32 cfg_id )
 {
-    if(logger==NULL) logger = spdlog::rotating_logger_mt("logger", "logs/UsbDev_logger.txt", 1024*1024*30, 30);
-    spdlog::flush_on(spdlog::level::warn);
-//        for (int i = 0; i < 50; ++i)
-//            logger->info("{} * {} equals {:>10}", i, i, i*i);
+    if(logger==NULL)
+    {
+        logger = spdlog::rotating_logger_mt("logger", "logs/UsbDev_logger.txt", 1024*1024*30, 30);
+        spdlog::flush_on(spdlog::level::info);
+    }
+    logger->info("create instance.");
     return usbdev_new_qobj( UsbDev::DevCtl, vid_pid, cfg_id );
 }
 
@@ -1308,8 +1310,12 @@ UsbDev::DevCtl* DevCtl :: createInstance( quint32 vid_pid, quint32 cfg_id )
 // ============================================================================
 UsbDev::DevCtl*   DevCtl :: createInstanceSync( quint32 vid_pid, quint32 cfg_id )
 {
-    if(logger==NULL) logger = spdlog::rotating_logger_mt("logger", "logs/UsbDev_logger.txt", 1024*1024*30, 30);
-    spdlog::flush_on(spdlog::level::warn);
+    if(logger==NULL)
+    {
+        logger = spdlog::rotating_logger_mt("logger", "logs/UsbDev_logger.txt", 1024*1024*30, 30);
+        spdlog::flush_on(spdlog::level::info);
+    }
+    logger->info("createInstanceSync.");
     return usbdev_new_qobj( UsbDev::DevCtl, vid_pid, cfg_id, true ); }
 }
 

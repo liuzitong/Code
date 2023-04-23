@@ -225,13 +225,7 @@ Item{
                                                             else
                                                                 lastProgram=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::DynamicProgramVM", false,[lastCheckResult.program_id]);
 
-                                                            console.log(lastCheckResult.program_id);
-                                                            console.log(lastProgram.params.fixedParams.stimulationTime);
                                                             lastProgram.params=lastCheckResult.params;
-                                                            console.log(lastProgram.params.fixedParams.stimulationTime);
-                                                            console.log(lastProgram.params.fixedParams.stimulationTime);
-                                                            console.log(lastProgram.params.commonParams.strategy);
-
                                                             if(lastCheckResult.type!==2)
                                                                 IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::StaticCheckResultVm", lastCheckResult);
                                                             else
@@ -239,8 +233,6 @@ Item{
                                                             lastCheckResult=null;
                                                         }
 
-
-                                                        console.log(currentPatient.name);
                                                         if(currentPatient.name.indexOf(" ")>-1){ firstName =currentPatient.name.split(" ")[0]; lastName=currentPatient.name.split(" ")[1];};
                                                         newPatientId.text=currentPatient.patientId;newChineseName.text=currentPatient.name;genderSelect.selectGender(currentPatient.sex);newBirthDate.text=currentPatient.birthDate;newEnglishFirstName.text=firstName;newEnglishLastName.text=lastName
                                                         patientSaveButton.enabled=false;patientSaveButton.buttonColor = "#787878"
@@ -408,7 +400,7 @@ Item{
                                     height:parent.height;spacing:(width-6*height)/2;width:newPatient.width*0.6
                                     Item{height: parent.height;width: 2*height;LineEdit{id:newBirthDate;width: height*3.1;onTextChanged:{newPatientage.text=CusUtils.getAge(newBirthDate.text);}}}
                                     CusButton{text:lt+qsTr("Select");width:height*2;onClicked:{calendar.inputObj=newBirthDate;calendar.open();}}
-                                    LineEdit{id:newPatientage;width: height*2;text:"1";radius: height*0.2;horizontalAlignment: Text.AlignHCenter;readOnly: true;backgroundColor:backGroundColor;}
+                                    LineEdit{id:newPatientage;width: height*2;text:"";radius: height*0.2;horizontalAlignment: Text.AlignHCenter;readOnly: true;backgroundColor:backGroundColor;}
                                 }
                             }
                         }

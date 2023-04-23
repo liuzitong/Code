@@ -3,8 +3,6 @@
 #include <QAbstractListModel>
 #include <perimeter/main/database/program.h>
 namespace Perimeter{
-
-
 class ProgramListModelVm:public QAbstractListModel
 {
     Q_OBJECT

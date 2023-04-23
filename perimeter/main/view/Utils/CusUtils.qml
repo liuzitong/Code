@@ -10,6 +10,7 @@ Item{
 
     function rgb(r,g,b){var ret=(r<<16|g<<8|b); return ("#"+ret.toString(16).toUpperCase());}
     function getAge(birthDateStr){
+        if(birthDateStr==="") return "";
         var birthDate=new Date(Date.parse(birthDateStr));
         var now=new Date(Date.now());
         var age=now.getFullYear()-birthDate.getFullYear();

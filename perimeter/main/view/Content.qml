@@ -17,9 +17,6 @@ Rectangle {
     property string language:IcUiQmlApi.appCtrl.settings.language
     property var currentPatient: patientPage.currentPatient;
 
-
-    signal changePage(var name);
-
     Settings{id:settings;anchors.fill: parent;}
 
     About{id:about;anchors.fill: parent;}
@@ -68,7 +65,6 @@ Rectangle {
                         width: parent.width;height: parent.height*0.60;
                         CusButton{
                             type:"click";isAnime: false;underImageText.text: lt+qsTr("Login");underImageText.color: "white"; fontSize: height/4;rec.visible: false;width:image.sourceSize.width;imageSrc: "qrc:/Pics/base-svg/menu_login.svg";pressImageSrc: "qrc:/Pics/base-svg/menu_login_select.svg";
-                            onClicked: {changePage("login");}
                         }
                         Flow{
                             id:contentSwitcher
@@ -131,6 +127,7 @@ Rectangle {
 
             function changePage(pageTo,pageFrom,params)
             {
+
                 patientPage.visible=false;
                 checkPage.visible=false;
                 progressAnalysisLobbyPage.visible=false;
@@ -139,16 +136,17 @@ Rectangle {
                 analysisLobbypage.visible=false;
                 analysisPage.visible=false;
                 visionFieldIslandPage.visible=false;
+
                 console.log(pageTo);
                 console.log(pageFrom);
                 switch(pageTo)
                 {
                     case "patientManagement":
-                        if(pageFrom==="createNewPatient") patientPage.createNewPatient();
                         patientPage.visible=true;
                         patientPage.pageFrom=pageFrom;
                         checkContentButton.image.source=checkContentButton.imageSrc;
                         patientContentButton.image.source=patientContentButton.pressImageSrc;
+                        if(pageFrom==="analysis") patientPage.createNewPatient();
                         seperator1.opacity=1;
                         seperator2.opacity=1;
                         seperator3.opacity=0;
@@ -205,14 +203,12 @@ Rectangle {
                         patientInfo.visible=true;
                         break;
                     case "programCustomize":
-                        programPage.pageFrom=pageFrom;
                         programPage.visible=true;
                         seperator1.opacity=0;
                         seperator2.opacity=0;
                         seperator3.opacity=0;
                         patientContentButton.image.source=patientContentButton.imageSrc;
                         checkContentButton.image.source=checkContentButton.imageSrc;
-//                        patientInfo.visible=false;
                         break;
                     case "analysis":
                         analysisPage.pageFrom=pageFrom;
