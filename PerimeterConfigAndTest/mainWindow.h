@@ -167,9 +167,12 @@ private slots:
 
     void on_rawComand_clicked();
 
+    void on_action_connectDev_triggered();
+
     void on_action_disconnect_triggered();
 
     void on_pushButton_stopDynamic_clicked();
+
 
 private:
     void initData();

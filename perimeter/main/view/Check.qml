@@ -26,7 +26,7 @@ Item {id:root; width: 1366;height: 691
     property var frameProvidSvc: null;
     property var checkSvc: IcUiQmlApi.appCtrl.checkSvc;
     property string pageFrom: "";
-    onChangePage: {IcUiQmlApi.appCtrl.checkSvc.turnOffVideo();}
+    onChangePage: {/*IcUiQmlApi.appCtrl.checkSvc.turnOffVideo();*/}
 
     Component.onCompleted:{
         frameProvidSvc=IcUiQmlApi.appCtrl.frameProvidSvc;

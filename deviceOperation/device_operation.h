@@ -32,7 +32,7 @@ class DEVICEOPERATIONSHARED_EXPORT DeviceOperation:public QObject
     Q_OBJECT
     Q_PROPERTY(bool autoAlignPupil READ getAutoAlignPupil WRITE setAutoAlignPupil NOTIFY autoAlignPupilChanged)
     Q_PROPERTY(bool isDeviceReady READ getIsDeviceReady WRITE setIsDeviceReady NOTIFY isDeviceReadyChanged)
-    Q_PROPERTY(bool isCastLightAdjusted READ getIsCastLightAdjusted WRITE setIsCastLightAdjusted NOTIFY isCastLightAdjustedChanged)
+    Q_PROPERTY(int castLightAdjustStatus READ getCastLightAdjustStatus WRITE setCastLightAdjustStatus NOTIFY castLightAdjustStatusChanged)
     Q_PROPERTY(bool pupilDiameter READ getPupilDiameter WRITE setPupilDiameter NOTIFY pupilDiameterChanged)
 
 public:
@@ -96,7 +96,7 @@ public:
     bool getAutoAlignPupil(){return m_autoAlignPupil;}void setAutoAlignPupil(bool value){m_autoAlignPupil=value;emit autoAlignPupilChanged();}Q_SIGNAL void autoAlignPupilChanged();
     bool getIsDeviceReady(){return m_isDeviceReady;}void setIsDeviceReady(bool value){if(m_isDeviceReady!=value){m_isDeviceReady=value;emit isDeviceReadyChanged();}}Q_SIGNAL void isDeviceReadyChanged();
     float getPupilDiameter(){return m_pupilDiameter;}void setPupilDiameter(float value){m_pupilDiameter=value;emit pupilDiameterChanged();}Q_SIGNAL void pupilDiameterChanged();
-    bool getIsCastLightAdjusted(){return m_isCastLightAdjusted;}void setIsCastLightAdjusted(bool value){m_isCastLightAdjusted=value;emit isCastLightAdjustedChanged();}Q_SIGNAL void isCastLightAdjustedChanged();
+    int getCastLightAdjustStatus(){return m_castLightAdjustStatus;}void setCastLightAdjustStatus(int value){m_castLightAdjustStatus=value;emit castLightAdjustStatusChanged();}Q_SIGNAL void castLightAdjustStatusChanged();
 public:
     Status m_status;
     bool m_isDeviceReady=false,m_autoAlignPupil=true;
@@ -115,8 +115,8 @@ public:
     QByteArray m_frameRawData;
     QElapsedTimer m_shutterElapsedTimer;
     int m_shutterElapsedTime;
-    bool m_isCastLightAdjusted=false;
-    int m_currentCastLightDA=m_config.castLightADPresetRef();
+    int m_castLightAdjustStatus=0;    //0:未标准,1:调整光斑和位置,2:矫正的光强,3:校准完成
+    int m_currentCastLightDA;
     int m_castLightTargetDA;
     QElapsedTimer m_castLightAdjustElapsedTimer;
 

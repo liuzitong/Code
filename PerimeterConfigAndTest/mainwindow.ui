@@ -6228,6 +6228,7 @@
    <addaction name="action_downloadConfig"/>
    <addaction name="action_saveLocalData"/>
    <addaction name="action_readLocalData"/>
+   <addaction name="action_connectDev"/>
    <addaction name="action_disconnect"/>
   </widget>
   <action name="action_chooseDevice">
@@ -6289,6 +6290,11 @@
   <action name="action_disconnect">
    <property name="text">
     <string>关闭连接</string>
+   </property>
+  </action>
+  <action name="action_connectDev">
+   <property name="text">
+    <string>连接设备</string>
    </property>
   </action>
  </widget>

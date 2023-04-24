@@ -721,6 +721,7 @@ bool StaticCheck::waitForAnswer()
             sum+=i;
         }
         waitTime=sum/(m_answeredTimes.size())+commonParams.responseDelayTime;
+        m_answeredTimes.pop_front();
         qDebug()<<"autoAdapt wait Time is:"+QString::number(waitTime);
     }
 
@@ -1489,15 +1490,15 @@ CheckSvc::CheckSvc(QObject *parent)
         msgBox.exec();
     });
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::isDeviceReadyChanged,this,&CheckSvc::devReadyChanged);
-    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::isCastLightAdjustedChanged,this,&CheckSvc::isCastLightAdjustedChanged);
+    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::castLightAdjustStatusChanged,this,&CheckSvc::castLightAdjustStatusChanged);
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::pupilDiameterChanged,this,&CheckSvc::pupilDiameterChanged);
-    connectDev();
+//    connectDev();
 }
 
 CheckSvc::~CheckSvc()
 {
 //    m_workerThread.quit();
-    disconnectDev();
+//    disconnectDev();
     m_workerThread.terminate();
     m_worker->deleteLater();
 }
@@ -1594,9 +1595,9 @@ bool CheckSvc::getDevReady()
     return DevOps::DeviceOperation::getSingleton()->getIsDeviceReady();
 }
 
-bool CheckSvc::getIsCastLightAdjusted()
+int CheckSvc::getCastLightAdjustStatus()
 {
-    return DevOps::DeviceOperation::getSingleton()->getIsCastLightAdjusted();
+    return DevOps::DeviceOperation::getSingleton()->getCastLightAdjustStatus();
 }
 
 bool CheckSvc::getAutoAlignPupil()

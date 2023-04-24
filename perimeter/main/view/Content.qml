@@ -195,7 +195,7 @@ Rectangle {
                                 checkPage.refresh();          //区别是从其它页面返回
                         }
                         else {checkPage.currentProgram=params.currentProgram;}
-                        IcUiQmlApi.appCtrl.checkSvc.turnOnVideo();
+//                        IcUiQmlApi.appCtrl.checkSvc.turnOnVideo();
                         patientContentButton.image.source=patientContentButton.imageSrc;
                         checkContentButton.image.source=checkContentButton.pressImageSrc;
                         seperator1.opacity=0;

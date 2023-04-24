@@ -1046,14 +1046,13 @@ void MainWindow::on_spinBox_centerLightAndOtherDA_valueChanged(int arg1)
         int index=ui->comboBox_lightSelect_1->currentIndex();
         switch (index)
         {
-        case 0:m_config.centerFixationLampDARef()=arg1;break;
-        case 1:m_config.yellowBackgroundLampDARef()=arg1;break;
-        case 2:m_config.centerInfraredLampDARef()=arg1;break;
-        case 3:m_config.borderInfraredLampDARef()=arg1;break;
-        case 4:m_config.eyeglassFrameLampDARef()=arg1;break;
-        case 5:m_config.castLightADPresetRef()=arg1;break;
+        case 0:ui->lineEdit_centralLightDA->setText(QString::number(arg1));break;
+        case 1:ui->lineEdit_yellowBackGroundLampDa->setText(QString::number(arg1));break;
+        case 2:ui->lineEdit_centerInfraredLampDA->setText(QString::number(arg1));break;break;
+        case 3:ui->lineEdit_borderLampDA->setText(QString::number(arg1));break;break;
+        case 4:ui->lineEdit_eyeGlassLampDa->setText(QString::number(arg1));break;break;
+        case 5:ui->lineEdit_castLightDA->setText(QString::number(arg1));break;break;
         }
-        refreshConfigUI();
     }
 }
 
@@ -1195,6 +1194,15 @@ void MainWindow::on_rawComand_clicked()
     if(ok)
         m_devCtl->sendBinaryCommand(ba,strings.count());
 
+}
+
+void MainWindow::on_action_connectDev_triggered()
+{
+    if(m_devCtl!=NULL)
+    {
+        uninitDevCtl();
+    }
+    initDevCtl();
 }
 
 void MainWindow::on_action_disconnect_triggered()

@@ -54,7 +54,8 @@ DeviceSettings::DeviceSettings()
     m_castLightTagetDA=m_rootObj.value("castLightTargetDA").toInt();
     m_castLightDAChangeStep=m_rootObj.value("castLightDAChangeStep").toInt();
     m_castLightTargetColor=m_rootObj.value("castLightTargetColor").toInt();
-     m_castLightTargetSize=m_rootObj.value("castLightTargetSize").toInt();
+    m_castLightTargetSize=m_rootObj.value("castLightTargetSize").toInt();
+
     auto motorSpeed=m_rootObj.value("motorSpeed").toArray();
     for(int i=0;i<motorSpeed.count();i++)
     {

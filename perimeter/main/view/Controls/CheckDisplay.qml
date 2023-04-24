@@ -683,7 +683,6 @@ Item{
                 else if(currentProgram.type===1)                                // 筛选
                 {
                     dBList=currentCheckResult.resultData.checkData;
-                    console.log(dBList);
                     for(i=0;i<dBList.length;i++)
                     {
                         if(i<dotList.length)
