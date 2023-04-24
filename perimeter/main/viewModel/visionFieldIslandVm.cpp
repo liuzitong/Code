@@ -1,17 +1,14 @@
-#include "visionFieldIslandVm.h"
+﻿#include "visionFieldIslandVm.h"
 #include <perimeter/main/model/checkResultModel.h>
 #include <perimeter/main/model/patientmodel.h>
 #include <perimeter/main/services/analysis_svc.h>
 #include <QVariantList>
 #include <qimage.h>
-
+#include <qDebug>
 namespace Perimeter{
-
-
 VisionFieldIslandVm::VisionFieldIslandVm(const QVariantList &args)
 {
     int resultId=args[0].toInt();
-
     CheckResult_ptr checkResult_ptr(new CheckResult());
     checkResult_ptr->m_id=resultId;
     qx::dao::fetch_by_id(checkResult_ptr);
@@ -37,6 +34,7 @@ VisionFieldIslandVm::VisionFieldIslandVm(const QVariantList &args)
     {
         locs[i]={program.m_data.dots[i].x,program.m_data.dots[i].y};
     }
+
     auto innerRange=program.m_params.commonParams.Range[0];
     auto range=program.m_params.commonParams.Range[1];
 

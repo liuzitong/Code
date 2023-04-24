@@ -366,21 +366,17 @@ Item{
         function drawUnseen(dot)
         {
             var pixDot=dotToPixCoord(dot);
+            var dotRadius=diameter/180*3;
             var ctx = getContext("2d");
             var recHeight=diameter/180*2;
             var recWidth=diameter/180*1.5;
+            ctx.lineWidth = 0;
+            ctx.strokeStyle = "black";
+            ctx.fillStyle = "black";
+            ctx.beginPath();
             ctx.fillRect(pixDot.x-recWidth/2, pixDot.y-recHeight/2,recWidth, recHeight);
-
-//            var pixDot=dotToPixCoord(dot);
-//            var dotRadius=diameter/180*2;
-//            var ctx = getContext("2d");
-//            ctx.lineWidth = 0;
-//            ctx.strokeStyle = "black";
-//            ctx.beginPath();
-//            ctx.arc(pixDot.x, pixDot.y, dotRadius, 0, Math.PI*2);
-//            ctx.stroke();
-//            ctx.closePath();
-
+            ctx.stroke();
+            ctx.closePath();
         }
 
         function drawWeakSeen(dot)
@@ -687,10 +683,12 @@ Item{
                 else if(currentProgram.type===1)                                // 筛选
                 {
                     dBList=currentCheckResult.resultData.checkData;
+                    console.log(dBList);
                     for(i=0;i<dBList.length;i++)
                     {
                         if(i<dotList.length)
                         {
+//                            drawDot(dotList[i],"white");break;
                             switch (dBList[i])
                             {
                             case -999:drawDot(dotList[i],"white");break;

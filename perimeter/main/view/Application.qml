@@ -18,7 +18,8 @@ Window {
     property string lt:"";
     Component.onCompleted: {
         IcUiQmlApi.appCtrl.settings.langTriggerChanged.connect(function(){ltChanged();});
-        idPriv.init();content.changePage.connect(changePage);login.changePage.connect(changePage);CommonSettings.windowHeight=height;
+        idPriv.init();
+        CommonSettings.windowHeight=height;
     }
 
     onHeightChanged: {CommonSettings.windowHeight=height;console.log(height);console.log(CommonSettings.textHeight);console.log(CommonSettings.fontPointSize);}

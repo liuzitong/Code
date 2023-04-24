@@ -51,13 +51,13 @@ Column {
 //        }
 //        heightMapSurfaceDataProxy1.heightMapFile=":/layers/layer_1.png";
 //        layerOneSeries.dataProxy=heightMapSurfaceDataProxy1;
-        layerOneSeries.dataProxy.setHeightMap("D:/perimeterProject/perimeter/bin/debug/visionFieldIsland/visionField.png");
+        layerOneSeries.dataProxy.setHeightMap("./visionFieldIsland/visionField.png");
 //        layerOneSeries.baseGradient=layerOneGradient;
     }
 
     Component.onCompleted:
     {
-        heightMapSurfaceDataProxy=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::QHeightMapSurfaceDataProxyWrapper", false,["D:/perimeterProject/perimeter/bin/debug/visionFieldIsland/visionField.png"]);
+        heightMapSurfaceDataProxy=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::QHeightMapSurfaceDataProxyWrapper", false,["./visionFieldIsland/visionField.png"]);
         layerOneSeries.dataProxy=heightMapSurfaceDataProxy;
 //        heightMapSurfaceDataProxy2=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::QHeightMapSurfaceDataProxyWrapper", false,["D:/perimeterProject/perimeter/bin/debug/visionFieldIsland/layer_1.png"]);
 //        heightMapSurfaceDataProxy3=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::QHeightMapSurfaceDataProxyWrapper", false,["D:/perimeterProject/perimeter/bin/debug/visionFieldIsland/layer_1.png"]);

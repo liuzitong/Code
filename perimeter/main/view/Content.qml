@@ -166,7 +166,8 @@ Rectangle {
                     case "progressAnalysisLobby":
                         progressAnalysisLobbyPage.visible=true;
                         progressAnalysisLobbyPage.pageFrom=pageFrom;
-                        if(pageFrom!==null){
+                        if(pageFrom==="analysisLobby")
+                        {
                             progressAnalysisLobbyPage.os_od=params;
                             progressAnalysisLobbyPage.refresh();
                         }
