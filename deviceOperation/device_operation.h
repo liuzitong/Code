@@ -77,6 +77,7 @@ public:
     void waitMotorStop(QVector<UsbDev::DevCtl::MotorId> motorIDs);
     void lightUpCastLight();
     void dimDownCastLight();
+
 private:
     void moveChin(ChinMoveDirection direction);       //0左,1不动,2右;0上,1不动,2下
 public slots:
@@ -85,6 +86,7 @@ public slots:
     void workOnNewProfile();
     void workOnNewConfig();
     void workOnWorkStatusChanged();
+    void connectOrdisConnectDev();
 signals:
     void workStatusChanged();
     void newStatusData();
@@ -101,6 +103,7 @@ public:
     Status m_status;
     bool m_isDeviceReady=false,m_autoAlignPupil=true;
     bool m_isChecking=false;
+    bool m_connectDev=false;
     float m_deviation=0;
 //    bool m_deviation_valid;
     QSize m_videoSize;
@@ -113,7 +116,8 @@ public:
     QMutex m_statusLock;                      //防止多线程冲突,放入同线程不再需要
     UsbDev::FrameData m_frameData;
     QByteArray m_frameRawData;
-    QElapsedTimer m_shutterElapsedTimer;
+    QTimer m_connectTimer;
+    QElapsedTimer m_shutterElapsedTimer;      //静态刺激的时候用,记录打开时间
     int m_shutterElapsedTime;
     int m_castLightAdjustStatus=0;    //0:未标准,1:调整光斑和位置,2:矫正的光强,3:校准完成
     int m_currentCastLightDA;

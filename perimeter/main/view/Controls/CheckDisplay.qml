@@ -573,10 +573,20 @@ Item{
             }
 
             var dBList;
-            var dotList=currentProgram.data.dots;
+            var dots=currentProgram.data.dots;
+            var dotList=new Array(dots.length);
+            for(i=0;i<dotList.length;i++)
+            {
+                if(os_od==0)
+                    dotList[i]={x:dots[i].x,y:dots[i].y};
+                else
+                    dotList[i]={x:-dots[i].x,y:dots[i].y};
+
+            }
             var inputdotList=new Array(dynamicSelectedDots.length);
             for(i=0;i<dynamicSelectedDots.length;i++)
             {
+
                 inputdotList[i]={x:dynamicSelectedDots[i].x,y:dynamicSelectedDots[i].y};
             }
 
@@ -585,16 +595,16 @@ Item{
             {
                 dotList.forEach(function(item)
                 {
-                    if(os_od==1){
-                        item.x=-item.x;
-                    }
+//                    if(os_od==1){
+//                        item.x=-item.x;
+//                    }
                     drawDot(item,"white");
                 })
                 if(type==2)
                 {
                     inputdotList.forEach(function(item)
                     {
-                        if(os_od==1){item.x=-item.x;}
+//                        if(os_od==1){item.x=-item.x;}
                         dynamicInputDots(item);
                     })
                     if(currentProgram.params.strategy===1||currentProgram.params.strategy===2)   //画周围放射点
@@ -605,7 +615,7 @@ Item{
                         if(method===1) lines=6;
                         if(method===2) lines=8;
 
-                        for(var i=0;i<lines;i++)
+                        for(i=0;i<lines;i++)
                         {
                             var angle=Math.PI*2/lines*i;
                             var selectedDot=dynamicSelectedDots[0];
@@ -646,12 +656,10 @@ Item{
                 if(currentProgram.type===0)                                     //阈值,静态是结果-1(表示没测到)画点,其它画值
                 {
                     dBList=currentCheckResult.resultData.checkData;
-                    console.log(dBList);
                     for(i=0;i<dBList.length;i++)
                     {
                         if(i<dotList.length)                                            //一般结果
                         {
-                            console.log(dBList[i]);
                             if(dBList[i]===-999)
                                 drawDot(dotList[i],"white");
                             else if(dBList[i]<0)
@@ -803,6 +811,7 @@ Item{
                     }
                 }
                 delete inputdotList;
+                delete dotList;
             }
 
         }

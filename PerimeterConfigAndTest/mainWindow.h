@@ -183,8 +183,8 @@ private:
 
     //获取XY电机位置还有焦距
     bool getXYMotorPosAndFocalDistFromCoord(const CoordSpacePosInfo& coordSpacePosInfo,CoordMotorPosFocalDistInfo& coordMotorPosFocalDistInfo);
-    void staticCastTest(const CoordMotorPosFocalDistInfo& dot,int focalMotorPos,int db,quint8* sps,int durationTime,int shutterPos);
-    void dynamicCastTest(const CoordSpacePosInfo& dotSpaceBegin,const CoordSpacePosInfo& dotSpaceEnd,int spotSlot,int speedLevel);
+    void staticCastTest( CoordMotorPosFocalDistInfo& dot,int focalMotorPos,int db,quint8* sps,int durationTime,int shutterPos);
+    void dynamicCastTest( CoordSpacePosInfo& dotSpaceBegin, CoordSpacePosInfo& dotSpaceEnd,int spotSlot,int speedLevel);
     bool waitForAnswer();
     void init();
     void initDevCtl();

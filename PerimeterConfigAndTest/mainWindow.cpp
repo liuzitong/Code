@@ -375,11 +375,9 @@ void MainWindow::waitMotorStop(QVector<UsbDev::DevCtl::MotorId> motorIDs)
         {
             if(m_statusData.isMotorBusy(motorId))
             {
-                qDebug()<<" motor "<<motorId<<" is busy";
                 return true;
             }
         }
-        qDebug()<<"no motor busy";
         return false;
     };
     QElapsedTimer mstimer;
@@ -713,7 +711,7 @@ void MainWindow::on_pushButton_testStart_clicked()
 
 //            quint8 db=ui->spinBox_DbSetting->value();
             int spotSlot=ui->spinBox_spotSlot->value()-1;
-            int speedLevel=ui->spinBox_speedLevel->value();
+            int speedLevel=ui->spinBox_speedLevel->value()-1;
             dynamicCastTest(dotBegin,dotEnd,spotSlot,speedLevel);
             if(waitForAnswer()) {showDevInfo("dynamic answered.");}
             break;
@@ -1475,7 +1473,7 @@ bool MainWindow::getXYMotorPosAndFocalDistFromCoord(const CoordSpacePosInfo& coo
     return true;
 }
 
-void MainWindow::staticCastTest(const CoordMotorPosFocalDistInfo& coordMotorPosFocalDistInfo,int focalMotorPos,int db,quint8* sps,int durationTime,int shutterPos)
+void MainWindow::staticCastTest( CoordMotorPosFocalDistInfo& coordMotorPosFocalDistInfo,int focalMotorPos,int db,quint8* sps,int durationTime,int shutterPos)
 {
     if(m_devCtl==NULL) return;
 //    以后加上
@@ -1507,15 +1505,19 @@ void MainWindow::staticCastTest(const CoordMotorPosFocalDistInfo& coordMotorPosF
 }
 
 
-void MainWindow::dynamicCastTest(const CoordSpacePosInfo& dotSpaceBegin,const CoordSpacePosInfo& dotSpaceEnd,int spotSlot,int speedLevel)
+void MainWindow::dynamicCastTest(CoordSpacePosInfo& dotSpaceBegin,CoordSpacePosInfo& dotSpaceEnd,int spotSlot,int speedLevel)
 {
-    qDebug()<<dotSpaceBegin.coordX;
-    qDebug()<<dotSpaceBegin.coordY;
-    qDebug()<<dotSpaceEnd.coordX;
-    qDebug()<<dotSpaceEnd.coordY;
+//    dotSpaceBegin.coordX=3.66054f;
+//    dotSpaceBegin.coordY=41.8402f;
+//    dotSpaceEnd.coordX=0;
+//    dotSpaceEnd.coordY=0;
+//    qDebug()<<dotSpaceBegin.coordX;
+//    qDebug()<<dotSpaceBegin.coordY;
+//    qDebug()<<dotSpaceEnd.coordX;
+//    qDebug()<<dotSpaceEnd.coordY;
     auto data=m_localTableData.m_dynamicLenAndTimeData;
-    auto stepLength=float(data(speedLevel-1,0))*0.01;
-    auto stepTime=data(speedLevel-1,1);
+    auto stepLength=float(data(speedLevel,0))*0.01;
+    auto stepTime=data(speedLevel,1);
     float stepLengthX,stepLengthY;
     float distX=dotSpaceEnd.coordX-dotSpaceBegin.coordX;
     float distY=dotSpaceEnd.coordY-dotSpaceBegin.coordY;

@@ -1166,7 +1166,6 @@ void DynamicCheck::initialize()
 
 void DynamicCheck::Checkprocess()
 {
-    qDebug()<<m_records.length();
     auto& record=m_records[getPathRecordIndex()];
     stimulate(record.beginLoc,record.endLoc);
     auto answerLoc=waitForAnswer();
@@ -1180,7 +1179,6 @@ int DynamicCheck::getPathRecordIndex()
     {
         if(!i.checked) indexes.push_back(i.index);
     }
-    qDebug()<<indexes[qrand()%indexes.length()];
     return indexes[qrand()%indexes.length()];
 }
 
@@ -1193,6 +1191,7 @@ void DynamicCheck::stimulate(QPointF begin, QPointF end)
 
 QVector<QPointF> DynamicCheck::waitForAnswer()
 {
+    static int watiForAnswerCount=0;
     if(!m_deviceOperation->getSingleton()->getIsDeviceReady())
     {
         UtilitySvc::wait(50);  //刷新下状态
@@ -1266,22 +1265,37 @@ QVector<QPointF> DynamicCheck::waitForAnswer()
     }
     else
     {
-        while(m_deviceOperation->getDynamicMoveStatus())
+        while(true)
         {
-            if(m_deviceOperation->getAnswerPadStatus())
+            while(m_deviceOperation->getDynamicMoveStatus())
             {
-                auto answerLoc=m_deviceOperation->getDyanmicAnswerPos();
-                answerLocs.push_back(answerLoc);
-                m_deviceOperation->stopDynamic();
-                goto Exit;
+                if(m_deviceOperation->getAnswerPadStatus())
+                {
+                    auto answerLoc=m_deviceOperation->getDyanmicAnswerPos();
+                    answerLocs.push_back(answerLoc);
+                    m_deviceOperation->stopDynamic();
+                    goto Exit;
+                }
+                QApplication::processEvents();
             }
-//            qDebug()<<"events in";
-            QApplication::processEvents();
-//            qDebug()<<"events out";
+            qDebug()<<"dynamicMove stopped";
+            QElapsedTimer elapsedTimer;
+            elapsedTimer.start();
+            while(!m_deviceOperation->getDynamicMoveStatus())
+            {
+                if(elapsedTimer.elapsed()>200)      //真的停止移动
+                {
+                    watiForAnswerCount++;
+                    qDebug()<<"dynamicMove really stopped:"+QString::number(watiForAnswerCount);
+                    goto Exit;
+                }
+                QApplication::processEvents();
+            }
         }
     }
     Exit:
     m_deviceOperation->openShutter(0);
+    m_deviceOperation->waitMotorStop({UsbDev::DevCtl::MotorId_Shutter});
     m_checkedCount++;
     return answerLocs;
 }

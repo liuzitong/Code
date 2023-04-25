@@ -148,8 +148,8 @@ ModalPopupDialog/* Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                        CusText{text:lt+qsTr("Move speed"); anchors.left: parent.left; anchors.leftMargin: 0;width: parent.width*0.4;horizontalAlignment: Text.AlignLeft;font.pointSize: fontPointSize;}
                                        CusComboBox{
                                            width: parent.width*0.5; anchors.right: parent.right;model:["1°/"+qsTr("sec"),"2°/"+qsTr("sec"),"3°/"+qsTr("sec"),"4°/"+qsTr("sec"),"5°/"+qsTr("sec"),"6°/"+qsTr("sec"),"7°/"+qsTr("sec"),"8°/"+qsTr("sec"),"9°/"+qsTr("sec")];
-                                           currentIndex:currentProgram===null?0:(currentProgram.params.speed-1);
-                                           Component.onCompleted: {idPopup.ok.connect(function(){currentProgram.params.speed=currentIndex+1;})}
+                                           currentIndex:currentProgram===null?0:(currentProgram.params.speed);
+                                           Component.onCompleted: {idPopup.ok.connect(function(){currentProgram.params.speed=currentIndex;})}
                                        }
                                    }
                                    Item{
@@ -161,9 +161,7 @@ ModalPopupDialog/* Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                            {
                                                idPopup.ok.connect(function(){currentProgram.params.brightness=value;});
                                                idPopup.currentProgramChanged.connect(function(){
-                                                   value=currentProgram.params.brightness
-                                                   console.log(value);
-                                                   ;})
+                                                   value=currentProgram.params.brightness;})
                                            }
                                        }
                                    }

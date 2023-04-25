@@ -50,12 +50,15 @@ void StaticCheckResultVm::insert()
         for(auto& imgData:dotImgDatas)
         {
             count++;
-            QImage img((uchar*)imgData.data(),imgSize.width(),imgSize.height(),QImage::Format_Grayscale8);
-            img=img.scaled(realTimeEyePosPicSize.width(),realTimeEyePosPicSize.height());
-//            img.save(R"(./savePics/)"+QString::number(count)+".bmp");
-            const char* data=(char*)(img.bits());
-            QByteArray ba(data,realTimeEyePosPicSize.width()*realTimeEyePosPicSize.height());
-            sp->m_blob.append(ba);
+            if(imgData.size()>0)
+            {
+                QImage img((uchar*)imgData.data(),imgSize.width(),imgSize.height(),QImage::Format_Grayscale8);
+                img=img.scaled(realTimeEyePosPicSize.width(),realTimeEyePosPicSize.height());
+    //            img.save(R"(./savePics/)"+QString::number(count)+".bmp");
+                const char* data=(char*)(img.bits());
+                QByteArray ba(data,realTimeEyePosPicSize.width()*realTimeEyePosPicSize.height());
+                sp->m_blob.append(ba);
+            }
         }
     }
     qx::dao::insert(sp);

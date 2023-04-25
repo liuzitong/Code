@@ -128,13 +128,11 @@ public:
             qDebug()<<"nullptr";
         }
         auto& dataList=m_data->checkData;
-        qDebug()<<dataList.size();
         for(auto& data:dataList)
         {
             QObject* vm=new DynamicDataNodeVm(&data);
             m_checkData.append(QVariant::fromValue(vm));
         }
-        qDebug()<<m_data->checkData.size();
         return m_checkData;
     }
 

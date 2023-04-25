@@ -75,7 +75,12 @@ Column {
         Row{anchors.fill: parent;
             Item{height: parent.height;width:parent.width*0.20;
                 Item{anchors.fill: parent;anchors.margins:parent.height*0.15;
-                    CusButton{text:lt+qsTr("Back");onClicked:{root.changePage(pageFrom,{});}}}
+                    CusButton{text:lt+qsTr("Back");onClicked:{
+//                            if(pageFrom=="check")
+//                                root.changePage(pageFrom,{currentProgram:currentProgram});
+//                            else if(pageFrom=="analysisLobby")
+                                root.changePage(pageFrom,{});
+                        }}}
                 }
             Item{height: parent.height;width:parent.width*0.52;
                 Item{anchors.fill: parent;anchors.margins:parent.height*0.15;
