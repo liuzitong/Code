@@ -1,0 +1,259 @@
+关于界面日期
+
+关于                                                    About
+设备类型                                                Device type
+软件版本                                                Version
+版权所有 ©2019 重庆贝奥新视野医疗设备有限公司           Copyright @2019 Chongqing BioNewVision Medical Device Co.Lt.
+确定                                                    OK
+取消                                                    Cancel
+电脑自动视野仪系统                                      Computer automatic perimeter system
+
+
+病人管理界面
+检查日期                                                Check date
+选择                                                    Select
+到                                                      To
+按时间查询                                              Query by time
+患者ID                                                  Patient ID
+姓名                                                    Name
+性别                                                    Sex
+名字                                                    First name
+姓氏                                                    Last name
+出生日期                                                Birth date
+男性                                                      Male
+女性                                                      Female
+其它                                                    Others
+载入                                                    Load
+第                                                      The 
+页                                                      Page
+总共                                                    Total
+条纪录                                                  Records
+球面                                                    Sphere
+柱面                                                    Cylinder
+轴向                                                    Axis
+视力                                                    Visual acuity
+右眼                                                    Right eye
+左眼                                                    Left eye
+计算                                                    Calculate
+关闭                                                    Exit
+复查                                                    Recheck
+修改                                                    Modify
+删除                                                    Delete
+查看报告                                                View reports
+进入检测                                                Check
+保存                                                    Save
+新建患者                                                New patient
+新建                                                    New
+返回                                                    Back
+
+
+
+分析界面
+左眼分析                                                Left eye Analysis
+右眼分析                                                Right eye Analysis
+进展分析                                                Progress Analysis
+视岛                                                    View island
+常规分析                                                Single
+三合一                                                  Three in one
+总览                                                    Overview
+阈值                                                    Threshold
+筛选                                                    Screening
+动态                                                    Dynamic
+动态数据                                                Dyanmic data
+分析                                                    Analysis
+
+
+
+检查界面
+程序名                                                  Program name
+光标                                                    Cursor
+策略                                                    Strategy
+假阳性率                                                False positive rate
+假阴性率                                                False negative rate
+假阳错误                                                False Pos errors
+假阴错误                                                False Neg errors
+固视丢失率                                              Fixation loss rate
+固视丢失                                                Fixation losses
+测试点数                                                Check dot count
+测试时间                                                Check timespan
+瞳孔直径                                                Pupil diameter
+眼动警报                                                Eye move alarm mode
+固视偏移                                                Fixation deviation
+选择程序                                                Select program
+参数设置                                                Params setting
+开始测试                                                Start
+恢复检查                                                Resume
+暂停检查                                                Pause
+停止测试                                                Stop
+切换眼别                                                Switch eye
+
+
+程序选择
+特殊                                                    Special
+动态                                                    Dynamic
+自定义                                                  Custom
+设置为默认程序                                          Set to default program
+
+content
+登录                                                    Login
+设置                                                    Settings
+自定义                                                  Customize
+患者                                                    Patient
+检测                                                    Check
+
+动态分析
+不报警                                                  No alarm
+只报警                                                  Only alarm
+报警并暂停                                              Alarm and pause
+眼动报警模式                                            Eye move alarm mode
+测试用时                                                Check time
+刺激光标                                                Stimulus cursor
+背景光                                                  Background light
+标准动态                                                Standard
+盲区动态                                                Blind area
+暗区动态                                                Dark area
+直线动态                                                Straight line
+屈光度                                                  Diopter
+诊断                                                    Diagnosis
+
+等视标识线                                              Iospter ident
+离心度起点                                              Degrees start
+子午线起点                                              Meridian start
+离心度停止                                              Degrees stop
+子午线停止                                              Meridian stop
+刺激亮度反应                                            Stimulus response
+
+DynamicParamsSetting.qml
+常用参数                                                Common params
+测试范围                                                Check range
+测试点数                                                Dots count
+光标颜色                                                Cursor color
+光标大小                                                Cursor size
+背景颜色                                                Background color
+固视目标                                                Fixation target
+中心点                                                  Center dot
+秒                                                      sec
+移动速度                                                Move speed
+移动亮度                                                Move brightness
+移动方式                                                Move method
+移动距离                                                Move distance
+
+NewProgram.qml
+创建程序                                                Create program
+类别                                                    Type
+全阈值                                                  Full threshold
+智能交互式                                              Smart interactive
+快速智能交互式                                          Fast interactive
+二区法                                                  One stage
+三区法                                                  Two stages
+量化缺损                                                Quantify defects
+单刺激                                                  Single stimulus
+
+ProgramCustomize.qml
+清除                                                    Clear
+复制                                                    Copy
+圆形选点                                                Circle dots
+矩形选点                                                Rectangle dots
+解锁                                                    Unlock
+已解锁                                                  Unlocked
+
+ProgramCustomizeCircleDot.qml
+创建圆形程序的范围                                      Create program according to circle
+外圆                                                    Outer circle
+内圆                                                    Inner circle
+间距                                                    Spacing
+单位                                                    Unit
+输入解锁密码                                            Input password
+
+ProgramCustomizeSquareDot.qml
+创建圆形程序的范围                                      Create program according to square
+
+ProgressAnalysisBaseLine.qml
+超出界限                                                Out of limits
+普遍敏感度降低                                          Low sensitivity
+边界                                                    Border of limits
+正常范围                                                Within normal limits
+选择程序                                                Program
+青光眼半视野检查                                        GHT
+中心点                                                  Center dot
+平均缺损                                                MD
+平均标准差                                              PSD
+
+斜率不明显                                              Slope insignificant
+斜率明显                                                Slope significant
+进展速度                                                ProgressSpeed
+基线平均缺损                                            Baseline average MD
+斜率情况                                                Slope status
+
+ProgressAnalysisLobby.qml
+复位                                                    Reset
+进展基线                                                Progress baseline
+进展分析                                                Progress analysis
+单次进展分析                                            Single Progress
+
+ProgressAnalysisSingle.qml
+小菱形                                                  Small diamond
+大菱形                                                  Big diamond
+底点                                                    Bottom dot
+中心点检测                                              Center dot check
+
+总体偏差                                                Total deviation
+模式偏差                                                Pattern deviation
+
+没有进展                                                no progress
+可能的进展                                              possible progress
+很有可能的进展                                          very possible progress
+
+基线检查日期                                                BaseLine dates
+以前的追踪检查日期                                          Previous dates
+恶化                                                    Deterioarted
+连续                                                    Consecutiveness
+超出范围                                                Out of range
+
+SaveToAnotherProgram.qml
+另存为程序                                              Save as another program
+
+Settings.qml
+选择语言                                                Select language
+默认                                                    Default
+医院名称                                                Hospital name
+
+StaticAnalysisReportOverView.qml
+灰度                                                    Gray tone
+
+StaticAnalysisReportScreening.qml
+看见                                                    Seen
+未看见                                                  Unseen
+盲点                                                    Blind spot
+缺陷深度                                                Defect depth
+的预期                                                  Expectation
+常用参数                                                Common params
+固定参数                                                Fixed params
+策略模式                                                Strategy mode
+年龄相关                                                Age related
+阈值相关                                                Threshold related
+兰·黄测试                                               Cyan·yellow Check
+响应自适应                                              Response auto adapt
+响应延迟时间                                            Response delay time
+中心点检测                                              Center dot check
+短期波动                                                Short term fluctuation
+固视选择                                                Fixation target
+盲点测试                                                Blind dot test
+
+刺激时间                                                Stimulus time
+间隔时间                                                Inteval time
+假阳性周期                                              False positive cycle
+假阴性周期                                              False negative cycle
+固视丢失周期                                            Fixation loss cycle
+单刺激分贝                                              Single stimulus DB
+盲点刺激分贝                                            Blind dot stimulus DB
+短期波动次数                                            Short term fluctuation count
+
+VisionFieldIsland.qml
+缩小                                                    Zoom out
+放大                                                    Zoom in
+设备信息                                                Device info
+
+
+进展差值                                                Progress difference
+进展分析                                                Progress analysis
