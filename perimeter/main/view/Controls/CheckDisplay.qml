@@ -116,7 +116,7 @@ Item{
                     if(currentCheckResult===null) return;
                     var dotClicked=displayCanvas.pixCoordToDot({x:mouseX,y:mouseY});
                     var dotList=currentProgram.data.dots;
-                    var dist=Math.pow(10,6);
+                    var dist=Math.pow(10,10);
                     var index;
                     for(var i=0;i<dotList.length;i++)
                     {
@@ -128,18 +128,15 @@ Item{
                             index=i;
                         }
                     }
-                    if(currentCheckResult.params.centerDotCheck)
+
+                    if(currentCheckResult.params.commonParams.centerDotCheck)
                     {
-                        if(Math.pow(dotClicked.x,2)+Math.pow(dotClicked.y,2)<dist)
+                        if((Math.pow(dotClicked.x,2)+Math.pow(dotClicked.y,2))<dist)
                         {
-                            clickedDotIndex=dotList.length*2;                                   //中心点
+                            index=dotList.length*2;                                   //中心点
                         }
                     }
-                    else
-                    {
-                        clickedDotIndex=index;                                             //其它
-                    }
-
+                    clickedDotIndex=index;                                             //其它
                     displayCanvas.requestPaint();
                 }
                 else
@@ -676,14 +673,14 @@ Item{
                         else if(i===dotList.length*2)                           //中心点
                         {
 
-                            if(dBList[i]===-999)
-                                drawDot(dotList[i],"white");
+                            if(dBList[i]===-999);
+//                                drawDot(dotList[i],"white");
                             else if(dBList[i]<0)
-                                drawText("<0",dotToPixCoord(dotList[i]).x,dotToPixCoord(dotList[i]).y)
+                                drawText("<0",dotToPixCoord({x:0,y:0}).x,dotToPixCoord({x:0,y:0}).y)
                             else if(dBList[i]>51)
-                                drawText(">51",dotToPixCoord(dotList[i]).x,dotToPixCoord(dotList[i]).y)
-                            else  if(dBList[i]!==-1)
-                                drawDB(dBList[i],dotList[i]);
+                                drawText(">51",dotToPixCoord({x:0,y:0}).x,dotToPixCoord({x:0,y:0}).y)
+                            else  if(dBList[i])
+                                drawDB(dBList[i],{x:0,y:0});
                         }
 
                     }

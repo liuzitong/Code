@@ -36,7 +36,7 @@ void TestClass::test()
 //     msgBox.setText("The document has been modified.");
 //     msgBox.exec();
 
-     DevOps::DeviceOperation::getSingleton()->dynamicStimulate({4.0f,42.0f},{0,0},4,5,true);
+     DevOps::DeviceOperation::getSingleton()->stopDynamic();
 //    DevOps::DeviceOperation::getSingleton()->dynamicStimulate({0,0},{30,30},1,1,true);
 
 

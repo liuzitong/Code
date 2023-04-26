@@ -23,7 +23,7 @@ struct Status
 {
    int color;
    int spot;
-   int DB;
+//   int DB;
 };
 
 

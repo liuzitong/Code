@@ -119,6 +119,7 @@ void MainWindow::initDevCtl()
     ui->checkBox_IO->setChecked(m_settings.m_updateIOInfo);
     ui->checkBox_startRefreshInfo->setChecked(m_settings.m_updateRefreshIOInfo);
     ui->checkBox_RefreshIO->setChecked(m_settings.m_updateRefreshIOInfo);
+
 }
 
 
@@ -226,6 +227,10 @@ void MainWindow::uninitDevCtl()
     disconnect(m_devCtl,&UsbDev::DevCtl::updateInfo,this,&MainWindow::showDevInfo);
     disconnect(m_devCtl,&UsbDev::DevCtl::newStatusData,this,&MainWindow::refreshStatus);
     disconnect(m_devCtl,&UsbDev::DevCtl::newFrameData,this,&MainWindow::refreshVideo);
+    ui->checkBox_IO->setChecked(Qt::CheckState::Unchecked);
+    ui->checkBox_startRefreshInfo->setChecked(Qt::CheckState::Unchecked);
+    ui->checkBox_RefreshIO->setChecked(Qt::CheckState::Unchecked);
+
     delete m_devCtl;
 }
 

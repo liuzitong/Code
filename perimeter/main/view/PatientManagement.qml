@@ -491,7 +491,7 @@ Item{
             Item{height: parent.height;width:parent.width*0.6;
                 CusButton{text:lt+qsTr("Exit");onClicked:Qt.quit()}
                 Flow{height: parent.height;spacing: height*0.8;anchors.horizontalCenter: parent.horizontalCenter
-                    CusButton{enabled:currentPatient!==null&&lastProgram!==null;text:lt+qsTr("Recheck");onClicked:root.changePage("check",{lastProgram:lastProgram})}
+                    CusButton{enabled:currentPatient!==null&&lastProgram!==null&&IcUiQmlApi.appCtrl.checkSvc.devReady&&IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus===3;text:lt+qsTr("Recheck");onClicked:root.changePage("check",{lastProgram:lastProgram})}
                     CusButton{id:patientReviseButton;enabled: false;text:lt+qsTr("Modify");
                         onClicked:
                         {
@@ -529,7 +529,7 @@ Item{
                 }
             }
             Flow{height:parent.height; layoutDirection: Qt.RightToLeft;width:parent.width*0.4;spacing: height*0.8;
-                CusButton{text:lt+qsTr("Check");enabled:!(currentPatient===null);
+                CusButton{text:lt+qsTr("Check");enabled:!(currentPatient===null)&&IcUiQmlApi.appCtrl.checkSvc.devReady&&IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus===3;
                     onClicked:
                     {
                         root.changePage("check",{lastProgram:null});
