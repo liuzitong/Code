@@ -168,6 +168,8 @@ public:
 
     MoveCache* readMoveCache() const;
 
+    void readConfig();
+
     void sendBinaryCommand(QByteArray ba,int dataLen);
 
 

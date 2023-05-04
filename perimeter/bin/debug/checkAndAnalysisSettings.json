@@ -8,12 +8,12 @@
     "boundaryOne":
     {
         "center":{"x":-30,"y":0},
-        "radius":65
+        "radius":55
     },
     "boundaryTwo":
     {
         "center":{"x":30,"y":0},
-        "radius":65
+        "radius":55
     },
     "boundaryShowRange":60
 }

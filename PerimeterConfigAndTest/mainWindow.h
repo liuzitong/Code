@@ -40,6 +40,7 @@ private slots:
     void refreshVideo();
     void refreshConnectionStatus(int);
     void updateProfile();
+    void updateConfig();
 
     void on_tabWidget_currentChanged(int index);
 
@@ -206,7 +207,7 @@ private:
     TableModel *m_xyDistTableModel;                         //xy桌标对应的距离 本机数据
     TableModel *m_dbAngleDampingTableModel;                 //DB离心度衰减参数表 本机数据
     TableModel *m_dynamicLenAndTimeModel;
-    Status m_status={-1,-1,-1};
+    Status m_status={-1,-1};
     UsbDev::DevCtl *m_devCtl=NULL;
     UsbDev::Config m_config;
     LocalTableData m_localTableData;

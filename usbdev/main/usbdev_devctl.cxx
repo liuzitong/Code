@@ -285,26 +285,47 @@ bool   DevCtl_Worker :: cmd_ReadConfig( bool req_emit )
 {
     updateInfo("读取Config中.");
     if ( ! this->isDeviceWork()) { return false; }
-    unsigned char buffOut[512]={0}; bool ret = true;
-    unsigned char buffIn[512*3]={0};
-    if ( ret ) {
-        buffOut[0] = 0x5a; buffOut[1] = 0xf1;
-        updateIOInfo(QString("W:")+buffToQStr(reinterpret_cast<const char*>(buffOut),2));
-        ret = this->cmdComm_bulkOutSync( buffOut, sizeof( buffOut ) );
-        if ( ! ret ) { updateInfo("send read config command failed."); }
+    bool ret = true;
+
+    int frameSize=512;
+    int totalFrame=ceil(double(Config::dataLen())/frameSize);
+    int fragment=Config::dataLen()-frameSize*(totalFrame-1);
+    unsigned char* dataPtr=new unsigned char[totalFrame*frameSize];
+
+    for(int i=0;i<totalFrame;i++)
+    {
+        if(ret)
+        {
+            unsigned char buffOut[512];
+            buffOut[0] = 0x5a; buffOut[1] = 0xf1;buffOut[2]=totalFrame;buffOut[3]=i;
+            updateIOInfo(QString("W:")+buffToQStr(reinterpret_cast<const char*>(buffOut),4));
+            ret = this->cmdComm_bulkOutSync( buffOut, sizeof( buffOut ) );
+            if ( ! ret ) { updateInfo(QString("send read config  %0nd segment command failed.").arg(QString::number(i))); }
+        }
+        if(ret)
+        {
+            if(i!=totalFrame-1)
+            {
+                ret = this->cmdComm_bulkInSync( dataPtr+512*i, sizeof( 512 ));
+                if ( ! ret ) { updateInfo(QString("recv. config  %0nd segment data failed.").arg(QString::number(i)));}
+                else   updateIOInfo(QString("Config %0nd segment R:").arg(QString::number(i))+buffToQStr(reinterpret_cast<const char*>(dataPtr+512*i),512));
+            }
+            else
+            {
+                ret = this->cmdComm_bulkInSync( dataPtr+512*i, sizeof( fragment ));
+                if ( ! ret ) { updateInfo(QString("recv. config  %0nd segment data failed.").arg(QString::number(i)));}
+                else   updateIOInfo(QString("Config %0nd segment R:").arg(QString::number(i))+buffToQStr(reinterpret_cast<const char*>(dataPtr+512*i),fragment));
+            }
+        }
     }
-    if ( ret ) {
-        ret = this->cmdComm_bulkInSync( buffIn, sizeof( buffIn ));
-        if ( ! ret ) { updateInfo("recv. config data failed."); }
-    }
+
     if ( ret ) {
         updateInfo("recv. config data succeeded.");
-        updateIOInfo(QString("Config R:")+buffToQStr(reinterpret_cast<const char*>(buffIn),1328));
-        Config config( QByteArray::fromRawData( reinterpret_cast<const char*>(buffIn), sizeof(buffIn)));
+        updateIOInfo(QString("Config R:")+buffToQStr(reinterpret_cast<const char*>(dataPtr),Config::dataLen()));
+        Config config( QByteArray::fromRawData( reinterpret_cast<const char*>(dataPtr), sizeof(Config::dataLen())));
         if ( ! config.isEmpty()) { if ( req_emit ){ emit this->newConfig(config); }}
         m_config = config;
     }
-
     return ret;
 }
 
@@ -1140,9 +1161,6 @@ void   DevCtl :: saveConfig(Config& cfg )
     int frameSize=512-4;
     int totalFrame=ceil(double(cfg.dataLen())/frameSize);
     int fragment=cfg.dataLen()-frameSize*(totalFrame-1);
-//    qDebug()<<totalFrame;
-//    qDebug()<<cfg.dataLen();
-//    qDebug()<<fragment;
     unsigned char* dataPtr=(unsigned char*)cfg.dataPtr();
 
     for(int i=0;i<totalFrame;i++)
@@ -1201,6 +1219,12 @@ MoveCache *DevCtl::readMoveCache() const
                 Q_RETURN_ARG( MoveCache*, retVal )
                 );
     return retVal;
+}
+
+void DevCtl::readConfig()
+{
+    QMetaObject::invokeMethod(
+        T_PrivPtr( m_obj )->wkrPtr(), ("cmd_ReadConfig" ),Qt::QueuedConnection );
 }
 
 void DevCtl::sendBinaryCommand(QByteArray ba,int dataLen)

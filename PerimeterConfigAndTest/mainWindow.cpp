@@ -114,7 +114,7 @@ void MainWindow::initDevCtl()
     connect(m_devCtl,&UsbDev::DevCtl::newStatusData,this,&MainWindow::refreshStatus);
     connect(m_devCtl,&UsbDev::DevCtl::newFrameData,this,&MainWindow::refreshVideo);
     connect(m_devCtl,&UsbDev::DevCtl::newProfile,this,&MainWindow::updateProfile);
-    connect(m_devCtl,&UsbDev::DevCtl::newConfig,this,[&](){showDevInfo("new Config updated");});
+    connect(m_devCtl,&UsbDev::DevCtl::newConfig,this,&MainWindow::updateConfig);
 
     ui->checkBox_IO->setChecked(m_settings.m_updateIOInfo);
     ui->checkBox_startRefreshInfo->setChecked(m_settings.m_updateRefreshIOInfo);
@@ -535,6 +535,13 @@ void MainWindow::updateProfile()
     else if(m_profile.devType()==0x0088) ui->label_devType->setText("投射");
     else ui->label_devType->setText("未知");
     ui->label_devVer->setText(QString::number(m_profile.devVersion(),16));
+}
+
+void MainWindow::updateConfig()
+{
+    showDevInfo("Config Got.");
+    memcpy(m_config.dataPtr(),m_devCtl->config().dataPtr(),m_config.dataLen());
+    refreshConfigUI();
 }
 
 void MainWindow::on_pushButton_cameraSwitch_clicked()
@@ -1038,8 +1045,7 @@ void MainWindow::on_action_updateConfigToLower_triggered()
 
 void MainWindow::on_action_downloadConfig_triggered()
 {
-    memcpy(m_config.dataPtr(),m_devCtl->config().dataPtr(),m_config.dataLen());
-    refreshConfigUI();
+    m_devCtl->readConfig();
 }
 
 void MainWindow::on_spinBox_centerLightAndOtherDA_valueChanged(int arg1)

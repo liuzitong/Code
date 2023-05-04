@@ -118,6 +118,8 @@ public:
     QByteArray m_frameRawData;
     QTimer m_connectTimer;
     QElapsedTimer m_shutterElapsedTimer;      //静态刺激的时候用,记录打开时间
+    bool m_isWaitingForStaticStimulationAnswer;
+    bool m_staticStimulationAnswer;
     int m_shutterElapsedTime;
     int m_castLightAdjustStatus=0;    //0:未标准,1:调整光斑和位置,2:矫正的光强,3:校准完成
     int m_currentCastLightDA;

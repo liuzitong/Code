@@ -83,7 +83,7 @@ public:
 //    int* stepTimePtr();
 //    float& stepLengthRef();
     void* dataPtr();
-    int dataLen();
+    static int dataLen();
     //    void* GetData();
 private:
     void *m_obj=nullptr;

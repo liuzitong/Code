@@ -366,6 +366,7 @@ qint32&       Config :: xMotorPosForLightCorrectionRef()
 qint32&       Config :: yMotorPosForLightCorrectionRef()
 { return T_PrivPtr( m_obj )->yMotorPosForLightCorrectionRef(); }
 
+
 //int&       Config :: xMotorPosForDiamondCenterTestRef()
 //{ return T_PrivPtr( m_obj )->xMotorPosForDiamondCenterTestRef(); }
 
@@ -393,13 +394,12 @@ int(*       Config :: DbPosMappingPtr())[2]
 void *Config::dataPtr()
 {return (void*)&(T_PrivPtr( m_obj )->crcVeryficationRef());}
 
+
+
 int Config::dataLen()
 {
     return 552;
-//    return sizeof(ConfigPriv); 继承了的东西有字段,不能用这种方法
 }
-
-
 
 //void* Config::GetData()
 //{ return  (void*)&(T_PrivPtr( m_obj )->crcVeryficationRef()); }

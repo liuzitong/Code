@@ -6,7 +6,6 @@ struct Status
 {
    int currentColorSlot;
    int currentLightSpotPos;
-   int currentDB;
 };
 
 struct CoordSpacePosInfo

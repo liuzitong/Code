@@ -175,6 +175,7 @@ void DeviceOperation::setCursorColorAndCursorSize(int color, int spot)
         waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_Focus});
         m_devCtl->move5Motors(speed,motorPos,UsbDev::DevCtl::Relative);
     }
+    waitMotorStop({UsbDev::DevCtl::MotorId_Focus});
     m_status.color=color;
     m_status.spot=spot;
 }
@@ -274,7 +275,7 @@ void DeviceOperation::setDB(int DB)
     motorPos[4]=config.DbPosMappingPtr()[DB][1];
     auto spsConfig=DeviceSettings::getSingleton()->m_5MotorSpeed;
     sps[3]=spsConfig[3];sps[4]=spsConfig[4];
-    waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_Light_Spot});
+    waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
     m_devCtl->move5Motors(sps,motorPos);
 //    m_status.DB=DB;
 }
@@ -341,6 +342,8 @@ void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB,bool
     move5Motors(isMotorMove,motorPos);
 }
 
+
+
 void DeviceOperation::adjustCastLight()
 {
     qDebug()<<"adjustCastLightStart";
@@ -357,7 +360,7 @@ void DeviceOperation::adjustCastLight()
     openShutter(65535);
     m_currentCastLightDA=m_config.castLightADPresetRef();
     m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA);
-    waitForSomeTime(1000);
+    waitForSomeTime(2000);
     m_castLightAdjustStatus=2;
     m_castLightAdjustElapsedTimer.start();
 }
@@ -489,7 +492,13 @@ void DeviceOperation::openShutter(int durationTime)
 {
     if(!m_isDeviceReady) return;
     auto shutterPos=m_config.shutterOpenPosRef();
+    qDebug()<<"openShutter";
+
     m_devCtl->openShutter(durationTime,shutterPos);
+//    while(qAbs(m_statusData.motorPosition(UsbDev::DevCtl::MotorId_Shutter)-m_config.shutterOpenPosRef())<10)
+//    {
+
+//    }
     m_shutterElapsedTimer.restart();
     m_shutterElapsedTime=durationTime;
 }
@@ -606,6 +615,15 @@ void DeviceOperation::workOnNewStatuData()
         setLamp(LampId::LampId_borderInfrared,0,false);
     }
 
+    if(m_isWaitingForStaticStimulationAnswer)
+    {
+        if(m_statusData.answerpadStatus())
+        {
+            m_staticStimulationAnswer=true;
+        }
+    }
+
+
     if(m_videoOnOff!=m_statusData.cameraStatus())
         m_devCtl->setFrontVideo(m_videoOnOff);
 
@@ -633,10 +651,10 @@ void DeviceOperation::workOnNewStatuData()
         }
         else
         {
+            setCastLightAdjustStatus(3);
             openShutter(0);
             waitMotorStop({UsbDev::DevCtl::MotorId_Shutter});
 //            waitForSomeTime(3000);              //防止摄像头刷不出来
-            setCastLightAdjustStatus(3);
         }
     }
     emit newStatusData();

@@ -72,6 +72,10 @@ Item{
     onOs_odChanged:
     {
 //        resetInputDot();
+        for(var i=0;i<dynamicSelectedDots.length;i++)
+        {
+            dynamicSelectedDots[i].x=-dynamicSelectedDots[i].x;
+        }
         displayCanvas.requestPaint();
     }
 
@@ -121,6 +125,11 @@ Item{
                     for(var i=0;i<dotList.length;i++)
                     {
                         var dot=dotList[i];
+                        if(os_od===1)
+                        {
+                            dot.x=-dot.x;
+                        }
+
                         var temp=Math.pow(dot.x-dotClicked.x,2)+Math.pow(dot.y-dotClicked.y,2)
                         if(temp<dist)
                         {
@@ -142,10 +151,10 @@ Item{
                 else
                 {
                     dot = displayCanvas.pixCoordToDot({x:mouseX,y:mouseY});
-                    if(os_od==1)
-                    {
-                        dot.x=-dot.x;
-                    }
+//                    if(os_od==1)
+//                    {
+//                        dot.x=-dot.x;
+//                    }
                     if (mouse.button === Qt.RightButton)
                     {
                         if(dynamicSelectedDots.length===0) return;
@@ -580,12 +589,15 @@ Item{
                     dotList[i]={x:-dots[i].x,y:dots[i].y};
 
             }
+
+
             var inputdotList=new Array(dynamicSelectedDots.length);
             for(i=0;i<dynamicSelectedDots.length;i++)
             {
 
                 inputdotList[i]={x:dynamicSelectedDots[i].x,y:dynamicSelectedDots[i].y};
             }
+//            console.log(inputdotList);
 
 
             if(root.currentCheckResult==null)                       //结果为空的时候按照程序画圆点
@@ -617,7 +629,7 @@ Item{
                             var angle=Math.PI*2/lines*i;
                             var selectedDot=dynamicSelectedDots[0];
                             var x=Math.cos(angle)*dynamicCircleRadius+selectedDot.x;
-                            if(os_od==1) x=-x;
+//                            if(os_od==1) x=-x;
                             var y=Math.sin(angle)*dynamicCircleRadius+selectedDot.y;
                             drawDot({x:x,y:y},"white");
                         }
@@ -633,6 +645,10 @@ Item{
                     if(clickedDotIndex<dotList.length)
                     {
                          clickedDot=currentProgram.data.dots[clickedDotIndex];
+                        if(os_od===1)
+                        {
+                            clickedDot.x=-clickedDot.x;
+                        }
                     }
                     else if(clickedDotIndex==2*dotList.length)
                     {

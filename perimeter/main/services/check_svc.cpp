@@ -79,6 +79,7 @@ private:
     bool m_stimulated;
     QVector<DotRecord*> m_lastCheckDotRecord;
     QVector<LastCheckedDotType> m_lastCheckeDotType;
+    QElapsedTimer m_stimulationWaitingForAnswerElapsedTimer;      //开门开启等待应答
     bool m_alreadyChecked;
 
 public:
@@ -224,6 +225,7 @@ void StaticCheck::initialize()
     m_autoAdaptTime=0;
     m_blindDotLocateIndex=0;
     m_stimulationCount=0;
+    m_stimulated=false;
     m_alreadyChecked=false;
     m_isStartWithBaseDots=false;
     m_isDoingBaseDotsCheck=false;
@@ -312,9 +314,11 @@ void StaticCheck::initialize()
     setLight(true);
     m_deviceOperation->lightUpCastLight();
     m_deviceOperation->m_isChecking=true;
+    m_deviceOperation->m_isWaitingForStaticStimulationAnswer=false;
+    m_deviceOperation->m_staticStimulationAnswer=false;
     m_deviceOperation->setCursorColorAndCursorSize(int(cursorColor),int(cursorSize));
     m_deviceOperation->waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y});
-    UtilitySvc::wait(5000);    //等几秒启动
+    UtilitySvc::wait(4000);    //等几秒启动
 }
 
 //第一次先跑点,直接刺激,第二次跑点,等待上次刺激的应答,然后再刺激,再跑点,再等待上次的应答.(保证再等待应答的同时跑点.)
@@ -564,9 +568,13 @@ void StaticCheck::stimulate()
     }
     else
     {
-        m_deviceOperation->waitForSomeTime(durationTime);
+//        m_deviceOperation->waitForSomeTime(durationTime);
+        m_deviceOperation->m_shutterElapsedTimer.restart();                      //假阴不开快门
+        m_deviceOperation->m_shutterElapsedTime=durationTime;
         m_resultModel->m_data.fixationDeviation.push_back(-m_deviceOperation->m_deviation);
     }
+    m_deviceOperation->m_isWaitingForStaticStimulationAnswer=true;
+    m_stimulationWaitingForAnswerElapsedTimer.restart();
 }
 
 void StaticCheck::getReadyToStimulate(QPointF loc, int DB)
@@ -710,24 +718,22 @@ bool StaticCheck::waitForAnswer()
 //        qDebug()<<"pausing";
         QApplication::processEvents();
     }
-    QElapsedTimer elapsedTimer;
-    elapsedTimer.restart();
+
     int waitTime;
     auto commonParams=m_resultModel->m_params.commonParams;
+    auto fixedParams=m_resultModel->m_params.fixedParams;
     if(m_answeredTimes.size()<=10||commonParams.responseAutoAdapt==false)
     {
-        auto fixedParams=m_resultModel->m_params.fixedParams;
+
         waitTime=fixedParams.stimulationTime+fixedParams.intervalTime;
 //        qDebug()<<"fixxed wait Time is:"+QString::number(waitTime);
     }
     else
     {
+        constexpr int maxWaitTime=4000;
         int sum=0;
-        for(auto&i:m_answeredTimes)
-        {
-            sum+=i;
-        }
-        waitTime=sum/(m_answeredTimes.size())+commonParams.responseDelayTime;
+        for(auto&i:m_answeredTimes) sum+=i;
+        waitTime=qMin(sum/(m_answeredTimes.size())+commonParams.responseDelayTime,maxWaitTime);
         m_answeredTimes.pop_front();
 //        qDebug()<<"autoAdapt wait Time is:"+QString::number(waitTime);
     }
@@ -737,7 +743,10 @@ bool StaticCheck::waitForAnswer()
     bool answer=false;
 //    int time=0;
 //    int count=0;
-    while((elapsedTimer.elapsed()<waitTime)&&(!answer))   //应答时间内
+//    QElapsedTimer elapsedTimer;
+//    elapsedTimer.restart();
+//    qDebug()<<"start time counting";
+    while((m_stimulationWaitingForAnswerElapsedTimer.elapsed()<waitTime)&&(!answer))   //应答时间内
     {
 //        if(elapsedTimer.elapsed()-time>50)
 //        {
@@ -745,17 +754,20 @@ bool StaticCheck::waitForAnswer()
 //            qDebug()<<"count:"<<count;
 //            count++;
 //        }
-        if(m_deviceOperation->getAnswerPadStatus())
+        if(m_deviceOperation->m_staticStimulationAnswer)
         {
 
+            m_deviceOperation->m_isWaitingForStaticStimulationAnswer=false;
+            m_deviceOperation->m_staticStimulationAnswer=false;
             answer=true;
 //            qDebug()<<"answered";
             UtilitySvc::wait(m_programModel->m_params.fixedParams.leastWaitingTime);                //最小等待时间
         }
         else QApplication::processEvents();
     }
+//    qDebug()<<"end time count time";
 //    qDebug()<<"answer Time is:"+QString::number(elapsedTimer.elapsed());
-    m_answeredTimes.append(elapsedTimer.elapsed());
+    m_answeredTimes.append(m_stimulationWaitingForAnswerElapsedTimer.elapsed());
     return answer;                       //超出时间应答
 }
 
@@ -1039,16 +1051,17 @@ void StaticCheck::ProcessAnswer(bool answered)
 
 void StaticCheck::waitAndProcessAnswer()
 {
-bool answerResult;
-if(m_deviceOperation->m_isDeviceReady)
-     answerResult=waitForAnswer();
-else
-{
-    answerResult=qrand()%100<50;
-//    answerResult=true;
-    UtilitySvc::wait(100);
-}
-//    QThread::msleep(1000);
+    bool answerResult;
+    if(m_deviceOperation->m_isDeviceReady)
+         answerResult=waitForAnswer();
+    else
+    {
+        answerResult=qrand()%100<50;
+    //    answerResult=true;
+        UtilitySvc::wait(100);
+    }
+    //    QThread::msleep(1000);
+    qDebug()<<answerResult;
     ProcessAnswer(answerResult);
 }
 void StaticCheck::setLight(bool onOff)
@@ -1069,6 +1082,11 @@ void StaticCheck::setLight(bool onOff)
         }
         else
         {
+            if(m_programModel->m_params.commonParams.centerDotCheck)
+            {
+                for(int i=0;i<4;i++)
+                    m_deviceOperation->setLamp(DevOps::LampId::LampId_smallDiamond,i,false);
+            }
             m_deviceOperation->setLamp(DevOps::LampId::LampId_centerFixation,0,false);
         }
         break;
@@ -1153,7 +1171,7 @@ void DynamicCheck::initialize()
             case DynamicParams::DynamicDistance::_15:distance=15;break;
         }
         auto centerDot=m_dynamicSelectedDots[0];
-        if(os_od!=0){centerDot.rx()=-centerDot.rx();}
+//        if(os_od!=0){centerDot.rx()=-centerDot.rx();}
 
         m_resultModel->m_data.checkData.resize(m_totalCount);
         for(int i=0;i<m_totalCount;i++)
@@ -1178,11 +1196,11 @@ void DynamicCheck::initialize()
         m_resultModel->m_data.checkData.resize(2);
         auto beginDot=m_dynamicSelectedDots[0];
         auto endDot=m_dynamicSelectedDots[1];
-        if(os_od!=0)
-        {
-            beginDot.rx()=-beginDot.rx();
-            endDot.rx()=-endDot.rx();
-        }
+//        if(os_od!=0)
+//        {
+//            beginDot.rx()=-beginDot.rx();
+//            endDot.rx()=-endDot.rx();
+//        }
         m_records.push_back(PathRecord{0,beginDot,endDot,{0,0},false,false});
         break;
     }
@@ -1488,7 +1506,10 @@ void CheckSvcWorker::doWork()
                 setCheckState(3);
                 emit sendErrorInfo(m_check->m_errorInfo);
             }
-            if(m_check->m_checkedCount==m_check->m_totalCount) setCheckState(4);
+            if(*m_checkState!=3)                //有可能外部结束后,后面把它覆盖为完成,就剩1个点的时候出现此情况.
+            {
+                if(m_check->m_checkedCount==m_check->m_totalCount) setCheckState(4);
+            }
             emit checkedCountChanged(m_check->m_checkedCount);
             emit checkResultChanged();
             QApplication::processEvents();
