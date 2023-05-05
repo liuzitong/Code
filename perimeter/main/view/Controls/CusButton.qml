@@ -115,7 +115,7 @@ Item{
         id:rec
         width:parent.width
         height:parent.height
-        color: enabled?buttonColor:"#a0a0a0"
+        color: enabled?buttonColor:"#c0c0c0"
         radius: root.radius
         border.color: root.borderColor
         border.width: root.borderWidth

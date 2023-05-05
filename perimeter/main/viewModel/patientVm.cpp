@@ -62,6 +62,9 @@ PatientVm::PatientVm(const QVariantList & args)
     qDebug()<<"constructor";
     if(args.count()==0)
     {
+        m_data.reset(new PatientModel());
+        m_data->m_lastUpdate=QDateTime::currentDateTime();
+        m_rx=new RxVm(m_data->m_rx);
         return;
     }
     else
@@ -81,8 +84,6 @@ PatientVm::PatientVm(const QVariantList & args)
             m_rx=new RxVm(Utility::QStringToEntity<Rx>(patient_ptr->m_rx));
         }
     }
-
-
 }
 
 PatientVm::~PatientVm()

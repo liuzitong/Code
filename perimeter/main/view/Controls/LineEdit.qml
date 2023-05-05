@@ -17,7 +17,7 @@ Item{
     signal enterPressed();
     Rectangle {
         anchors.fill: parent;
-        id:recbackground;border.width: 1;radius: root.radius;color:root.enabled?readOnly? "#e4e6e8":"white" :"#a0a0a0";border.color: "#bdc0c6"
+        id:recbackground;border.width: 1;radius: root.radius;color:root.enabled?readOnly? "#e4e6e8":"white" :"#e0e0e0";border.color: "#bdc0c6"
         TextInput{
             id:textInput;
             anchors.fill: parent;

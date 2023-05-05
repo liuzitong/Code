@@ -284,14 +284,12 @@ bool   DevCtl_Worker :: cmd_ReadProfile( bool req_emit )
 bool   DevCtl_Worker :: cmd_ReadConfig( bool req_emit )
 {
     updateInfo("读取Config中.");
-    if ( ! this->isDeviceWork()) { return false; }
     bool ret = true;
-
     int frameSize=512;
     int totalFrame=ceil(double(Config::dataLen())/frameSize);
     int fragment=Config::dataLen()-frameSize*(totalFrame-1);
     unsigned char* dataPtr=new unsigned char[totalFrame*frameSize];
-
+    if ( !this->isDeviceWork())  updateInfo("no connection.");
     for(int i=0;i<totalFrame;i++)
     {
         if(ret)
@@ -299,33 +297,35 @@ bool   DevCtl_Worker :: cmd_ReadConfig( bool req_emit )
             unsigned char buffOut[512];
             buffOut[0] = 0x5a; buffOut[1] = 0xf1;buffOut[2]=totalFrame;buffOut[3]=i;
             updateIOInfo(QString("W:")+buffToQStr(reinterpret_cast<const char*>(buffOut),4));
-            ret = this->cmdComm_bulkOutSync( buffOut, sizeof( buffOut ) );
+            if ( this->isDeviceWork()) ret = this->cmdComm_bulkOutSync( buffOut, sizeof( buffOut ) );
             if ( ! ret ) { updateInfo(QString("send read config  %0nd segment command failed.").arg(QString::number(i))); }
+
         }
-        if(ret)
+        if(ret&&this->isDeviceWork())
         {
             if(i!=totalFrame-1)
             {
-                ret = this->cmdComm_bulkInSync( dataPtr+512*i, sizeof( 512 ));
+                if (this->isDeviceWork()) ret = this->cmdComm_bulkInSync( dataPtr+512*i, sizeof( 512 ));
                 if ( ! ret ) { updateInfo(QString("recv. config  %0nd segment data failed.").arg(QString::number(i)));}
                 else   updateIOInfo(QString("Config %0nd segment R:").arg(QString::number(i))+buffToQStr(reinterpret_cast<const char*>(dataPtr+512*i),512));
             }
             else
             {
-                ret = this->cmdComm_bulkInSync( dataPtr+512*i, sizeof( fragment ));
+                if (this->isDeviceWork()) ret = this->cmdComm_bulkInSync( dataPtr+512*i, sizeof( fragment ));
                 if ( ! ret ) { updateInfo(QString("recv. config  %0nd segment data failed.").arg(QString::number(i)));}
                 else   updateIOInfo(QString("Config %0nd segment R:").arg(QString::number(i))+buffToQStr(reinterpret_cast<const char*>(dataPtr+512*i),fragment));
             }
         }
     }
 
-    if ( ret ) {
+    if ( ret&& this->isDeviceWork()) {
         updateInfo("recv. config data succeeded.");
         updateIOInfo(QString("Config R:")+buffToQStr(reinterpret_cast<const char*>(dataPtr),Config::dataLen()));
         Config config( QByteArray::fromRawData( reinterpret_cast<const char*>(dataPtr), sizeof(Config::dataLen())));
         if ( ! config.isEmpty()) { if ( req_emit ){ emit this->newConfig(config); }}
         m_config = config;
     }
+    delete [] dataPtr;
     return ret;
 }
 
@@ -1169,13 +1169,22 @@ void   DevCtl :: saveConfig(Config& cfg )
         unsigned char* ptr=reinterpret_cast<unsigned char*>(ba.data());
         ptr[0]=0x5a;ptr[1]=0xf2;ptr[2]=totalFrame;ptr[3]=i;
         if(i!=totalFrame-1)
+        {
             memcpy(ptr+4,dataPtr+frameSize*i,frameSize);
+            QMetaObject::invokeMethod(
+             T_PrivPtr( m_obj )->wkrPtr(), "cmd_GeneralCmd", Qt::QueuedConnection,
+             Q_ARG( QByteArray, ba  ),Q_ARG( QString,QString("上传配置")),Q_ARG( quint32, 512)
+            );
+        }
+
         else
+        {
             memcpy(ptr+4,dataPtr+frameSize*i,fragment);
-        QMetaObject::invokeMethod(
-         T_PrivPtr( m_obj )->wkrPtr(), "cmd_GeneralCmd", Qt::QueuedConnection,
-         Q_ARG( QByteArray, ba  ),Q_ARG( QString,QString("上传配置")),Q_ARG( quint32, 512)
-        );
+            QMetaObject::invokeMethod(
+             T_PrivPtr( m_obj )->wkrPtr(), "cmd_GeneralCmd", Qt::QueuedConnection,
+             Q_ARG( QByteArray, ba  ),Q_ARG( QString,QString("上传配置")),Q_ARG( quint32, fragment+4)
+            );
+        }
     }
 }
 

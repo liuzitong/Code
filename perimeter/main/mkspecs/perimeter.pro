@@ -12,7 +12,7 @@ CONFIG -= app_bundle
 DEFINES += QT_DEPRECATED_WARNINGS QT_MESSAGELOGCONTEXT _QX_NO_PRECOMPILED_HEADER
 QMAKE_CFLAGS += /utf-8
 QMAKE_CXXFLAGS += /utf-8
-
+RC_FILE = perimeter.rc
 TRANSLATIONS +=  $$PWD/../../perimeter_zh_CN.ts
 TR_EXCLUDE += $$PWD/../../../perimeter/third-part/*
 
