@@ -101,7 +101,10 @@ public:
     int getCastLightAdjustStatus(){return m_castLightAdjustStatus;}void setCastLightAdjustStatus(int value){m_castLightAdjustStatus=value;emit castLightAdjustStatusChanged();}Q_SIGNAL void castLightAdjustStatusChanged();
 public:
     Status m_status;
+    QElapsedTimer m_workStatusElapsedTimer;
     bool m_isDeviceReady=false,m_autoAlignPupil=true;
+    bool m_eyeglassStatus;
+    bool m_eyeglassIntialize=false;
     bool m_isChecking=false;
     bool m_connectDev=false;
     float m_deviation=0;

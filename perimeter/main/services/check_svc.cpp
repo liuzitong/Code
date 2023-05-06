@@ -94,6 +94,9 @@ public:
     virtual void Checkprocess() override;
     virtual void finished() override;
 
+//signals:
+//    void currentCheckingDotChanged(int index);
+
 private:
     std::tuple<bool,QPointF,int> getCheckCycleLocAndDB();
 
@@ -112,6 +115,8 @@ private:
     void waitAndProcessAnswer();
 
     virtual void setLight(bool onOff) override;
+
+
 };
 
 class DynamicCheck:public Check
@@ -363,6 +368,8 @@ void StaticCheck::finished()
     m_deviceOperation->m_isChecking=false;
     m_deviceOperation->dimDownCastLight();
     setLight(false);
+    m_deviceOperation->setLamp(DevOps::LampId::LampId_eyeglassInfrared,0,false);
+    m_deviceOperation->setLamp(DevOps::LampId::LampId_borderInfrared,0,false);
 }
 
 
@@ -1429,6 +1436,8 @@ void DynamicCheck::finished()
 {
     m_deviceOperation->m_isChecking=false;
     setLight(false);
+    m_deviceOperation->setLamp(DevOps::LampId::LampId_eyeglassInfrared,0,false);
+    m_deviceOperation->setLamp(DevOps::LampId::LampId_borderInfrared,0,false);
     m_deviceOperation->dimDownCastLight();
 }
 
@@ -1441,6 +1450,7 @@ void DynamicCheck::setLight(bool onOff)
     }
     else
         m_deviceOperation->setLamp(DevOps::LampId::LampId_yellowBackground,0,onOff);
+
 }
 
 void CheckSvcWorker::initialize()

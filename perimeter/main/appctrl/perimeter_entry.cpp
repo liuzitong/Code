@@ -97,11 +97,12 @@ static void gMsgHandler( QtMsgType type, const QMessageLogContext &ctxt, const Q
     }
 
 
-    #if defined(_MSC_VER)
-        OutputDebugStringW( reinterpret_cast<LPCWSTR>( fmt_str.constData()) );
-    #else
+//    #if defined(_MSC_VER)
+//        OutputDebugStringW( reinterpret_cast<LPCWSTR>( fmt_str.constData()) );
+//    #else
         std::fprintf( stderr, fmt_str.toUtf8().constData() );
-    #endif
+//        std::cout<<fmt_str.toUtf8().constData();
+//    #endif
 #endif
 
 }
@@ -117,27 +118,14 @@ int  main ( int argc, char *argv[] )
 {
     int ret = 0;
     //handle the terminate signal
-
     signal( SIGTERM, & gSigTerm_Handler );
     qInstallMessageHandler( & gMsgHandler );
-
 
 
     // start the application
     gPrintMemCntr("pre-stage");
     {
         QApplication app(argc, argv);
-
-//        LimeReport::ReportEngine* report = new LimeReport::ReportEngine();
-
-//        report->dataManager()->clearUserVariables();
-
-//        report->setShowProgressDialog(false);
-//        report->designReport();
-
-
-
-
         Perimeter::AppCtrl *app_ctrl = new Perimeter::AppCtrl;
         app_ctrl->doInit();
 
@@ -158,7 +146,6 @@ int  main ( int argc, char *argv[] )
 
         eng->load(QUrl(QLatin1String("qrc:/perimeter/main/view/Application.qml")));
         qmlRegisterSingletonType(QUrl("qrc:/perimeter/main/view/Utils/CusUtils.qml"), "perimeter.main.view.Utils", 1, 0, "CusUtils");
-
 
         gPrintMemCntr("enter eventloop stage");
 //        QObject::connect(eng, &QQmlEngine::quit, QCoreApplication::instance(),  &QCoreApplication::quit);

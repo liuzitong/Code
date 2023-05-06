@@ -165,7 +165,7 @@ DevCtl_Worker :: ~DevCtl_Worker ( )
 void   DevCtl_Worker :: init( bool req_emit )
 {
     if ( m_usb_dev == nullptr ) {
-        emit updateInfo(QString("正在初始化连接.VIdPId:%1.").arg(QString::number(m_vid_pid,16)));
+        emit updateInfo(QString("intialize connetion.VIdPId:%1.").arg(QString::number(m_vid_pid,16)));
         m_wks = DevCtl::WorkStatus_S_ConnectToDev;
         if ( req_emit ) { emit this->workStatusChanged( DevCtl::WorkStatus_S_ConnectToDev ); }
         m_usb_dev = usbdev_new( SciPack::NwkUsbObj2, m_vid_pid, uint8_t( m_cfg_id ), 0xff000000, 0, 0 );//连接实例
@@ -173,19 +173,19 @@ void   DevCtl_Worker :: init( bool req_emit )
         if ( m_usb_dev->status() == SciPack::NwkUsbObj2::StatusID_S_OK ) {
             m_wks = DevCtl::WorkStatus_S_OK;
             if ( req_emit ) { emit this->workStatusChanged( DevCtl::WorkStatus_S_OK ); }
-            emit updateInfo("连接成功.");
+            emit updateInfo("connection succeed.");
             this->cmd_ClearCache();
             this->cmd_ReadProfile( req_emit );
             this->cmd_ReadConfig (req_emit);
         } else {
             m_wks = DevCtl::WorkStatus_E_UnExpected;
             if ( req_emit ) { emit this->workStatusChanged( DevCtl::WorkStatus_E_UnExpected ); }
-            emit updateInfo("连接异常.");
+            emit updateInfo("connection UnExpected.");
             usbdev_delete( m_usb_dev, SciPack::NwkUsbObj2 );
             m_usb_dev = nullptr;
             m_wks = DevCtl::WorkStatus_S_Disconnected;
             if ( req_emit ) { emit this->workStatusChanged( DevCtl::WorkStatus_S_Disconnected ); }
-            emit updateInfo("断开连接.");
+            emit updateInfo("disconnected.");
         }
     }
 }
@@ -218,7 +218,7 @@ bool    DevCtl_Worker :: cmdComm_bulkOutSync( const unsigned char *buff, int buf
     SciPack::NwkUsbObj2::DataPacket  pkg;
     pkg.dat_id = 0; pkg.dat_ptr = const_cast<unsigned char*>( buff ); pkg.dat_size = buff_sz;
     bool ret=m_usb_dev->bulkTransSync( SciPack::NwkUsbObj2::PipeTypeID_BlkBulkOut, & pkg ) == SCIPACK_S_OK;
-//    QString msg="cmdComm_bulkOutSync:\n"+buffToQStr(reinterpret_cast<const char*>(buff),buff_sz);
+//    QString msg="cmdComm_bulkOutSync:"+buffToQStr(reinterpret_cast<const char*>(buff),buff_sz);
 //    logger->info(msg.toStdString());
     return ret;
 }
@@ -231,7 +231,7 @@ bool    DevCtl_Worker :: cmdComm_bulkInSync( unsigned char *buff, int buff_sz)
     SciPack::NwkUsbObj2::DataPacket pkg;
     pkg.dat_id = 0; pkg.dat_ptr = buff; pkg.dat_size = buff_sz;
     bool ret=( m_usb_dev->bulkTransSync( SciPack::NwkUsbObj2::PipeTypeID_BlkBulkIn, & pkg ) == SCIPACK_S_OK );
-//    QString msg="cmdComm_bulkInSync:\n"+buffToQStr(reinterpret_cast<const char*>(buff),buff_sz);
+//    QString msg="cmdComm_bulkInSync:"+buffToQStr(reinterpret_cast<const char*>(buff),buff_sz);
 //    logger->info(msg.toStdString());
     return ret;
 }
@@ -255,7 +255,7 @@ bool    DevCtl_Worker :: cmdComm_strInSync( unsigned char *buff, int buff_sz )
 // ============================================================================
 bool   DevCtl_Worker :: cmd_ReadProfile( bool req_emit )
 {
-    updateInfo("读取Profile中");
+    updateInfo("read Profile.");
 //    if ( ! this->isDeviceWork()) { return false; }
     unsigned char buff[512]={0}; bool ret = true;
     if ( ret ) {
@@ -283,7 +283,7 @@ bool   DevCtl_Worker :: cmd_ReadProfile( bool req_emit )
 // ============================================================================
 bool   DevCtl_Worker :: cmd_ReadConfig( bool req_emit )
 {
-    updateInfo("读取Config中.");
+    updateInfo("read Config.");
     bool ret = true;
     int frameSize=512;
     int totalFrame=ceil(double(Config::dataLen())/frameSize);
@@ -331,7 +331,7 @@ bool   DevCtl_Worker :: cmd_ReadConfig( bool req_emit )
 
 StaticCache* DevCtl_Worker::cmd_ReadStaticCache()
 {
-    updateInfo("读取静态投射缓存.");
+    updateInfo("read static cache.");
     if(!this->isDeviceWork()){return Q_NULLPTR;}
     unsigned char buff[512]={0};
     bool ret = true;
@@ -350,7 +350,7 @@ StaticCache* DevCtl_Worker::cmd_ReadStaticCache()
     }
     if(ret)
     {
-        updateIOInfo(QString("R:")+buffToQStr(reinterpret_cast<const char*>(buff),sizeof(m_staticCache)));
+        updateIOInfo(QString("R:")+buffToQStr(reinterpret_cast<const char*>(buff),sizeof(m_staticCache))+"");
         memcpy(m_staticCache,buff,sizeof(m_staticCache));
         return m_staticCache;
     }
@@ -360,7 +360,7 @@ StaticCache* DevCtl_Worker::cmd_ReadStaticCache()
 
 MoveCache* DevCtl_Worker::cmd_ReadMoveCache()
 {
-    updateInfo("读取移动投射缓存.");
+    updateInfo("read move cache.");
     if(!this->isDeviceWork()){return Q_NULLPTR;}
     unsigned char buff[512]={0};
     bool ret = true;
@@ -378,7 +378,7 @@ MoveCache* DevCtl_Worker::cmd_ReadMoveCache()
     }
     if(ret)
     {
-        updateIOInfo(QString("R:")+buffToQStr(reinterpret_cast<const char*>(buff),sizeof(m_moveCache)));
+        updateIOInfo(QString("R:")+buffToQStr(reinterpret_cast<const char*>(buff),sizeof(m_moveCache))+"");
         memcpy(m_moveCache,buff,sizeof(m_moveCache));
         return m_moveCache;
     }
@@ -411,7 +411,7 @@ bool   DevCtl_Worker :: cmd_ReadStatusData()
         if ( ! ret ) { updateRefreshInfo("recv. status data failed."); }
     }
     if ( ret ) {
-        updateRefreshIOInfo(QString("R:")+buffToQStr(reinterpret_cast<const char*>(buff),64));
+        updateRefreshIOInfo(QString("R:")+buffToQStr(reinterpret_cast<const char*>(buff),64)+"");
         StatusData sd( QByteArray::fromRawData( reinterpret_cast<const char*>(buff),sizeof(buff)));
         if ( ! sd.isEmpty()) {
             emit this->newStatusData( sd );
@@ -428,13 +428,13 @@ bool  DevCtl_Worker :: cmd_ReadFrameData()
     static int count=0;
     if ( m_video_trg_called.loadAcquire() > 0 ) { m_video_trg_called.fetchAndSubOrdered(1); }
     if ( ! this->isDeviceWork() || ! m_is_video_on || m_profile.isEmpty()) { updateRefreshInfo("no camera."); return false; }
-    updateRefreshInfo("读取视频帧:"+QString::number(count));
+    updateRefreshInfo("read frame:"+QString::number(count)+"");
     bool ret = true;
     QSize sz = m_profile.videoSize();
     QByteArray ba( sz.height()*sz.width(), 0 );
     ret = this->cmdComm_strInSync( reinterpret_cast<unsigned char*>( ba.data()), ba.size());
     if ( ret ) {
-        updateRefreshIOInfo(QString("R:")+buffToQStr(reinterpret_cast<const char*>(ba.data()),20));
+        updateRefreshIOInfo(QString("R:")+buffToQStr(reinterpret_cast<const char*>(ba.data()),20)+"");
 //        if(count%10==0)
 //        {
 //            QFile file(QString(R"(./videoData/)")+QString::number(count));
@@ -497,7 +497,7 @@ bool  DevCtl_Worker :: cmd_TurnOnVideo()
     if ( ! this->isDeviceWork()) { updateInfo("no connection!");return false; }
 //    if ( m_is_video_on ) { return true; }
     bool ret = true;
-    updateInfo("打开摄像头.");
+    updateInfo("open camera.");
     if ( ret ) { // turn on EP2
         SciPack::NwkUsbObj2::SetupPacket pkg;
         pkg.m_req_type = 0x40; pkg.m_req = 0xb2; pkg.m_value = 0;
@@ -516,7 +516,7 @@ bool  DevCtl_Worker :: cmd_TurnOnVideo()
     }
     if ( ret ) {
         m_is_video_on = true; m_elapse_tmr.start();
-        updateInfo("摄像头打开成功.");
+        updateInfo("open camera succeed.");
         emit this->videoStatusChanged( true );
     }
     return ret;
@@ -530,7 +530,7 @@ bool  DevCtl_Worker :: cmd_TurnOffVideo()
     if ( ! this->isDeviceWork()) { updateInfo("no connection!");return false; }
 //    if ( ! m_is_video_on ) { return true; }
     bool ret = true;
-    updateInfo("关闭摄像头.");
+    updateInfo("turn off camera.");
     if ( ret ) { // turn off video
         unsigned char buff[512];
         buff[0] = 0x5a; buff[1] = 0x70; buff[2] = 0x00; buff[3] = 0x00;
@@ -549,7 +549,7 @@ bool  DevCtl_Worker :: cmd_TurnOffVideo()
         }
     }
     if ( ret ) {
-        updateInfo("关闭摄像头.");
+        updateInfo("turn off camera.");
         m_is_video_on = false; m_elapse_tmr.invalidate();
         emit this->videoStatusChanged( false );
     }
@@ -561,7 +561,7 @@ bool DevCtl_Worker::cmd_ClearCache()
 {
     if ( ! this->isDeviceWork()) { updateInfo("no connection!");return false; }
     bool ret = true;
-    updateInfo("清除缓存.");
+    updateInfo("clear Cache.");
     if ( ret ) { //clear Cache
         SciPack::NwkUsbObj2::SetupPacket pkg;
         pkg.m_req_type = 0x40; pkg.m_req = 0xb2; pkg.m_value = 0;
@@ -572,7 +572,7 @@ bool DevCtl_Worker::cmd_ClearCache()
         }
     }
     if ( ret ) {
-        updateInfo("清除缓存完成.");
+        updateInfo("clear cache done.");
     }
     return ret;
 }
@@ -621,7 +621,7 @@ auto     DevCtl_Worker :: cmd_readUsbEEPROM ( char *buff, int size, int eeprom_a
     auto ret = ( m_usb_dev->ctlTransSync( & setup_pkg, & data_pkg, & bytes_trans ) == SCIPACK_S_OK );
 //    if ( ! ret ) { spdlog::warn("read USB EEPROM cmd failed!"); }
     if ( ret ) {
-        qDebug( "readEEPROM: %d address OK", eeprom_addr );
+        updateInfo( QString("readEEPROM: %1 address OK.").arg(QString::number(eeprom_addr)));
     }
     return ret;
 }
@@ -640,7 +640,7 @@ auto     DevCtl_Worker :: cmd_writeUsbEEPROM( const char *buff, int size, int ee
     auto ret = ( m_usb_dev->ctlTransSync( & setup_pkg, & data_pkg, & bytes_trans ) == SCIPACK_S_OK );
 //    if ( ! ret ) { spdlog::warn("write USB EEPROM cmd failed!"); }
     if ( ret ) {
-        qDebug( "writeEEPROM: %d address OK", eeprom_addr );
+        updateInfo(  QString("writeEEPROM: %1 address OK.").arg(QString::number(eeprom_addr )));
     }
     return ret;
 }
@@ -1078,7 +1078,7 @@ void  DevCtl :: moveChinMotors( quint8* sps, qint32* dist,MoveMethod method)
     memcpy(ptr+4,dist,8);
     QMetaObject::invokeMethod(
         T_PrivPtr( m_obj )->wkrPtr(), "cmd_GeneralCmd", Qt::QueuedConnection,
-        Q_ARG( QByteArray, ba ),Q_ARG( QString,QString("移动腮托电机")),Q_ARG( quint32, 12 )
+        Q_ARG( QByteArray, ba ),Q_ARG( QString,QString("move Chin motor")),Q_ARG( quint32, 12 )
     );
 }
 
@@ -1096,7 +1096,7 @@ void   DevCtl :: move5Motors( quint8*  sps, qint32*  dist,MoveMethod method)
     memcpy(ptr+8,dist,20);
     QMetaObject::invokeMethod(
         T_PrivPtr( m_obj )->wkrPtr(), "cmd_GeneralCmd", Qt::QueuedConnection,
-        Q_ARG( QByteArray, ba  ),Q_ARG( QString,QString("五电机移动")),Q_ARG( quint32, 28 )
+        Q_ARG( QByteArray, ba  ),Q_ARG( QString,QString("move five motors")),Q_ARG( quint32, 28 )
                 );
 }
 
@@ -1109,7 +1109,7 @@ void DevCtl::sendDynamicData(quint8 totalFrame, quint8 frameNumber, quint32 data
     memcpy(ptr+8,posData,dataLen-8);
     QMetaObject::invokeMethod(
         T_PrivPtr( m_obj )->wkrPtr(), "cmd_GeneralCmd", Qt::QueuedConnection,
-        Q_ARG( QByteArray, ba  ),Q_ARG( QString,QString("发射投射移动数据")),Q_ARG( quint32, dataLen )
+        Q_ARG( QByteArray, ba  ),Q_ARG( QString,QString("send dynamic data")),Q_ARG( quint32, dataLen )
                 );
 }
 
@@ -1122,7 +1122,7 @@ void DevCtl::startDynamic(quint8 spsX, quint8 spsY, quint8 spsF, quint32 stepTim
     memcpy(ptr+12,&totalStepCount,12);
     QMetaObject::invokeMethod(
         T_PrivPtr( m_obj )->wkrPtr(), "cmd_GeneralCmd", Qt::QueuedConnection,
-        Q_ARG( QByteArray, ba  ),Q_ARG( QString,QString("开始投射移动")),Q_ARG( quint32, 16 )
+        Q_ARG( QByteArray, ba  ),Q_ARG( QString,QString("start dyanmic move")),Q_ARG( quint32, 16 )
                 );
 }
 
@@ -1133,7 +1133,7 @@ void DevCtl::stopDyanmic()
     ptr[0]=0x5a;ptr[1]=0x58;
     QMetaObject::invokeMethod(
         T_PrivPtr( m_obj )->wkrPtr(), "cmd_GeneralCmd", Qt::QueuedConnection,
-        Q_ARG( QByteArray, ba  ),Q_ARG( QString,QString("停止投射移动")),Q_ARG( quint32, 4 )
+        Q_ARG( QByteArray, ba  ),Q_ARG( QString,QString("stop dynamic move")),Q_ARG( quint32, 4 )
                 );
 }
 
@@ -1148,7 +1148,7 @@ void   DevCtl :: resetMotor( MotorId mot,quint8 speed )
     ptr[0]=0x5a;ptr[1]=0x57;ptr[2]=mot;ptr[3]=speed;
     QMetaObject::invokeMethod(
         T_PrivPtr( m_obj )->wkrPtr(), "cmd_GeneralCmd", Qt::QueuedConnection,
-        Q_ARG( QByteArray, ba  ),Q_ARG( QString,QString("复位电机")),Q_ARG( quint32, 4 )
+        Q_ARG( QByteArray, ba  ),Q_ARG( QString,QString("reset motor")),Q_ARG( quint32, 4 )
     );
 }
 
@@ -1173,7 +1173,7 @@ void   DevCtl :: saveConfig(Config& cfg )
             memcpy(ptr+4,dataPtr+frameSize*i,frameSize);
             QMetaObject::invokeMethod(
              T_PrivPtr( m_obj )->wkrPtr(), "cmd_GeneralCmd", Qt::QueuedConnection,
-             Q_ARG( QByteArray, ba  ),Q_ARG( QString,QString("上传配置")),Q_ARG( quint32, 512)
+             Q_ARG( QByteArray, ba  ),Q_ARG( QString,QString("upload config")),Q_ARG( quint32, 512)
             );
         }
 
@@ -1182,7 +1182,7 @@ void   DevCtl :: saveConfig(Config& cfg )
             memcpy(ptr+4,dataPtr+frameSize*i,fragment);
             QMetaObject::invokeMethod(
              T_PrivPtr( m_obj )->wkrPtr(), "cmd_GeneralCmd", Qt::QueuedConnection,
-             Q_ARG( QByteArray, ba  ),Q_ARG( QString,QString("上传配置")),Q_ARG( quint32, fragment+4)
+             Q_ARG( QByteArray, ba  ),Q_ARG( QString,QString("upload config")),Q_ARG( quint32, fragment+4)
             );
         }
     }
@@ -1241,7 +1241,7 @@ void DevCtl::sendBinaryCommand(QByteArray ba,int dataLen)
     ba.resize(512);
     QMetaObject::invokeMethod(
      T_PrivPtr( m_obj )->wkrPtr(), "cmd_GeneralCmd", Qt::QueuedConnection,
-     Q_ARG( QByteArray, ba  ),Q_ARG( QString,QString("二进制命令")),Q_ARG( quint32, dataLen)
+     Q_ARG( QByteArray, ba  ),Q_ARG( QString,QString("binary command")),Q_ARG( quint32, dataLen)
     );
 }
 
@@ -1256,7 +1256,7 @@ void   DevCtl :: setLamp( LampId lampId,quint8 lampNumber, quint16 da)
     gPutInt16(&ptr[4],da);
     QMetaObject::invokeMethod(
         T_PrivPtr( m_obj )->wkrPtr(), "cmd_GeneralCmd", Qt::QueuedConnection,
-        Q_ARG( QByteArray, ba),Q_ARG( QString,QString("设置背景灯")),Q_ARG( quint32, 6 )
+        Q_ARG( QByteArray, ba),Q_ARG( QString,QString("set Lamp")),Q_ARG( quint32, 6 )
         );
 }
 
@@ -1267,7 +1267,7 @@ void DevCtl::setWhiteLamp(quint8 r,quint8 g,quint8 b)
     ptr[0]=0x5a;ptr[1]=0x81;ptr[2]=r;ptr[3]=g;ptr[4]=b;
     QMetaObject::invokeMethod(
         T_PrivPtr( m_obj )->wkrPtr(), "cmd_GeneralCmd", Qt::QueuedConnection,
-        Q_ARG( QByteArray, ba),Q_ARG( QString,QString("设置背景白灯")),Q_ARG( quint32, 5 )
+        Q_ARG( QByteArray, ba),Q_ARG( QString,QString("set white Lamp")),Q_ARG( quint32, 5 )
                 );
 }
 
@@ -1280,7 +1280,7 @@ void DevCtl::openShutter(quint16 durationTime, qint32 coord_shutter)
     gPutInt32(&ptr[4],coord_shutter);
     QMetaObject::invokeMethod(
         T_PrivPtr( m_obj )->wkrPtr(), "cmd_GeneralCmd", Qt::QueuedConnection,
-        Q_ARG( QByteArray, ba),Q_ARG( QString,QString("打开快门")),Q_ARG( quint32, 8 )
+        Q_ARG( QByteArray, ba),Q_ARG( QString,QString("open shutter")),Q_ARG( quint32, 8 )
                 );
 }
 

@@ -337,27 +337,27 @@ Item{
                             Row{
                                 width: parent.width;height:patientInfo.rowHight;spacing: parent.width*0.02
                                 CusText{text:"*"+lt+qsTr("Patient ID")+" "; horizontalAlignment: Text.AlignRight ;width:parent.width*0.20;font.pointSize: fontPointSize;}
-                                LineEdit{enabled:patientSaveButton.enabled||patientReviseButton.enabled;id:newPatientId;width: parent.width*0.6;}
+                                LineEdit{id:newPatientId;width: parent.width*0.6;}
                                 CusButton{height: parent.height;width: height;imageSrc:"qrc:/Pics/base-svg/btn_find.svg";onClicked:{patientInfoListView.patientListModelVm.getPatientListByPatientId(newPatientId.text);}}
                             }
                             Row{
                                 id:newChineseNameRow;visible:false;width: parent.width;height:patientInfo.rowHight;spacing: parent.width*0.02
                                 CusText{text:"*"+lt+qsTr("Name")+" "; horizontalAlignment: Text.AlignRight ;width:parent.width*0.20;font.pointSize: fontPointSize;}
-                                LineEdit{enabled:patientSaveButton.enabled||patientReviseButton.enabled;id:newChineseName;width: parent.width*0.6}
+                                LineEdit{id:newChineseName;width: parent.width*0.6}
                                 CusButton{height: parent.height;width: height;imageSrc:"qrc:/Pics/base-svg/btn_find.svg";onClicked:{patientInfoListView.patientListModelVm.getPatientListByName(newChineseName.text,dateFrom.text,dateTo.text);}}
                             }
 
                             Row{
                                 id:newEnglishFirstNameRow;visible:false;width: parent.width;height:patientInfo.rowHight;spacing: parent.width*0.02
                                 CusText{text:"*"+lt+qsTr("First name")+" "; horizontalAlignment: Text.AlignRight ;width:parent.width*0.20;font.pointSize: fontPointSize;}
-                                LineEdit{enabled:patientSaveButton.enabled||patientReviseButton.enabled;id:newEnglishFirstName;width: parent.width*0.6}
+                                LineEdit{id:newEnglishFirstName;width: parent.width*0.6}
                                 CusButton{height: parent.height;width: height;imageSrc:"qrc:/Pics/base-svg/btn_find.svg";onClicked:{patientInfoListView.patientListModelVm.getPatientListByName(newEnglishFirstName.text+" "+newEnglishLastNameRow.text,dateFrom.text,dateTo.text);}}
                             }
 
                             Row{
                                 id:newEnglishLastNameRow;visible:false;width: parent.width;height:patientInfo.rowHight;spacing: parent.width*0.02
                                 CusText{text:"*"+lt+qsTr("Last name"); horizontalAlignment: Text.AlignRight ;width:parent.width*0.20;font.pointSize: fontPointSize;}
-                                LineEdit{enabled:patientSaveButton.enabled||patientReviseButton.enabled;id:newEnglishLastName;width: parent.width*0.6}
+                                LineEdit{id:newEnglishLastName;width: parent.width*0.6}
                             }
 
                             Row{
@@ -367,17 +367,14 @@ Item{
                                     id:genderSelect;property int gender;
                                     height:parent.height;spacing:(width-6*height)/2;width:newPatient.width*0.6
                                     CusButton{
-                                        enabled:patientSaveButton.enabled||patientReviseButton.enabled;
                                         id:manButton;property bool chosen:false;imageSrc: "qrc:/Pics/base-svg/btn_sex_man.svg";width: 2*height
                                         onClicked: {genderSelect.selectGender(0)}
                                     }
                                     CusButton{
-                                        enabled:patientSaveButton.enabled||patientReviseButton.enabled;
                                         id:womanButton;property bool chosen:false;imageSrc: "qrc:/Pics/base-svg/btn_sex_woman.svg";width: 2*height
                                         onClicked:  {genderSelect.selectGender(1)}
                                     }
                                     CusButton{
-                                        enabled:patientSaveButton.enabled||patientReviseButton.enabled;
                                         id:otherButton;property bool chosen:false;text:lt+qsTr("Others");width:height*2;
                                         onClicked: {genderSelect.selectGender(2)}
                                     }
@@ -402,9 +399,8 @@ Item{
                                 CusText{text:"*"+lt+qsTr("Birth date")+" "; horizontalAlignment: Text.AlignRight ;width:parent.width*0.20;font.pointSize: fontPointSize;}
                                 Row{
                                     height:parent.height;spacing:(width-6*height)/2;width:newPatient.width*0.6
-                                    Item{height: parent.height;width: 2*height;LineEdit{enabled:patientSaveButton.enabled||patientReviseButton.enabled;id:newBirthDate;width: height*3.1;onTextChanged:{newPatientage.text=CusUtils.getAge(newBirthDate.text);}}}
+                                    Item{height: parent.height;width: 2*height;LineEdit{id:newBirthDate;width: height*3.1;onTextChanged:{newPatientage.text=CusUtils.getAge(newBirthDate.text);}}}
                                     CusButton{
-                                        enabled:patientSaveButton.enabled||patientReviseButton.enabled;
                                         text:lt+qsTr("Select");width:height*2;onClicked:{calendar.inputObj=newBirthDate;calendar.open();}}
                                     LineEdit{
                                         id:newPatientage;width: height*2;text:"";radius: height*0.2;horizontalAlignment: Text.AlignHCenter;readOnly: true;backgroundColor:backGroundColor;
@@ -543,7 +539,7 @@ Item{
                         root.changePage("check",{lastProgram:null});
                     }
                 }
-                CusButton{id:patientSaveButton;text:lt+qsTr("Save");enabled: false;
+                CusButton{id:patientSaveButton;text:lt+qsTr("Save");/*enabled: false;*/
                     onClicked:{
                         var name="";
                         if(!doubleName){ name=newChineseName.text; }

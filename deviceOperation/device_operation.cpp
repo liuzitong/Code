@@ -10,6 +10,7 @@
 #include <thread>
 #include <QtConcurrent/QtConcurrent>
 #include <QtGlobal>
+#include <iostream>
 
 //#include <QQmlEngine>
 
@@ -21,10 +22,11 @@ QSharedPointer<DeviceOperation> DeviceOperation::m_singleton=nullptr;
 DeviceOperation::DeviceOperation()
 {
     m_config=DeviceData::getSingleton()->m_config;
-    m_connectTimer.setInterval(5000);
+    m_connectTimer.setInterval(10000);
     connect(&m_connectTimer,&QTimer::timeout,this,&DeviceOperation::connectOrdisConnectDev);
     m_connectTimer.start();
-//    connect(this,&DeviceOperation::updateDevInfo,[](QString str){qDebug()<<str;});
+    connect(this,&DeviceOperation::updateDevInfo,[](QString str){std::cout<<str.toStdString()+"\n";});
+    m_workStatusElapsedTimer.start();
 }
 
 
@@ -38,6 +40,7 @@ void DeviceOperation::connectDev()
 {
     m_status={-1,-1};
     m_connectDev=true;
+    connectOrdisConnectDev();
 }
 
 void DeviceOperation::disconnectDev()
@@ -49,7 +52,7 @@ void DeviceOperation::connectOrdisConnectDev()
 {
     if(m_connectDev&&m_devCtl==nullptr)
     {
-        updateDevInfo("connecting");
+        updateDevInfo("connecting.\n");
         auto deviceSettings=DeviceSettings::getSingleton();
         quint32 vid_pid=deviceSettings->m_VID.toInt(nullptr,16)<<16|deviceSettings->m_PID.toInt(nullptr,16);
         m_devCtl.reset(UsbDev::DevCtl::createInstance(vid_pid));
@@ -357,10 +360,11 @@ void DeviceOperation::adjustCastLight()
                    UsbDev::DevCtl::MotorId_X,
                    UsbDev::DevCtl::MotorId_Y
                    });
+    waitForSomeTime(1000);
     openShutter(65535);
     m_currentCastLightDA=m_config.castLightADPresetRef();
     m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA);
-    waitForSomeTime(2000);
+    waitForSomeTime(1000);
     m_castLightAdjustStatus=2;
     m_castLightAdjustElapsedTimer.start();
 }
@@ -526,7 +530,7 @@ void DeviceOperation::waitMotorStop(QVector<UsbDev::DevCtl::MotorId> motorIDs)
     do
     {
         QApplication::processEvents();
-    }while(getMotorsBusy(motorIDs)||(mstimer.elapsed()<50)); //50ms
+    }while(getMotorsBusy(motorIDs)||(mstimer.elapsed()<100));
 }
 
 void DeviceOperation::waitForSomeTime(int time)
@@ -602,17 +606,22 @@ void DeviceOperation::dimDownCastLight()
 
 void DeviceOperation::workOnNewStatuData()
 {
+    if(m_workStatusElapsedTimer.elapsed()>=1000)
+    {
+        m_workStatusElapsedTimer.restart();
+        updateDevInfo("receive new workStatus");
+    }
     m_statusData=m_devCtl->takeNextPendingStatusData();
     auto eyeglassStatus=m_statusData.eyeglassStatus();
     if(m_isChecking)
     {
-        setLamp(LampId::LampId_eyeglassInfrared,0,eyeglassStatus);
-        setLamp(LampId::LampId_borderInfrared,0,!eyeglassStatus);
-    }
-    else
-    {
-        setLamp(LampId::LampId_eyeglassInfrared,0,false);
-        setLamp(LampId::LampId_borderInfrared,0,false);
+        if(m_eyeglassStatus!=eyeglassStatus||!m_eyeglassIntialize)
+        {
+            m_eyeglassStatus=eyeglassStatus;
+            m_eyeglassIntialize=true;
+            setLamp(LampId::LampId_eyeglassInfrared,0,eyeglassStatus);
+            setLamp(LampId::LampId_borderInfrared,0,!eyeglassStatus);
+        }
     }
 
     if(m_isWaitingForStaticStimulationAnswer)
@@ -654,6 +663,7 @@ void DeviceOperation::workOnNewStatuData()
             setCastLightAdjustStatus(3);
             openShutter(0);
             waitMotorStop({UsbDev::DevCtl::MotorId_Shutter});
+            m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA*0.3);
 //            waitForSomeTime(3000);              //防止摄像头刷不出来
         }
     }
