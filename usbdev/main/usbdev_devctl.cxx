@@ -258,12 +258,12 @@ bool   DevCtl_Worker :: cmd_ReadProfile( bool req_emit )
     updateInfo("read Profile.");
 //    if ( ! this->isDeviceWork()) { return false; }
     unsigned char buff[512]={0}; bool ret = true;
-    if ( ret ) {
-        buff[0] = 0x5a; buff[1] = 0xf0;
-        updateIOInfo(QString("W:")+buffToQStr(reinterpret_cast<const char*>(buff),2));
-        ret = this->cmdComm_bulkOutSync( buff, sizeof( buff ) );
-        if ( ! ret ) { updateInfo("send read profile command failed."); }
-    }
+
+    buff[0] = 0x5a; buff[1] = 0xf0;
+    updateIOInfo(QString("W:")+buffToQStr(reinterpret_cast<const char*>(buff),2));
+    ret = this->cmdComm_bulkOutSync( buff, sizeof( buff ) );
+    if ( ! ret ) { updateInfo("send read profile command failed."); }
+
     if ( ret ) {
         ret = this->cmdComm_bulkInSync( buff, sizeof( buff ));
         if ( ! ret ) { updateInfo("recv. profile data failed."); }
@@ -284,41 +284,39 @@ bool   DevCtl_Worker :: cmd_ReadProfile( bool req_emit )
 bool   DevCtl_Worker :: cmd_ReadConfig( bool req_emit )
 {
     updateInfo("read Config.");
+    if ( !this->isDeviceWork())  updateInfo("no connection.");
     bool ret = true;
     int frameSize=512;
     int totalFrame=ceil(double(Config::dataLen())/frameSize);
     int fragment=Config::dataLen()-frameSize*(totalFrame-1);
     unsigned char* dataPtr=new unsigned char[totalFrame*frameSize];
-    if ( !this->isDeviceWork())  updateInfo("no connection.");
     for(int i=0;i<totalFrame;i++)
     {
-        if(ret)
-        {
-            unsigned char buffOut[512];
-            buffOut[0] = 0x5a; buffOut[1] = 0xf1;buffOut[2]=totalFrame;buffOut[3]=i;
-            updateIOInfo(QString("W:")+buffToQStr(reinterpret_cast<const char*>(buffOut),4));
-            if ( this->isDeviceWork()) ret = this->cmdComm_bulkOutSync( buffOut, sizeof( buffOut ) );
-            if ( ! ret ) { updateInfo(QString("send read config  %0nd segment command failed.").arg(QString::number(i))); }
 
-        }
+        unsigned char buff[512];
+        buff[0] = 0x5a; buff[1] = 0xf1;buff[2]=totalFrame;buff[3]=i;
+        updateIOInfo(QString("W:")+buffToQStr(reinterpret_cast<const char*>(buff),4));
+        if ( this->isDeviceWork()) ret = this->cmdComm_bulkOutSync( buff, sizeof( buff ) );
+        if ( ! ret ) { updateInfo(QString("send read config  %0nd segment command failed.").arg(QString::number(i))); }
+
         if(ret&&this->isDeviceWork())
         {
             if(i!=totalFrame-1)
             {
-                if (this->isDeviceWork()) ret = this->cmdComm_bulkInSync( dataPtr+512*i, sizeof( 512 ));
+                ret = this->cmdComm_bulkInSync( dataPtr+512*i, 512 );
                 if ( ! ret ) { updateInfo(QString("recv. config  %0nd segment data failed.").arg(QString::number(i)));}
                 else   updateIOInfo(QString("Config %0nd segment R:").arg(QString::number(i))+buffToQStr(reinterpret_cast<const char*>(dataPtr+512*i),512));
             }
             else
             {
-                if (this->isDeviceWork()) ret = this->cmdComm_bulkInSync( dataPtr+512*i, sizeof( fragment ));
+                ret = this->cmdComm_bulkInSync( dataPtr+512*i, 512);
                 if ( ! ret ) { updateInfo(QString("recv. config  %0nd segment data failed.").arg(QString::number(i)));}
                 else   updateIOInfo(QString("Config %0nd segment R:").arg(QString::number(i))+buffToQStr(reinterpret_cast<const char*>(dataPtr+512*i),fragment));
             }
         }
     }
 
-    if ( ret&& this->isDeviceWork()) {
+    if ( ret&&this->isDeviceWork()) {
         updateInfo("recv. config data succeeded.");
         updateIOInfo(QString("Config R:")+buffToQStr(reinterpret_cast<const char*>(dataPtr),Config::dataLen()));
         Config config( QByteArray::fromRawData( reinterpret_cast<const char*>(dataPtr), sizeof(Config::dataLen())));

@@ -8,6 +8,7 @@ Item{
     property var currentProgram: null;
     property var currentCheckResult:null;
     property int clickedDotIndex: -1;
+    property int currentCheckingDotIndex: IcUiQmlApi.appCtrl.checkSvc.currentCheckingDotIndex;
     property alias testOver:displayCanvas.testOver;
     property int os_od: 0;
     property var dynamicSelectedDots:[];
@@ -21,6 +22,13 @@ Item{
     property int lastStrategy;
     signal clearResult();
 
+    onCurrentCheckResultChanged:
+    {
+        displayCanvas.requestPaint();
+        console.log(currentCheckingDotIndex);
+    }
+
+    onCurrentCheckingDotIndexChanged: { displayCanvas.requestPaint();}
 
 
     function resetInputDot()
@@ -79,7 +87,6 @@ Item{
         displayCanvas.requestPaint();
     }
 
-    onCurrentCheckResultChanged: { displayCanvas.requestPaint();}
 
     signal painted();
     antialiasing: true
@@ -674,7 +681,14 @@ Item{
                         if(i<dotList.length)                                            //一般结果
                         {
                             if(dBList[i]===-999)
-                                drawDot(dotList[i],"white");
+                            {
+                                if(i===currentCheckingDotIndex)
+                                {
+                                    drawDot(dotList[i],"blue");
+                                }
+                                else
+                                    drawDot(dotList[i],"white");
+                            }
                             else if(dBList[i]<0)
                                  drawText("<0",dotToPixCoord(dotList[i]).x,dotToPixCoord(dotList[i]).y)
                             else if(dBList[i]>51)

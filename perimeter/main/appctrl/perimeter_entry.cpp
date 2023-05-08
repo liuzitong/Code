@@ -97,12 +97,11 @@ static void gMsgHandler( QtMsgType type, const QMessageLogContext &ctxt, const Q
     }
 
 
-//    #if defined(_MSC_VER)
-//        OutputDebugStringW( reinterpret_cast<LPCWSTR>( fmt_str.constData()) );
-//    #else
+    #if defined(_MSC_VER)
+        OutputDebugStringW( reinterpret_cast<LPCWSTR>( fmt_str.constData()) );
+    #else
         std::fprintf( stderr, fmt_str.toUtf8().constData() );
-//        std::cout<<fmt_str.toUtf8().constData();
-//    #endif
+    #endif
 #endif
 
 }

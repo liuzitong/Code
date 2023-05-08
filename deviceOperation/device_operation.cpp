@@ -63,7 +63,7 @@ void DeviceOperation::connectOrdisConnectDev()
         connect(m_devCtl.data(),&UsbDev::DevCtl::newFrameData,this,&DeviceOperation::workOnNewFrameData);
         connect(m_devCtl.data(),&UsbDev::DevCtl::newProfile,this,&DeviceOperation::workOnNewProfile);
         connect(m_devCtl.data(),&UsbDev::DevCtl::newConfig,this,&DeviceOperation::workOnNewConfig);
-        waitForSomeTime(3000);
+        waitForSomeTime(8000);
         if(m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_OK)
         {
             qDebug()<<"Connect Successfully.";
@@ -108,9 +108,9 @@ QSharedPointer<DeviceOperation> DeviceOperation::getSingleton()
 
 void DeviceOperation::setCursorColorAndCursorSize(int color, int spot)
 {
-//    if(!m_isDeviceReady) return;
+    if(!m_isDeviceReady) return;
     if(m_status.color==color&&m_status.spot==spot) return;             //变换到改变光斑颜色位置
-    qDebug()<<"setCursorColorAndCursorSize";
+    std::cout<<"setCursorColorAndCursorSize"<<std::endl;
     auto profile=m_profile;
     auto config=m_config;
     quint8 sps[5]={1,1,1,1,1};
@@ -284,8 +284,9 @@ void DeviceOperation::setDB(int DB)
 }
 
 
-void DeviceOperation::getReadyToStimulate(int motorPosX,int motorPosY,int motorPosFocal)
+void DeviceOperation::moveToAdjustLight(int motorPosX,int motorPosY,int motorPosFocal)
 {
+    std::cout<<"move to adjustlight";
     int motorPos[5];
     motorPos[0]=motorPosX;
     motorPos[1]=motorPosY;
@@ -300,16 +301,13 @@ void DeviceOperation::getReadyToStimulate(int motorPosX,int motorPosY,int motorP
                    UsbDev::DevCtl::MotorId_X,
                    UsbDev::DevCtl::MotorId_Y
                    });
-    while(m_shutterElapsedTimer.elapsed()<=m_shutterElapsedTime+100)  //增加100 防止延迟,就是关掉了快门才移动
-    {
-        QCoreApplication::processEvents();
-    }
     move5Motors(isMotorMove,motorPos);
 }
 
 
 void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB,bool isMainDotInfoTable)
 {
+    std::cout<<"DB is:"<<DB<<std::endl;
     m_isMainTable=isMainDotInfoTable;
     if(!m_isDeviceReady) return;
     auto coordSpacePosInfo=DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoord(loc,isMainDotInfoTable);
@@ -338,10 +336,16 @@ void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB,bool
                    UsbDev::DevCtl::MotorId_X,
                    UsbDev::DevCtl::MotorId_Y
                    });
-    while(m_shutterElapsedTimer.elapsed()<=m_shutterElapsedTime+50)  //增加100 防止延迟,就是关掉了快门才移动
+
+    std::cout<<"waiting shutter close"<<std::endl;
+//    std::cout<<m_statusData.motorPosition(UsbDev::DevCtl::MotorId_Shutter)<<std::endl;;
+//    std::cout<<m_config.shutterOpenPosRef()<<std::endl;
+    waitForSomeTime(180);
+    while(qAbs(m_statusData.motorPosition(UsbDev::DevCtl::MotorId_Shutter)-m_config.shutterOpenPosRef())<20)
     {
         QCoreApplication::processEvents();
     }
+    std::cout<<"done waiting"<<std::endl;
     move5Motors(isMotorMove,motorPos);
 }
 
@@ -349,11 +353,11 @@ void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB,bool
 
 void DeviceOperation::adjustCastLight()
 {
-    qDebug()<<"adjustCastLightStart";
+    std::cout<<"adjustCastLightStart"<<std::endl;
     int color=DeviceSettings::getSingleton()->m_castLightTargetColor;
     int size=DeviceSettings::getSingleton()->m_castLightTargetSize;
     setCursorColorAndCursorSize(color,size);
-    getReadyToStimulate(m_config.xMotorPosForLightCorrectionRef(),m_config.yMotorPosForLightCorrectionRef(),m_config.focalLengthMotorPosForLightCorrectionRef());
+    moveToAdjustLight(m_config.xMotorPosForLightCorrectionRef(),m_config.yMotorPosForLightCorrectionRef(),m_config.focalLengthMotorPosForLightCorrectionRef());
     waitMotorStop({UsbDev::DevCtl::MotorId_Color,
                    UsbDev::DevCtl::MotorId_Light_Spot,
                    UsbDev::DevCtl::MotorId_Focus,
@@ -488,7 +492,7 @@ void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSiz
 void DeviceOperation::stopDynamic()
 {
     if(!m_isDeviceReady) return;
-    qDebug()<<"stop Dynamic";
+    std::cout<<"stop Dynamic"<<std::endl;
     m_devCtl->stopDyanmic();
 }
 
@@ -496,15 +500,15 @@ void DeviceOperation::openShutter(int durationTime)
 {
     if(!m_isDeviceReady) return;
     auto shutterPos=m_config.shutterOpenPosRef();
-    qDebug()<<"openShutter";
+    std::cout<<"openShutter"<<std::endl;
 
     m_devCtl->openShutter(durationTime,shutterPos);
 //    while(qAbs(m_statusData.motorPosition(UsbDev::DevCtl::MotorId_Shutter)-m_config.shutterOpenPosRef())<10)
 //    {
 
 //    }
-    m_shutterElapsedTimer.restart();
-    m_shutterElapsedTime=durationTime;
+//    m_shutterElapsedTimer.restart();
+//    m_shutterElapsedTime=durationTime;
 }
 
 void DeviceOperation::move5Motors(bool isMotorMove[], int MotorPoses[])
@@ -524,7 +528,8 @@ void DeviceOperation::move5Motors(bool isMotorMove[], int MotorPoses[])
 
 void DeviceOperation::waitMotorStop(QVector<UsbDev::DevCtl::MotorId> motorIDs)
 {
-    if(!m_isDeviceReady) return;
+    if(!m_isDeviceReady)
+        return;
     QElapsedTimer mstimer;
     mstimer.restart();//必须先等一会儿刷新状态
     do
@@ -539,6 +544,7 @@ void DeviceOperation::waitForSomeTime(int time)
     mstimer.restart();
     do
     {
+
         QApplication::processEvents();
     }while(mstimer.elapsed()<time);
 }
@@ -606,31 +612,43 @@ void DeviceOperation::dimDownCastLight()
 
 void DeviceOperation::workOnNewStatuData()
 {
-    if(m_workStatusElapsedTimer.elapsed()>=1000)
+
+    if(m_workStatusElapsedTimer.elapsed()>=5000)
     {
         m_workStatusElapsedTimer.restart();
         updateDevInfo("receive new workStatus");
     }
     m_statusData=m_devCtl->takeNextPendingStatusData();
-    auto eyeglassStatus=m_statusData.eyeglassStatus();
-    if(m_isChecking)
-    {
-        if(m_eyeglassStatus!=eyeglassStatus||!m_eyeglassIntialize)
-        {
-            m_eyeglassStatus=eyeglassStatus;
-            m_eyeglassIntialize=true;
-            setLamp(LampId::LampId_eyeglassInfrared,0,eyeglassStatus);
-            setLamp(LampId::LampId_borderInfrared,0,!eyeglassStatus);
-        }
-    }
+//    auto eyeglassStatus=m_statusData.eyeglassStatus();
+//    if(m_isChecking)
+//    {
+//        if(m_eyeglassStatus!=eyeglassStatus||!m_eyeglassIntialize)
+//        {
+//            m_eyeglassStatus=eyeglassStatus;
+//            m_eyeglassIntialize=true;
+//            setLamp(LampId::LampId_eyeglassInfrared,0,eyeglassStatus);
+//            setLamp(LampId::LampId_borderInfrared,0,!eyeglassStatus);
+//        }
+//    }
 
-    if(m_isWaitingForStaticStimulationAnswer)
+
+
+    if(m_statusData.answerpadStatus()&&m_isWaitingForStaticStimulationAnswer)
     {
-        if(m_statusData.answerpadStatus())
-        {
-            m_staticStimulationAnswer=true;
-        }
+//        if(m_isStaticCheckPausingTimer.elapsed()>200)
+//        {
+//            m_isStaticCheckPausing=true;
+//        }
+        m_staticStimulationAnswer=true;
     }
+//    else
+//    {
+//        m_isStaticCheckPausing=false;
+//        m_isStaticCheckPausingTimer.restart();
+//    }
+
+
+
 
 
     if(m_videoOnOff!=m_statusData.cameraStatus())
@@ -638,13 +656,13 @@ void DeviceOperation::workOnNewStatuData()
 
     if(m_castLightAdjustStatus==2&&m_castLightAdjustElapsedTimer.elapsed()>=200&&m_isDeviceReady)
     {
-        qDebug()<<"keep adjust castLightDa";
+        updateDevInfo("keep adjust castLightDa");
         int tagetDA=DeviceSettings::getSingleton()->m_castLightTagetDA;
         int DADiff=DeviceSettings::getSingleton()->m_castLightDADifference;
         int step=DeviceSettings::getSingleton()->m_castLightDAChangeStep;
         int currentDA=m_statusData.castLightDA();
-        qDebug()<<"castlight Da:"<<QString::number(m_currentCastLightDA);
-        qDebug()<<"current da:"<<QString::number(currentDA);
+        updateDevInfo("castlight Da:"+QString::number(m_currentCastLightDA));
+        updateDevInfo("current da:"+QString::number(currentDA));
         if(qAbs(tagetDA-currentDA)>DADiff)
         {
             if(tagetDA>currentDA)

@@ -94,8 +94,8 @@ public:
     virtual void Checkprocess() override;
     virtual void finished() override;
 
-//signals:
-//    void currentCheckingDotChanged(int index);
+signals:
+    void currentCheckingDotChanged(int index);
 
 private:
     std::tuple<bool,QPointF,int> getCheckCycleLocAndDB();
@@ -113,6 +113,8 @@ private:
     void ProcessAnswer(bool answered);
 
     void waitAndProcessAnswer();
+
+    void checkWaiting();
 
     virtual void setLight(bool onOff) override;
 
@@ -220,6 +222,7 @@ signals:
     void checkTimeChanged(int secs);
     void sendErrorInfo(QString error);
     void stop();
+    void currentCheckingDotChanged(int index);
 
 };
 
@@ -245,6 +248,7 @@ void StaticCheck::initialize()
     auto cursorColor=m_programModel->m_params.commonParams.cursorColor;
     m_value_30d=m_utilitySvc->getValue30d(int(cursorSize),int(cursorColor),m_patientModel->m_age);
     m_value_60d=m_utilitySvc->m_value_60d;
+    emit currentCheckingDotChanged(-1);
     switch (m_resultModel->m_params.commonParams.fixationTarget)
     {
     case FixationTarget::centerPoint:m_y_offset=0;break;
@@ -321,6 +325,7 @@ void StaticCheck::initialize()
     m_deviceOperation->m_isChecking=true;
     m_deviceOperation->m_isWaitingForStaticStimulationAnswer=false;
     m_deviceOperation->m_staticStimulationAnswer=false;
+//    m_deviceOperation->m_stimulationTime=m_programModel->m_params.fixedParams.stimulationTime;
     m_deviceOperation->setCursorColorAndCursorSize(int(cursorColor),int(cursorSize));
     m_deviceOperation->waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y});
     UtilitySvc::wait(4000);    //等几秒启动
@@ -344,17 +349,19 @@ void StaticCheck::Checkprocess()
         m_lastCheckDotRecord.push_back(&getCheckDotRecordRef());   //存储lastDotType为commondot 并且存储指针
 //        auto dotRec=m_lastCheckDotRecord.last();
 //        qDebug()<<"getCheckDotRecordRef loc:"<<dotRec->loc<<" DB:"<<QString::number(dotRec->StimulationDBs.last())<<"upper:"<<QString::number(dotRec->upperBound)<<"lower:"<<QString::number(dotRec->lowerBound);
+        emit currentCheckingDotChanged(m_lastCheckDotRecord.last()->index);
         getReadyToStimulate(m_lastCheckDotRecord.last()->loc,m_lastCheckDotRecord.last()->StimulationDBs.last());
     }
-//    if(!m_lastCheckeDotType.isEmpty())
-//    {
-//        qDebug()<<"last Checked Dot length:"+QString::number(m_lastCheckeDotType.size())+".first:"+int(m_lastCheckeDotType.first())+".last:"+int(m_lastCheckeDotType.last());
-//    }
+
+
     if(m_stimulated)                               //最开始没刺激过就不需要处理
     {
         m_stimulated=false;
         waitAndProcessAnswer();                             //取出commonDot 并且取出指针,处理的时候可能发现下一个是已经检查出结果的点,这个时候就选择不刺激置m_alreadyChecked为true
     }
+
+    checkWaiting();
+
     if(m_checkedCount<m_totalCount&&!m_alreadyChecked)                         //如果测试完毕或者是已经得到结果的点就不刺激了
     {
         m_stimulationCount++;
@@ -575,9 +582,7 @@ void StaticCheck::stimulate()
     }
     else
     {
-//        m_deviceOperation->waitForSomeTime(durationTime);
-        m_deviceOperation->m_shutterElapsedTimer.restart();                      //假阴不开快门
-        m_deviceOperation->m_shutterElapsedTime=durationTime;
+        m_deviceOperation->waitForSomeTime(durationTime);           //假阴
         m_resultModel->m_data.fixationDeviation.push_back(-m_deviceOperation->m_deviation);
     }
     m_deviceOperation->m_isWaitingForStaticStimulationAnswer=true;
@@ -720,12 +725,6 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
 bool StaticCheck::waitForAnswer()
 {
 //    qDebug()<<"waitForAnswer";
-    while(m_deviceOperation->getAnswerPadStatus())   //一直按着算暂停
-    {
-//        qDebug()<<"pausing";
-        QApplication::processEvents();
-    }
-
     int waitTime;
     auto commonParams=m_resultModel->m_params.commonParams;
     auto fixedParams=m_resultModel->m_params.fixedParams;
@@ -746,34 +745,24 @@ bool StaticCheck::waitForAnswer()
     }
 
 
-
+    std::cout<<"start time count time"<<std::endl;
     bool answer=false;
-//    int time=0;
-//    int count=0;
-//    QElapsedTimer elapsedTimer;
-//    elapsedTimer.restart();
-//    qDebug()<<"start time counting";
     while((m_stimulationWaitingForAnswerElapsedTimer.elapsed()<waitTime)&&(!answer))   //应答时间内
     {
-//        if(elapsedTimer.elapsed()-time>50)
-//        {
-//            time=elapsedTimer.elapsed();
-//            qDebug()<<"count:"<<count;
-//            count++;
-//        }
         if(m_deviceOperation->m_staticStimulationAnswer)
         {
 
             m_deviceOperation->m_isWaitingForStaticStimulationAnswer=false;
             m_deviceOperation->m_staticStimulationAnswer=false;
             answer=true;
-//            qDebug()<<"answered";
             UtilitySvc::wait(m_programModel->m_params.fixedParams.leastWaitingTime);                //最小等待时间
         }
         else QApplication::processEvents();
     }
-//    qDebug()<<"end time count time";
-//    qDebug()<<"answer Time is:"+QString::number(elapsedTimer.elapsed());
+
+
+    std::cout<<"end time count time"<<std::endl;
+    std::cout<<(QString("answer Time is:")+QString::number(m_stimulationWaitingForAnswerElapsedTimer.elapsed())).toStdString()<<std::endl;
     m_answeredTimes.append(m_stimulationWaitingForAnswerElapsedTimer.elapsed());
     return answer;                       //超出时间应答
 }
@@ -1071,6 +1060,29 @@ void StaticCheck::waitAndProcessAnswer()
     qDebug()<<answerResult;
     ProcessAnswer(answerResult);
 }
+
+void StaticCheck::checkWaiting()
+{
+    bool isPaused=false;
+    QElapsedTimer timer;
+    timer.start();
+    while(m_deviceOperation->getAnswerPadStatus())
+    {
+        QApplication::processEvents();
+        if(timer.elapsed()>300)
+        {
+            std::cout<<"pausing";
+            isPaused=true;
+            timer.restart();
+        }
+    }
+
+    if(isPaused)
+    {
+        UtilitySvc::wait(m_programModel->m_params.fixedParams.intervalTime);                //最小等待时间
+    }
+}
+
 void StaticCheck::setLight(bool onOff)
 {
     switch (m_programModel->m_params.commonParams.fixationTarget)
@@ -1466,6 +1478,7 @@ void CheckSvcWorker::initialize()
         ((StaticCheck*)m_check.data())->m_resultModel=static_cast<StaticCheckResultVm*>(m_checkResultVm)->getModel();
 //        qDebug()<<QString::number((((StaticCheck*)m_check.data())->m_resultModel)->m_id);
         ((StaticCheck*)m_check.data())->m_programModel=static_cast<StaticProgramVm*>(m_programVm)->getModel();
+        connect(((StaticCheck*)m_check.data()),&StaticCheck::currentCheckingDotChanged,this,&CheckSvcWorker::currentCheckingDotChanged);
     }
     else
     {
@@ -1573,6 +1586,7 @@ CheckSvc::CheckSvc(QObject *parent)
     connect(m_worker,&CheckSvcWorker::checkedCountChanged,this, &CheckSvc::setCheckedCount);
     connect(m_worker,&CheckSvcWorker::totalCountChanged,this, &CheckSvc::setTotalCount);
     connect(m_worker,&CheckSvcWorker::checkTimeChanged,this, &CheckSvc::setCheckTime);
+    connect(m_worker,&CheckSvcWorker::currentCheckingDotChanged,[&](int value){m_currentCheckingDotIndex=value;emit currentCheckingDotIndexChanged();});
     connect(m_worker,&CheckSvcWorker::sendErrorInfo,this, [](QString errorInfo)
     {
         QMessageBox msgBox;

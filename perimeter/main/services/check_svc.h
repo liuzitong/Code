@@ -23,6 +23,8 @@ class CheckSvc: public QObject
     Q_PROPERTY(bool autoAlignPupil READ getAutoAlignPupil WRITE setAutoAlignPupil NOTIFY autoAlignPupilChanged)
     Q_PROPERTY(bool pupilDiameter READ getPupilDiameter NOTIFY pupilDiameterChanged)
     Q_PROPERTY(QVariantList dynamicSelectedDots WRITE setInputDots)
+    Q_PROPERTY(int currentCheckingDotIndex READ getCurrentCheckingDotIndex NOTIFY currentCheckingDotIndexChanged)
+
 
 //    Q_PROPERTY(CheckSvcWorker* worker READ getWorker)
 public:
@@ -59,6 +61,7 @@ public:
     bool getAutoAlignPupil();void setAutoAlignPupil(bool autoAlign);Q_SIGNAL void autoAlignPupilChanged();
     float getPupilDiameter();Q_SIGNAL void pupilDiameterChanged();
     void setInputDots(QVariantList value);
+    int getCurrentCheckingDotIndex(){return m_currentCheckingDotIndex;}Q_SIGNAL void currentCheckingDotIndexChanged();
 //    CheckSvcWorker* getWorker(){return m_worker;}
 
 private:
@@ -68,6 +71,7 @@ private:
     int m_checkedCount=0;
     int m_totalCount=0;
     int m_checkTime=0;
+    int m_currentCheckingDotIndex=-1;
     QList<QPoint> m_dynamicSelectedDots;
     PatientVm* m_patientVm;
     ProgramVm* m_programVm;
