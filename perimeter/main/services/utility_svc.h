@@ -54,6 +54,7 @@ public:
     int m_blindDotTestDB;
     int m_blindDotTestIncDB;
     int m_falsePositiveDecDB;
+    bool m_checkFalseNegAndPos;
     double m_VFImultiplier;
     QSize m_realTimeEyePosPicSize;
 

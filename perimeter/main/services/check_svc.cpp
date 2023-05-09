@@ -10,6 +10,7 @@
 #include "frame_provid_svc.h"
 #include <array>
 #include <QMessageBox>
+//#include <QtConcurrent/QtConcurrent>
 namespace Perimeter{
 constexpr int MaxDB=51;
 constexpr int MinDB=0;
@@ -72,7 +73,7 @@ private:
     int m_autoAdaptTime;
     QVector<int> m_lastShortTermCycleCheckedDotIndex;
     QVector<DotRecord> m_shortTermFlucRecords;          //index为 m_totalCount~2*m_totalCount-1
-//    int m_falsePosCycCount=qrand()%10,m_falseNegCycCount=qrand()%10,m_fiaxationViewLossCyc=qrand()%10;  //错开
+//    int m_falsePosCyc,m_falseNegCycCount,m_fiaxationViewLossCyc;  //错开
     QVector<QPointF> m_blindDot;
     int m_blindDotLocateIndex=0;
     int m_stimulationCount=0;                   //刺激次数到了测试盲点位置
@@ -81,6 +82,11 @@ private:
     QVector<LastCheckedDotType> m_lastCheckeDotType;
     QElapsedTimer m_stimulationWaitingForAnswerElapsedTimer;      //开门开启等待应答
     bool m_alreadyChecked;
+
+
+    int debug_DB;
+    QPoint debug_Loc;
+
 
 public:
     QSharedPointer<StaticCheckResultModel> m_resultModel;
@@ -343,6 +349,7 @@ void StaticCheck::Checkprocess()
 //        qDebug()<<"checkCycleLocAndDB loc:"<<std::get<1>(checkCycleLocAndDB)<<" DB"<<std::get<2>(checkCycleLocAndDB);
         m_lastCheckDotRecord.push_back(nullptr);
         getReadyToStimulate(std::get<1>(checkCycleLocAndDB),std::get<2>(checkCycleLocAndDB));
+        emit currentCheckingDotChanged(-1);
     }
     else
     {
@@ -364,9 +371,16 @@ void StaticCheck::Checkprocess()
 
     if(m_checkedCount<m_totalCount&&!m_alreadyChecked)                         //如果测试完毕或者是已经得到结果的点就不刺激了
     {
-        m_stimulationCount++;
-        m_stimulated=true;
-        stimulate();
+//        if(m_lastCheckeDotType.last()==LastCheckedDotType::locateBlindDot&&!m_blindDot.isEmpty())      // 盲点如果已经确定就直接跳过
+//        {
+//            std::cout<<"pop second blindDot"<<std::endl;
+//            m_lastCheckeDotType.pop_back();
+//        }
+//        else{
+            stimulate();
+            m_stimulationCount++;
+            m_stimulated=true;
+//        }
     }
 }
 
@@ -585,6 +599,7 @@ void StaticCheck::stimulate()
         m_deviceOperation->waitForSomeTime(durationTime);           //假阴
         m_resultModel->m_data.fixationDeviation.push_back(-m_deviceOperation->m_deviation);
     }
+    std::cout<<"***** DB shi:"<<debug_DB<<"    "<<"zuo biao x:"<<debug_Loc.x()<<" "<<"zuobiao y:"<<debug_Loc.y()<<"    yong shi:"<<m_stimulationWaitingForAnswerElapsedTimer.elapsed()<<std::endl;
     m_deviceOperation->m_isWaitingForStaticStimulationAnswer=true;
     m_stimulationWaitingForAnswerElapsedTimer.restart();
 }
@@ -601,6 +616,17 @@ void StaticCheck::getReadyToStimulate(QPointF loc, int DB)
     if(DB<MinDB) DB=MinDB;
     if(DB>MaxDB) DB=MaxDB;
     m_deviceOperation->getReadyToStimulate({loc.x(),loc.y()+m_y_offset},int(m_resultModel->m_params.commonParams.cursorSize),DB,isMainTable);
+
+    debug_DB=DB;
+    debug_Loc=loc.toPoint();
+//    QtConcurrent::run([&]()
+//    {
+//        UtilitySvc::wait(100);
+//        m_deviceOperation->waitMotorStop({{UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y}});
+//        std::cout<<"Time spent to get ready to stimulate:"<<m_stimulationWaitingForAnswerElapsedTimer.elapsed()<<std::endl;
+//        QThread::currentThread()->terminate();
+//    });
+
 }
 
 void StaticCheck::getProperValByRefToNearDotDB(StaticCheck::DotRecord &dotRecord)
@@ -673,8 +699,9 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
     if(commomParams.blindDotTest==true)                 //盲点测试,size过大表示盲点寻找失败
     {
         //确定盲点,条件是要经历一点测试次数,而且盲为空
-        if(m_stimulationCount>UtilitySvc::getSingleton()->m_checkCountBeforeGetBlindDotCheck&&m_blindDot.isEmpty())
+        if(m_stimulationCount>=UtilitySvc::getSingleton()->m_checkCountBeforeGetBlindDotCheck&&m_blindDot.isEmpty())
         {
+            std::cout<<"locating blindDOt"<<std::endl;
             QPoint blindDotLoc;
             if(m_resultModel->m_OS_OD==0)
                 blindDotLoc=UtilitySvc::getSingleton()->m_left_blindDot[m_blindDotLocateIndex];
@@ -694,30 +721,32 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
         }
     }
 
-
-    if(m_stimulationCount%fixedParams.falsePositiveCycle==qrand()%fixedParams.falsePositiveCycle)         //假阳
+    if(UtilitySvc::getSingleton()->m_checkFalseNegAndPos)
     {
-        QVector<DotRecord> m_checkedRecords;
-        for(auto& recordDot:m_dotRecords)
+        if(m_stimulationCount%fixedParams.falsePositiveCycle==qrand()%fixedParams.falsePositiveCycle)         //假阳
         {
-            if(recordDot.checked)
+            QVector<DotRecord> m_checkedRecords;
+            for(auto& recordDot:m_dotRecords)
             {
-                m_checkedRecords.push_back(recordDot);
+                if(recordDot.checked)
+                {
+                    m_checkedRecords.push_back(recordDot);
+                }
             }
+            if(m_checkedRecords.size()==0) return {false,{0,0},0};
+            auto recordDot=m_checkedRecords[qrand()%m_checkedRecords.size()];
+            m_lastCheckeDotType.push_back(LastCheckedDotType::falsePositiveTest);
+            return {true,recordDot.loc,recordDot.DB-UtilitySvc::getSingleton()->m_falsePositiveDecDB};
         }
-        if(m_checkedRecords.size()==0) return {false,{0,0},0};
-        auto recordDot=m_checkedRecords[qrand()%m_checkedRecords.size()];
-        m_lastCheckeDotType.push_back(LastCheckedDotType::falsePositiveTest);
-        return {true,recordDot.loc,recordDot.DB-UtilitySvc::getSingleton()->m_falsePositiveDecDB};
-    }
 
 
-    if(m_stimulationCount%fixedParams.falseNegativeCycle==qrand()%fixedParams.falseNegativeCycle)         //假阴,随机点,到刺激的时候不开快门
-    {
-        auto locs=m_programModel->m_data.dots;
-        auto loc=locs[qrand()%locs.size()];
-        m_lastCheckeDotType.push_back(LastCheckedDotType::falseNegativeTest);
-        return {true,{loc.x,loc.y},0};
+        if(m_stimulationCount%fixedParams.falseNegativeCycle==qrand()%fixedParams.falseNegativeCycle)         //假阴,随机点,到刺激的时候不开快门
+        {
+            auto locs=m_programModel->m_data.dots;
+            auto loc=locs[qrand()%locs.size()];
+            m_lastCheckeDotType.push_back(LastCheckedDotType::falseNegativeTest);
+            return {true,{loc.x,loc.y},0};
+        }
     }
     return {false,{0,0},0};
 }
@@ -782,6 +811,18 @@ void StaticCheck::ProcessAnswer(bool answered)
         {
             if(m_resultModel->m_OS_OD==0) m_blindDot.push_back(UtilitySvc::getSingleton()->m_left_blindDot[m_blindDotLocateIndex]);
             else m_blindDot.push_back(UtilitySvc::getSingleton()->m_right_blindDot[m_blindDotLocateIndex]);
+
+
+            if(m_lastCheckeDotType.last()==LastCheckedDotType::locateBlindDot)
+            {
+                m_alreadyChecked=true;
+                if(m_deviceOperation->m_isDeviceReady)
+                    m_deviceOperation->move5Motors(std::array<bool,5>{false,false,false,false,false}.data(),std::array<int,5>{0,0,0,0,0}.data());       //盲点已经确定就没必要跑点了,早点停止可以立即跑下一个点
+                m_lastCheckDotRecord.pop_back();
+                m_lastCheckeDotType.pop_back();
+            }
+
+            std::cout<<"blinddot located."<<std::endl;
         }
         else
         {

@@ -6,6 +6,7 @@ QT += widgets
 QT += printsupport
 QT += xml
 QT += datavisualization
+#QT += concurrent
 CONFIG += thread
 CONFIG += c++11
 CONFIG -= app_bundle
