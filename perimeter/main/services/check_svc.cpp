@@ -73,13 +73,14 @@ private:
     int m_autoAdaptTime;
     QVector<int> m_lastShortTermCycleCheckedDotIndex;
     QVector<DotRecord> m_shortTermFlucRecords;          //index为 m_totalCount~2*m_totalCount-1
-//    int m_falsePosCyc,m_falseNegCycCount,m_fiaxationViewLossCyc;  //错开
+    int m_falsePosCyc,m_falseNegCyc,m_fiaxationViewLossCyc;  //随机错开值
     QVector<QPointF> m_blindDot;
     int m_blindDotLocateIndex=0;
     int m_stimulationCount=0;                   //刺激次数到了测试盲点位置
     bool m_stimulated;
     QVector<DotRecord*> m_lastCheckDotRecord;
     QVector<LastCheckedDotType> m_lastCheckeDotType;
+    QVector<std::tuple<LastCheckedDotType,QPointF, int>> m_checkCycleDotList;       //存储待测试盲点测试,假阴,假阳等信息
     QElapsedTimer m_stimulationWaitingForAnswerElapsedTimer;      //开门开启等待应答
     bool m_alreadyChecked;
 
@@ -235,6 +236,7 @@ signals:
 void StaticCheck::initialize()
 {
     constexpr int initialNumber=999;
+    qsrand(QTime::currentTime().msec());
     m_checkedCount=0;
     m_autoAdaptTime=0;
     m_blindDotLocateIndex=0;
@@ -243,6 +245,10 @@ void StaticCheck::initialize()
     m_alreadyChecked=false;
     m_isStartWithBaseDots=false;
     m_isDoingBaseDotsCheck=false;
+    auto fixedParams=m_resultModel->m_params.fixedParams;
+    m_fiaxationViewLossCyc=qrand()%fixedParams.fixationViewLossCycle;
+    m_falsePosCyc=qrand()%fixedParams.falsePositiveCycle;
+    m_falseNegCyc=qrand()%fixedParams.falseNegativeCycle;
     m_resultModel->m_patient_id=m_patientModel->m_id;
     m_resultModel->m_program_id=m_programModel->m_id;
     m_resultModel->m_videoSize=m_deviceOperation->m_videoSize;
@@ -423,7 +429,6 @@ StaticCheck::DotRecord &StaticCheck::getCheckDotRecordRef()
     }
     if(m_isStartWithBaseDots)
     {
-        qsrand(QTime::currentTime().msec());
         QVector<DotRecord> zoneRightTop,zoneRightBottom,zoneLeftBottom,zoneLeftTop;
         QVector<DotRecord> zoneCheckedRightTop,zoneCheckedRightBottom,zoneCheckedLeftBottom,zoneCheckedLeftTop;
         QPointF zoneRightTopCenter,zoneRightBottomCenter,zoneLeftBottomCenter,zoneLeftTopCenter;
@@ -696,6 +701,8 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
         m_errorInfo=tr("Cant't locate blind dot.Turn off blindDot check.");
         return {};
     }
+
+
     if(commomParams.blindDotTest==true)                 //盲点测试,size过大表示盲点寻找失败
     {
         //确定盲点,条件是要经历一点测试次数,而且盲为空
@@ -710,20 +717,24 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
 
             m_lastCheckeDotType.push_back(LastCheckedDotType::locateBlindDot);
             return {true,blindDotLoc,m_stimulationCount>UtilitySvc::getSingleton()->m_blindDotTestDB};
+
         }
 
         //盲点不为空的时候到了周期测试盲点.
-        if(!m_blindDot.isEmpty()&&m_stimulationCount%fixedParams.fixationViewLossCycle==qrand()%fixedParams.fixationViewLossCycle)
+        if(!m_blindDot.isEmpty()&&m_stimulationCount%fixedParams.fixationViewLossCycle==m_fiaxationViewLossCyc)
+//        if(!m_blindDot.isEmpty()&&m_stimulationCount%fixedParams.fixationViewLossCycle==qrand()%fixedParams.fixationViewLossCycle)
         {
             auto blindDB=UtilitySvc::getSingleton()->m_blindDotTestDB+UtilitySvc::getSingleton()->m_blindDotTestIncDB;
-            m_lastCheckeDotType.push_back(LastCheckedDotType::blindDotTest);
-            return {true,{m_blindDot[0].x(),m_blindDot[0].y()},blindDB};
+//            m_lastCheckeDotType.push_back(LastCheckedDotType::blindDotTest);
+//            return {true,{m_blindDot[0].x(),m_blindDot[0].y()},blindDB};
+            m_checkCycleDotList.append({LastCheckedDotType::blindDotTest,m_blindDot[0],blindDB});
         }
     }
 
     if(UtilitySvc::getSingleton()->m_checkFalseNegAndPos)
     {
-        if(m_stimulationCount%fixedParams.falsePositiveCycle==qrand()%fixedParams.falsePositiveCycle)         //假阳
+        if(m_stimulationCount%fixedParams.falsePositiveCycle==m_falsePosCyc)
+//        if(m_stimulationCount%fixedParams.falsePositiveCycle==qrand()%fixedParams.falsePositiveCycle)         //假阳
         {
             QVector<DotRecord> m_checkedRecords;
             for(auto& recordDot:m_dotRecords)
@@ -735,20 +746,31 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
             }
             if(m_checkedRecords.size()==0) return {false,{0,0},0};
             auto recordDot=m_checkedRecords[qrand()%m_checkedRecords.size()];
-            m_lastCheckeDotType.push_back(LastCheckedDotType::falsePositiveTest);
-            return {true,recordDot.loc,recordDot.DB-UtilitySvc::getSingleton()->m_falsePositiveDecDB};
+//            m_lastCheckeDotType.push_back(LastCheckedDotType::falsePositiveTest);
+//            return {true,recordDot.loc,recordDot.DB-UtilitySvc::getSingleton()->m_falsePositiveDecDB};
+            m_checkCycleDotList.append({LastCheckedDotType::falsePositiveTest,recordDot.loc,recordDot.DB-UtilitySvc::getSingleton()->m_falsePositiveDecDB});
         }
 
-
-        if(m_stimulationCount%fixedParams.falseNegativeCycle==qrand()%fixedParams.falseNegativeCycle)         //假阴,随机点,到刺激的时候不开快门
+        if(m_stimulationCount%fixedParams.falseNegativeCycle==m_falseNegCyc)
+//        if(m_stimulationCount%fixedParams.falseNegativeCycle==qrand()%fixedParams.falseNegativeCycle)         //假阴,随机点,到刺激的时候不开快门
         {
             auto locs=m_programModel->m_data.dots;
             auto loc=locs[qrand()%locs.size()];
-            m_lastCheckeDotType.push_back(LastCheckedDotType::falseNegativeTest);
-            return {true,{loc.x,loc.y},0};
+//            m_lastCheckeDotType.push_back(LastCheckedDotType::falseNegativeTest);
+//            return {true,{loc.x,loc.y},0};
+            m_checkCycleDotList.append({LastCheckedDotType::falseNegativeTest,loc.toQPointF(),0});
         }
     }
-    return {false,{0,0},0};
+    if(m_checkCycleDotList.size()>0)
+    {
+        auto checkCycleDot=m_checkCycleDotList.takeFirst();
+        m_lastCheckeDotType.push_back(std::get<0>(checkCycleDot));
+        return {true,std::get<1>(checkCycleDot),std::get<2>(checkCycleDot)};
+    }
+    else
+    {
+        return {false,{0,0},0};
+    }
 }
 
 bool StaticCheck::waitForAnswer()
@@ -1181,9 +1203,9 @@ void StaticCheck::setLight(bool onOff)
 
 void DynamicCheck::initialize()
 {
+    qsrand(QTime::currentTime().msec());
     m_resultModel->m_patient_id=m_patientModel->m_id;
     m_resultModel->m_program_id=m_programModel->m_id;
-    qsrand(QTime::currentTime().msec());
     m_checkedCount=0;
     auto& os_od=m_resultModel->m_OS_OD;
     auto& params=m_programModel->m_params;

@@ -307,7 +307,6 @@ void DeviceOperation::moveToAdjustLight(int motorPosX,int motorPosY,int motorPos
 
 void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB,bool isMainDotInfoTable)
 {
-    std::cout<<"DB is:"<<DB<<std::endl;
     m_isMainTable=isMainDotInfoTable;
     if(!m_isDeviceReady) return;
     auto coordSpacePosInfo=DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoord(loc,isMainDotInfoTable);

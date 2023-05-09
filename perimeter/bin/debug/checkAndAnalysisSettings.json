@@ -4,7 +4,7 @@
     "blindDotTestIncDB":5,
     "falsePositiveDecDB":10,
     "VFImultiplier":1.0,
-    "checkFalseNegAndPos":false,
+    "checkFalseNegAndPos":true,
     "realTimeEyePosPicSize":"320*240",
     "boundaryOne":
     {
