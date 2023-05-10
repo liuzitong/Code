@@ -26,7 +26,8 @@ Item {id:root; width: 1366;height: 691
     property var frameProvidSvc: null;
     property var checkSvc: IcUiQmlApi.appCtrl.checkSvc;
     property string pageFrom: "";
-    onChangePage: {IcUiQmlApi.appCtrl.checkSvc.turnOffVideo();}
+    onChangePage: {IcUiQmlApi.appCtrl.checkSvc.leaveCheck();}
+
 
     Component.onCompleted:{
         frameProvidSvc=IcUiQmlApi.appCtrl.frameProvidSvc;
@@ -40,6 +41,15 @@ Item {id:root; width: 1366;height: 691
         currentProgram.type!==2?staticParamsSetting.currentProgram=currentProgram:dynamicParamsSetting.currentProgram=currentProgram;
         dynamicParamsSetting.currentProgramChanged();                       //不知道为毛这里要触发一次
         staticParamsSetting.currentProgramChanged();
+        IcUiQmlApi.appCtrl.checkSvc.readyToCheck=false;
+        IcUiQmlApi.appCtrl.checkSvc.program=currentProgram;
+        IcUiQmlApi.appCtrl.checkSvc.patient=currentPatient;
+        if(currentProgram!==null)
+        {
+            console.log(currentProgram.id);
+            IcUiQmlApi.appCtrl.checkSvc.prepareToCheck();
+        }
+
     }
 
     onRefresh: {
@@ -224,10 +234,10 @@ Item {id:root; width: 1366;height: 691
                                 }
                                 Item{id:controlPanel;width:controlPanel.height*4/3;height: parent.height*0.23;anchors.horizontalCenter: parent.horizontalCenter;
                                     CusButton {id:autoButton;width: parent.width*0.35;height: parent.height*0.28;buttonColor: backGroundColor; text:checkSvc.autoAlignPupil?"Auto":"Manual";borderColor: "black";anchors.horizontalCenter: parent.horizontalCenter; anchors.verticalCenter: parent.verticalCenter;onClicked: {checkSvc.autoAlignPupil=!checkSvc.autoAlignPupil;}}
-                                    CusButton {id:upButton;enabled:!checkSvc.autoAlignPupil;rec.visible: false;anchors.left: parent.Top;height: image.sourceSize.height*root.height/691;imageHightScale:1.0;width: image.sourceSize.width*root.width/1366;anchors.horizontalCenter: parent.horizontalCenter;imageSrc: "qrc:/Pics/capture-svg/arrow_1up.svg";onPressed:{imageHightScale=1.1;checkSvc.moveChinUp();}onReleased:{imageHightScale=1.0;checkSvc.stopMovingChin();}}
-                                    CusButton {id:downButton;enabled:!checkSvc.autoAlignPupil;rec.visible: false;anchors.bottom: parent.bottom; height: image.sourceSize.height*root.height/691;imageHightScale:1.0;width: image.sourceSize.width*root.width/1366;anchors.horizontalCenter: parent.horizontalCenter;imageSrc: "qrc:/Pics/capture-svg/arrow_2down.svg";onPressed:{imageHightScale=1.1;checkSvc.moveChinDown();}onReleased:{imageHightScale=1.0;checkSvc.stopMovingChin();}}
-                                    CusButton {id:leftButton;enabled:!checkSvc.autoAlignPupil;rec.visible: false; anchors.right: autoButton.left; anchors.verticalCenter: parent.verticalCenter; imageHightScale:1.0;height: image.sourceSize.height*root.height/691; anchors.rightMargin:(controlPanel.height-autoButton.height-upButton.height*2)/2;width: image.sourceSize.width*root.width/1366;imageSrc: "qrc:/Pics/capture-svg/arrow_3left.svg";onPressed:{imageHightScale=1.1;checkSvc.moveChinLeft();}onReleased:{imageHightScale=1.0;checkSvc.stopMovingChin();}}
-                                    CusButton {id:rightButton;enabled:!checkSvc.autoAlignPupil;rec.visible: false;anchors.left: autoButton.right;anchors.verticalCenter: parent.verticalCenter;imageHightScale:1.0;height: image.sourceSize.height*root.height/691; anchors.leftMargin:(controlPanel.height-autoButton.height-upButton.height*2)/2;width: image.sourceSize.width*root.width/1366; imageSrc: "qrc:/Pics/capture-svg/arrow_4right.svg";onPressed:{imageHightScale=1.1;checkSvc.moveChinRight();}onReleased:{imageHightScale=1.0;checkSvc.stopMovingChin();}}
+                                    CusButton {id:upButton;rec.visible: false;anchors.left: parent.Top;height: image.sourceSize.height*root.height/691;imageHightScale:1.0;width: image.sourceSize.width*root.width/1366;anchors.horizontalCenter: parent.horizontalCenter;imageSrc: "qrc:/Pics/capture-svg/arrow_1up.svg";onPressed:{imageHightScale=1.1;checkSvc.moveChinUp();}onReleased:{imageHightScale=1.0;checkSvc.stopMovingChin();}}
+                                    CusButton {id:downButton;rec.visible: false;anchors.bottom: parent.bottom; height: image.sourceSize.height*root.height/691;imageHightScale:1.0;width: image.sourceSize.width*root.width/1366;anchors.horizontalCenter: parent.horizontalCenter;imageSrc: "qrc:/Pics/capture-svg/arrow_2down.svg";onPressed:{imageHightScale=1.1;checkSvc.moveChinDown();}onReleased:{imageHightScale=1.0;checkSvc.stopMovingChin();}}
+                                    CusButton {id:leftButton;rec.visible: false; anchors.right: autoButton.left; anchors.verticalCenter: parent.verticalCenter; imageHightScale:1.0;height: image.sourceSize.height*root.height/691; anchors.rightMargin:(controlPanel.height-autoButton.height-upButton.height*2)/2;width: image.sourceSize.width*root.width/1366;imageSrc: "qrc:/Pics/capture-svg/arrow_3left.svg";onPressed:{imageHightScale=1.1;checkSvc.moveChinLeft();}onReleased:{imageHightScale=1.0;checkSvc.stopMovingChin();}}
+                                    CusButton {id:rightButton;rec.visible: false;anchors.left: autoButton.right;anchors.verticalCenter: parent.verticalCenter;imageHightScale:1.0;height: image.sourceSize.height*root.height/691; anchors.leftMargin:(controlPanel.height-autoButton.height-upButton.height*2)/2;width: image.sourceSize.width*root.width/1366; imageSrc: "qrc:/Pics/capture-svg/arrow_4right.svg";onPressed:{imageHightScale=1.1;checkSvc.moveChinRight();}onReleased:{imageHightScale=1.0;checkSvc.stopMovingChin();}}
                                 }
                                 Rectangle{id:eyeOptionsGroup; width: parent.width*0.83;height: parent.height*0.25;anchors.horizontalCenter: parent.horizontalCenter; border.color: backGroundBorderColor;color: backGroundColor; radius: width*0.03;
                                     Item{ anchors.fill: parent;anchors.margins: parent.height*0.1;
@@ -389,7 +399,7 @@ Item {id:root; width: 1366;height: 691
                 Item{height: parent.height;width:parent.width*0.25;
                     Item{anchors.fill: parent;anchors.margins:parent.height*0.15;
                         Flow{height: parent.height;spacing: height*0.8;anchors.horizontalCenter: parent.horizontalCenter;
-                            CusButton{enabled:IcUiQmlApi.appCtrl.checkSvc.checkState>=3;text:lt+qsTr("Select program");width:IcUiQmlApi.appCtrl.settings.isRuntimeLangEng?height*4:height*2.5;
+                            CusButton{enabled:IcUiQmlApi.appCtrl.checkSvc.checkState>=3&&IcUiQmlApi.appCtrl.checkSvc.readyToCheck;text:lt+qsTr("Select program");width:IcUiQmlApi.appCtrl.settings.isRuntimeLangEng?height*4:height*2.5;
                                 onClicked:
                                 {
                                     if(currentCheckResult!==null)
@@ -406,7 +416,7 @@ Item {id:root; width: 1366;height: 691
                             CusButton{
                                 id:paramsSetting;
                                 text:lt+qsTr("Params setting");
-                                enabled:(currentProgram!==null&&IcUiQmlApi.appCtrl.checkSvc.checkState>=3);
+                                enabled:(currentProgram!==null&&IcUiQmlApi.appCtrl.checkSvc.checkState>=3)&&IcUiQmlApi.appCtrl.checkSvc.readyToCheck;
                                 width:IcUiQmlApi.appCtrl.settings.isRuntimeLangEng?height*4:height*2.5;
                                 onClicked:if(currentProgram.type!==2){ staticParamsSetting.open();} else {/*dynamicParamsSetting.currentProgramChanged();console.log(currentProgram.params.brightness);*/dynamicParamsSetting.open();}
                             }
@@ -419,7 +429,7 @@ Item {id:root; width: 1366;height: 691
                             id:checkControl
                             height: parent.height;spacing: height*0.8;anchors.horizontalCenter: parent.horizontalCenter;
                             CusButton{
-                                enabled: /*IcUiQmlApi.appCtrl.checkSvc.devReady&&IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus===3&&*/(currentProgram.type!==2||checkDisplay.dynamicSelectedDotsReady);
+                                enabled: /*IcUiQmlApi.appCtrl.checkSvc.devReady&&IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus===3&&*/IcUiQmlApi.appCtrl.checkSvc.readyToCheck&&(currentProgram.type!==2||checkDisplay.dynamicSelectedDotsReady);
                                 property int checkState: IcUiQmlApi.appCtrl.checkSvc.checkState;
                                 text:{if(checkState>2) return lt+qsTr("Start");if(checkState===2) return lt+qsTr("Resume");if(checkState===0||checkState===1) return lt+qsTr("Pause")}
                                 onClicked:{
@@ -448,8 +458,7 @@ Item {id:root; width: 1366;height: 691
                                         currentCheckResult.type=currentProgram.type;
                                         currentCheckResult.params=currentProgram.params;
 
-                                        IcUiQmlApi.appCtrl.checkSvc.program=currentProgram;
-                                        IcUiQmlApi.appCtrl.checkSvc.patient=currentPatient;
+
                                         IcUiQmlApi.appCtrl.checkSvc.checkResult=currentCheckResult;
                                         IcUiQmlApi.appCtrl.checkSvc.start();
 

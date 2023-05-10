@@ -22,7 +22,7 @@ QSharedPointer<DeviceOperation> DeviceOperation::m_singleton=nullptr;
 DeviceOperation::DeviceOperation()
 {
     m_config=DeviceData::getSingleton()->m_config;
-    m_connectTimer.setInterval(10000);
+    m_connectTimer.setInterval(120000);
     connect(&m_connectTimer,&QTimer::timeout,this,&DeviceOperation::connectOrdisConnectDev);
     m_connectTimer.start();
     connect(this,&DeviceOperation::updateDevInfo,[](QString str){std::cout<<str.toStdString()+"\n";});
@@ -203,6 +203,7 @@ void DeviceOperation::setLamp(LampId id, int index, bool onOff)
         }
     }
     m_devCtl->setLamp(UsbDev::DevCtl::LampId(id),index,da);
+    waitForSomeTime(10);
 }
 
 

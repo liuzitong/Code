@@ -11,7 +11,8 @@
 #include <array>
 #include <QMessageBox>
 //#include <QtConcurrent/QtConcurrent>
-namespace Perimeter{
+namespace Perimeter
+{
 constexpr int MaxDB=51;
 constexpr int MinDB=0;
 class Check:public QObject
@@ -31,10 +32,11 @@ public:
     virtual void Checkprocess()=0;
     virtual void initialize()=0;
     virtual void finished()=0;
+    virtual void lightsOn()=0;
+    void lightsOff();
 //signals:
 //    void  checkStateChanged();
-private:
-    virtual void setLight(bool onOff)=0;
+//private:
 
 };
 
@@ -100,6 +102,7 @@ public:
     virtual void initialize() override;
     virtual void Checkprocess() override;
     virtual void finished() override;
+    virtual void lightsOn() override;
 
 signals:
     void currentCheckingDotChanged(int index);
@@ -123,7 +126,7 @@ private:
 
     void checkWaiting();
 
-    virtual void setLight(bool onOff) override;
+
 
 
 };
@@ -176,10 +179,11 @@ private:
 
     void ProcessAnswer(QVector<QPointF> answerLocs,PathRecord& record);
 
-    virtual void setLight(bool onOff) override;
 
     // Check interface
 public:
+    virtual void lightsOn() override;
+
     virtual void finished() override;
 
     QList<QPoint> m_dynamicSelectedDots;
@@ -210,6 +214,8 @@ public:
         emit checkStateChanged();
     }
 public slots:
+    void prepareToCheck();
+
     void connectDev()
     {
         DevOps::DeviceOperation::getSingleton()->connectDev();    //连接设备
@@ -230,8 +236,18 @@ signals:
     void sendErrorInfo(QString error);
     void stop();
     void currentCheckingDotChanged(int index);
+    void readToCheck(bool isReady);
 
 };
+
+void Check::lightsOff()
+{
+    for(int i=0;i<4;i++) m_deviceOperation->setLamp(DevOps::LampId::LampId_bigDiamond,i,false);
+    m_deviceOperation->setLamp(DevOps::LampId::LampId_centerFixation,0,false);
+    for(int i=0;i<4;i++) m_deviceOperation->setLamp(DevOps::LampId::LampId_smallDiamond,i,false);
+    m_deviceOperation->setWhiteLamp(false);
+    m_deviceOperation->setLamp(DevOps::LampId::LampId_yellowBackground,0,false);
+}
 
 void StaticCheck::initialize()
 {
@@ -332,15 +348,11 @@ void StaticCheck::initialize()
         m_centerDotRecord=DotRecord{m_totalCount*2,QPointF{0,0},{DB},-initialNumber,false,false,-initialNumber,initialNumber};
     }
 
-    setLight(true);
-    m_deviceOperation->lightUpCastLight();
     m_deviceOperation->m_isChecking=true;
     m_deviceOperation->m_isWaitingForStaticStimulationAnswer=false;
     m_deviceOperation->m_staticStimulationAnswer=false;
 //    m_deviceOperation->m_stimulationTime=m_programModel->m_params.fixedParams.stimulationTime;
-    m_deviceOperation->setCursorColorAndCursorSize(int(cursorColor),int(cursorSize));
-    m_deviceOperation->waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y});
-    UtilitySvc::wait(4000);    //等几秒启动
+
 }
 
 //第一次先跑点,直接刺激,第二次跑点,等待上次刺激的应答,然后再刺激,再跑点,再等待上次的应答.(保证再等待应答的同时跑点.)
@@ -375,7 +387,7 @@ void StaticCheck::Checkprocess()
 
     checkWaiting();
 
-    if(m_checkedCount<m_totalCount&&!m_alreadyChecked)                         //如果测试完毕或者是已经得到结果的点就不刺激了
+    if(/*(*/m_checkedCount<m_totalCount/*||!m_shortTermFlucRecords.isEmpty())*/&&!m_alreadyChecked)                         //如果测试完毕或者是已经得到结果的点就不刺激了
     {
 //        if(m_lastCheckeDotType.last()==LastCheckedDotType::locateBlindDot&&!m_blindDot.isEmpty())      // 盲点如果已经确定就直接跳过
 //        {
@@ -393,10 +405,9 @@ void StaticCheck::Checkprocess()
 void StaticCheck::finished()
 {
     m_deviceOperation->m_isChecking=false;
-    m_deviceOperation->dimDownCastLight();
-    setLight(false);
-    m_deviceOperation->setLamp(DevOps::LampId::LampId_eyeglassInfrared,0,false);
-    m_deviceOperation->setLamp(DevOps::LampId::LampId_borderInfrared,0,false);
+    lightsOff();
+    UtilitySvc::wait(1000);
+    lightsOn();
 }
 
 
@@ -411,16 +422,13 @@ StaticCheck::DotRecord &StaticCheck::getCheckDotRecordRef()
 
     if(!m_shortTermFlucRecords.isEmpty())
     {
-        if(m_shortTermFlucRecords.size()>=2)
+        if(m_shortTermFlucRecords.size()>=2&&(!m_shortTermFlucRecords[m_shortTermFlucRecords.size()-2].checked))
         {
-            if(!m_shortTermFlucRecords[m_shortTermFlucRecords.size()-2].checked)
-            {
-                return m_shortTermFlucRecords[m_shortTermFlucRecords.size()-2];             //之前一个周期没测出短波要直接测完
-            }
+            return m_shortTermFlucRecords[m_shortTermFlucRecords.size()-2];             //之前一个周期没测出短波要直接测完
         }
         else
         {
-            if(qrand()%(1+m_resultModel->m_params.fixedParams.shortTermFluctuationCount)==0||m_checkedCount==m_totalCount-1)    //周期内随机到了短波周期,最后一轮了,先
+            if((qrand()%(1+m_resultModel->m_params.fixedParams.shortTermFluctuationCount)==0)||m_checkedCount>=m_totalCount-2)    //周期内随机到了短波周期,最后一轮了, 必须要减2
             {
                 if(!m_shortTermFlucRecords.last().checked)
                     return m_shortTermFlucRecords.last();
@@ -582,6 +590,7 @@ void StaticCheck::stimulate()
 //        qDebug()<<QString("deviation is:")+QString::number(m_deviceOperation->m_deviation);
         m_deviceOperation->waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y,UsbDev::DevCtl::MotorId_Shutter});
         m_deviceOperation->openShutter(durationTime);
+        std::cout<<"***** DB shi:"<<debug_DB<<"    "<<"zuo biao x:"<<debug_Loc.x()<<" "<<"zuobiao y:"<<debug_Loc.y()<<"    yong shi:"<<m_stimulationWaitingForAnswerElapsedTimer.elapsed()<<std::endl;
         switch (lastCheckedDotType)
         {
         case LastCheckedDotType::blindDotTest:
@@ -603,8 +612,8 @@ void StaticCheck::stimulate()
     {
         m_deviceOperation->waitForSomeTime(durationTime);           //假阴
         m_resultModel->m_data.fixationDeviation.push_back(-m_deviceOperation->m_deviation);
+        std::cout<<"***** jiayin"<<"zuo biao x:"<<debug_Loc.x()<<" "<<"zuobiao y:"<<debug_Loc.y()<<"    yong shi:"<<m_stimulationWaitingForAnswerElapsedTimer.elapsed()<<std::endl;
     }
-    std::cout<<"***** DB shi:"<<debug_DB<<"    "<<"zuo biao x:"<<debug_Loc.x()<<" "<<"zuobiao y:"<<debug_Loc.y()<<"    yong shi:"<<m_stimulationWaitingForAnswerElapsedTimer.elapsed()<<std::endl;
     m_deviceOperation->m_isWaitingForStaticStimulationAnswer=true;
     m_stimulationWaitingForAnswerElapsedTimer.restart();
 }
@@ -727,6 +736,7 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
             auto blindDB=UtilitySvc::getSingleton()->m_blindDotTestDB+UtilitySvc::getSingleton()->m_blindDotTestIncDB;
 //            m_lastCheckeDotType.push_back(LastCheckedDotType::blindDotTest);
 //            return {true,{m_blindDot[0].x(),m_blindDot[0].y()},blindDB};
+//            std::cout<<"blindDot:"<<
             m_checkCycleDotList.append({LastCheckedDotType::blindDotTest,m_blindDot[0],blindDB});
         }
     }
@@ -1087,6 +1097,8 @@ void StaticCheck::ProcessAnswer(bool answered)
                     m_lastShortTermCycleCheckedDotIndex.push_back(lastCheckedDot->index);         //加入最近检测点的集合
                     if(m_lastShortTermCycleCheckedDotIndex.size()==m_programModel->m_params.fixedParams.shortTermFluctuationCount)
                     {
+                        std::cout<<"add to shotTermCycle list."<<std::endl;
+                        std::cout<<m_shortTermFlucRecords.size();
                         auto selectedIndex=m_lastShortTermCycleCheckedDotIndex[qrand()%m_lastShortTermCycleCheckedDotIndex.size()];
                         m_lastShortTermCycleCheckedDotIndex.clear();
                         auto dotRecord=m_dotRecords[selectedIndex];
@@ -1146,58 +1158,46 @@ void StaticCheck::checkWaiting()
     }
 }
 
-void StaticCheck::setLight(bool onOff)
+void StaticCheck::lightsOn()
 {
     switch (m_programModel->m_params.commonParams.fixationTarget)
     {
     case FixationTarget::centerPoint:
     {
-        if(onOff==true)
+        if(m_programModel->m_params.commonParams.centerDotCheck)
         {
-            if(m_programModel->m_params.commonParams.centerDotCheck)
-            {
-                for(int i=0;i<4;i++)
-                    m_deviceOperation->setLamp(DevOps::LampId::LampId_smallDiamond,i,true);
-            }
-            else
-                m_deviceOperation->setLamp(DevOps::LampId::LampId_centerFixation,0,true);
+            for(int i=0;i<4;i++)
+                m_deviceOperation->setLamp(DevOps::LampId::LampId_smallDiamond,i,true);
         }
         else
-        {
-            if(m_programModel->m_params.commonParams.centerDotCheck)
-            {
-                for(int i=0;i<4;i++)
-                    m_deviceOperation->setLamp(DevOps::LampId::LampId_smallDiamond,i,false);
-            }
-            m_deviceOperation->setLamp(DevOps::LampId::LampId_centerFixation,0,false);
-        }
+            m_deviceOperation->setLamp(DevOps::LampId::LampId_centerFixation,0,true);
         break;
     }
     case FixationTarget::bigDiamond:
     {
         for(int i=0;i<4;i++)
-            m_deviceOperation->setLamp(DevOps::LampId::LampId_bigDiamond,i,onOff); break;
+            m_deviceOperation->setLamp(DevOps::LampId::LampId_bigDiamond,i,true); break;
         break;
     }
     case FixationTarget::smallDiamond:
     {
         for(int i=0;i<4;i++)
-            m_deviceOperation->setLamp(DevOps::LampId::LampId_smallDiamond,i,onOff); break;
+            m_deviceOperation->setLamp(DevOps::LampId::LampId_smallDiamond,i,true); break;
         break;
     }
     case FixationTarget::bottomPoint:
     {
-        m_deviceOperation->setLamp(DevOps::LampId::LampId_bigDiamond,1,onOff); break;
+        m_deviceOperation->setLamp(DevOps::LampId::LampId_bigDiamond,1,true); break;
         break;
     }
     }
 
     if(m_programModel->m_params.commonParams.backGroundColor==BackGroundColor::white)
     {
-        m_deviceOperation->setWhiteLamp(onOff);
+        m_deviceOperation->setWhiteLamp(true);
     }
     else
-        m_deviceOperation->setLamp(DevOps::LampId::LampId_yellowBackground,0,onOff);
+        m_deviceOperation->setLamp(DevOps::LampId::LampId_yellowBackground,0,true);
 }
 
 
@@ -1288,18 +1288,8 @@ void DynamicCheck::initialize()
     }
     }
 
-
-    setLight(true);
-    m_deviceOperation->lightUpCastLight();
     m_deviceOperation->m_isChecking=true;
-    auto cursorSize=m_programModel->m_params.cursorSize;
-    auto cursorColor=m_programModel->m_params.cursorColor;
-//    qDebug()<<m_programModel->m_params.brightness;
-    if(m_deviceOperation->m_isDeviceReady)
-    {
-        m_deviceOperation->setCursorColorAndCursorSize(int(cursorColor),int(cursorSize));
-        m_deviceOperation->setDB(m_programModel->m_params.brightness);
-    }
+
 }
 
 void DynamicCheck::Checkprocess()
@@ -1505,32 +1495,45 @@ void DynamicCheck::ProcessAnswer(QVector<QPointF> answerLoc,PathRecord& record)
 }
 
 
-
-
 void DynamicCheck::finished()
 {
     m_deviceOperation->m_isChecking=false;
-    setLight(false);
-    m_deviceOperation->setLamp(DevOps::LampId::LampId_eyeglassInfrared,0,false);
-    m_deviceOperation->setLamp(DevOps::LampId::LampId_borderInfrared,0,false);
-    m_deviceOperation->dimDownCastLight();
+    lightsOff();
+    UtilitySvc::wait(1000);
+    lightsOn();
 }
 
-void DynamicCheck::setLight(bool onOff)
+void DynamicCheck::lightsOn()
 {
-    m_deviceOperation->setLamp(DevOps::LampId::LampId_centerFixation,0,onOff);
+    m_deviceOperation->setLamp(DevOps::LampId::LampId_centerFixation,0,true);
     if(m_programModel->m_params.backGroundColor==BackGroundColor::white)
     {
-        m_deviceOperation->setWhiteLamp(onOff);
+        m_deviceOperation->setWhiteLamp(true);
     }
     else
-        m_deviceOperation->setLamp(DevOps::LampId::LampId_yellowBackground,0,onOff);
-
+        m_deviceOperation->setLamp(DevOps::LampId::LampId_yellowBackground,0,true);
 }
 
 void CheckSvcWorker::initialize()
 {
-//    qDebug()<<("initializing");
+    std::cout<<("initialize")<<std::endl;
+    int type=m_programVm->getType();
+    if(type!=2)
+    {
+        ((StaticCheck*)m_check.data())->m_resultModel=static_cast<StaticCheckResultVm*>(m_checkResultVm)->getModel();
+    }
+
+    else
+    {
+        ((DynamicCheck*)m_check.data())->m_resultModel=static_cast<DynamicCheckResultVm*>(m_checkResultVm)->getModel();
+        ((DynamicCheck*)m_check.data())->m_dynamicSelectedDots=m_dynamicSelectedDots;
+        UtilitySvc::wait(2000);    //等几秒启动
+    }
+}
+
+void CheckSvcWorker::prepareToCheck()
+{
+    std::cout<<("prepareToCheck")<<std::endl;
     int type=m_programVm->getType();
 //    qDebug()<<type;
     if(type!=2)
@@ -1538,21 +1541,35 @@ void CheckSvcWorker::initialize()
         m_check.reset(new StaticCheck());
         m_check->m_checkState=m_checkState;
         m_check->m_patientModel=m_patientVm->getModel();
-        ((StaticCheck*)m_check.data())->m_resultModel=static_cast<StaticCheckResultVm*>(m_checkResultVm)->getModel();
-//        qDebug()<<QString::number((((StaticCheck*)m_check.data())->m_resultModel)->m_id);
         ((StaticCheck*)m_check.data())->m_programModel=static_cast<StaticProgramVm*>(m_programVm)->getModel();
         connect(((StaticCheck*)m_check.data()),&StaticCheck::currentCheckingDotChanged,this,&CheckSvcWorker::currentCheckingDotChanged);
+        auto cursorSize=((StaticCheck*)m_check.data())->m_programModel->m_params.commonParams.cursorSize;
+        auto cursorColor=((StaticCheck*)m_check.data())->m_programModel->m_params.commonParams.cursorColor;
+        m_check->lightsOff();
+        m_check->lightsOn();
+        m_check->m_deviceOperation->setCursorColorAndCursorSize(int(cursorColor),int(cursorSize));
+        m_check->m_deviceOperation->waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y});
+        UtilitySvc::wait(500);    //等几秒启动
     }
+
     else
     {
         m_check.reset(new DynamicCheck());
         m_check->m_checkState=m_checkState;
         m_check->m_patientModel=m_patientVm->getModel();
-        ((DynamicCheck*)m_check.data())->m_resultModel=static_cast<DynamicCheckResultVm*>(m_checkResultVm)->getModel();
         ((DynamicCheck*)m_check.data())->m_programModel=static_cast<DynamicProgramVm*>(m_programVm)->getModel();
-        ((DynamicCheck*)m_check.data())->m_dynamicSelectedDots=m_dynamicSelectedDots;
+        auto cursorSize=((DynamicCheck*)m_check.data())->m_programModel->m_params.cursorSize;
+        auto cursorColor=((DynamicCheck*)m_check.data())->m_programModel->m_params.cursorColor;
+        auto brightness=((DynamicCheck*)m_check.data())->m_programModel->m_params.brightness;
+        m_check->lightsOff();
+        m_check->lightsOn();
+        m_check->m_deviceOperation->setCursorColorAndCursorSize(int(cursorColor),int(cursorSize));
+        m_check->m_deviceOperation->setDB(brightness);
+        m_check->m_deviceOperation->waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y});
         connect(this,&CheckSvcWorker::stop,[&](){m_check->m_deviceOperation->stopDynamic();});
+        UtilitySvc::wait(500);    //等几秒启动
     }
+    emit readToCheck(true);
 }
 
 
@@ -1656,6 +1673,7 @@ CheckSvc::CheckSvc(QObject *parent)
         msgBox.setText(errorInfo);
         msgBox.exec();
     });
+    connect(m_worker,&CheckSvcWorker::readToCheck,[&](bool isReady){setReadyToCheck(isReady);});
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::isDeviceReadyChanged,this,&CheckSvc::devReadyChanged);
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::castLightAdjustStatusChanged,this,&CheckSvc::castLightAdjustStatusChanged);
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::pupilDiameterChanged,this,&CheckSvc::pupilDiameterChanged);
@@ -1676,8 +1694,6 @@ void CheckSvc::start()
 //    {
 //        qDebug()<<QString::number(m_checkResultVm->getPatient_id());
 //    }
-    m_worker->m_patientVm=m_patientVm;
-    m_worker->m_programVm=m_programVm;
     m_worker->m_checkResultVm=m_checkResultVm;
     m_worker->m_checkState=&m_checkState;
     if(m_programVm->getType()==2) m_worker->m_dynamicSelectedDots=m_dynamicSelectedDots;
@@ -1721,6 +1737,27 @@ void CheckSvc::disconnectDev()
     QMetaObject::invokeMethod(m_worker,"disconnectDev",Qt::QueuedConnection);
 }
 
+void CheckSvc::prepareToCheck()
+{
+    qDebug()<<"prepareToCheck";
+    while(getCastLightAdjustStatus()!=3)
+    {
+        QApplication::processEvents();
+    }
+    m_worker->m_patientVm=m_patientVm;
+    m_worker->m_programVm=m_programVm;
+    QMetaObject::invokeMethod(m_worker,"prepareToCheck",Qt::QueuedConnection);
+//    if(m_programVm->getType()!=2)
+//    {
+//        auto program=static_cast<StaticProgramVm*>(m_programVm);
+//    }
+//    else
+//    {
+//        auto program=static_cast<DynamicProgramVm*>(m_programVm);
+//    }
+//    DevOps::DeviceOperation::getSingleton()->setCursorColorAndCursorSize(m_programVm)
+}
+
 void CheckSvc::moveChinUp()
 {
     DevOps::DeviceOperation::getSingleton()->moveChinUp();
@@ -1746,16 +1783,18 @@ void CheckSvc::stopMovingChin()
     DevOps::DeviceOperation::getSingleton()->stopMovingChin();
 }
 
-void CheckSvc::turnOnVideo()
+void CheckSvc::enterCheck()
 {
     qDebug()<<"trunOnVideo";
     DevOps::DeviceOperation::getSingleton()->turnOnVideo();
+    DevOps::DeviceOperation::getSingleton()->lightUpCastLight();
 }
 
-void CheckSvc::turnOffVideo()
+void CheckSvc::leaveCheck()
 {
     qDebug()<<"trunOffVideo";
     DevOps::DeviceOperation::getSingleton()->turnOffVideo();
+    DevOps::DeviceOperation::getSingleton()->dimDownCastLight();
 }
 
 bool CheckSvc::getDevReady()
@@ -1794,6 +1833,9 @@ void Perimeter::CheckSvc::setInputDots(QVariantList value)
         m_dynamicSelectedDots.push_back({radius,angle});
     }
 }
+
+
+
 }
 #include "check_svc.moc"
 

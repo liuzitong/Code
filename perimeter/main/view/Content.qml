@@ -194,12 +194,11 @@ Rectangle {
                             if(params.lastProgram===null)
                                 checkPage.refresh();          //区别是从其它页面返回
                         }
-//                        else if(pageFrom==="analysis")
-//                        {
-//                            checkPage.currentProgram=params.currentProgram;
-//                        }
-                        IcUiQmlApi.appCtrl.checkSvc.turnOffVideo();
-                        IcUiQmlApi.appCtrl.checkSvc.turnOnVideo();
+                        else if(pageFrom==="analysis")
+                        {
+                            checkPage.currentProgram=params.currentProgram;
+                        }
+                        IcUiQmlApi.appCtrl.checkSvc.enterCheck();
                         patientContentButton.image.source=patientContentButton.imageSrc;
                         checkContentButton.image.source=checkContentButton.pressImageSrc;
                         seperator1.opacity=0;

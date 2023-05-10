@@ -24,6 +24,8 @@ class CheckSvc: public QObject
     Q_PROPERTY(bool pupilDiameter READ getPupilDiameter NOTIFY pupilDiameterChanged)
     Q_PROPERTY(QVariantList dynamicSelectedDots WRITE setInputDots)
     Q_PROPERTY(int currentCheckingDotIndex READ getCurrentCheckingDotIndex NOTIFY currentCheckingDotIndexChanged)
+    Q_PROPERTY(bool readyToCheck READ getReadyToCheck WRITE setReadyToCheck NOTIFY readyToCheckChanged)
+
 
 
 //    Q_PROPERTY(CheckSvcWorker* worker READ getWorker)
@@ -36,14 +38,15 @@ public:
     Q_INVOKABLE void stop();
     Q_INVOKABLE void connectDev();
     Q_INVOKABLE void disconnectDev();
+    Q_INVOKABLE void prepareToCheck();
 
     Q_INVOKABLE void moveChinUp();
     Q_INVOKABLE void moveChinDown();
     Q_INVOKABLE void moveChinLeft();
     Q_INVOKABLE void moveChinRight();
     Q_INVOKABLE void stopMovingChin();
-    Q_INVOKABLE void turnOnVideo();
-    Q_INVOKABLE void turnOffVideo();
+    Q_INVOKABLE void enterCheck();
+    Q_INVOKABLE void leaveCheck();
 
 //signals:
 //  void setCheckState(int value);
@@ -62,6 +65,7 @@ public:
     float getPupilDiameter();Q_SIGNAL void pupilDiameterChanged();
     void setInputDots(QVariantList value);
     int getCurrentCheckingDotIndex(){return m_currentCheckingDotIndex;}Q_SIGNAL void currentCheckingDotIndexChanged();
+    bool getReadyToCheck(){return m_readyToCheck;}void setReadyToCheck(bool value){m_readyToCheck=value;emit readyToCheckChanged();} Q_SIGNAL void readyToCheckChanged();
 //    CheckSvcWorker* getWorker(){return m_worker;}
 
 private:
@@ -72,6 +76,7 @@ private:
     int m_totalCount=0;
     int m_checkTime=0;
     int m_currentCheckingDotIndex=-1;
+    bool m_readyToCheck=false;
     QList<QPoint> m_dynamicSelectedDots;
     PatientVm* m_patientVm;
     ProgramVm* m_programVm;
