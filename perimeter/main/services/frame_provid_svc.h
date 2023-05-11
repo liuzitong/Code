@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QAbstractVideoSurface>
 #include <QVideoSurfaceFormat>
-
+#include <QImage>
 /*!
  * \brief FrameProvidSvc 作为qml VideoOutput.source
  */
@@ -44,6 +44,7 @@ public slots:
      */
     void onNewVideoContentReceived(/*QByteArray qa*/);
 private:
+    void drawCrossHair(QImage& img);
     QAbstractVideoSurface *m_surface = NULL;
     QVideoSurfaceFormat m_format;
     static QSharedPointer<FrameProvidSvc> m_singleton;

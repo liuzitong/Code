@@ -12,6 +12,7 @@ import perimeter.main.view.Utils 1.0
 Window {
     id: window;visible: true;width: 1366;height: 768;title: lt+qsTr("Perimeter");
     minimumWidth: 1366;minimumHeight: 768;property string currentpage: "Login";
+    MouseArea{anchors.fill: parent;hoverEnabled: true;/*onMouseXChanged: {console.log("posChanged");}onMouseYChanged: {console.log("posChanged");}*/}
     Content{id:content;anchors.fill: parent;}
 //    Login{id:login;visible: false;anchors.fill: parent;}
     property bool isEng: IcUiQmlApi.appCtrl.settings.isRuntimeLangEng;

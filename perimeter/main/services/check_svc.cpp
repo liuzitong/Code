@@ -31,6 +31,7 @@ public:
     static constexpr int y_offsetDiamond=-8,y_offsetBottomPoint=-12;
     virtual void Checkprocess()=0;
     virtual void initialize()=0;
+    virtual void resetData()=0;
     virtual void finished()=0;
     virtual void lightsOn()=0;
     void lightsOff();
@@ -100,6 +101,7 @@ public:
         qDebug()<<"check deleted";
     }
     virtual void initialize() override;
+    virtual void resetData() override;
     virtual void Checkprocess() override;
     virtual void finished() override;
     virtual void lightsOn() override;
@@ -169,6 +171,8 @@ private:
 
     virtual void initialize() override;
 
+    virtual void resetData() override;
+
     virtual void Checkprocess() override;
 
     int getPathRecordIndex();
@@ -236,7 +240,7 @@ signals:
     void sendErrorInfo(QString error);
     void stop();
     void currentCheckingDotChanged(int index);
-    void readToCheck(bool isReady);
+    void readyToCheck(bool isReady);
 
 };
 
@@ -251,6 +255,23 @@ void Check::lightsOff()
 
 void StaticCheck::initialize()
 {
+    auto cursorSize=m_programModel->m_params.commonParams.cursorSize;
+    auto cursorColor=m_programModel->m_params.commonParams.cursorColor;
+    m_value_30d=m_utilitySvc->getValue30d(int(cursorSize),int(cursorColor),m_patientModel->m_age);
+    m_value_60d=m_utilitySvc->m_value_60d;
+
+    switch (m_programModel->m_params.commonParams.fixationTarget)
+    {
+    case FixationTarget::centerPoint:m_y_offset=0;break;
+    case FixationTarget::bigDiamond:
+    case FixationTarget::smallDiamond:m_y_offset=y_offsetDiamond;break;
+    case FixationTarget::bottomPoint:m_y_offset=y_offsetBottomPoint;break;
+    }
+
+}
+
+void StaticCheck::resetData()
+{
     constexpr int initialNumber=999;
     qsrand(QTime::currentTime().msec());
     m_checkedCount=0;
@@ -261,6 +282,15 @@ void StaticCheck::initialize()
     m_alreadyChecked=false;
     m_isStartWithBaseDots=false;
     m_isDoingBaseDotsCheck=false;
+    m_answeredTimes.clear();
+    m_dotRecords.clear();
+    m_lastShortTermCycleCheckedDotIndex.clear();
+    m_shortTermFlucRecords.clear();
+    m_blindDot.clear();
+    m_lastCheckDotRecord.clear();
+    m_lastCheckeDotType.clear();
+    m_checkCycleDotList.clear();
+
     auto fixedParams=m_resultModel->m_params.fixedParams;
     m_fiaxationViewLossCyc=qrand()%fixedParams.fixationViewLossCycle;
     m_falsePosCyc=qrand()%fixedParams.falsePositiveCycle;
@@ -272,21 +302,8 @@ void StaticCheck::initialize()
     m_resultModel->m_data.checkData=std::vector<int>(m_totalCount*2+1,-initialNumber);  //第一段程序点个数为测出点DB,第二段程序点个数为短波周期DB,第三段为中心点DB
     m_resultModel->m_data.realTimeDB.resize(m_totalCount*2+1);
     m_resultModel->m_imgData.resize(m_totalCount*2+1);
-    auto cursorSize=m_programModel->m_params.commonParams.cursorSize;
-    auto cursorColor=m_programModel->m_params.commonParams.cursorColor;
-    m_value_30d=m_utilitySvc->getValue30d(int(cursorSize),int(cursorColor),m_patientModel->m_age);
-    m_value_60d=m_utilitySvc->m_value_60d;
+
     emit currentCheckingDotChanged(-1);
-    switch (m_resultModel->m_params.commonParams.fixationTarget)
-    {
-    case FixationTarget::centerPoint:m_y_offset=0;break;
-    case FixationTarget::bigDiamond:
-    case FixationTarget::smallDiamond:m_y_offset=y_offsetDiamond;break;
-    case FixationTarget::bottomPoint:m_y_offset=y_offsetBottomPoint;break;
-    }
-
-
-
     int DBChanged=0;
     if(m_programModel->m_params.commonParams.strategy==StaticParams::CommonParams::Strategy::oneStage
             ||m_programModel->m_params.commonParams.strategy==StaticParams::CommonParams::Strategy::twoStages
@@ -296,19 +313,12 @@ void StaticCheck::initialize()
     }
 
 
-
     if(m_programModel->m_params.commonParams.strategy==StaticParams::CommonParams::Strategy::smartInteractive
             ||m_programModel->m_params.commonParams.strategy==StaticParams::CommonParams::Strategy::fastInterative)
     {
         m_isStartWithBaseDots=true;
         m_isDoingBaseDotsCheck=true;
     }
-
-//    QPointF centerDotLoc;
-//    if(m_resultModel->m_params.commonParams.fixationTarget==FixationTarget::centerPoint)
-//    {
-//        centerDotLoc={0,float(y_offsetDiamond)};
-//    }
 
     if(m_programModel->m_params.commonParams.strategy!=StaticParams::CommonParams::Strategy::singleStimulation)
     {
@@ -347,12 +357,9 @@ void StaticCheck::initialize()
         }
         m_centerDotRecord=DotRecord{m_totalCount*2,QPointF{0,0},{DB},-initialNumber,false,false,-initialNumber,initialNumber};
     }
-
     m_deviceOperation->m_isChecking=true;
     m_deviceOperation->m_isWaitingForStaticStimulationAnswer=false;
     m_deviceOperation->m_staticStimulationAnswer=false;
-//    m_deviceOperation->m_stimulationTime=m_programModel->m_params.fixedParams.stimulationTime;
-
 }
 
 //第一次先跑点,直接刺激,第二次跑点,等待上次刺激的应答,然后再刺激,再跑点,再等待上次的应答.(保证再等待应答的同时跑点.)
@@ -1203,14 +1210,20 @@ void StaticCheck::lightsOn()
 
 void DynamicCheck::initialize()
 {
-    qsrand(QTime::currentTime().msec());
-    m_resultModel->m_patient_id=m_patientModel->m_id;
-    m_resultModel->m_program_id=m_programModel->m_id;
-    m_checkedCount=0;
-    auto& os_od=m_resultModel->m_OS_OD;
     auto& params=m_programModel->m_params;
     m_speedLevel=params.speed;
     m_cursorSize=(int)params.cursorSize;
+}
+
+void DynamicCheck::resetData()
+{
+    qsrand(QTime::currentTime().msec());
+    m_resultModel->m_patient_id=m_patientModel->m_id;
+    m_resultModel->m_program_id=m_programModel->m_id;
+    m_records.clear();
+    m_checkedCount=0;
+    auto& os_od=m_resultModel->m_OS_OD;
+    auto& params=m_programModel->m_params;
     switch(params.strategy)
     {
     case DynamicParams::Strategy::standard:
@@ -1289,7 +1302,6 @@ void DynamicCheck::initialize()
     }
 
     m_deviceOperation->m_isChecking=true;
-
 }
 
 void DynamicCheck::Checkprocess()
@@ -1527,15 +1539,14 @@ void CheckSvcWorker::initialize()
     {
         ((DynamicCheck*)m_check.data())->m_resultModel=static_cast<DynamicCheckResultVm*>(m_checkResultVm)->getModel();
         ((DynamicCheck*)m_check.data())->m_dynamicSelectedDots=m_dynamicSelectedDots;
-        UtilitySvc::wait(2000);    //等几秒启动
+//        UtilitySvc::wait(2000);    //等几秒启动
     }
 }
 
 void CheckSvcWorker::prepareToCheck()
 {
-    std::cout<<("prepareToCheck")<<std::endl;
     int type=m_programVm->getType();
-//    qDebug()<<type;
+    qDebug()<<type;
     if(type!=2)
     {
         m_check.reset(new StaticCheck());
@@ -1549,9 +1560,7 @@ void CheckSvcWorker::prepareToCheck()
         m_check->lightsOn();
         m_check->m_deviceOperation->setCursorColorAndCursorSize(int(cursorColor),int(cursorSize));
         m_check->m_deviceOperation->waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y});
-        UtilitySvc::wait(500);    //等几秒启动
     }
-
     else
     {
         m_check.reset(new DynamicCheck());
@@ -1567,9 +1576,10 @@ void CheckSvcWorker::prepareToCheck()
         m_check->m_deviceOperation->setDB(brightness);
         m_check->m_deviceOperation->waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y});
         connect(this,&CheckSvcWorker::stop,[&](){m_check->m_deviceOperation->stopDynamic();});
-        UtilitySvc::wait(500);    //等几秒启动
     }
-    emit readToCheck(true);
+    m_check->initialize();
+    UtilitySvc::wait(500);    //等几秒启动
+    emit readyToCheck(true);
 }
 
 
@@ -1590,7 +1600,7 @@ void CheckSvcWorker::doWork()
         case 0:                                             //start
         {
             initialize();
-            m_check->initialize();
+            m_check->resetData();
 //            qDebug()<<m_check->m_totalCount;
             emit totalCountChanged(m_check->m_totalCount);
             emit checkedCountChanged(0);
@@ -1612,6 +1622,7 @@ void CheckSvcWorker::doWork()
             if(*m_checkState!=3)                //有可能外部结束后,后面把它覆盖为完成,就剩1个点的时候出现此情况.
             {
                 if(m_check->m_checkedCount==m_check->m_totalCount) setCheckState(4);
+
             }
             emit checkedCountChanged(m_check->m_checkedCount);
             emit checkResultChanged();
@@ -1647,6 +1658,7 @@ void CheckSvcWorker::doWork()
             m_checkResultVm->insert();
             qDebug()<<("finished");
             emit checkProcessFinished();
+            setCheckState(5);
             return;
         }
         };
@@ -1673,7 +1685,7 @@ CheckSvc::CheckSvc(QObject *parent)
         msgBox.setText(errorInfo);
         msgBox.exec();
     });
-    connect(m_worker,&CheckSvcWorker::readToCheck,[&](bool isReady){setReadyToCheck(isReady);});
+    connect(m_worker,&CheckSvcWorker::readyToCheck,[&](bool isReady){setReadyToCheck(isReady);});
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::isDeviceReadyChanged,this,&CheckSvc::devReadyChanged);
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::castLightAdjustStatusChanged,this,&CheckSvc::castLightAdjustStatusChanged);
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::pupilDiameterChanged,this,&CheckSvc::pupilDiameterChanged);
@@ -1739,11 +1751,7 @@ void CheckSvc::disconnectDev()
 
 void CheckSvc::prepareToCheck()
 {
-    qDebug()<<"prepareToCheck";
-    while(getCastLightAdjustStatus()!=3)
-    {
-        QApplication::processEvents();
-    }
+    std::cout<<("prepareToCheck")<<std::endl;
     m_worker->m_patientVm=m_patientVm;
     m_worker->m_programVm=m_programVm;
     QMetaObject::invokeMethod(m_worker,"prepareToCheck",Qt::QueuedConnection);

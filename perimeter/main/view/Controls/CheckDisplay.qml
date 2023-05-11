@@ -25,7 +25,7 @@ Item{
     onCurrentCheckResultChanged:
     {
         displayCanvas.requestPaint();
-        console.log(currentCheckingDotIndex);
+//        console.log(currentCheckingDotIndex);
     }
 
     onCurrentCheckingDotIndexChanged: { displayCanvas.requestPaint();}

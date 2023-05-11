@@ -190,13 +190,20 @@ Rectangle {
 //                        checkPage.rePaintCanvas();
                         if(pageFrom==="patientManagement")
                         {
-                            checkPage.currentProgram=params.lastProgram;                //recheck
-                            if(params.lastProgram===null)
+                            if(params.type==="check")
+                            {
                                 checkPage.refresh();          //区别是从其它页面返回
+                            }
+                            else
+                            {
+                                checkPage.currentProgram=params.lastProgram;                //recheck
+                            }
+
                         }
                         else if(pageFrom==="analysis")
                         {
-                            checkPage.currentProgram=params.currentProgram;
+                            if(params.type==="reCheck")
+                                checkPage.currentProgram=params.currentProgram;
                         }
                         IcUiQmlApi.appCtrl.checkSvc.enterCheck();
                         patientContentButton.image.source=patientContentButton.imageSrc;

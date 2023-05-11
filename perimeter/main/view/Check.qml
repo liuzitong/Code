@@ -431,7 +431,7 @@ Item {id:root; width: 1366;height: 691
                             CusButton{
                                 enabled: /*IcUiQmlApi.appCtrl.checkSvc.devReady&&IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus===3&&*/IcUiQmlApi.appCtrl.checkSvc.readyToCheck&&(currentProgram.type!==2||checkDisplay.dynamicSelectedDotsReady);
                                 property int checkState: IcUiQmlApi.appCtrl.checkSvc.checkState;
-                                text:{if(checkState>2) return lt+qsTr("Start");if(checkState===2) return lt+qsTr("Resume");if(checkState===0||checkState===1) return lt+qsTr("Pause")}
+                                text:{if(checkState===3||checkState===5) return lt+qsTr("Start");if(checkState===2) return lt+qsTr("Resume");if(checkState===0||checkState===1) return lt+qsTr("Pause")}
                                 onClicked:{
                                     IcUiQmlApi.appCtrl.checkSvc.dynamicSelectedDots=checkDisplay.dynamicSelectedDots;     //动态输入点
                                     if(checkState>2)
@@ -509,7 +509,7 @@ Item {id:root; width: 1366;height: 691
                         CusComboBoxButton{
                             height: parent.height; anchors.right: parent.right; anchors.rightMargin: 0;width: height*3.5;
 //                            enabled: currentCheckResult!==null;
-                            enabled: currentCheckResult!==null&&IcUiQmlApi.appCtrl.checkSvc.checkState===4;
+                            enabled: currentCheckResult!==null&&IcUiQmlApi.appCtrl.checkSvc.checkState===5;
                             property var listModel:ListModel {}
                             property var reportNames: [[lt+qsTr("Single"),lt+qsTr("Three in one"),lt+qsTr("Overview"),lt+qsTr("Three in one"),lt+qsTr("Threshold")],[lt+qsTr("Screening")],[lt+qsTr("Dynamic"),lt+qsTr("Dyanmic data")]]
                             comboBox.model: listModel;popDirectionDown: false;complexType: true;

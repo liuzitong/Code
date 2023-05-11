@@ -1,5 +1,5 @@
 ﻿#include "frame_provid_svc.h"
-#include <QImage>
+
 #include <QDebug>
 #include <deviceOperation/device_operation.h>
 #include <memory>
@@ -68,16 +68,88 @@ void FrameProvidSvc::onNewVideoContentReceived(/*QByteArray qa*/)
 {
     auto rawData=DevOps::DeviceOperation::getSingleton()->m_frameRawData;
 //    qDebug()<<"frame provider received "+QString::number(rawData.size());
-    if(rawData.size()==640*480)
+
+    auto videoSize=DevOps::DeviceOperation::getSingleton()->m_videoSize;
+    if(rawData.size()==videoSize.width()*videoSize.height())
     {
-        QImage img((uchar*)rawData.data(),640,480,QImage::Format::Format_Grayscale8);
+        QImage img((uchar*)rawData.data(),videoSize.width(),videoSize.height(),QImage::Format::Format_Grayscale8);
         auto img2=img.convertToFormat(QImage::Format::Format_ARGB32);
+//        img2.setPixelColor(3,3,Qt::yellow);
+//        for(int )
+        drawCrossHair(img2);
         QVideoFrame frame(img2);
         setFormat(frame.width(),frame.height(),frame.pixelFormat());
         if (m_surface)
             m_surface->present(frame);
     }
 }
+
+void FrameProvidSvc::drawCrossHair(QImage &img)
+{
+    {
+        int h=img.height()*0.5;
+        for(int w=img.width()*0.45;w<img.width()*0.55;w++)
+        {
+            img.setPixelColor(w,h,Qt::yellow);
+        }
+    }
+    {
+        int w=img.width()*0.5;
+        for(int h=img.height()*0.5-img.width()*0.05;h<img.height()*0.5+img.width()*0.05;h++)
+        {
+            img.setPixelColor(w,h,Qt::yellow);
+        }
+    }
+
+    {
+        int h=img.height()*0.25;
+        for(int w=img.width()*0.25;w<img.width()*0.25+img.height()*0.05;w++)
+        {
+            img.setPixelColor(w,h,Qt::yellow);
+        }
+        for(int w=img.width()*0.75-img.height()*0.05;w<img.width()*0.75;w++)
+        {
+            img.setPixelColor(w,h,Qt::yellow);
+        }
+    }
+
+    {
+        int h=img.height()*0.75;
+        for(int w=img.width()*0.25;w<img.width()*0.25+img.height()*0.05;w++)
+        {
+            img.setPixelColor(w,h,Qt::yellow);
+        }
+        for(int w=img.width()*0.75-img.height()*0.05;w<img.width()*0.75;w++)
+        {
+            img.setPixelColor(w,h,Qt::yellow);
+        }
+    }
+
+    {
+        int w=img.width()*0.25;
+        for(int h=img.height()*0.25;w<img.height()*0.30;w++)
+        {
+            img.setPixelColor(w,h,Qt::yellow);
+        }
+        for(int h=img.height()*0.70;w<img.height()*0.75;w++)
+        {
+            img.setPixelColor(w,h,Qt::yellow);
+        }
+    }
+
+    {
+        int w=img.width()*0.75;
+        for(int h=img.height()*0.25;w<img.height()*0.30;w++)
+        {
+            img.setPixelColor(w,h,Qt::yellow);
+        }
+        for(int h=img.height()*0.70;w<img.height()*0.75;w++)
+        {
+            img.setPixelColor(w,h,Qt::yellow);
+        }
+    }
+}
+
 
 //void FrameProvidSvc::onNewVideoContentReceived(/*QByteArray qa*/)
 //{

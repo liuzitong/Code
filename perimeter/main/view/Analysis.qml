@@ -85,10 +85,10 @@ Column {
             Item{height: parent.height;width:parent.width*0.52;
                 Item{anchors.fill: parent;anchors.margins:parent.height*0.15;
                     Flow{height: parent.height;spacing: height*0.8;width: parent.width;anchors.horizontalCenter: parent.horizontalCenter
-                        CusButton{text:lt+qsTr("Recheck");enabled:currentProgram!==null&&IcUiQmlApi.appCtrl.checkSvc.devReady&&IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus===3;
+                        CusButton{text:lt+qsTr("Recheck");enabled:currentProgram!==null/*&&IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus===3*/;
                             onClicked:{
                                 currentProgram.params=currentCheckResult.params;
-                                root.changePage("check",{currentProgram:currentProgram});
+                                root.changePage("check",{currentProgram:currentProgram,type:"reCheck"});
                             }
                         }
                         CusButton{text:lt+qsTr("New patient");onClicked:{root.changePage("patientManagement",{});}}

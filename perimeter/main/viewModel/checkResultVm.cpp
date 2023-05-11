@@ -39,6 +39,7 @@ StaticCheckResultVm::StaticCheckResultVm(const CheckResult_ptr & checkResult_ptr
 
 void StaticCheckResultVm::insert()
 {
+    qDebug()<<"insert result";
     static int count=0;
     auto sp=m_data->ModelToDB();
     sp->m_time=QDateTime::currentDateTime();
@@ -62,8 +63,9 @@ void StaticCheckResultVm::insert()
         }
     }
     qx::dao::insert(sp);
-    m_data->m_id=sp->m_id;
     qDebug()<<sp->m_id;
+    m_data->m_id=sp->m_id;
+
 }
 
 void StaticCheckResultVm::update()
