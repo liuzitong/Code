@@ -330,14 +330,14 @@ void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB,bool
     motorPos[4]=config.DbPosMappingPtr()[DB][1];
 
     bool isMotorMove[5]{true,true,true,true,true};
-    waitMotorStop({UsbDev::DevCtl::MotorId_Color,
-                   UsbDev::DevCtl::MotorId_Light_Spot,
-                   UsbDev::DevCtl::MotorId_Focus,
-                   UsbDev::DevCtl::MotorId_X,
-                   UsbDev::DevCtl::MotorId_Y
-                   });
+//    waitMotorStop({UsbDev::DevCtl::MotorId_Color,
+//                   UsbDev::DevCtl::MotorId_Light_Spot,
+//                   UsbDev::DevCtl::MotorId_Focus,
+//                   UsbDev::DevCtl::MotorId_X,
+//                   UsbDev::DevCtl::MotorId_Y
+//                   });
 
-    std::cout<<"waiting shutter close"<<std::endl;
+//    std::cout<<"waiting shutter close"<<std::endl;
 //    std::cout<<m_statusData.motorPosition(UsbDev::DevCtl::MotorId_Shutter)<<std::endl;;
 //    std::cout<<m_config.shutterOpenPosRef()<<std::endl;
     waitForSomeTime(180);
@@ -345,7 +345,7 @@ void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB,bool
     {
         QCoreApplication::processEvents();
     }
-    std::cout<<"done waiting"<<std::endl;
+//    std::cout<<"done waiting"<<std::endl;
     move5Motors(isMotorMove,motorPos);
 }
 
@@ -598,14 +598,20 @@ void DeviceOperation::moveChin(ChinMoveDirection direction)
 
 void DeviceOperation::lightUpCastLight()
 {
-    if(m_isDeviceReady)
+    if(m_isDeviceReady&&!m_castLightUp)
+    {
         m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA);
+        m_castLightUp=true;
+    }
 }
 
 void DeviceOperation::dimDownCastLight()
 {
-    if(m_isDeviceReady)
+    if(m_isDeviceReady&&m_castLightUp)
+    {
         m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA*0.3);
+        m_castLightUp=false;
+    }
 }
 
 
@@ -682,7 +688,7 @@ void DeviceOperation::workOnNewStatuData()
             openShutter(0);
             waitMotorStop({UsbDev::DevCtl::MotorId_Shutter});
             m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA*0.3);
-//            waitForSomeTime(3000);              //防止摄像头刷不出来
+            waitForSomeTime(1000);              //防止摄像头刷不出来
         }
     }
     emit newStatusData();

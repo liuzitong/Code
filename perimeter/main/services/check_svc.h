@@ -6,6 +6,7 @@
 #include <perimeter/main/viewModel/checkResultVm.h>
 #include <perimeter/main/model/patientModel.h>
 #include <QVariantList>
+#include <QTimer>
 namespace Perimeter{
 class CheckSvcWorker;
 class CheckSvc: public QObject
@@ -28,6 +29,8 @@ class CheckSvc: public QObject
 
 
 
+
+
 //    Q_PROPERTY(CheckSvcWorker* worker READ getWorker)
 public:
     explicit CheckSvc(QObject *parent = nullptr);
@@ -47,6 +50,7 @@ public:
     Q_INVOKABLE void stopMovingChin();
     Q_INVOKABLE void enterCheck();
     Q_INVOKABLE void leaveCheck();
+    Q_INVOKABLE void castlightUp();
 
 //signals:
 //  void setCheckState(int value);
@@ -77,10 +81,12 @@ private:
     int m_checkTime=0;
     int m_currentCheckingDotIndex=-1;
     bool m_readyToCheck=false;
+    bool m_atCheckingPage=false;
     QList<QPoint> m_dynamicSelectedDots;
     PatientVm* m_patientVm;
     ProgramVm* m_programVm;
     CheckResultVm* m_checkResultVm;
+    QTimer m_castLightDimdownTimer;
 };
 }
 #endif // CheckSvc_H

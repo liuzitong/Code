@@ -129,6 +129,7 @@ public:
     int m_castLightAdjustStatus=0;    //0:未标准,1:调整光斑和位置,2:矫正的光强,3:校准完成
     int m_currentCastLightDA;
     int m_castLightTargetDA;
+    bool m_castLightUp=false;
 //    int m_stimulationTime=180;
     QElapsedTimer m_castLightAdjustElapsedTimer;
 

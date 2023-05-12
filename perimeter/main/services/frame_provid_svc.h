@@ -35,7 +35,9 @@ public:
      * \param heigth    视频高
      * \param format    enum QVideoFrame::PixelFormat
      */
-    void setFormat(int width, int heigth, QVideoFrame::PixelFormat format);
+    void setFormat(int width, int height, QVideoFrame::PixelFormat format);
+
+    Q_INVOKABLE void setVideoSize(int width,int height);
 
 public slots:
     /*!
@@ -47,6 +49,8 @@ private:
     void drawCrossHair(QImage& img);
     QAbstractVideoSurface *m_surface = NULL;
     QVideoSurfaceFormat m_format;
+    int m_width;
+    int m_height;
     static QSharedPointer<FrameProvidSvc> m_singleton;
 };
 }

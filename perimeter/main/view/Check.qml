@@ -228,7 +228,10 @@ Item {id:root; width: 1366;height: 691
                                             anchors.fill: parent
                                             focus : visible
                                             id:vedio;
+                                            onWidthChanged: frameProvidSvc.setVideoSize(width,height);
+                                            onHeightChanged: frameProvidSvc.setVideoSize(width,height);
 
+                                            Component.onCompleted: frameProvidSvc.setVideoSize(width,height);
                                         }
                                     }
                                 }

@@ -303,7 +303,6 @@ void StaticCheck::resetData()
     m_resultModel->m_data.realTimeDB.resize(m_totalCount*2+1);
     m_resultModel->m_imgData.resize(m_totalCount*2+1);
 
-    emit currentCheckingDotChanged(-1);
     int DBChanged=0;
     if(m_programModel->m_params.commonParams.strategy==StaticParams::CommonParams::Strategy::oneStage
             ||m_programModel->m_params.commonParams.strategy==StaticParams::CommonParams::Strategy::twoStages
@@ -379,10 +378,22 @@ void StaticCheck::Checkprocess()
     else
     {
         m_lastCheckDotRecord.push_back(&getCheckDotRecordRef());   //存储lastDotType为commondot 并且存储指针
-//        auto dotRec=m_lastCheckDotRecord.last();
 //        qDebug()<<"getCheckDotRecordRef loc:"<<dotRec->loc<<" DB:"<<QString::number(dotRec->StimulationDBs.last())<<"upper:"<<QString::number(dotRec->upperBound)<<"lower:"<<QString::number(dotRec->lowerBound);
+
         emit currentCheckingDotChanged(m_lastCheckDotRecord.last()->index);
         getReadyToStimulate(m_lastCheckDotRecord.last()->loc,m_lastCheckDotRecord.last()->StimulationDBs.last());
+
+
+//        int static count=0;
+//        switch(count)
+//        {
+//        case 0:getReadyToStimulate({-15,0},0);break;
+//        case 1:getReadyToStimulate({15,0},0);break;
+//        case 2:getReadyToStimulate({0,-15},0);break;
+//        case 3:getReadyToStimulate({0,15},0);break;
+//        }
+//        count++;
+//        count%=4;
     }
 
 
@@ -394,7 +405,7 @@ void StaticCheck::Checkprocess()
 
     checkWaiting();
 
-    if(/*(*/m_checkedCount<m_totalCount/*||!m_shortTermFlucRecords.isEmpty())*/&&!m_alreadyChecked)                         //如果测试完毕或者是已经得到结果的点就不刺激了
+    if(m_checkedCount<m_totalCount&&!m_alreadyChecked)                         //如果测试完毕或者是已经得到结果的点就不刺激了
     {
 //        if(m_lastCheckeDotType.last()==LastCheckedDotType::locateBlindDot&&!m_blindDot.isEmpty())      // 盲点如果已经确定就直接跳过
 //        {
@@ -412,6 +423,7 @@ void StaticCheck::Checkprocess()
 void StaticCheck::finished()
 {
     m_deviceOperation->m_isChecking=false;
+    emit currentCheckingDotChanged(-1);
     lightsOff();
     UtilitySvc::wait(1000);
     lightsOn();
@@ -477,10 +489,22 @@ StaticCheck::DotRecord &StaticCheck::getCheckDotRecordRef()
             }
         }
 
-        if(zoneRightTop.count()>0) zone.push_back(0);
-        if(zoneRightBottom.count()>0) zone.push_back(1);
-        if(zoneLeftBottom.count()>0) zone.push_back(2);
-        if(zoneLeftTop.count()>0) zone.push_back(3);
+//        if(zoneRightTop.count()>0) zone.push_back(0);
+//        if(zoneRightBottom.count()>0) zone.push_back(1);
+//        if(zoneLeftBottom.count()>0) zone.push_back(2);
+//        if(zoneLeftTop.count()>0) zone.push_back(3);
+
+        //这样谁剩的多 ,谁概率大
+//        for(int i=0;i<(zoneRightTop.count());i++) zone.push_back(0);
+//        for(int i=0;i<(zoneRightBottom.count());i++) zone.push_back(1);
+//        for(int i=0;i<(zoneLeftBottom.count());i++) zone.push_back(2);
+//        for(int i=0;i<(zoneLeftTop.count());i++) zone.push_back(3);
+        zone.append(QVector<int>(zoneRightTop.count(),0));
+        zone.append(QVector<int>(zoneRightBottom.count(),1));
+        zone.append(QVector<int>(zoneLeftBottom.count(),2));
+        zone.append(QVector<int>(zoneLeftTop.count(),3));
+
+
 
         auto zoneNumber=zone[qrand()%zone.size()];                                                  //随机出区域和参考点坐标
         QVector<DotRecord> seletedZoneRecords;
@@ -813,7 +837,6 @@ bool StaticCheck::waitForAnswer()
     }
 
 
-    std::cout<<"start time count time"<<std::endl;
     bool answer=false;
     while((m_stimulationWaitingForAnswerElapsedTimer.elapsed()<waitTime)&&(!answer))   //应答时间内
     {
@@ -825,12 +848,11 @@ bool StaticCheck::waitForAnswer()
             answer=true;
             UtilitySvc::wait(m_programModel->m_params.fixedParams.leastWaitingTime);                //最小等待时间
         }
-        else QApplication::processEvents();
+        else
+            QApplication::processEvents();
     }
-
-
-    std::cout<<"end time count time"<<std::endl;
-    std::cout<<(QString("answer Time is:")+QString::number(m_stimulationWaitingForAnswerElapsedTimer.elapsed())).toStdString()<<std::endl;
+//    std::cout<<std::endl;
+//    std::cout<<(QString("answer Time is:")+QString::number(m_stimulationWaitingForAnswerElapsedTimer.elapsed())).toStdString()<<std::endl;
     m_answeredTimes.append(m_stimulationWaitingForAnswerElapsedTimer.elapsed());
     return answer;                       //超出时间应答
 }
@@ -1135,7 +1157,6 @@ void StaticCheck::waitAndProcessAnswer()
     else
     {
         answerResult=qrand()%100<50;
-    //    answerResult=true;
         UtilitySvc::wait(100);
     }
     //    QThread::msleep(1000);
@@ -1541,6 +1562,7 @@ void CheckSvcWorker::initialize()
         ((DynamicCheck*)m_check.data())->m_dynamicSelectedDots=m_dynamicSelectedDots;
 //        UtilitySvc::wait(2000);    //等几秒启动
     }
+    m_check->m_deviceOperation->lightUpCastLight();
 }
 
 void CheckSvcWorker::prepareToCheck()
@@ -1689,6 +1711,14 @@ CheckSvc::CheckSvc(QObject *parent)
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::isDeviceReadyChanged,this,&CheckSvc::devReadyChanged);
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::castLightAdjustStatusChanged,this,&CheckSvc::castLightAdjustStatusChanged);
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::pupilDiameterChanged,this,&CheckSvc::pupilDiameterChanged);
+
+    connect(&m_castLightDimdownTimer,&QTimer::timeout,[&]()
+    {
+        if(m_checkState>=3)
+            DevOps::DeviceOperation::getSingleton()->dimDownCastLight();
+    });
+    m_castLightDimdownTimer.setInterval(30000);
+    m_castLightDimdownTimer.start();
 //    connectDev();
 }
 
@@ -1795,7 +1825,8 @@ void CheckSvc::enterCheck()
 {
     qDebug()<<"trunOnVideo";
     DevOps::DeviceOperation::getSingleton()->turnOnVideo();
-    DevOps::DeviceOperation::getSingleton()->lightUpCastLight();
+//    DevOps::DeviceOperation::getSingleton()->lightUpCastLight();
+    m_atCheckingPage=true;
 }
 
 void CheckSvc::leaveCheck()
@@ -1803,6 +1834,12 @@ void CheckSvc::leaveCheck()
     qDebug()<<"trunOffVideo";
     DevOps::DeviceOperation::getSingleton()->turnOffVideo();
     DevOps::DeviceOperation::getSingleton()->dimDownCastLight();
+    m_atCheckingPage=false;
+}
+
+void CheckSvc::castlightUp()
+{
+    if(m_atCheckingPage) DevOps::DeviceOperation::getSingleton()->lightUpCastLight();
 }
 
 bool CheckSvc::getDevReady()

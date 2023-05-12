@@ -723,9 +723,17 @@ Item{
                         if(i<dotList.length)
                         {
 //                            drawDot(dotList[i],"white");break;
+
                             switch (dBList[i])
                             {
-                            case -999:drawDot(dotList[i],"white");break;
+                            case -999:
+                                if(i===currentCheckingDotIndex)
+                                {
+                                    drawDot(dotList[i],"blue");
+                                }
+                                else
+                                    drawDot(dotList[i],"white");
+                                break;
                             case 0:drawUnseen(dotList[i]);break;
                             case 1:drawWeakSeen(dotList[i]);break;
                             case 2:drawSeen(dotList[i]);break;

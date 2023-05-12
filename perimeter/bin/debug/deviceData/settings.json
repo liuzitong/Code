@@ -9,7 +9,7 @@
     "pupilPixelDiameterLimit":40,
     "pupilDiameterPixelToMillimeterConstant":0.171875,
     "pupilDiameterPixelToFixationDeviationConstant":0.25,
-    "motorSpeed":[3,3,1,1,1,1,1],
+    "motorSpeed":[3,3,1,7,7,1,1],
     "castLightDADifference":50,
     "castLightDAChangeStep":10,
     "castLightTargetDA":15000,

@@ -17,6 +17,11 @@ Rectangle {
     property string language:IcUiQmlApi.appCtrl.settings.language
     property var currentPatient: patientPage.currentPatient;
 
+    MouseArea{anchors.fill: parent;hoverEnabled: true;
+        onMouseXChanged: {console.log("posChanged");if(checkPage.visible==true){IcUiQmlApi.appCtrl.checkSvc.castlightUp()}}
+        onMouseYChanged: {console.log("posChanged");if(checkPage.visible==true){IcUiQmlApi.appCtrl.checkSvc.castlightUp()}}
+    }
+
     Settings{id:settings;anchors.fill: parent;}
 
     About{id:about;anchors.fill: parent;}
