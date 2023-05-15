@@ -56,6 +56,7 @@ public:
     int m_falsePositiveDecDB;
     bool m_checkFalseNegAndPos;
     double m_VFImultiplier;
+    float m_checkZoneRatial;
     QSize m_realTimeEyePosPicSize;
 
     QVector<QVector<QVector<int>>> m_value_30d_cursorSize_cursorColor;

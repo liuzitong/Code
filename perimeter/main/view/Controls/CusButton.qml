@@ -18,7 +18,7 @@ Item{
     property string pressImageSrc: ""
     property double imageHightScale: 0.6
     property bool isAnime: true
-    property int animationDuration: 150
+    property int animationDuration: 50
     property alias image: image;
     property alias rec: rec;
     property alias underImageText: imageText;

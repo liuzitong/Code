@@ -85,7 +85,7 @@ public slots:
     void workOnNewFrameData();
     void workOnNewProfile();
     void workOnNewConfig();
-    void workOnWorkStatusChanged();
+    void workOnWorkStatusChanged(int status);
     void connectOrdisConnectDev();
 signals:
     void workStatusChanged();

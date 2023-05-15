@@ -9,6 +9,7 @@ Item{
     property var currentCheckResult:null;
     property int clickedDotIndex: -1;
     property int currentCheckingDotIndex: IcUiQmlApi.appCtrl.checkSvc.currentCheckingDotIndex;
+    property int nextCheckingDotIndex: IcUiQmlApi.appCtrl.checkSvc.nextCheckingDotIndex;
     property alias testOver:displayCanvas.testOver;
     property int os_od: 0;
     property var dynamicSelectedDots:[];
@@ -28,7 +29,8 @@ Item{
 //        console.log(currentCheckingDotIndex);
     }
 
-    onCurrentCheckingDotIndexChanged: { displayCanvas.requestPaint();}
+    onCurrentCheckingDotIndexChanged: {displayCanvas.requestPaint();}
+    onNextCheckingDotIndexChanged: {displayCanvas.requestPaint();}
 
 
     function resetInputDot()
@@ -684,6 +686,10 @@ Item{
                             {
                                 if(i===currentCheckingDotIndex)
                                 {
+                                    drawDot(dotList[i],"red");
+                                }
+                                else if(i===nextCheckingDotIndex)
+                                {
                                     drawDot(dotList[i],"blue");
                                 }
                                 else
@@ -727,13 +733,17 @@ Item{
                             switch (dBList[i])
                             {
                             case -999:
-                                if(i===currentCheckingDotIndex)
-                                {
-                                    drawDot(dotList[i],"blue");
-                                }
-                                else
-                                    drawDot(dotList[i],"white");
-                                break;
+                            if(i===currentCheckingDotIndex)
+                            {
+                                drawDot(dotList[i],"red");
+                            }
+                            else if(i===nextCheckingDotIndex)
+                            {
+                                drawDot(dotList[i],"blue");
+                            }
+                            else
+                                drawDot(dotList[i],"white");
+                            break;
                             case 0:drawUnseen(dotList[i]);break;
                             case 1:drawWeakSeen(dotList[i]);break;
                             case 2:drawSeen(dotList[i]);break;

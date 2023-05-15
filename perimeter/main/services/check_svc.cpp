@@ -108,6 +108,7 @@ public:
 
 signals:
     void currentCheckingDotChanged(int index);
+    void nextCheckingDotChanged(int index);
 
 private:
     std::tuple<bool,QPointF,int> getCheckCycleLocAndDB();
@@ -240,6 +241,7 @@ signals:
     void sendErrorInfo(QString error);
     void stop();
     void currentCheckingDotChanged(int index);
+    void nextCheckingDotChanged(int index);
     void readyToCheck(bool isReady);
 
 };
@@ -366,6 +368,7 @@ void StaticCheck::Checkprocess()
 {
 
     m_alreadyChecked=false;
+    int stimulationIndex;
     auto checkCycleLocAndDB=getCheckCycleLocAndDB();                //存储LastdotType为各种检查
     if(m_error==true) return;                                       //找不到盲点 退出检查
     if(std::get<0>(checkCycleLocAndDB))
@@ -373,14 +376,15 @@ void StaticCheck::Checkprocess()
 //        qDebug()<<"checkCycleLocAndDB loc:"<<std::get<1>(checkCycleLocAndDB)<<" DB"<<std::get<2>(checkCycleLocAndDB);
         m_lastCheckDotRecord.push_back(nullptr);
         getReadyToStimulate(std::get<1>(checkCycleLocAndDB),std::get<2>(checkCycleLocAndDB));
-        emit currentCheckingDotChanged(-1);
+        emit nextCheckingDotChanged(-1);
     }
     else
     {
         m_lastCheckDotRecord.push_back(&getCheckDotRecordRef());   //存储lastDotType为commondot 并且存储指针
 //        qDebug()<<"getCheckDotRecordRef loc:"<<dotRec->loc<<" DB:"<<QString::number(dotRec->StimulationDBs.last())<<"upper:"<<QString::number(dotRec->upperBound)<<"lower:"<<QString::number(dotRec->lowerBound);
 
-        emit currentCheckingDotChanged(m_lastCheckDotRecord.last()->index);
+        stimulationIndex=m_lastCheckDotRecord.last()->index;
+        emit nextCheckingDotChanged(stimulationIndex);
         getReadyToStimulate(m_lastCheckDotRecord.last()->loc,m_lastCheckDotRecord.last()->StimulationDBs.last());
 
 
@@ -416,6 +420,7 @@ void StaticCheck::Checkprocess()
             stimulate();
             m_stimulationCount++;
             m_stimulated=true;
+            emit currentCheckingDotChanged(stimulationIndex);
 //        }
     }
 }
@@ -424,6 +429,7 @@ void StaticCheck::finished()
 {
     m_deviceOperation->m_isChecking=false;
     emit currentCheckingDotChanged(-1);
+    emit nextCheckingDotChanged(-1);
     lightsOff();
     UtilitySvc::wait(1000);
     lightsOn();
@@ -499,14 +505,43 @@ StaticCheck::DotRecord &StaticCheck::getCheckDotRecordRef()
 //        for(int i=0;i<(zoneRightBottom.count());i++) zone.push_back(1);
 //        for(int i=0;i<(zoneLeftBottom.count());i++) zone.push_back(2);
 //        for(int i=0;i<(zoneLeftTop.count());i++) zone.push_back(3);
-        zone.append(QVector<int>(zoneRightTop.count(),0));
-        zone.append(QVector<int>(zoneRightBottom.count(),1));
-        zone.append(QVector<int>(zoneLeftBottom.count(),2));
-        zone.append(QVector<int>(zoneLeftTop.count(),3));
 
 
+        int zoneNumber;
 
-        auto zoneNumber=zone[qrand()%zone.size()];                                                  //随机出区域和参考点坐标
+//        QVector<int> arr={zoneRightTop.count(),zoneRightBottom.count(),zoneLeftBottom.count(),zoneLeftTop.count()};
+//        QPair<int,int> maxUnCheckedZone{INT_MIN,-1},minUnCheckedZone{INT_MAX,-1};
+
+//        for(int i=0;i<arr.length();i++)
+//        {
+//            if(arr[i]>maxUnCheckedZone.first)
+//            {
+//                maxUnCheckedZone.first=arr[i];
+//                maxUnCheckedZone.second=i;
+//            }
+
+//            if(arr[i]<minUnCheckedZone.first)
+//            {
+//                minUnCheckedZone.first=arr[i];
+//                minUnCheckedZone.second=i;
+//            }
+//        }
+
+//        //随机出区域和参考点坐标
+//        if(float(maxUnCheckedZone.first)/float(minUnCheckedZone.first)>UtilitySvc::getSingleton()->m_checkZoneRatial)
+//        {
+//            zoneNumber=maxUnCheckedZone.second;
+//        }
+//        else
+//        {
+            zone.append(QVector<int>(zoneRightTop.count(),0));
+            zone.append(QVector<int>(zoneRightBottom.count(),1));
+            zone.append(QVector<int>(zoneLeftBottom.count(),2));
+            zone.append(QVector<int>(zoneLeftTop.count(),3));
+            zoneNumber=zone[qrand()%zone.size()];
+//        }
+
+
         QVector<DotRecord> seletedZoneRecords;
         QVector<DotRecord> seletedZoneCheckedRecords;
         QPointF centerCoord;
@@ -1157,6 +1192,7 @@ void StaticCheck::waitAndProcessAnswer()
     else
     {
         answerResult=qrand()%100<50;
+//        answerResult=false;
         UtilitySvc::wait(100);
     }
     //    QThread::msleep(1000);
@@ -1576,6 +1612,7 @@ void CheckSvcWorker::prepareToCheck()
         m_check->m_patientModel=m_patientVm->getModel();
         ((StaticCheck*)m_check.data())->m_programModel=static_cast<StaticProgramVm*>(m_programVm)->getModel();
         connect(((StaticCheck*)m_check.data()),&StaticCheck::currentCheckingDotChanged,this,&CheckSvcWorker::currentCheckingDotChanged);
+        connect(((StaticCheck*)m_check.data()),&StaticCheck::nextCheckingDotChanged,this,&CheckSvcWorker::nextCheckingDotChanged);
         auto cursorSize=((StaticCheck*)m_check.data())->m_programModel->m_params.commonParams.cursorSize;
         auto cursorColor=((StaticCheck*)m_check.data())->m_programModel->m_params.commonParams.cursorColor;
         m_check->lightsOff();
@@ -1700,7 +1737,8 @@ CheckSvc::CheckSvc(QObject *parent)
     connect(m_worker,&CheckSvcWorker::checkedCountChanged,this, &CheckSvc::setCheckedCount);
     connect(m_worker,&CheckSvcWorker::totalCountChanged,this, &CheckSvc::setTotalCount);
     connect(m_worker,&CheckSvcWorker::checkTimeChanged,this, &CheckSvc::setCheckTime);
-    connect(m_worker,&CheckSvcWorker::currentCheckingDotChanged,[&](int value){m_currentCheckingDotIndex=value;emit currentCheckingDotIndexChanged();});
+    connect(m_worker,&CheckSvcWorker::currentCheckingDotChanged,[&](int value){m_currentCheckingDotIndex=value;qDebug()<<value;emit currentCheckingDotIndexChanged();});
+    connect(m_worker,&CheckSvcWorker::nextCheckingDotChanged,[&](int value){m_nextCheckingDotIndex=value;emit nextCheckingDotIndexChanged();});
     connect(m_worker,&CheckSvcWorker::sendErrorInfo,this, [](QString errorInfo)
     {
         QMessageBox msgBox;

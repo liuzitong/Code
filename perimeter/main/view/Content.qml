@@ -18,8 +18,8 @@ Rectangle {
     property var currentPatient: patientPage.currentPatient;
 
     MouseArea{anchors.fill: parent;hoverEnabled: true;
-        onMouseXChanged: {console.log("posChanged");if(checkPage.visible==true){IcUiQmlApi.appCtrl.checkSvc.castlightUp()}}
-        onMouseYChanged: {console.log("posChanged");if(checkPage.visible==true){IcUiQmlApi.appCtrl.checkSvc.castlightUp()}}
+        onMouseXChanged: {if(checkPage.visible==true){IcUiQmlApi.appCtrl.checkSvc.castlightUp()}}
+        onMouseYChanged: {if(checkPage.visible==true){IcUiQmlApi.appCtrl.checkSvc.castlightUp()}}
     }
 
     Settings{id:settings;anchors.fill: parent;}

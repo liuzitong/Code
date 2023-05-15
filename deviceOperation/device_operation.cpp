@@ -57,42 +57,11 @@ void DeviceOperation::connectOrdisConnectDev()
         quint32 vid_pid=deviceSettings->m_VID.toInt(nullptr,16)<<16|deviceSettings->m_PID.toInt(nullptr,16);
         m_devCtl.reset(UsbDev::DevCtl::createInstance(vid_pid));
         connect(m_devCtl.data(),&UsbDev::DevCtl::workStatusChanged,this,&DeviceOperation::workOnWorkStatusChanged);
-        connect(m_devCtl.data(),&UsbDev::DevCtl::updateInfo,this,&DeviceOperation::updateDevInfo);
-//        connect(m_devCtl.data(),&UsbDev::DevCtl::updateIOInfo,this,&DeviceOperation::updateDevInfo);
-        connect(m_devCtl.data(),&UsbDev::DevCtl::newStatusData,this,&DeviceOperation::workOnNewStatuData);
-        connect(m_devCtl.data(),&UsbDev::DevCtl::newFrameData,this,&DeviceOperation::workOnNewFrameData);
-        connect(m_devCtl.data(),&UsbDev::DevCtl::newProfile,this,&DeviceOperation::workOnNewProfile);
-        connect(m_devCtl.data(),&UsbDev::DevCtl::newConfig,this,&DeviceOperation::workOnNewConfig);
-        waitForSomeTime(8000);
-        if(m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_OK)
-        {
-            qDebug()<<"Connect Successfully.";
-            updateDevInfo("Connect Successfully.");
-            adjustCastLight();
-        }
-        else
-        {
-            disconnect(m_devCtl.data(),&UsbDev::DevCtl::workStatusChanged,this,&DeviceOperation::workOnWorkStatusChanged);
-            disconnect(m_devCtl.data(),&UsbDev::DevCtl::updateInfo,this,&DeviceOperation::updateDevInfo);
-            disconnect(m_devCtl.data(),&UsbDev::DevCtl::newStatusData,this,&DeviceOperation::workOnNewStatuData);
-            disconnect(m_devCtl.data(),&UsbDev::DevCtl::newFrameData,this,&DeviceOperation::workOnNewFrameData);
-            disconnect(m_devCtl.data(),&UsbDev::DevCtl::newProfile,this,&DeviceOperation::workOnNewProfile);
-            disconnect(m_devCtl.data(),&UsbDev::DevCtl::newConfig,this,&DeviceOperation::workOnNewConfig);
-            m_devCtl.reset(nullptr);
-        }
     }
     if(!m_connectDev&&m_devCtl!=nullptr)
     {
-        qDebug()<<"stopConnect";
-        disconnect(m_devCtl.data(),&UsbDev::DevCtl::workStatusChanged,this,&DeviceOperation::workOnWorkStatusChanged);
-        disconnect(m_devCtl.data(),&UsbDev::DevCtl::updateInfo,this,&DeviceOperation::updateDevInfo);
-        disconnect(m_devCtl.data(),&UsbDev::DevCtl::newStatusData,this,&DeviceOperation::workOnNewStatuData);
-        disconnect(m_devCtl.data(),&UsbDev::DevCtl::newFrameData,this,&DeviceOperation::workOnNewFrameData);
-        disconnect(m_devCtl.data(),&UsbDev::DevCtl::newProfile,this,&DeviceOperation::workOnNewProfile);
-        disconnect(m_devCtl.data(),&UsbDev::DevCtl::newConfig,this,&DeviceOperation::workOnNewConfig);
         m_devCtl.reset(nullptr);
         setIsDeviceReady(false);
-        m_connectDev=false;
     }
 }
 
@@ -141,10 +110,11 @@ void DeviceOperation::setCursorColorAndCursorSize(int color, int spot)
     int  spot_Circl_Motor_Steps=profile.motorRange(UsbDev::DevCtl::MotorId_Light_Spot).second-profile.motorRange(UsbDev::DevCtl::MotorId_Light_Spot).first;
     {
         int focalPos=config.focusPosForSpotAndColorChangeRef();
-        int motorPos[5]{0,0,focalPos,m_statusData.motorPosition(UsbDev::DevCtl::MotorId::MotorId_Color)+color_Circl_Motor_Steps*10,m_statusData.motorPosition(UsbDev::DevCtl::MotorId::MotorId_Light_Spot)+spot_Circl_Motor_Steps*10};
+        int motorPos[5]{0,0,focalPos,color_Circl_Motor_Steps*10,spot_Circl_Motor_Steps*10};
         waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
          //移动焦距电机电机到联动位置,一边转动颜色和光斑
-        m_devCtl->move5Motors(std::array<quint8, 5>{0,0,sps[2],1,1}.data(),motorPos);
+        m_devCtl->move5Motors(std::array<quint8, 5>{0,0,sps[2],0,0}.data(),motorPos);
+        m_devCtl->move5Motors(std::array<quint8, 5>{0,0,0,1,1}.data(),motorPos,UsbDev::DevCtl::MoveMethod::Relative);
         //焦距电机停止就停止,颜色和光斑
         waitMotorStop({UsbDev::DevCtl::MotorId_Focus});
         m_devCtl->move5Motors(std::array<quint8, 5>{1,1,1,1,1}.data(),std::array<int, 5>{0,0,0,0,0}.data(),UsbDev::DevCtl::MoveMethod::Relative);
@@ -343,8 +313,9 @@ void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB,bool
     waitForSomeTime(180);
     while(qAbs(m_statusData.motorPosition(UsbDev::DevCtl::MotorId_Shutter)-m_config.shutterOpenPosRef())<20)
     {
-        QCoreApplication::processEvents();
+        QApplication::processEvents();
     }
+    waitForSomeTime(50);
 //    std::cout<<"done waiting"<<std::endl;
     move5Motors(isMotorMove,motorPos);
 }
@@ -772,16 +743,51 @@ void DeviceOperation::workOnNewConfig()
     }
 }
 
-
-
-void DeviceOperation::workOnWorkStatusChanged()
+void DeviceOperation::workOnWorkStatusChanged(int status)
 {
-    if(m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_Disconnected)
+    if(m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_OK)
     {
+        qDebug()<<"in connecting.";
+    }
+    if(m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_OK)
+    {
+        qDebug()<<"Connect Successfully.";
+        updateDevInfo("Connect Successfully.");
+        connect(m_devCtl.data(),&UsbDev::DevCtl::updateInfo,this,&DeviceOperation::updateDevInfo);
+        connect(m_devCtl.data(),&UsbDev::DevCtl::newStatusData,this,&DeviceOperation::workOnNewStatuData);
+        connect(m_devCtl.data(),&UsbDev::DevCtl::newFrameData,this,&DeviceOperation::workOnNewFrameData);
+        connect(m_devCtl.data(),&UsbDev::DevCtl::newProfile,this,&DeviceOperation::workOnNewProfile);
+        connect(m_devCtl.data(),&UsbDev::DevCtl::newConfig,this,&DeviceOperation::workOnNewConfig);
+        waitForSomeTime(8000);
+        adjustCastLight();
+    }
+    else if(m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_Disconnected||m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_Disconnected)
+    {
+        if(m_devCtl!=nullptr)
+        {
+            disconnect(m_devCtl.data(),&UsbDev::DevCtl::workStatusChanged,this,&DeviceOperation::workOnWorkStatusChanged);
+            disconnect(m_devCtl.data(),&UsbDev::DevCtl::updateInfo,this,&DeviceOperation::updateDevInfo);
+            disconnect(m_devCtl.data(),&UsbDev::DevCtl::newStatusData,this,&DeviceOperation::workOnNewStatuData);
+            disconnect(m_devCtl.data(),&UsbDev::DevCtl::newFrameData,this,&DeviceOperation::workOnNewFrameData);
+            disconnect(m_devCtl.data(),&UsbDev::DevCtl::newProfile,this,&DeviceOperation::workOnNewProfile);
+            disconnect(m_devCtl.data(),&UsbDev::DevCtl::newConfig,this,&DeviceOperation::workOnNewConfig);
+            m_devCtl.reset(nullptr);
+        }
         setIsDeviceReady(false);
-        connectDev();
     }
     emit workStatusChanged();
 }
+
+
+
+//void DeviceOperation::workOnWorkStatusChanged()
+//{
+//    if(m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_Disconnected)
+//    {
+//        setIsDeviceReady(false);
+//        connectDev();
+//    }
+//    emit workStatusChanged();
+//}
 }
 

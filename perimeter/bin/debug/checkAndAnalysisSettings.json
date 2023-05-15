@@ -6,6 +6,7 @@
     "VFImultiplier":1.0,
     "checkFalseNegAndPos":true,
     "realTimeEyePosPicSize":"320*240",
+    "checkZoneRatial":1.2,
     "boundaryOne":
     {
         "center":{"x":-25,"y":0},
