@@ -107,7 +107,7 @@ UtilitySvc::UtilitySvc()
         m_falsePositiveDecDB=jo["falsePositiveAddDB"].toInt();
         m_VFImultiplier=jo["VFImultiplier"].toDouble();
         m_checkFalseNegAndPos=jo["checkFalseNegAndPos"].toBool();
-        m_checkZoneRatial=jo["checkZoneRatial"].toBool();
+        m_checkZoneRatio=jo["checkZoneRatio"].toDouble();
         QStringList strs=jo["realTimeEyePosPicSize"].toString().split("*");
         if(strs.size()==2)
         {

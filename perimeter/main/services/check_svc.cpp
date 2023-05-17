@@ -438,6 +438,7 @@ void StaticCheck::finished()
 
 StaticCheck::DotRecord &StaticCheck::getCheckDotRecordRef()
 {
+    qsrand(QTime::currentTime().msecsSinceStartOfDay());
     m_lastCheckeDotType.push_back(LastCheckedDotType::commonCheckDot);
 
     if(m_resultModel->m_params.commonParams.centerDotCheck==true&&m_centerDotRecord.checked==false)
@@ -499,41 +500,45 @@ StaticCheck::DotRecord &StaticCheck::getCheckDotRecordRef()
 
 
         int zoneNumber;
-
+//        int zoneNumberExclued=-1;
         QVector<int> arr={zoneRightTop.count(),zoneRightBottom.count(),zoneLeftBottom.count(),zoneLeftTop.count()};
-        QPair<int,int> maxUnCheckedZone{INT_MIN,-1},minUnCheckedZone{INT_MAX,-1};
+//        QPair<int,int> maxUnCheckedZone{INT_MIN,-1}/*,minUnCheckedZone{INT_MAX,-1}*/;
+
+        int maxCheckedCount=INT_MIN;
 
         for(int i=0;i<arr.length();i++)
         {
-            if(arr[i]>maxUnCheckedZone.first)
+            if(arr[i]>maxCheckedCount)
             {
-                maxUnCheckedZone.first=arr[i];
-                maxUnCheckedZone.second=i;
+                maxCheckedCount=arr[i];
+//                maxUnCheckedZone.second=i;
             }
 
-            if(arr[i]<minUnCheckedZone.first)
-            {
-                minUnCheckedZone.first=arr[i];
-                minUnCheckedZone.second=i;
-            }
+//            if(arr[i]<minUnCheckedZone.first)
+//            {
+//                minUnCheckedZone.first=arr[i];
+//                minUnCheckedZone.second=i;
+//            }
         }
+
 
 
         //随机出区域和参考点坐标
-        if(/*(maxUnCheckedZone.first-minUnCheckedZone.first)>5&&(*/float(maxUnCheckedZone.first)/float(minUnCheckedZone.first)/*)*/>UtilitySvc::getSingleton()->m_checkZoneRatial)
-        {
-            zoneNumber=maxUnCheckedZone.second;
-        }
-        else
-        {
-            zone.append(QVector<int>(zoneRightTop.count(),0));
-            zone.append(QVector<int>(zoneRightBottom.count(),1));
-            zone.append(QVector<int>(zoneLeftBottom.count(),2));
-            zone.append(QVector<int>(zoneLeftTop.count(),3));
-            zoneNumber=zone[qrand()%zone.size()];
-        }
+//        if(/*(maxUnCheckedZone.first-minUnCheckedZone.first)>5&&(*/float(maxUnCheckedZone.first)/float(minUnCheckedZone.first)/*)*/>UtilitySvc::getSingleton()->m_checkZoneRatio)
+//        {
+//            zoneNumberExclued=minUnCheckedZone.second;
+//        }
 
+        if(float(maxCheckedCount)/float(zoneRightTop.count())<UtilitySvc::getSingleton()->m_checkZoneRatio) zone.append(QVector<int>(zoneRightTop.count(),0));
+        if(float(maxCheckedCount)/float(zoneRightBottom.count())<UtilitySvc::getSingleton()->m_checkZoneRatio) zone.append(QVector<int>(zoneRightBottom.count(),1));
+        if(float(maxCheckedCount)/float(zoneLeftBottom.count())<UtilitySvc::getSingleton()->m_checkZoneRatio) zone.append(QVector<int>(zoneLeftBottom.count(),2));
+        if(float(maxCheckedCount)/float(zoneLeftTop.count())<UtilitySvc::getSingleton()->m_checkZoneRatio) zone.append(QVector<int>(zoneLeftTop.count(),3));
 
+        zoneNumber=zone[qrand()%zone.size()];
+//        qDebug()<<UtilitySvc::getSingleton()->m_checkZoneRatio;
+//        qDebug()<<float(maxUnCheckedZone.first)/float(minUnCheckedZone.first);
+//        qDebug()<<maxUnCheckedZone;
+//        qDebug()<<minUnCheckedZone;
         QVector<DotRecord> seletedZoneRecords;
         QVector<DotRecord> seletedZoneCheckedRecords;
         QPointF centerCoord;

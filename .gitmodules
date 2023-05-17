@@ -1,0 +1,3 @@
+[submodule "perimeter/third-part/LimeReport"]
+	path = perimeter/third-part/LimeReport
+	url = https://github.com/fralx/LimeReport.git
