@@ -2,7 +2,7 @@
     "PID": "b0b0",
     "VID": "ffff",
     "castLightDAChangeStep": 10,
-    "castLightDAChanged": 200,
+    "castLightDAChanged": 160,
     "castLightDADifference": 50,
     "castLightTargetColor": 0,
     "castLightTargetDA": 15000,

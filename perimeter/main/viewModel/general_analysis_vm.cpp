@@ -6,6 +6,10 @@
 #include "perimeter/main/appctrl/perimeter_appctrl.hxx"
 #include "perimeter/third-part/qxpack/indcom/ui_qml_base/qxpack_ic_ui_qml_api.hxx"
 #include <perimeter/main/services/translate_svc.h>
+
+
+
+
 namespace Perimeter {
 class ThresholdAnalysisResult : public QObject
 {
@@ -149,6 +153,8 @@ StaticAnalysisVm::StaticAnalysisVm(const QVariantList &args)
         analysisMethodSvc->drawScreening(m_values,m_locs,m_range,m_OS_OD,img,0.8);img.save(m_previewFolder+"Screening.bmp");
 
     }
+
+
 }
 
 StaticAnalysisVm::~StaticAnalysisVm()
@@ -275,10 +281,11 @@ void StaticAnalysisVm::showReport(int report)
         filePath="./reports/Screening.lrxml";
     }
 
-    auto reportEngine = QSharedPointer<LimeReport::ReportEngine>(new LimeReport::ReportEngine());
-    if(!TranslateController::isRuntimeLangEng())  reportEngine->setReportLanguage(QLocale::Chinese);
-    reportEngine->loadFromFile(filePath);
-    auto manager=reportEngine->dataManager();
+//    auto reportEngine = QSharedPointer<LimeReport::ReportEngine>(new LimeReport::ReportEngine());
+    if(UtilitySvc::reportEngine==nullptr) UtilitySvc::reportEngine=new  LimeReport::ReportEngine();
+    UtilitySvc::reportEngine->loadFromFile(filePath);
+    if(!TranslateController::isRuntimeLangEng())  UtilitySvc::reportEngine->setReportLanguage(QLocale::Chinese);
+    auto manager=UtilitySvc::reportEngine->dataManager();
     manager->clearUserVariables();
     manager->setReportVariable("ProgramName",TranslateController::getTranlatedName(m_program.m_name));
     manager->setReportVariable("OS_OD",m_checkResult.m_OS_OD==0?"OS":"OD");
@@ -379,9 +386,9 @@ void StaticAnalysisVm::showReport(int report)
     manager->setReportVariable("deviceInfo",tr("Device info")+QString(":")+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("deviceInfo").toString());
     manager->setReportVariable("version", tr("Version")+QString(":")+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("version").toString());
 
-    reportEngine->setShowProgressDialog(true);
-    reportEngine->setPreviewScaleType(LimeReport::ScaleType::Percents,50);
-    reportEngine->previewReport(/*LimeReport::PreviewHint::ShowAllPreviewBars*/);
+    UtilitySvc::reportEngine->setShowProgressDialog(true);
+    UtilitySvc::reportEngine->setPreviewScaleType(LimeReport::ScaleType::Percents,50);
+    UtilitySvc::reportEngine->previewReport(/*LimeReport::PreviewHint::ShowAllPreviewBars*/);
 }
 
 QObject *StaticAnalysisVm::getResult()
@@ -449,17 +456,17 @@ void DynamicAnalysisVm::showReport(int report)
     analysisMethodSvc->drawFixationDeviation(m_fixationValues,imgFixation);imgFixation.save(m_reportFolder+"FixationDeviation.bmp");
 
 
-    auto reportEngine = QSharedPointer<LimeReport::ReportEngine>(new LimeReport::ReportEngine());
-    if(!TranslateController::isRuntimeLangEng())  reportEngine->setReportLanguage(QLocale::Chinese);
+    if(UtilitySvc::reportEngine==nullptr) UtilitySvc::reportEngine=new  LimeReport::ReportEngine();
+    if(!TranslateController::isRuntimeLangEng())  UtilitySvc::reportEngine->setReportLanguage(QLocale::Chinese);
     if(report==0)
     {
-        reportEngine->loadFromFile("./reports/Dynamic.lrxml");
+        UtilitySvc::reportEngine->loadFromFile("./reports/Dynamic.lrxml");
     }
     else
     {
-        reportEngine->loadFromFile("./reports/DynamicDotsInfo.lrxml");
+        UtilitySvc::reportEngine->loadFromFile("./reports/DynamicDotsInfo.lrxml");
     }
-    auto manager=reportEngine->dataManager();
+    auto manager=UtilitySvc::reportEngine->dataManager();
     manager->clearUserVariables();
     manager->setReportVariable("ProgramName",TranslateController::getTranlatedName(m_program.m_name));
     manager->setReportVariable("OS_OD",m_checkResult.m_OS_OD==0?"OS":"OD");
@@ -524,9 +531,9 @@ void DynamicAnalysisVm::showReport(int report)
     manager->setReportVariable("version", tr("Version")+QString(":")+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("version").toString());
 
 
-    reportEngine->setShowProgressDialog(true);
-    reportEngine->setPreviewScaleType(LimeReport::ScaleType::Percents,50);
-    reportEngine->previewReport(/*LimeReport::PreviewHint::ShowAllPreviewBars*/);
+    UtilitySvc::reportEngine->setShowProgressDialog(true);
+    UtilitySvc::reportEngine->setPreviewScaleType(LimeReport::ScaleType::Percents,50);
+    UtilitySvc::reportEngine->previewReport(/*LimeReport::PreviewHint::ShowAllPreviewBars*/);
 }
 
 

@@ -1,5 +1,5 @@
-﻿import QtQuick 2.0
-import QtQml 2.2
+﻿import QtQml 2.2
+import QtQuick 2.0
 Item{
     id:root
     property string buttonColor: "#dcdee0";

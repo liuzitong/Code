@@ -214,14 +214,9 @@ Item{
                                                         if(isSelected)
                                                         {
                                                             imageSrc="qrc:/Pics/base-svg/btn_select_click.svg";/*patientInfoListView.seletedPatient.push(model.Id)*/model.isSelected=true;
-                                                            console.log(patientInfoListView.patientListModelVm.selectedCount);
-                                                            console.log(model.Id);
-                                                            console.log(currentPatient.id);
-                                                            console.log(model.Id!=currentPatient.id);
                                                         }
                                                         else{
                                                              imageSrc="qrc:/Pics/base-svg/btn_select_normal.svg";/*patientInfoListView.seletedPatient.pop(model.Id);*/model.isSelected=false;
-                                                             console.log(patientInfoListView.patientListModelVm.selectedCount);
                                                         }
 //                                                        patientInfoListView.seletedPatientLength=patientInfoListView.seletedPatient.length;
 //                                                        console.log(patientInfoListView.seletedPatient);
@@ -565,17 +560,11 @@ Item{
                     CusButton{text:lt+qsTr("Delete");
                         enabled: patientInfoListView.patientListModelVm.selectedCount>0;
                         onClicked: {
-//                            var pl=patientInfoListView.seletedPatient;
-//                            console.log(pl);
-//                            for(var i=0;i<pl.length;i++){
-//                                if(currentPatient==null||pl[i]!==currentPatient.id)
-//                                    patientInfoListView.patientListModelVm.deletePatient(pl[i]);
-//                            }
                             patientInfoListView.patientListModelVm.deletePatients();
                             query.startQuery();
                         }
                     }
-                    CusButton{text:lt+qsTr("View reports");enabled:currentPatient!==null;onClicked: {root.changePage("analysisLobby",{});}}
+                    CusButton{text:lt+qsTr("View reports");enabled:currentPatient!==null&&lastProgram!==null;onClicked: {root.changePage("analysisLobby",{});}}
                 }
             }
             Flow{height:parent.height; layoutDirection: Qt.RightToLeft;width:parent.width*0.4;spacing: height*0.8;

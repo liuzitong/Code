@@ -6,7 +6,7 @@
 #include <QVector>
 #include "perimeter/main/appctrl/perimeter_appctrl.hxx"
 #include "perimeter/third-part/qxpack/indcom/ui_qml_base/qxpack_ic_ui_qml_api.hxx"
-
+#include <perimeter/main/services/utility_svc.h>
 
 namespace Perimeter {
 
@@ -233,10 +233,10 @@ void ProgressAnalysisListVm::getProgressBaseLineReport(QString diagnosis)
     analysisSvc->drawBaseLine(mdList,startYear,endYear,months,img,true);img.save(m_reportFolder+"baseLine.bmp");
     analysisSvc->BaseLineAnalysis(mdList,months,avgMd,progressSpeedBase,progressSpeedDeviation,slopeType);
 
-    auto reportEngine = QSharedPointer<LimeReport::ReportEngine>(new LimeReport::ReportEngine());
-    if(!TranslateController::isRuntimeLangEng())  reportEngine->setReportLanguage(QLocale::Chinese);
-    reportEngine->loadFromFile("./reports/baseLine.lrxml");
-    auto manager=reportEngine->dataManager();
+   if(UtilitySvc::reportEngine==nullptr) UtilitySvc::reportEngine=new  LimeReport::ReportEngine();
+    if(!TranslateController::isRuntimeLangEng())  UtilitySvc::reportEngine->setReportLanguage(QLocale::Chinese);
+    UtilitySvc::reportEngine->loadFromFile("./reports/baseLine.lrxml");
+    auto manager=UtilitySvc::reportEngine->dataManager();
     manager->clearUserVariables();
     manager->setReportVariable("hospitalName",QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("hospitalName").toString());
     manager->setReportVariable("name",m_patient.m_name);
@@ -280,9 +280,9 @@ void ProgressAnalysisListVm::getProgressBaseLineReport(QString diagnosis)
     manager->setReportVariable("version", tr("Version")+": "+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("version").toString());
 
 
-    reportEngine->setShowProgressDialog(true);
-    reportEngine->setPreviewScaleType(LimeReport::ScaleType::Percents,50);
-    reportEngine->previewReport(/*LimeReport::PreviewHint::ShowAllPreviewBars*/);
+    UtilitySvc::reportEngine->setShowProgressDialog(true);
+    UtilitySvc::reportEngine->setPreviewScaleType(LimeReport::ScaleType::Percents,50);
+    UtilitySvc::reportEngine->previewReport(/*LimeReport::PreviewHint::ShowAllPreviewBars*/);
 
 }
 
@@ -326,10 +326,10 @@ void Perimeter::ProgressAnalysisListVm::getThreeFollowUpsReport(int index,QStrin
     }
 
 
-    auto reportEngine = QSharedPointer<LimeReport::ReportEngine>(new LimeReport::ReportEngine());
-    if(!TranslateController::isRuntimeLangEng())  reportEngine->setReportLanguage(QLocale::Chinese);
-    reportEngine->loadFromFile("./reports/threeFollowUps.lrxml");
-    auto manager=reportEngine->dataManager();
+    if(UtilitySvc::reportEngine==nullptr) UtilitySvc::reportEngine=new  LimeReport::ReportEngine();
+    if(!TranslateController::isRuntimeLangEng())  UtilitySvc::reportEngine->setReportLanguage(QLocale::Chinese);
+    UtilitySvc::reportEngine->loadFromFile("./reports/threeFollowUps.lrxml");
+    auto manager=UtilitySvc::reportEngine->dataManager();
     manager->clearUserVariables();
     manager->setReportVariable("hospitalName",QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("hospitalName").toString());
     manager->setReportVariable("name",m_patient.m_name);
@@ -370,9 +370,9 @@ void Perimeter::ProgressAnalysisListVm::getThreeFollowUpsReport(int index,QStrin
     manager->setReportVariable("version",tr("Version")+": "+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("version").toString());
 
 
-    reportEngine->setShowProgressDialog(true);
-    reportEngine->setPreviewScaleType(LimeReport::ScaleType::Percents,50);
-    reportEngine->previewReport(/*LimeReport::PreviewHint::ShowAllPreviewBars*/);
+    UtilitySvc::reportEngine->setShowProgressDialog(true);
+    UtilitySvc::reportEngine->setPreviewScaleType(LimeReport::ScaleType::Percents,50);
+    UtilitySvc::reportEngine->previewReport(/*LimeReport::PreviewHint::ShowAllPreviewBars*/);
 }
 
 void Perimeter::ProgressAnalysisListVm::getSingleProgressReport(int index,QString diagnosis)
@@ -431,10 +431,10 @@ void Perimeter::ProgressAnalysisListVm::getSingleProgressReport(int index,QStrin
     analysisSvc->drawFixationDeviation(fixationValues,imgFixation);imgFixation.save(m_reportFolder+"FixationDeviation.bmp");
 
 
-    auto reportEngine = QSharedPointer<LimeReport::ReportEngine>(new LimeReport::ReportEngine());
-    if(!TranslateController::isRuntimeLangEng())  reportEngine->setReportLanguage(QLocale::Chinese);
-    reportEngine->loadFromFile("./reports/SingleProgress.lrxml");
-    auto manager=reportEngine->dataManager();
+    if(UtilitySvc::reportEngine==nullptr) UtilitySvc::reportEngine=new  LimeReport::ReportEngine();
+    if(!TranslateController::isRuntimeLangEng())  UtilitySvc::reportEngine->setReportLanguage(QLocale::Chinese);
+    UtilitySvc::reportEngine->loadFromFile("./reports/SingleProgress.lrxml");
+    auto manager=UtilitySvc::reportEngine->dataManager();
     manager->clearUserVariables();
     manager->setReportVariable("ProgramName",m_currentDataList[index].program);
     manager->setReportVariable("OS_OD",m_OS_OD==0?"OS":"OD");
@@ -502,9 +502,9 @@ void Perimeter::ProgressAnalysisListVm::getSingleProgressReport(int index,QStrin
     manager->setReportVariable("deviceInfo",tr("Device info")+": "+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("deviceInfo").toString());
     manager->setReportVariable("version",tr("Version")+": "+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("version").toString());
 
-    reportEngine->setShowProgressDialog(true);
-    reportEngine->setPreviewScaleType(LimeReport::ScaleType::Percents,50);
-    reportEngine->previewReport(/*LimeReport::PreviewHint::ShowAllPreviewBars*/);
+    UtilitySvc::reportEngine->setShowProgressDialog(true);
+    UtilitySvc::reportEngine->setPreviewScaleType(LimeReport::ScaleType::Percents,50);
+    UtilitySvc::reportEngine->previewReport(/*LimeReport::PreviewHint::ShowAllPreviewBars*/);
 }
 
 

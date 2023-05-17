@@ -6,6 +6,7 @@
 #include <QSharedPointer>
 #include <QVariant>
 #include <QSize>
+#include "perimeter/third-part/LimeReport/limereport/LimeReport"
 namespace Perimeter
 {
 class UtilitySvc:public QObject
@@ -18,6 +19,8 @@ public:
 
     QVariantList getBoundaries();
     int getBoundaryShowRange();
+
+    static LimeReport::ReportEngine* reportEngine;
 
     static QPointF convertPolarToOrth(QPointF loc);
 

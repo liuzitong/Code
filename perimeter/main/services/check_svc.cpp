@@ -495,51 +495,43 @@ StaticCheck::DotRecord &StaticCheck::getCheckDotRecordRef()
             }
         }
 
-//        if(zoneRightTop.count()>0) zone.push_back(0);
-//        if(zoneRightBottom.count()>0) zone.push_back(1);
-//        if(zoneLeftBottom.count()>0) zone.push_back(2);
-//        if(zoneLeftTop.count()>0) zone.push_back(3);
 
-        //这样谁剩的多 ,谁概率大
-//        for(int i=0;i<(zoneRightTop.count());i++) zone.push_back(0);
-//        for(int i=0;i<(zoneRightBottom.count());i++) zone.push_back(1);
-//        for(int i=0;i<(zoneLeftBottom.count());i++) zone.push_back(2);
-//        for(int i=0;i<(zoneLeftTop.count());i++) zone.push_back(3);
 
 
         int zoneNumber;
 
-//        QVector<int> arr={zoneRightTop.count(),zoneRightBottom.count(),zoneLeftBottom.count(),zoneLeftTop.count()};
-//        QPair<int,int> maxUnCheckedZone{INT_MIN,-1},minUnCheckedZone{INT_MAX,-1};
+        QVector<int> arr={zoneRightTop.count(),zoneRightBottom.count(),zoneLeftBottom.count(),zoneLeftTop.count()};
+        QPair<int,int> maxUnCheckedZone{INT_MIN,-1},minUnCheckedZone{INT_MAX,-1};
 
-//        for(int i=0;i<arr.length();i++)
-//        {
-//            if(arr[i]>maxUnCheckedZone.first)
-//            {
-//                maxUnCheckedZone.first=arr[i];
-//                maxUnCheckedZone.second=i;
-//            }
+        for(int i=0;i<arr.length();i++)
+        {
+            if(arr[i]>maxUnCheckedZone.first)
+            {
+                maxUnCheckedZone.first=arr[i];
+                maxUnCheckedZone.second=i;
+            }
 
-//            if(arr[i]<minUnCheckedZone.first)
-//            {
-//                minUnCheckedZone.first=arr[i];
-//                minUnCheckedZone.second=i;
-//            }
-//        }
+            if(arr[i]<minUnCheckedZone.first)
+            {
+                minUnCheckedZone.first=arr[i];
+                minUnCheckedZone.second=i;
+            }
+        }
 
-//        //随机出区域和参考点坐标
-//        if(float(maxUnCheckedZone.first)/float(minUnCheckedZone.first)>UtilitySvc::getSingleton()->m_checkZoneRatial)
-//        {
-//            zoneNumber=maxUnCheckedZone.second;
-//        }
-//        else
-//        {
+
+        //随机出区域和参考点坐标
+        if(/*(maxUnCheckedZone.first-minUnCheckedZone.first)>5&&(*/float(maxUnCheckedZone.first)/float(minUnCheckedZone.first)/*)*/>UtilitySvc::getSingleton()->m_checkZoneRatial)
+        {
+            zoneNumber=maxUnCheckedZone.second;
+        }
+        else
+        {
             zone.append(QVector<int>(zoneRightTop.count(),0));
             zone.append(QVector<int>(zoneRightBottom.count(),1));
             zone.append(QVector<int>(zoneLeftBottom.count(),2));
             zone.append(QVector<int>(zoneLeftTop.count(),3));
             zoneNumber=zone[qrand()%zone.size()];
-//        }
+        }
 
 
         QVector<DotRecord> seletedZoneRecords;

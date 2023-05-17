@@ -1,17 +1,16 @@
-#ifndef GENERAL_ANALYSIS_VM_H
+﻿#ifndef GENERAL_ANALYSIS_VM_H
 #define GENERAL_ANALYSIS_VM_H
 
 #include <QObject>
 #include <QVector>
 #include <perimeter/main/model/checkResultModel.h>
 #include <perimeter/main/model/patientmodel.h>
-#include "perimeter/third-part/LimeReport/limereport/LimeReport"
+
 namespace Perimeter {
-
-
-
 class StaticAnalysisVm: public QObject
 {
+
+
     Q_OBJECT
     Q_PROPERTY(int type READ getType)
     Q_PROPERTY(int selectedDotIndex READ getSelectedDotIndex NOTIFY selectedDotIndexChanged)
@@ -25,6 +24,8 @@ public:
     Q_INVOKABLE QObject* getResult();
 
     int getType(){return m_type;}
+
+
 private:
 
     QVector<int> m_values,m_fixationValues,m_dev,m_mDev,m_peDev,m_peMDev;
@@ -51,7 +52,6 @@ public:
 
     int getType(){return m_type;}
 private:
-    LimeReport::ReportEngine* m_reportEngine=nullptr;
     QString m_previewFolder="./previewImage/";
     QString m_reportFolder="./reportImage/";
     QVector<QPointF> m_values;

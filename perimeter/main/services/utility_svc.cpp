@@ -12,6 +12,8 @@
 namespace Perimeter
 {
 
+LimeReport::ReportEngine* UtilitySvc::reportEngine=nullptr;
+
 UtilitySvc::UtilitySvc()
 {
     {

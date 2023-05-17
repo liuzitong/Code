@@ -192,7 +192,7 @@ void AnalysisSvc::ThresholdAnalysis(int resultId,QVector<int>& dev,QVector<int>&
     QVector<int> value_30d=UtilitySvc::getSingleton()->getValue30d(cursorSize,cursorColor,patient.m_age);
 
 
-    qDebug()<<value_30d;
+//    qDebug()<<value_30d;
 
     QVector<int> pe_v5,pe_v2,pe_v1,pe_v05;
     if(cursorColor==2&&backGroundColor==1&&cursorSize==4)
@@ -251,7 +251,7 @@ void AnalysisSvc::ThresholdAnalysis(int resultId,QVector<int>& dev,QVector<int>&
         }
 
 
-        qDebug()<<sv[i];
+//        qDebug()<<sv[i];
 
 
         if(sv[i]>=0)
@@ -263,7 +263,7 @@ void AnalysisSvc::ThresholdAnalysis(int resultId,QVector<int>& dev,QVector<int>&
         }                                                   //dev 盲点
         else{ dev[i]=-99; }
 
-        qDebug()<<dev[i];
+//        qDebug()<<dev[i];
 
 
         if(dev[i]!=-99)
@@ -279,7 +279,7 @@ void AnalysisSvc::ThresholdAnalysis(int resultId,QVector<int>& dev,QVector<int>&
             peDev[i]=-99;
         }
 
-        qDebug()<<peDev[i];
+//        qDebug()<<peDev[i];
 
         if(sv[i]>0)
         {
