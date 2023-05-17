@@ -1715,6 +1715,7 @@ void CheckSvcWorker::doWork()
                 static_cast<DynamicCheckResultVm*>(m_checkResultVm)->getResultData()->setTestTimespan(m_time);
             }
             m_checkResultVm->insert();
+            m_patientVm->update();
             qDebug()<<("finished");
             emit checkProcessFinished();
             setCheckState(5);

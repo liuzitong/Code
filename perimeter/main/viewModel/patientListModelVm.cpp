@@ -1,6 +1,7 @@
-#include "patientListModelVm.h"
+﻿#include "patientListModelVm.h"
 #include "perimeter/base/common/perimeter_memcntr.hxx"
 #include <QList>
+#include <vector>
 
 
 namespace Perimeter{
@@ -12,18 +13,21 @@ enum PatientRoles
     name,
     birthDate,
     sex,
-    lastUpdate
+    lastUpdate,
+    isSelected
 };
+
 
 }
 namespace Perimeter{
 #define T_PrivPtr( o )  perimeter_objcast( PatientListModelVmPriv*, o )
-class PERIMETER_API PatientListModelVmPriv
+class PatientListModelVmPriv
 {
-private:
+public:
     PatientListModelVm* m_parent;
     Patient_List m_list;
-public:
+    QVector<bool> m_isSelected;
+
     PatientListModelVmPriv(PatientListModelVm* pa)
     {
         m_parent=pa;
@@ -33,6 +37,7 @@ public:
     {
         int index=idx.row();
         Patient_ptr pp=m_list[index];
+        bool isSelected=m_isSelected[index];
         switch (role)
         {
         case (PatientRoles::Id):return (int)pp->m_id;
@@ -41,8 +46,24 @@ public:
         case (PatientRoles::birthDate): return pp->m_birthDate.toString("yyyy/MM/dd");
         case (PatientRoles::sex): return static_cast<int>(pp->m_sex);
         case (PatientRoles::lastUpdate): return pp->m_lastUpdate;
+        case (PatientRoles::isSelected): return isSelected;
         default:return QVariant();
         }
+    }
+
+    bool setData(const QModelIndex &idx, const QVariant &value, int role)
+    {
+        int index=idx.row();
+        switch (role)
+        {
+        case (PatientRoles::isSelected):
+        {
+            m_isSelected[index]=value.toBool();
+            qDebug()<<"set Index";
+            return true;
+        }
+        }
+        return false;
     }
 
     QHash<int, QByteArray> roleNames() const
@@ -54,6 +75,7 @@ public:
            roles[birthDate] = "birthDate";
            roles[sex]="sex";
            roles[lastUpdate]="lastUpdate";
+           roles[isSelected]="isSelected";
            return roles;
     }
 
@@ -61,8 +83,23 @@ public:
     {
         m_parent->beginResetModel();
         m_list=patient_list;
+        m_isSelected=QVector<bool>(m_list.size(),false);
         m_parent->endResetModel();
     }
+
+    int getSelectedPatientCount()
+    {
+        int count=0;
+        for(auto&i:m_isSelected)
+        {
+            if(i==true)
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
 };
 
 PatientListModelVm::PatientListModelVm(const QVariantList &)
@@ -88,6 +125,13 @@ void PatientListModelVm::setPatientList(Patient_List patient_list)
     T_PrivPtr( m_obj )->setPatientList(patient_list);
 }
 
+bool PatientListModelVm::setData(const QModelIndex &idx, const QVariant &value, int role)
+{
+    T_PrivPtr( m_obj )->setData(idx,value,role);
+    emit selectedCountChanged();
+    return true;
+}
+
 int PatientListModelVm::rowCount(const QModelIndex &) const
 {
     return T_PrivPtr( m_obj )->RowCount();
@@ -101,6 +145,26 @@ QVariant PatientListModelVm::data(const QModelIndex &idx, int role) const
 QHash<int, QByteArray> PatientListModelVm::roleNames() const
 {
     return T_PrivPtr( m_obj )->roleNames();
+}
+
+int PatientListModelVm::getSelectedCount()
+{
+    return T_PrivPtr( m_obj )->getSelectedPatientCount();
+}
+
+void PatientListModelVm::deletePatients()
+{
+    auto& isSelected=T_PrivPtr( m_obj )->m_isSelected;
+    auto patientList=T_PrivPtr( m_obj )->m_list;
+    for(int i=0;i<isSelected.length();i++)
+    {
+        if(isSelected[i])
+        {
+            deletePatient(patientList[i]->m_id);
+        }
+    }
+    isSelected.clear();
+    emit selectedCountChanged();
 }
 
 //void PatientListModelVm::addPatient(QString patientId, QString name, int sex, QDate date,QDateTime updateTime)
@@ -130,6 +194,7 @@ void PatientListModelVm:: deletePatient(long id)
     qAssert(bCommit);
     db.commit();
 }
+
 
 void PatientListModelVm::getPatientListByTimeSpan(QDate from,QDate to)
 {
@@ -190,6 +255,7 @@ void PatientListModelVm::getPatientListByBirthDate(QDate date)
     setPatientList(Patient_List);
     emit patientListChanged();
 }
+
 
 
 //void PatientListModelVm::updatePatient(long id,QString patientId, QString name, int sex, QDate date)

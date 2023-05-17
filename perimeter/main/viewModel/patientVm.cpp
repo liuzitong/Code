@@ -94,6 +94,7 @@ PatientVm::~PatientVm()
 void PatientVm::update()
 {
     auto patient_ptr=getPatientData();
+    patient_ptr->m_lastUpdate=QDateTime::currentDateTime();
     qx::dao::update(patient_ptr);
 }
 
@@ -101,6 +102,7 @@ void PatientVm::insert()
 {
     auto patient_ptr=getPatientData();
     qx::dao::insert(patient_ptr);
+    m_data->m_id=patient_ptr->m_id;
 }
 
 QObject *PatientVm::getLastCheckResult()
@@ -180,9 +182,6 @@ void PatientVm::setBirthDate(QString date)
     int month=list[1].toInt();
     int day=list[2].toInt();
     m_data->m_birthDate.setDate(year,month,day);
-    qDebug()<<year;
-    qDebug()<<month;
-    qDebug()<<day;
 }
 
 QDateTime PatientVm::getLastUpdate()

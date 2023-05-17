@@ -4,8 +4,8 @@ import QtQuick.Window 2.3
 import QtQml 2.2
 import QtQuick.Controls.Styles 1.4
 import perimeter.main.view.Controls 1.0
-import qxpack.indcom.ui_qml_base 1.0
 import perimeter.main.view.Utils 1.0
+import qxpack.indcom.ui_qml_base 1.0
 
 Item{
     id:root;
@@ -28,14 +28,33 @@ Item{
 //    onLanguageChanged: console.log("haha");
 //    onDoubleNameChanged: console.log("dogdog");
 
-//    Component.onCompleted:
-//    {
+    Timer{
+        id: timer
+        function setTimeout(cb, delayTime) {
+            timer.interval = delayTime;
+            timer.repeat = false;
+            timer.triggered.connect(cb);
+            timer.triggered.connect(function release () {
+                timer.triggered.disconnect(cb); // This is important
+                timer.triggered.disconnect(release); // This is important as well
+            });
+            timer.start();
+        }
+    }
+
+
+
+    Component.onCompleted:
+    {
+//        patientInfoListView.patientListModelVm=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::PatientListModelVm", true);
+        timer.setTimeout(function() {query.startQuery();}, 500);
 //        currentPatient=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::PatientVm", false,[1]);
-//    }
+    }
 
 
     function createNewPatient(){
         if(currentPatient!==null) IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::PatientVm", currentPatient);
+        currentPatient=null;
         patientReviseButton.enabled=false;patientReviseButton.buttonColor="#787878"
         patientSaveButton.enabled=true; patientSaveButton.buttonColor = "#dcdee0"
         newPatientId.text="";
@@ -59,10 +78,10 @@ Item{
                         Row{
                             id:dateSelection; width: parent.width;opacity: 1;height: patientInfo.rowHight;spacing: height*0.4;
                             CusText{text: lt+qsTr("Check date");horizontalAlignment: Text.AlignLeft;width: height*2.5;font.pointSize: fontPointSize;}
-                            LineEdit{/*property string name: "dateFrom";*/id:dateFrom;radius: height/6;width: height*3.1;}
+                            LineEdit{/*property string name: "dateFrom";*/id:dateFrom;readOnly:true;radius: height/6;width: height*3.1;}
                             CusButton{id:dateFromButton;text:lt+qsTr("Select");width:height*2;onClicked:{calendar.inputObj=dateFrom;calendar.open();}}
                             CusText{text:lt+qsTr("To");width: height*0.6;font.pointSize: fontPointSize;}
-                            LineEdit{/*property string name: "dateTo";*/id:dateTo;radius: height/6;width: height*3.1;}
+                            LineEdit{/*property string name: "dateTo";*/id:dateTo;readOnly:true;radius: height/6;width: height*3.1;}
                             CusButton{id:dateToButton;text:lt+qsTr("Select");width:height*2;
                                 onClicked:{
                                     if(dateFrom.text!==""&&dateTo.text=="")
@@ -144,20 +163,13 @@ Item{
                                 Row{
                                     id:header
                                     width: parent.width; height:patientInfo.rowHight;spacing: -1;z:1;
-                                    property bool isAllSelected: false;
-                                    CusButton{
-                                        width: parent.width*1/10;height: parent.height;buttonColor: "#D2D3D5"; borderColor: "#656566";radius:0;imageSrc:"qrc:/Pics/base-svg/btn_select_normal.svg"
-                                        onClicked: {
-                                            if(!header.isAllSelected)
-                                            {
-                                                header.isAllSelected=true;imageSrc="qrc:/Pics/base-svg/btn_select_click.svg";
-                                            }
-                                            else
-                                            {
-                                                header.isAllSelected=false;imageSrc="qrc:/Pics/base-svg/btn_select_normal.svg";
-                                            }
-                                        }
-                                    }
+//                                    property bool isAllSelected: false;
+//                                    CusButton{
+//                                        width: parent.width*1/10;height: parent.height;buttonColor: "#D2D3D5"; borderColor: "#656566";radius:0;/*imageSrc:"qrc:/Pics/base-svg/btn_select_normal.svg"*/
+//                                        imageSrc:header.isAllSelected?"qrc:/Pics/base-svg/btn_select_click.svg":"qrc:/Pics/base-svg/btn_select_normal.svg";
+//                                        onClicked: {header.isAllSelected=!header.isAllSelected;}
+//                                    }
+                                    Rectangle{width: parent.width*1/10;height: parent.height;color: "#D2D3D5"; border.color: "#656566";}
                                     Rectangle{width: parent.width*2.5/10+1;height: parent.height;color: "#D2D3D5"; border.color: "#656566";CusText{anchors.fill: parent;text:lt+qsTr("Patient ID");font.pointSize: fontPointSize;}}
                                     Rectangle{width: parent.width*2.5/10+1;height: parent.height;color: "#D2D3D5"; border.color: "#656566";CusText{anchors.fill: parent;text:lt+qsTr("Name");font.pointSize: fontPointSize;}}
                                     Rectangle{width: parent.width*1/10+1;height: parent.height;color: "#D2D3D5"; border.color: "#656566";CusText{anchors.fill: parent;text:lt+qsTr("Sex");font.pointSize: fontPointSize;}}
@@ -166,10 +178,10 @@ Item{
                                 }
                                 ListView{
                                     id:patientInfoListView
-                                    property int seletedPatientLength:0;
-                                    property var seletedPatient:[];
+//                                    property int seletedPatientLength:0;
+//                                    property var seletedPatient:[];
                                     property var patientListModelVm:null;
-                                    width: parent.width;height:patientInfoCol.height-patientInfo.rowHight +1; interactive: false; spacing: -1;clip:true;snapMode: ListView.SnapPosition;/*interactive: false;*/
+                                    width: parent.width;height:patientInfoCol.height-patientInfo.rowHight+1;/* cacheBuffer: 0;*/spacing: -1;clip:true;snapMode: ListView.SnapPosition;interactive: false;
                                     delegate: patientInfoDelegate
                                     model:patientListModelVm;
                                     property var sex:[lt+qsTr("Male"),lt+qsTr("Female"),lt+qsTr("Others")];
@@ -185,26 +197,56 @@ Item{
                                             width: patientInfoListView.width;height: (patientInfoCol.height-patientInfo.rowHight)/pageSize+1;
                                             MouseArea{
                                                 anchors.fill: parent;
-//                                                onClicked: {console.log("Ted Say hi id="+model.Id)}
                                             }
                                             Row{
                                                 id:patientInfoRow;anchors.fill: parent;spacing: -1;
-                                                property bool isSelected: false;
+//                                                property alias isAllSelected: header.isAllSelected;
+//                                                onIsAllSelectedChanged: isSelected=isAllSelected;
                                                 CusButton{
+                                                    id:selectedPatient;
                                                     width: parent.width*1/10;height: parent.height;buttonColor: "white"; borderColor: backGroundBorderColor;radius:0;isAnime:false;imageSrc:"qrc:/Pics/base-svg/btn_select_normal.svg"
-                                                    onClicked:
+                                                    property bool isSelected:model.isSelected;
+//                                                    property bool isAllSelected: header.isAllSelected;
+                                                    enabled: currentPatient==null||(currentPatient.id!=model.Id);
+                                                    onClicked:isSelected=!isSelected;
+                                                    onIsSelectedChanged:
                                                     {
-                                                        if(!patientInfoRow.isSelected){patientInfoRow.isSelected=true;imageSrc="qrc:/Pics/base-svg/btn_select_click.svg";patientInfoListView.seletedPatient.push(model.Id);}
-                                                        else{patientInfoRow.isSelected=false;imageSrc="qrc:/Pics/base-svg/btn_select_normal.svg";patientInfoListView.seletedPatient.pop(model.Id);}
-                                                        patientInfoListView.seletedPatientLength=patientInfoListView.seletedPatient.length;
+                                                        if(isSelected)
+                                                        {
+                                                            imageSrc="qrc:/Pics/base-svg/btn_select_click.svg";/*patientInfoListView.seletedPatient.push(model.Id)*/model.isSelected=true;
+                                                            console.log(patientInfoListView.patientListModelVm.selectedCount);
+                                                            console.log(model.Id);
+                                                            console.log(currentPatient.id);
+                                                            console.log(model.Id!=currentPatient.id);
+                                                        }
+                                                        else{
+                                                             imageSrc="qrc:/Pics/base-svg/btn_select_normal.svg";/*patientInfoListView.seletedPatient.pop(model.Id);*/model.isSelected=false;
+                                                             console.log(patientInfoListView.patientListModelVm.selectedCount);
+                                                        }
+//                                                        patientInfoListView.seletedPatientLength=patientInfoListView.seletedPatient.length;
+//                                                        console.log(patientInfoListView.seletedPatient);
                                                     }
+
+//                                                    onIsAllSelectedChanged:
+//                                                    {
+//                                                        isSelected=isAllSelected;
+//                                                    }
+
+//                                                    onIsSelectedChanged:
+//                                                    {
+//                                                        if(!patientInfoRow.isSelected){patientInfoRow.isSelected=true;imageSrc="qrc:/Pics/base-svg/btn_select_click.svg";patientInfoListView.seletedPatient.push(model.Id);}
+//                                                        else{patientInfoRow.isSelected=false;imageSrc="qrc:/Pics/base-svg/btn_select_normal.svg";patientInfoListView.seletedPatient.pop(model.Id);}
+//                                                        patientInfoListView.seletedPatientLength=patientInfoListView.seletedPatient.length;
+//                                                    }
+
                                                 }
-                                                Rectangle{width: parent.width*2.5/10+1;height: parent.height;color: "white"; border.color: backGroundBorderColor;CusText{anchors.fill: parent;font.pointSize: fontPointSize;text:model.patientId}}
+                                                Rectangle{width: parent.width*2.5/10+1;height: parent.height;color: "white"; border.color: backGroundBorderColor;CusText{anchors.fill: parent;font.pointSize: fontPointSize;text:model.patientId+" "+model.Id}}
                                                 Rectangle{width: parent.width*2.5/10+1;height: parent.height;color: "white"; border.color: backGroundBorderColor;CusText{anchors.fill: parent;font.pointSize: fontPointSize;text:model.name/*+" "+model.Id+" "+model.lastUpdate*/}}
                                                 Rectangle{width: parent.width*1/10+1;height: parent.height;color: "white"; border.color: backGroundBorderColor;CusText{anchors.fill: parent;font.pointSize: fontPointSize;text:patientInfoListView.sex[model.sex]}}
                                                 Rectangle{width: parent.width*2/10+1;height: parent.height;color: "white"; border.color: backGroundBorderColor;CusText{anchors.fill: parent;font.pointSize: fontPointSize;text:model.birthDate}}
                                                 CusButton
                                                 {
+                                                    enabled: !selectedPatient.isSelected;
                                                     width: parent.width*1/10;height: parent.height;buttonColor: "white"; radius:0;imageSrc:"qrc:/Pics/base-svg/btn_analysis_enter.svg"
                                                     onClicked:
                                                     {
@@ -307,7 +349,8 @@ Item{
                                 pageIndex.currentPage=1;
                                 var rowCount=patientInfoListView.model.rowCount();
                                 console.log("model count:"+rowCount);
-                                pageIndex.totalPage=rowCount/pageSize+1;
+                                pageIndex.totalPage=rowCount/pageSize;
+                                if(rowCount%pageSize!==0) pageIndex.totalPage+=1;
                                 pageIndex.totalRecordCount=rowCount;
                             }
                         }
@@ -399,7 +442,7 @@ Item{
                                 CusText{text:"*"+lt+qsTr("Birth date")+" "; horizontalAlignment: Text.AlignRight ;width:parent.width*0.20;font.pointSize: fontPointSize;}
                                 Row{
                                     height:parent.height;spacing:(width-6*height)/2;width:newPatient.width*0.6
-                                    Item{height: parent.height;width: 2*height;LineEdit{id:newBirthDate;width: height*3.1;onTextChanged:{newPatientage.text=CusUtils.getAge(newBirthDate.text);}}}
+                                    Item{height: parent.height;width: 2*height;LineEdit{id:newBirthDate;readOnly:true;width: height*3.1;onTextChanged:{newPatientage.text=CusUtils.getAge(newBirthDate.text);}}}
                                     CusButton{
                                         text:lt+qsTr("Select");width:height*2;onClicked:{calendar.inputObj=newBirthDate;calendar.open();}}
                                     LineEdit{
@@ -520,12 +563,15 @@ Item{
                         }
                     }
                     CusButton{text:lt+qsTr("Delete");
-                        enabled: !(patientInfoListView.seletedPatientLength===0);
+                        enabled: patientInfoListView.patientListModelVm.selectedCount>0;
                         onClicked: {
-                            var pl=patientInfoListView.seletedPatient;
-                            for(var i=0;i<pl.length;i++){
-                                patientInfoListView.patientListModelVm.deletePatient(pl[i]);
-                            }
+//                            var pl=patientInfoListView.seletedPatient;
+//                            console.log(pl);
+//                            for(var i=0;i<pl.length;i++){
+//                                if(currentPatient==null||pl[i]!==currentPatient.id)
+//                                    patientInfoListView.patientListModelVm.deletePatient(pl[i]);
+//                            }
+                            patientInfoListView.patientListModelVm.deletePatients();
                             query.startQuery();
                         }
                     }
@@ -559,6 +605,7 @@ Item{
                         currentPatient.rx.rx3_r=parseFloat(rx3_r.text);
                         currentPatient.rx.visual_r=parseFloat(visual_r.text);
                         currentPatient.insert();
+                        console.log(currentPatient.id);
                         root.currentPatientChanged();
                         query.startQuery();
                     }

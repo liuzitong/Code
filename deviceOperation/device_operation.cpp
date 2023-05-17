@@ -335,11 +335,11 @@ void DeviceOperation::adjustCastLight()
                    UsbDev::DevCtl::MotorId_X,
                    UsbDev::DevCtl::MotorId_Y
                    });
-    waitForSomeTime(1000);
+    waitForSomeTime(200);
     openShutter(65535);
-    m_currentCastLightDA=m_config.castLightADPresetRef();
+    m_currentCastLightDA=m_config.castLightADPresetRef()+DeviceSettings::getSingleton()->m_castLightDAChanged;
     m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA);
-    waitForSomeTime(1000);
+    waitForSomeTime(200);
     m_castLightAdjustStatus=2;
     m_castLightAdjustElapsedTimer.start();
 }
@@ -631,7 +631,7 @@ void DeviceOperation::workOnNewStatuData()
     if(m_videoOnOff!=m_statusData.cameraStatus())
         m_devCtl->setFrontVideo(m_videoOnOff);
 
-    if(m_castLightAdjustStatus==2&&m_castLightAdjustElapsedTimer.elapsed()>=200&&m_isDeviceReady)
+    if(m_castLightAdjustStatus==2&&m_castLightAdjustElapsedTimer.elapsed()>=500&&m_isDeviceReady)
     {
         updateDevInfo("keep adjust castLightDa");
         int tagetDA=DeviceSettings::getSingleton()->m_castLightTagetDA;
@@ -659,7 +659,9 @@ void DeviceOperation::workOnNewStatuData()
             openShutter(0);
             waitMotorStop({UsbDev::DevCtl::MotorId_Shutter});
             m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA*0.3);
-            waitForSomeTime(1000);              //防止摄像头刷不出来
+            DeviceSettings::getSingleton()->m_castLightDAChanged=m_currentCastLightDA-m_config.castLightADPresetRef();
+            DeviceSettings::getSingleton()->saveCastLightDAChanged();
+            waitForSomeTime(200);              //防止摄像头刷不出来
         }
     }
     emit newStatusData();
@@ -725,21 +727,21 @@ void DeviceOperation::workOnNewProfile()
     qDebug()<<"work on new Profile";
     m_profile=m_devCtl->profile();
     m_videoSize=m_profile.videoSize();
-    if(!m_profile.isEmpty()&&!m_config.isEmpty())
+    if(!m_isDeviceReady&&!m_profile.isEmpty()&&!m_config.isEmpty())
     {
         setIsDeviceReady(true);
+        adjustCastLight();                                //以后采用此法
     }
-
-
 }
 
 void DeviceOperation::workOnNewConfig()
 {
     qDebug()<<"work on new config";
     m_config=m_devCtl->config();
-    if(!m_profile.isEmpty()&&!m_config.isEmpty())
+    if(!m_isDeviceReady&&!m_profile.isEmpty()&&!m_config.isEmpty())
     {
         setIsDeviceReady(true);
+        adjustCastLight();
     }
 }
 
@@ -758,8 +760,8 @@ void DeviceOperation::workOnWorkStatusChanged(int status)
         connect(m_devCtl.data(),&UsbDev::DevCtl::newFrameData,this,&DeviceOperation::workOnNewFrameData);
         connect(m_devCtl.data(),&UsbDev::DevCtl::newProfile,this,&DeviceOperation::workOnNewProfile);
         connect(m_devCtl.data(),&UsbDev::DevCtl::newConfig,this,&DeviceOperation::workOnNewConfig);
-        waitForSomeTime(8000);
-        adjustCastLight();
+//        waitForSomeTime(8000);                                          //目前config获取会导致阻塞 所以需要多等一下
+//        adjustCastLight();
     }
     else if(m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_Disconnected||m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_Disconnected)
     {

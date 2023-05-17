@@ -11,13 +11,7 @@ QSharedPointer<DeviceSettings> DeviceSettings::m_singleton=nullptr;
 DeviceSettings::DeviceSettings()
 {
     QFile loadFile(R"(deviceData/settings.json)");
-
-    if(!loadFile.open(QIODevice::ReadOnly))
-    {
-        qDebug() << "could't open projects json";
-        return;
-    }
-
+    loadFile.open(QIODevice::ReadOnly);
     QByteArray allData = loadFile.readAll();
     loadFile.close();
 
@@ -32,7 +26,7 @@ DeviceSettings::DeviceSettings()
 
     m_rootObj = jsonDoc.object();
     QStringList keys = m_rootObj.keys();
-//    for(int i = 0; i < keys.size(); i++)
+    for(int i = 0; i < keys.size(); i++)
 //    {
 //        qDebug() << "key" << i << " is:" << keys.at(i);
 //    }
@@ -55,6 +49,7 @@ DeviceSettings::DeviceSettings()
     m_castLightDAChangeStep=m_rootObj.value("castLightDAChangeStep").toInt();
     m_castLightTargetColor=m_rootObj.value("castLightTargetColor").toInt();
     m_castLightTargetSize=m_rootObj.value("castLightTargetSize").toInt();
+    m_castLightDAChanged=m_rootObj.value("castLightDAChanged").toInt();
 
     auto motorSpeed=m_rootObj.value("motorSpeed").toArray();
     for(int i=0;i<motorSpeed.count();i++)
@@ -80,13 +75,6 @@ DeviceSettings::DeviceSettings()
         int slot=obj["Slot"].toInt();
         m_colorToSlot.append({color,slot});
     }
-
-
-
-//    QJsonDocument doc(m_rootObj);
-//    auto data=doc.toJson();
-//    loadFile.write(data);
-
 }
 
 QSharedPointer<DeviceSettings> DeviceSettings::getSingleton()
@@ -96,4 +84,15 @@ QSharedPointer<DeviceSettings> DeviceSettings::getSingleton()
         m_singleton.reset(new DeviceSettings());
     }
     return m_singleton;
+}
+
+void DeviceSettings::saveCastLightDAChanged()
+{
+    m_rootObj["castLightDAChanged"]=m_castLightDAChanged;
+    QJsonDocument jsonDoc(m_rootObj);
+    auto data=jsonDoc.toJson();
+    QFile loadFile(R"(deviceData/settings.json)");
+    loadFile.open(QIODevice::WriteOnly);
+    loadFile.write(data,data.length());
+    loadFile.close();
 }

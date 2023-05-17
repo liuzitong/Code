@@ -1,34 +1,75 @@
 {
-    "VID": "ffff",
     "PID": "b0b0",
-    "pupilAutoAlignPixelTolerance": 5,
-    "pupilAutoAlignStep": 300,
+    "VID": "ffff",
+    "castLightDAChangeStep": 10,
+    "castLightDAChanged": 200,
+    "castLightDADifference": 50,
+    "castLightTargetColor": 0,
+    "castLightTargetDA": 15000,
+    "castLightTargetSize": 5,
+    "colorToSlot": [
+        {
+            "Color": 0,
+            "Slot": 1
+        },
+        {
+            "Color": 0,
+            "Slot": 1
+        },
+        {
+            "Color": 1,
+            "Slot": 2
+        },
+        {
+            "Color": 0,
+            "Slot": 1
+        },
+        {
+            "Color": 2,
+            "Slot": 4
+        }
+    ],
     "localConfigPath": "./deviceData/config.dat",
     "localDataPath": "./deviceData/data.dat",
-    "pupilGreyLimit":40,
-    "pupilPixelDiameterLimit":40,
-    "pupilDiameterPixelToMillimeterConstant":0.171875,
-    "pupilDiameterPixelToFixationDeviationConstant":0.25,
-    "motorSpeed":[4,4,1,7,7,1,1],
-    "castLightDADifference":50,
-    "castLightDAChangeStep":10,
-    "castLightTargetDA":15000,
-    "castLightTargetColor":0,
-    "castLightTargetSize":5,
-    "colorToSlot": [
-        {"Color": 0,"Slot": 1},
-        {"Color": 0,"Slot": 1},
-        {"Color": 1,"Slot": 2},
-        {"Color": 0,"Slot": 1},
-        {"Color": 2,"Slot": 4}
+    "motorSpeed": [
+        4,
+        4,
+        1,
+        7,
+        7,
+        1,
+        1
     ],
+    "pupilAutoAlignPixelTolerance": 5,
+    "pupilAutoAlignStep": 300,
+    "pupilDiameterPixelToFixationDeviationConstant": 0.25,
+    "pupilDiameterPixelToMillimeterConstant": 0.171875,
+    "pupilGreyLimit": 40,
+    "pupilPixelDiameterLimit": 40,
     "spotSizeToSlot": [
-        {"spotSize": 5,"Slot": 0},
-        {"spotSize": 4,"Slot": 1},
-        {"spotSize": 3,"Slot": 2},
-        {"spotSize": 2,"Slot": 3},
-        {"spotSize": 1,"Slot": 4},
-        {"spotSize": 0,"Slot": 5}
+        {
+            "Slot": 0,
+            "spotSize": 5
+        },
+        {
+            "Slot": 1,
+            "spotSize": 4
+        },
+        {
+            "Slot": 2,
+            "spotSize": 3
+        },
+        {
+            "Slot": 3,
+            "spotSize": 2
+        },
+        {
+            "Slot": 4,
+            "spotSize": 1
+        },
+        {
+            "Slot": 5,
+            "spotSize": 0
+        }
     ]
-
 }

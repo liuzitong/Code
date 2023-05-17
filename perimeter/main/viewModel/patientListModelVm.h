@@ -5,10 +5,10 @@
 #include <perimeter/main/database/patient.h>
 #include <QDebug>
 namespace Perimeter{
-class PERIMETER_API PatientListModelVm:public QAbstractListModel
+class PatientListModelVm:public QAbstractListModel
 {
     Q_OBJECT
-//    Q_PROPERTY(int currentValue READ current WRITE setCurrent NOTIFY currentChanged)
+    Q_PROPERTY(int selectedCount READ getSelectedCount NOTIFY selectedCountChanged)
 public:
     Q_INVOKABLE explicit PatientListModelVm(const QVariantList &);
     Q_INVOKABLE virtual ~PatientListModelVm() Q_DECL_OVERRIDE;
@@ -24,6 +24,7 @@ public:
     Q_INVOKABLE void getPatientListByBirthDate(QDate date);
 //    Q_INVOKABLE void updatePatient(long id,QString patientId, QString name, int sex, QDate date);
     Q_INVOKABLE void deletePatient(long id);
+    Q_INVOKABLE void deletePatients();
 //    Q_INVOKABLE void addPatient(QString patientId,QString name,int sex,QDate date,QDateTime updateTime=QDateTime::currentDateTime());
 //    Q_INVOKABLE void hello();
 //    Q_SIGNAL void currentChanged();
@@ -41,6 +42,8 @@ public:
     //! @note we used roles like "id","name","dob", so view can use name to access it.
     virtual QHash<int,QByteArray>  roleNames( ) const Q_DECL_OVERRIDE;
 
+    int getSelectedCount();Q_SIGNAL void selectedCountChanged();
+
 //    //! directly set data object at spec. index
 //    virtual bool       setData ( const QModelIndex &, const QVariant &, int ) Q_DECL_OVERRIDE;
 
@@ -50,10 +53,13 @@ public:
 private:
     void setPatientList(Patient_List patient_list);
 
-
     void* m_obj;
     friend class PatientListModelVmPriv;
     Q_DISABLE_COPY(PatientListModelVm);
+
+    // QAbstractItemModel interface
+public:
+    virtual bool setData(const QModelIndex &index, const QVariant &value, int role) override;
 };
 }
 #endif // PATIENTMODELLIST_H

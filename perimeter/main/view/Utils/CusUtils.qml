@@ -15,7 +15,7 @@ Item{
         var now=new Date(Date.now());
         var age=now.getFullYear()-birthDate.getFullYear();
         if(now.getMonth()<birthDate.getMonth()) age-=1;
-        if((now.getMonth()==birthDate.getMonth())&&(now.getDay()<birthDate.getDay())) age-=1;
+        else if((now.getMonth()==birthDate.getMonth())&&(now.getDate()<birthDate.getDate())) age-=1;
         return age;
     }
 

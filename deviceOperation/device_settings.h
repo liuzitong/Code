@@ -24,6 +24,7 @@ public:
     int m_castLightDAChangeStep;
     int m_castLightTargetColor;
     int m_castLightTargetSize;
+    int m_castLightDAChanged;
     int m_pupilAutoAlignStep;
     quint8 m_5MotorSpeed[5];
     quint8 m_motorChinSpeed[2];
@@ -35,6 +36,8 @@ public:
     double m_pupilDiameterPixelToFixationDeviationConstant;
     static QSharedPointer<DeviceSettings> getSingleton();
     static QSharedPointer<DeviceSettings> m_singleton;
+
+    void saveCastLightDAChanged();
 };
 
 #endif // DEVICE_SETTINGS_H

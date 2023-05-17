@@ -20,7 +20,7 @@ namespace Perimeter {
 
 void TestClass::test()
 {
-//    createPatientData();
+    createPatientData();
 //    createCheckResultData();
 //    createDynamicCheckResultData();
 //    createCheckResultVm();
@@ -36,7 +36,7 @@ void TestClass::test()
 //     msgBox.setText("The document has been modified.");
 //     msgBox.exec();
 
-     DevOps::DeviceOperation::getSingleton()->stopDynamic();
+//     DevOps::DeviceOperation::getSingleton()->stopDynamic();
 //    DevOps::DeviceOperation::getSingleton()->dynamicStimulate({0,0},{30,30},1,1,true);
 
 
@@ -51,7 +51,7 @@ void TestClass::createPatientData()
 //    QSqlDatabase db = qx::QxSqlDatabase::getDatabase();
 //    bool bCommit = db.transaction();
     QList<Patient_ptr> pplist;
-    for(int i=0;i<2000;i++)
+    for(int i=0;i<200;i++)
     {
         Patient_ptr patient_ptr;
         QDateTime time = QDateTime::currentDateTime();
@@ -82,6 +82,7 @@ void TestClass::createPatientData()
                     </t>
                     </boost_serialization>)"
                     );
+        patient_ptr.reset(pp);
         pplist.append(patient_ptr);
     }
 //    qDebug()<<list.length();

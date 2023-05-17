@@ -176,7 +176,7 @@ void   DevCtl_Worker :: init( bool req_emit )
             emit updateInfo("connection succeed.");
             this->cmd_ClearCache();
             this->cmd_ReadProfile( req_emit );
-            this->cmd_ReadConfig (req_emit);
+//            this->cmd_ReadConfig (req_emit);                          //以后要加上
         } else {
             m_wks = DevCtl::WorkStatus_E_UnExpected;
             if ( req_emit ) { emit this->workStatusChanged( DevCtl::WorkStatus_E_UnExpected ); }

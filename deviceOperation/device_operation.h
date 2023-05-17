@@ -59,6 +59,7 @@ public:
     static QSharedPointer<DeviceOperation> getSingleton();
     void connectDev();
     void disconnectDev();
+    void connectOrdisConnectDev();
     void getReadyToStimulate(QPointF loc,int spotSize,int DB,bool isMainDotInfoTable);
     void adjustCastLight();
     void dynamicStimulate(QPointF begin, QPointF end, int cursorSize,int speedLevel,bool isMainDotInfoTable);
@@ -86,7 +87,6 @@ public slots:
     void workOnNewProfile();
     void workOnNewConfig();
     void workOnWorkStatusChanged(int status);
-    void connectOrdisConnectDev();
 signals:
     void workStatusChanged();
     void newStatusData();
