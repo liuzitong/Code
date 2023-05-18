@@ -136,6 +136,7 @@ Item{
                                 height: parent.height;width: height;imageSrc:"qrc:/Pics/base-svg/btn_find.svg"
                                 onClicked:query.startQuery();
                             }
+
                             function startQuery()
                             {
 //                                console.log(patientID.text);
@@ -568,7 +569,7 @@ Item{
                 }
             }
             Flow{height:parent.height; layoutDirection: Qt.RightToLeft;width:parent.width*0.4;spacing: height*0.8;
-                CusButton{text:lt+qsTr("Check");enabled:!(currentPatient===null)/*&&IcUiQmlApi.appCtrl.checkSvc.devReady&&IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus===3*/;
+                CusButton{text:lt+qsTr("Check");enabled:!(currentPatient===null)&&IcUiQmlApi.appCtrl.checkSvc.devReady&&IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus===3;
                     onClicked:
                     {
                         root.changePage("check",{lastProgram:null,type:"check"});

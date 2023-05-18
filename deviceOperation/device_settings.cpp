@@ -50,6 +50,7 @@ DeviceSettings::DeviceSettings()
     m_castLightTargetColor=m_rootObj.value("castLightTargetColor").toInt();
     m_castLightTargetSize=m_rootObj.value("castLightTargetSize").toInt();
     m_castLightDAChanged=m_rootObj.value("castLightDAChanged").toInt();
+    m_castLightLastAdjustedDate=m_rootObj.value("castLightLastAdjustedDate").toString();
 
     auto motorSpeed=m_rootObj.value("motorSpeed").toArray();
     for(int i=0;i<motorSpeed.count();i++)
@@ -86,9 +87,10 @@ QSharedPointer<DeviceSettings> DeviceSettings::getSingleton()
     return m_singleton;
 }
 
-void DeviceSettings::saveCastLightDAChanged()
+void DeviceSettings::saveSettings()
 {
     m_rootObj["castLightDAChanged"]=m_castLightDAChanged;
+    m_rootObj["castLightLastAdjustedDate"]=m_castLightLastAdjustedDate;
     QJsonDocument jsonDoc(m_rootObj);
     auto data=jsonDoc.toJson();
     QFile loadFile(R"(deviceData/settings.json)");

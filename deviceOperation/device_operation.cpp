@@ -25,6 +25,8 @@ DeviceOperation::DeviceOperation()
     m_connectTimer.setInterval(120000);
     connect(&m_connectTimer,&QTimer::timeout,this,&DeviceOperation::connectOrdisConnectDev);
     m_connectTimer.start();
+//    m_videoTimer.start(500);
+//    connect(&m_videoTimer,&QTimer::timeout,this,[](){std::cout<<"dsfs"<<std::endl;});
     connect(this,&DeviceOperation::updateDevInfo,[](QString str){std::cout<<str.toStdString()+"\n";});
     m_workStatusElapsedTimer.start();
 }
@@ -173,7 +175,7 @@ void DeviceOperation::setLamp(LampId id, int index, bool onOff)
         }
     }
     m_devCtl->setLamp(UsbDev::DevCtl::LampId(id),index,da);
-    waitForSomeTime(10);
+//    waitForSomeTime(10);
 }
 
 
@@ -515,7 +517,6 @@ void DeviceOperation::waitForSomeTime(int time)
     mstimer.restart();
     do
     {
-
         QApplication::processEvents();
     }while(mstimer.elapsed()<time);
 }
@@ -572,6 +573,7 @@ void DeviceOperation::lightUpCastLight()
     if(m_isDeviceReady&&!m_castLightUp)
     {
         m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA);
+        std::cout<<"cast light Up"<<std::endl;
         m_castLightUp=true;
     }
 }
@@ -581,6 +583,7 @@ void DeviceOperation::dimDownCastLight()
     if(m_isDeviceReady&&m_castLightUp)
     {
         m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA*0.3);
+        std::cout<<"cast light Down"<<std::endl;
         m_castLightUp=false;
     }
 }
@@ -596,17 +599,26 @@ void DeviceOperation::workOnNewStatuData()
         updateDevInfo("receive new workStatus");
     }
     m_statusData=m_devCtl->takeNextPendingStatusData();
-//    auto eyeglassStatus=m_statusData.eyeglassStatus();
-//    if(m_isChecking)
-//    {
-//        if(m_eyeglassStatus!=eyeglassStatus||!m_eyeglassIntialize)
-//        {
-//            m_eyeglassStatus=eyeglassStatus;
-//            m_eyeglassIntialize=true;
-//            setLamp(LampId::LampId_eyeglassInfrared,0,eyeglassStatus);
-//            setLamp(LampId::LampId_borderInfrared,0,!eyeglassStatus);
-//        }
-//    }
+    auto eyeglassStatus=m_statusData.eyeglassStatus();
+    if(m_videoOnOff)
+    {
+        if(m_eyeglassStatus!=eyeglassStatus||!m_eyeglassIntialize)
+        {
+            m_eyeglassStatus=eyeglassStatus;
+            m_eyeglassIntialize=true;
+            setLamp(LampId::LampId_eyeglassInfrared,0,eyeglassStatus);
+            std::cout<<"open eyeglassInfrared infrared:"<<eyeglassStatus<<std::endl;
+            setLamp(LampId::LampId_borderInfrared,0,!eyeglassStatus);
+            std::cout<<"open borderInfrared infrared:"<<!eyeglassStatus<<std::endl;
+        }
+    }
+    else if(m_eyeglassIntialize)
+    {
+        setLamp(LampId::LampId_eyeglassInfrared,0,false);
+        setLamp(LampId::LampId_borderInfrared,0,false);
+        m_eyeglassIntialize=false;
+        std::cout<<"close allInfrared infrared"<<std::endl;
+    }
 
 
 
@@ -629,7 +641,18 @@ void DeviceOperation::workOnNewStatuData()
 
 
     if(m_videoOnOff!=m_statusData.cameraStatus())
-        m_devCtl->setFrontVideo(m_videoOnOff);
+    {
+        if(m_videoOnOff)
+        {
+            m_devCtl->setFrontVideo(false);
+            m_devCtl->setFrontVideo(false);
+            m_devCtl->setFrontVideo(false);
+            m_devCtl->setFrontVideo(true);
+        }
+        else
+            m_devCtl->setFrontVideo(false);
+
+    }
 
     if(m_castLightAdjustStatus==2&&m_castLightAdjustElapsedTimer.elapsed()>=500&&m_isDeviceReady)
     {
@@ -659,9 +682,10 @@ void DeviceOperation::workOnNewStatuData()
             openShutter(0);
             waitMotorStop({UsbDev::DevCtl::MotorId_Shutter});
             m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA*0.3);
+
+            DeviceSettings::getSingleton()->m_castLightLastAdjustedDate=QDate::currentDate().toString("yyyy/MM/dd");
             DeviceSettings::getSingleton()->m_castLightDAChanged=m_currentCastLightDA-m_config.castLightADPresetRef();
-            DeviceSettings::getSingleton()->saveCastLightDAChanged();
-            waitForSomeTime(200);              //防止摄像头刷不出来
+            DeviceSettings::getSingleton()->saveSettings();
         }
     }
     emit newStatusData();
@@ -673,53 +697,55 @@ void DeviceOperation::workOnNewFrameData()
     m_frameRawData=m_frameData.rawData();
     emit newFrameData();
     return;
-    auto profile=m_profile;
-    bool valid;
-    auto vc=DeviceDataProcesser::caculatePupilDeviation(m_frameData.rawData(),profile.videoSize().width(),profile.videoSize().height(),valid);
-    if(!valid){ return;}
-    auto centerPoint=vc[0];
-//    auto deviationPix=sqrt(pow(centerPoint.x(),2)+pow(centerPoint.y(),2));
-    auto step=DeviceSettings::getSingleton()->m_pupilAutoAlignStep;
-    m_deviation=DeviceDataProcesser::caculateFixationDeviation(centerPoint);
-    if(m_autoAlignPupil)                //自动对眼位
-    {
-        int tolerance=DeviceSettings::getSingleton()->m_pupilAutoAlignPixelTolerance;
-        auto spsConfig=DeviceSettings::getSingleton()->m_motorChinSpeed;
-        quint8 sps[2]{spsConfig[0],spsConfig[1]};
-        int motorPos[2]{0};
-        if(centerPoint.x()>tolerance)
-        {
-            motorPos[0]=step;
-        }
-        if(centerPoint.x()<-tolerance)
-        {
-            motorPos[0]=-step;
-        }
-        if(centerPoint.y()>tolerance)
-        {
-            motorPos[1]=step;
-        }
-        if(centerPoint.y()<-tolerance)
-        {
-            motorPos[1]=-step;
-        }
-        m_devCtl->moveChinMotors(sps,motorPos,UsbDev::DevCtl::MoveMethod::Relative);
+//    auto profile=m_profile;
+//    bool valid;
+//    auto vc=DeviceDataProcesser::caculatePupilDeviation(m_frameData.rawData(),profile.videoSize().width(),profile.videoSize().height(),valid);
+//    if(!valid){ return;}
+//    m_pupilCenterPoint=vc[0];
+//    std::cout<<m_pupilCenterPoint.x()<<" "<<m_pupilCenterPoint.y()<<std::endl;
+//    auto step=DeviceSettings::getSingleton()->m_pupilAutoAlignStep;
+//    m_deviation=DeviceDataProcesser::caculateFixationDeviation(m_pupilCenterPoint);
+//    if(m_autoAlignPupil)                //自动对眼位
+//    {
+//        int tolerance=DeviceSettings::getSingleton()->m_pupilAutoAlignPixelTolerance;
+//        auto spsConfig=DeviceSettings::getSingleton()->m_motorChinSpeed;
+//        quint8 sps[2]{spsConfig[0],spsConfig[1]};
+//        int motorPos[2]{0};
+//        if(m_pupilCenterPoint.x()>tolerance)
+//        {
+//            motorPos[0]=step;
+//        }
+//        if(m_pupilCenterPoint.x()<-tolerance)
+//        {
+//            motorPos[0]=-step;
+//        }
+//        if(m_pupilCenterPoint.y()>tolerance)
+//        {
+//            motorPos[1]=step;
+//        }
+//        if(m_pupilCenterPoint.y()<-tolerance)
+//        {
+//            motorPos[1]=-step;
+//        }
+//        m_devCtl->moveChinMotors(sps,motorPos,UsbDev::DevCtl::MoveMethod::Relative);
 
-    }
-    if(m_pupilDiameter<0)
-    {
-        auto pupilDiameter=DeviceDataProcesser::caculatePupilDiameter(vc[1],vc[2]);
-        m_pupilDiameterArr.push_back(pupilDiameter);
-        if(m_pupilDiameterArr.size()>=50)
-        {
-            float sum=0;
-            for(auto&i:m_pupilDiameterArr)
-            {
-                sum+=i;
-            }
-            m_pupilDiameter=sum/m_pupilDiameterArr.size();
-        }
-    }
+//    }
+//    //计算瞳孔直径
+//    if(m_pupilDiameter<0)
+//    {
+//        auto pupilDiameter=DeviceDataProcesser::caculatePupilDiameter(vc[1],vc[2]);
+//        m_pupilDiameterArr.push_back(pupilDiameter);
+//        if(m_pupilDiameterArr.size()>=50)
+//        {
+//            float sum=0;
+//            for(auto&i:m_pupilDiameterArr)
+//            {
+//                sum+=i;
+//            }
+//            m_pupilDiameter=sum/m_pupilDiameterArr.size();
+//        }
+//    }
+//    emit newFrameData();
 }
 
 void DeviceOperation::workOnNewProfile()
@@ -730,7 +756,16 @@ void DeviceOperation::workOnNewProfile()
     if(!m_isDeviceReady&&!m_profile.isEmpty()&&!m_config.isEmpty())
     {
         setIsDeviceReady(true);
-        adjustCastLight();                                //以后采用此法
+        auto date=QDate::currentDate();
+        auto lastAdjustedDate=QDate::fromString(DeviceSettings::getSingleton()->m_castLightLastAdjustedDate,"yyyy/MM/dd");
+        bool adjusted=((date.year()==lastAdjustedDate.year())&&(date.month()==lastAdjustedDate.month())&&(date.day()==lastAdjustedDate.day()));
+        if(adjusted)
+        {
+            setCastLightAdjustStatus(3);
+            m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA*0.3);
+        }
+        else
+            adjustCastLight();
     }
 }
 
@@ -741,7 +776,16 @@ void DeviceOperation::workOnNewConfig()
     if(!m_isDeviceReady&&!m_profile.isEmpty()&&!m_config.isEmpty())
     {
         setIsDeviceReady(true);
-        adjustCastLight();
+        auto date=QDate::currentDate();
+        auto lastAdjustedDate=QDate::fromString(DeviceSettings::getSingleton()->m_castLightLastAdjustedDate,"yyyy/MM/dd");
+        bool adjusted=((date.year()==lastAdjustedDate.year())&&(date.month()==lastAdjustedDate.month())&&(date.day()==lastAdjustedDate.day()));
+        if(adjusted)
+        {
+            setCastLightAdjustStatus(3);
+            m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA*0.3);
+        }
+        else
+            adjustCastLight();
     }
 }
 

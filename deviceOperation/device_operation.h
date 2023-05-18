@@ -119,8 +119,10 @@ public:
     UsbDev::StatusData m_statusData;
     QMutex m_statusLock;                      //防止多线程冲突,放入同线程不再需要
     UsbDev::FrameData m_frameData;
+    QPoint m_pupilCenterPoint;
     QByteArray m_frameRawData;
     QTimer m_connectTimer;
+    QTimer m_videoTimer;
 //    QElapsedTimer m_isStaticCheckPausingTimer;
 //    bool m_isKeepingPressingAnswerPad;
 //    bool m_isStaticCheckPausing;

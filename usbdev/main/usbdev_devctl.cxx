@@ -547,7 +547,6 @@ bool  DevCtl_Worker :: cmd_TurnOffVideo()
         }
     }
     if ( ret ) {
-        updateInfo("turn off camera.");
         m_is_video_on = false; m_elapse_tmr.invalidate();
         emit this->videoStatusChanged( false );
     }

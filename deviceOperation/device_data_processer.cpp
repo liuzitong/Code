@@ -115,7 +115,7 @@ QVector<QPoint> DeviceDataProcesser::caculatePupilDeviation(const QByteArray ba,
         {
             if(ba[x+width*y]<pupilGreyLimit)
             {
-                qDebug()<<ba[x+width*y];
+//                qDebug()<<ba[x+width*y];
                 x_vc.push_back(x);
                 y_vc.push_back(y);
                 validCount++;

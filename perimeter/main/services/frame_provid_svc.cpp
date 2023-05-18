@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <deviceOperation/device_operation.h>
 #include <memory>
+#include <QPainter>
 namespace Perimeter{
 
 QSharedPointer<FrameProvidSvc> FrameProvidSvc::m_singleton=nullptr;
@@ -76,6 +77,9 @@ void FrameProvidSvc::onNewVideoContentReceived(/*QByteArray qa*/)
 //    qDebug()<<"frame provider received "+QString::number(rawData.size());
 
     auto videoSize=DevOps::DeviceOperation::getSingleton()->m_videoSize;
+
+    auto pupilCenterPoint=DevOps::DeviceOperation::getSingleton()->m_pupilCenterPoint;
+    QPoint scalePupilCenterPoint={pupilCenterPoint.x()*m_width/videoSize.width(),pupilCenterPoint.y()*m_height/videoSize.height()};
     if(rawData.size()==videoSize.width()*videoSize.height())
     {
         QImage img((uchar*)rawData.data(),videoSize.width(),videoSize.height(),QImage::Format::Format_Grayscale8);
@@ -84,6 +88,9 @@ void FrameProvidSvc::onNewVideoContentReceived(/*QByteArray qa*/)
 //        img2.setPixelColor(3,3,Qt::yellow);
 //        for(int )
         auto img3=img2.scaled(m_width,m_height,Qt::AspectRatioMode::KeepAspectRatio);
+        QPainter painter(&img3);
+        painter.setPen(Qt::red);
+        painter.drawEllipse({m_width/2,m_height/2},10,10);
         drawCrossHair(img3);
         QVideoFrame frame(img3);
         setFormat(frame.width(),frame.height(),frame.pixelFormat());
@@ -91,6 +98,7 @@ void FrameProvidSvc::onNewVideoContentReceived(/*QByteArray qa*/)
             m_surface->present(frame);
     }
 }
+
 
 void FrameProvidSvc::drawCrossHair(QImage &img)
 {
