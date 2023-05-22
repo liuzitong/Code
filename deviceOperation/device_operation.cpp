@@ -29,6 +29,7 @@ DeviceOperation::DeviceOperation()
 //    connect(&m_videoTimer,&QTimer::timeout,this,[](){std::cout<<"dsfs"<<std::endl;});
     connect(this,&DeviceOperation::updateDevInfo,[](QString str){std::cout<<str.toStdString()+"\n";});
     m_workStatusElapsedTimer.start();
+    m_currentCastLightDA=m_config.castLightADPresetRef()+DeviceSettings::getSingleton()->m_castLightDAChanged;
 }
 
 
@@ -259,7 +260,7 @@ void DeviceOperation::setDB(int DB)
 
 void DeviceOperation::moveToAdjustLight(int motorPosX,int motorPosY,int motorPosFocal)
 {
-    std::cout<<"move to adjustlight";
+    std::cout<<"move to adjustlight"<<std::endl;
     int motorPos[5];
     motorPos[0]=motorPosX;
     motorPos[1]=motorPosY;
@@ -339,7 +340,6 @@ void DeviceOperation::adjustCastLight()
                    });
     waitForSomeTime(200);
     openShutter(65535);
-    m_currentCastLightDA=m_config.castLightADPresetRef()+DeviceSettings::getSingleton()->m_castLightDAChanged;
     m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA);
     waitForSomeTime(200);
     m_castLightAdjustStatus=2;
@@ -771,7 +771,7 @@ void DeviceOperation::workOnNewProfile()
         if(adjusted)
         {
             setCastLightAdjustStatus(3);
-            m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA*0.3);
+            dimDownCastLight();
         }
         else
             adjustCastLight();
@@ -791,7 +791,8 @@ void DeviceOperation::workOnNewConfig()
         if(adjusted)
         {
             setCastLightAdjustStatus(3);
-            m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA*0.3);
+//            m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA*0.3);
+            dimDownCastLight();
         }
         else
             adjustCastLight();

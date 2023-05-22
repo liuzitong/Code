@@ -37,7 +37,11 @@ void TestClass::test()
 //     msgBox.exec();
 
 //     DevOps::DeviceOperation::getSingleton()->stopDynamic();
-//    DevOps::DeviceOperation::getSingleton()->dynamicStimulate({0,0},{30,30},1,1,true);
+    static bool aa=true;
+    if(aa)
+    DevOps::DeviceOperation::getSingleton()->lightUpCastLight();
+    else
+    DevOps::DeviceOperation::getSingleton()->dimDownCastLight();
 
 
 

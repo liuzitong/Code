@@ -376,6 +376,7 @@ void StaticCheck::Checkprocess()
 //        qDebug()<<"checkCycleLocAndDB loc:"<<std::get<1>(checkCycleLocAndDB)<<" DB"<<std::get<2>(checkCycleLocAndDB);
         m_lastCheckDotRecord.push_back(nullptr);
         getReadyToStimulate(std::get<1>(checkCycleLocAndDB),std::get<2>(checkCycleLocAndDB));
+        stimulationIndex=-1;
         emit nextCheckingDotChanged(-1);
     }
     else
