@@ -98,6 +98,8 @@ public:
 
     void  openShutter(quint16 durationTime,qint32 coord_shutter);
 
+    void  beep(quint16 repeatCount,quint16 durationTime,quint16 intervalTime);
+
     void  moveChinMotors( quint8* sps, qint32* value,MoveMethod method=MoveMethod::Abosolute);
 
     /*!

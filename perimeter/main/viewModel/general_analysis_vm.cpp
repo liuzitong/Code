@@ -386,6 +386,7 @@ void StaticAnalysisVm::showReport(int report)
     manager->setReportVariable("deviceInfo",tr("Device info")+QString(":")+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("deviceInfo").toString());
     manager->setReportVariable("version", tr("Version")+QString(":")+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("version").toString());
 
+
     UtilitySvc::reportEngine->setShowProgressDialog(true);
     UtilitySvc::reportEngine->setPreviewScaleType(LimeReport::ScaleType::Percents,50);
     UtilitySvc::reportEngine->previewReport(/*LimeReport::PreviewHint::ShowAllPreviewBars*/);

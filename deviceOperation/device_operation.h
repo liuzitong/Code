@@ -78,6 +78,7 @@ public:
     void waitMotorStop(QVector<UsbDev::DevCtl::MotorId> motorIDs);
     void lightUpCastLight();
     void dimDownCastLight();
+    void beep();
 
 private:
     void moveChin(ChinMoveDirection direction);       //0左,1不动,2右;0上,1不动,2下

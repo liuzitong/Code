@@ -174,6 +174,7 @@ private slots:
 
     void on_pushButton_stopDynamic_clicked();
 
+    void on_pushButton_beep_clicked();
 
 private:
     void initData();

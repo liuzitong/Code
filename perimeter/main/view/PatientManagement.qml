@@ -569,7 +569,7 @@ Item{
                 }
             }
             Flow{height:parent.height; layoutDirection: Qt.RightToLeft;width:parent.width*0.4;spacing: height*0.8;
-                CusButton{text:lt+qsTr("Check");enabled:!(currentPatient===null)&&IcUiQmlApi.appCtrl.checkSvc.devReady&&IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus===3;
+                CusButton{text:lt+qsTr("Check");enabled:currentPatient!==null/*&&IcUiQmlApi.appCtrl.checkSvc.devReady&&IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus===3*/;
                     onClicked:
                     {
                         root.changePage("check",{lastProgram:null,type:"check"});

@@ -588,6 +588,15 @@ void DeviceOperation::dimDownCastLight()
     }
 }
 
+void DeviceOperation::beep()
+{
+    auto devSetting=DeviceSettings::getSingleton();
+    if(m_isDeviceReady)
+    {
+        m_devCtl->beep(devSetting->m_beepCount,devSetting->m_beepDuration,devSetting->m_beepInterval);
+    }
+}
+
 
 
 void DeviceOperation::workOnNewStatuData()

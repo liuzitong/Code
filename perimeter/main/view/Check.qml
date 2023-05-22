@@ -519,8 +519,6 @@ Item {id:root; width: 1366;height: 691
                             button.text: lt+qsTr("Analysis");
                             button.onClicked:
                             {
-                                console.log(currentCheckResult.id);
-                                console.log(currentProgram.id);
                                 var report=listModel.get(0).report;
                                 analysis(report);
                             }

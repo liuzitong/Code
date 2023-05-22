@@ -52,6 +52,10 @@ DeviceSettings::DeviceSettings()
     m_castLightDAChanged=m_rootObj.value("castLightDAChanged").toInt();
     m_castLightLastAdjustedDate=m_rootObj.value("castLightLastAdjustedDate").toString();
 
+    m_beepCount=m_rootObj.value("beepCount").toInt();
+    m_beepDuration=m_rootObj.value("beepDuration").toInt();
+    m_beepInterval=m_rootObj.value("beepInterval").toInt();
+
     auto motorSpeed=m_rootObj.value("motorSpeed").toArray();
     for(int i=0;i<motorSpeed.count();i++)
     {

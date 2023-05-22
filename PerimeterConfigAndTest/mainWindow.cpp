@@ -1225,6 +1225,15 @@ void MainWindow::on_pushButton_stopDynamic_clicked()
     m_devCtl->stopDyanmic();
 }
 
+void MainWindow::on_pushButton_beep_clicked()
+{
+    quint16 repeatCount=ui->spinBox_BeepCount->value();
+    quint16 beepDuration=ui->spinBox_beepDurationTime->value();
+    quint16 beepInterval=ui->spinBox_beepIntervalTime->value();
+
+    m_devCtl->beep(repeatCount,beepDuration,beepInterval);
+}
+
 void MainWindow::on_plainTextEdit_rawCommand_textChanged()
 {
     static int previousWordCount=0;

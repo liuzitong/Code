@@ -26,6 +26,9 @@ public:
     int m_castLightTargetSize;
     int m_castLightDAChanged;
     QString m_castLightLastAdjustedDate;
+    int m_beepCount;
+    int m_beepInterval;
+    int m_beepDuration;
     int m_pupilAutoAlignStep;
     quint8 m_5MotorSpeed[5];
     quint8 m_motorChinSpeed[2];

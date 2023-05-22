@@ -1281,6 +1281,20 @@ void DevCtl::openShutter(quint16 durationTime, qint32 coord_shutter)
                 );
 }
 
+void DevCtl::beep(quint16 repeatCount, quint16 durationTime, quint16 intervalTime)
+{
+    QByteArray ba(512,0);
+    unsigned char* ptr=reinterpret_cast<unsigned char*>(ba.data());
+    ptr[0]=0x5a;ptr[1]=0x90;
+    gPutInt16(&ptr[2],repeatCount);
+    gPutInt16(&ptr[4],durationTime);
+    gPutInt16(&ptr[6],intervalTime);
+    QMetaObject::invokeMethod(
+        T_PrivPtr( m_obj )->wkrPtr(), "cmd_GeneralCmd", Qt::QueuedConnection,
+        Q_ARG( QByteArray, ba),Q_ARG( QString,QString("beep")),Q_ARG( quint32, 8 )
+                );
+}
+
 
 
 
