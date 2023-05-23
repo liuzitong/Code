@@ -107,8 +107,9 @@ public:
     virtual void lightsOn() override;
 
 signals:
-    void currentCheckingDotChanged(int index);
-    void nextCheckingDotChanged(int index);
+    void currentCheckingDotChanged(QPointF loc);
+    void nextCheckingDotChanged(QPointF loc);
+    void checkResultChanged();
 
 private:
     std::tuple<bool,QPointF,int> getCheckCycleLocAndDB();
@@ -240,8 +241,8 @@ signals:
     void checkTimeChanged(int secs);
     void sendErrorInfo(QString error);
     void stop();
-    void currentCheckingDotChanged(int index);
-    void nextCheckingDotChanged(int index);
+    void currentCheckingDotChanged(QPointF loc);
+    void nextCheckingDotChanged(QPointF loc);
     void readyToCheck(bool isReady);
 
 };
@@ -368,7 +369,6 @@ void StaticCheck::Checkprocess()
 {
 
     m_alreadyChecked=false;
-    int stimulationIndex;
     auto checkCycleLocAndDB=getCheckCycleLocAndDB();                //存储LastdotType为各种检查
     if(m_error==true) return;                                       //找不到盲点 退出检查
     if(std::get<0>(checkCycleLocAndDB))
@@ -376,17 +376,17 @@ void StaticCheck::Checkprocess()
 //        qDebug()<<"checkCycleLocAndDB loc:"<<std::get<1>(checkCycleLocAndDB)<<" DB"<<std::get<2>(checkCycleLocAndDB);
         m_lastCheckDotRecord.push_back(nullptr);
         getReadyToStimulate(std::get<1>(checkCycleLocAndDB),std::get<2>(checkCycleLocAndDB));
-        stimulationIndex=-1;
-        emit nextCheckingDotChanged(-1);
+//        stimulationIndex=-1;
+        emit nextCheckingDotChanged(std::get<1>(checkCycleLocAndDB));
     }
     else
     {
         m_lastCheckDotRecord.push_back(&getCheckDotRecordRef());   //存储lastDotType为commondot 并且存储指针
 //        qDebug()<<"getCheckDotRecordRef loc:"<<dotRec->loc<<" DB:"<<QString::number(dotRec->StimulationDBs.last())<<"upper:"<<QString::number(dotRec->upperBound)<<"lower:"<<QString::number(dotRec->lowerBound);
 
-        stimulationIndex=m_lastCheckDotRecord.last()->index;
-        emit nextCheckingDotChanged(stimulationIndex);
-        getReadyToStimulate(m_lastCheckDotRecord.last()->loc,m_lastCheckDotRecord.last()->StimulationDBs.last());
+//        stimulationIndex=m_lastCheckDotRecord.last()->index;
+        emit nextCheckingDotChanged(m_lastCheckDotRecord.last()->loc);
+        getReadyToStimulate(m_lastCheckDotRecord.last()->loc,m_lastCheckDotRecord.last()->DB);
 
 
 //        int static count=0;
@@ -406,6 +406,7 @@ void StaticCheck::Checkprocess()
     {
         m_stimulated=false;
         waitAndProcessAnswer();                             //取出commonDot 并且取出指针,处理的时候可能发现下一个是已经检查出结果的点,这个时候就选择不刺激置m_alreadyChecked为true
+        emit checkResultChanged();
     }
 
     checkWaiting();
@@ -421,7 +422,7 @@ void StaticCheck::Checkprocess()
             stimulate();
             m_stimulationCount++;
             m_stimulated=true;
-            emit currentCheckingDotChanged(stimulationIndex);
+
 //        }
     }
 }
@@ -429,10 +430,12 @@ void StaticCheck::Checkprocess()
 void StaticCheck::finished()
 {
     m_deviceOperation->m_isChecking=false;
-    emit currentCheckingDotChanged(-1);
-    emit nextCheckingDotChanged(-1);
+    emit currentCheckingDotChanged({999,999});
+    emit nextCheckingDotChanged({999,999});
     lightsOff();
-    UtilitySvc::wait(1000);
+    m_deviceOperation->resetMotors({UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
+    m_deviceOperation->beep();
+    UtilitySvc::wait(2000);
     lightsOn();
 }
 
@@ -654,6 +657,7 @@ void StaticCheck::stimulate()
 //        qDebug()<<QString("deviation is:")+QString::number(m_deviceOperation->m_deviation);
         m_deviceOperation->waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y,UsbDev::DevCtl::MotorId_Shutter});
         m_deviceOperation->openShutter(durationTime);
+        emit currentCheckingDotChanged(debug_Loc);
         std::cout<<"***** DB shi:"<<debug_DB<<"    "<<"zuo biao x:"<<debug_Loc.x()<<" "<<"zuobiao y:"<<debug_Loc.y()<<"    yong shi:"<<m_stimulationWaitingForAnswerElapsedTimer.elapsed()<<std::endl;
         switch (lastCheckedDotType)
         {
@@ -781,13 +785,13 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
         //确定盲点,条件是要经历一点测试次数,而且盲为空
         if(m_stimulationCount>=UtilitySvc::getSingleton()->m_checkCountBeforeGetBlindDotCheck&&m_blindDot.isEmpty())
         {
-            std::cout<<"locating blindDOt"<<std::endl;
             QPoint blindDotLoc;
             if(m_resultModel->m_OS_OD==0)
                 blindDotLoc=UtilitySvc::getSingleton()->m_left_blindDot[m_blindDotLocateIndex];
             else
                 blindDotLoc=UtilitySvc::getSingleton()->m_right_blindDot[m_blindDotLocateIndex];
 
+            std::cout<<"locating blindDOt"<<std::endl;
             m_lastCheckeDotType.push_back(LastCheckedDotType::locateBlindDot);
             return {true,blindDotLoc,m_stimulationCount>UtilitySvc::getSingleton()->m_blindDotTestDB};
 
@@ -795,19 +799,16 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
 
         //盲点不为空的时候到了周期测试盲点.
         if(!m_blindDot.isEmpty()&&m_stimulationCount%fixedParams.fixationViewLossCycle==m_fiaxationViewLossCyc)
-//        if(!m_blindDot.isEmpty()&&m_stimulationCount%fixedParams.fixationViewLossCycle==qrand()%fixedParams.fixationViewLossCycle)
         {
             auto blindDB=UtilitySvc::getSingleton()->m_blindDotTestDB+UtilitySvc::getSingleton()->m_blindDotTestIncDB;
-//            m_lastCheckeDotType.push_back(LastCheckedDotType::blindDotTest);
-//            return {true,{m_blindDot[0].x(),m_blindDot[0].y()},blindDB};
-//            std::cout<<"blindDot:"<<
             m_checkCycleDotList.append({LastCheckedDotType::blindDotTest,m_blindDot[0],blindDB});
+            std::cout<<"check blind dot:"<<m_blindDot[0].x()<<","<<m_blindDot[0].y()<<std::endl;
         }
     }
 
     if(UtilitySvc::getSingleton()->m_checkFalseNegAndPos)
     {
-        if(m_stimulationCount%fixedParams.falsePositiveCycle==m_falsePosCyc)
+        if(m_stimulationCount%fixedParams.falseNegativeCycle==m_falseNegCyc)
 //        if(m_stimulationCount%fixedParams.falsePositiveCycle==qrand()%fixedParams.falsePositiveCycle)         //假阳
         {
             QVector<DotRecord> m_checkedRecords;
@@ -822,17 +823,17 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
             auto recordDot=m_checkedRecords[qrand()%m_checkedRecords.size()];
 //            m_lastCheckeDotType.push_back(LastCheckedDotType::falsePositiveTest);
 //            return {true,recordDot.loc,recordDot.DB-UtilitySvc::getSingleton()->m_falsePositiveDecDB};
-            m_checkCycleDotList.append({LastCheckedDotType::falsePositiveTest,recordDot.loc,recordDot.DB-UtilitySvc::getSingleton()->m_falsePositiveDecDB});
+            m_checkCycleDotList.append({LastCheckedDotType::falseNegativeTest,recordDot.loc,recordDot.DB-UtilitySvc::getSingleton()->m_falseNegativeDecDB});
         }
 
-        if(m_stimulationCount%fixedParams.falseNegativeCycle==m_falseNegCyc)
+        if(m_stimulationCount%fixedParams.falsePositiveCycle==m_falsePosCyc)
 //        if(m_stimulationCount%fixedParams.falseNegativeCycle==qrand()%fixedParams.falseNegativeCycle)         //假阴,随机点,到刺激的时候不开快门
         {
             auto locs=m_programModel->m_data.dots;
             auto loc=locs[qrand()%locs.size()];
 //            m_lastCheckeDotType.push_back(LastCheckedDotType::falseNegativeTest);
 //            return {true,{loc.x,loc.y},0};
-            m_checkCycleDotList.append({LastCheckedDotType::falseNegativeTest,loc.toQPointF(),0});
+            m_checkCycleDotList.append({LastCheckedDotType::falsePositiveTest,loc.toQPointF(),0});
         }
     }
     if(m_checkCycleDotList.size()>0)
@@ -907,7 +908,7 @@ void StaticCheck::ProcessAnswer(bool answered)
             else m_blindDot.push_back(UtilitySvc::getSingleton()->m_right_blindDot[m_blindDotLocateIndex]);
 
 
-            if(m_lastCheckeDotType.last()==LastCheckedDotType::locateBlindDot)
+            if(m_lastCheckeDotType.last()==LastCheckedDotType::locateBlindDot)                      //如果下一个是盲点
             {
                 m_alreadyChecked=true;
                 if(m_deviceOperation->m_isDeviceReady)
@@ -915,8 +916,7 @@ void StaticCheck::ProcessAnswer(bool answered)
                 m_lastCheckDotRecord.pop_back();
                 m_lastCheckeDotType.pop_back();
             }
-
-            std::cout<<"blinddot located."<<std::endl;
+            std::cout<<"blinddot located:"<<m_blindDot[0].x()<<","<<m_blindDot[0].y()<<std::endl;
         }
         else
         {
@@ -934,14 +934,14 @@ void StaticCheck::ProcessAnswer(bool answered)
     case LastCheckedDotType::falsePositiveTest:
     {
         m_resultModel->m_data.falsePositiveTestCount++;
-        if(!answered)
+        if(answered)
             m_resultModel->m_data.falsePositiveCount++;
         break;
     }
     case LastCheckedDotType::falseNegativeTest:
     {
         m_resultModel->m_data.falseNegativeTestCount++;
-        if(answered)
+        if(!answered)
         {
             m_resultModel->m_data.falseNegativeCount++;
         }
@@ -1146,9 +1146,39 @@ void StaticCheck::ProcessAnswer(bool answered)
             m_resultModel->m_data.checkData[lastCheckedDot->index]=lastCheckedDot->DB; //存储结果
             if(m_programModel->m_params.commonParams.fixationTarget==FixationTarget::centerPoint&&lastCheckedDot->index==int(m_programModel->m_data.dots.size()*2))                //中心点检查完后换灯
             {
-                for(int i=0;i<4;i++)
-                    m_deviceOperation->setLamp(DevOps::LampId::LampId_smallDiamond,i,false);
-                m_deviceOperation->setLamp(DevOps::LampId::LampId_centerFixation,0,true);
+                switch (m_programModel->m_params.commonParams.fixationTarget)
+                {
+                case FixationTarget::centerPoint:
+                {
+                    for(int i=0;i<4;i++)
+                        m_deviceOperation->setLamp(DevOps::LampId::LampId_bigDiamond,i,false);
+                    m_deviceOperation->setLamp(DevOps::LampId::LampId_centerFixation,0,true);
+                    break;
+                }
+                case FixationTarget::bigDiamond:
+                {
+                    break;
+                }
+                case FixationTarget::smallDiamond:
+                {
+                    for(int i=0;i<4;i++)
+                    {
+                        m_deviceOperation->setLamp(DevOps::LampId::LampId_bigDiamond,i,false);
+                        m_deviceOperation->setLamp(DevOps::LampId::LampId_smallDiamond,i,true);
+                    }
+                    break;
+                }
+                case FixationTarget::bottomPoint:
+                {
+                    for(int i=0;i<4;i++)
+                    {
+                        if(i!=1) m_deviceOperation->setLamp(DevOps::LampId::LampId_bigDiamond,i,false);
+                    }
+                }
+                }
+
+                emit checkResultChanged();
+                UtilitySvc::wait(UtilitySvc::getSingleton()->m_centerPointCheckedWaitingTime);
             }
 
             if(lastCheckedDot->index<int(m_programModel->m_data.dots.size()))                //非短周期或者中心点
@@ -1191,7 +1221,7 @@ void StaticCheck::waitAndProcessAnswer()
     {
         answerResult=qrand()%100<50;
 //        answerResult=false;
-        UtilitySvc::wait(100);
+        UtilitySvc::wait(300);
     }
     //    QThread::msleep(1000);
     qDebug()<<answerResult;
@@ -1222,37 +1252,40 @@ void StaticCheck::checkWaiting()
 
 void StaticCheck::lightsOn()
 {
-    switch (m_programModel->m_params.commonParams.fixationTarget)
+    if(m_programModel->m_params.commonParams.centerDotCheck)
     {
-    case FixationTarget::centerPoint:
+        for(int i=0;i<4;i++)
+            m_deviceOperation->setLamp(DevOps::LampId::LampId_bigDiamond,i,true);
+    }
+    else
     {
-        if(m_programModel->m_params.commonParams.centerDotCheck)
+        switch (m_programModel->m_params.commonParams.fixationTarget)
+        {
+        case FixationTarget::centerPoint:
+        {
+            m_deviceOperation->setLamp(DevOps::LampId::LampId_centerFixation,0,true);
+            break;
+        }
+        case FixationTarget::bigDiamond:
+        {
+            for(int i=0;i<4;i++)
+                m_deviceOperation->setLamp(DevOps::LampId::LampId_bigDiamond,i,true);
+            break;
+        }
+        case FixationTarget::smallDiamond:
         {
             for(int i=0;i<4;i++)
                 m_deviceOperation->setLamp(DevOps::LampId::LampId_smallDiamond,i,true);
+            break;
         }
-        else
-            m_deviceOperation->setLamp(DevOps::LampId::LampId_centerFixation,0,true);
-        break;
+        case FixationTarget::bottomPoint:
+        {
+            m_deviceOperation->setLamp(DevOps::LampId::LampId_bigDiamond,1,true);
+            break;
+        }
+        }
     }
-    case FixationTarget::bigDiamond:
-    {
-        for(int i=0;i<4;i++)
-            m_deviceOperation->setLamp(DevOps::LampId::LampId_bigDiamond,i,true); break;
-        break;
-    }
-    case FixationTarget::smallDiamond:
-    {
-        for(int i=0;i<4;i++)
-            m_deviceOperation->setLamp(DevOps::LampId::LampId_smallDiamond,i,true); break;
-        break;
-    }
-    case FixationTarget::bottomPoint:
-    {
-        m_deviceOperation->setLamp(DevOps::LampId::LampId_bigDiamond,1,true); break;
-        break;
-    }
-    }
+
 
     if(m_programModel->m_params.commonParams.backGroundColor==BackGroundColor::white)
     {
@@ -1566,7 +1599,9 @@ void DynamicCheck::finished()
 {
     m_deviceOperation->m_isChecking=false;
     lightsOff();
-    UtilitySvc::wait(1000);
+    m_deviceOperation->beep();
+    m_deviceOperation->resetMotors({UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
+    UtilitySvc::wait(2000);
     lightsOn();
 }
 
@@ -1697,6 +1732,7 @@ void CheckSvcWorker::doWork()
 //            qDebug()<<("stopped");
             m_timer.stop();
             m_check->finished();
+            setCheckState(5);
             return;
         }
         case 4:                                             //finish
@@ -1736,8 +1772,8 @@ CheckSvc::CheckSvc(QObject *parent)
     connect(m_worker,&CheckSvcWorker::checkedCountChanged,this, &CheckSvc::setCheckedCount);
     connect(m_worker,&CheckSvcWorker::totalCountChanged,this, &CheckSvc::setTotalCount);
     connect(m_worker,&CheckSvcWorker::checkTimeChanged,this, &CheckSvc::setCheckTime);
-    connect(m_worker,&CheckSvcWorker::currentCheckingDotChanged,[&](int value){m_currentCheckingDotIndex=value;qDebug()<<value;emit currentCheckingDotIndexChanged();});
-    connect(m_worker,&CheckSvcWorker::nextCheckingDotChanged,[&](int value){m_nextCheckingDotIndex=value;emit nextCheckingDotIndexChanged();});
+    connect(m_worker,&CheckSvcWorker::currentCheckingDotChanged,[&](QPointF value){m_currentCheckingDotLoc=value;qDebug()<<value;emit currentCheckingDotLocChanged();});
+    connect(m_worker,&CheckSvcWorker::nextCheckingDotChanged,[&](QPointF value){m_nextCheckingDotLoc=value;emit nextCheckingDotLocChanged();});
     connect(m_worker,&CheckSvcWorker::sendErrorInfo,this, [](QString errorInfo)
     {
         QMessageBox msgBox;

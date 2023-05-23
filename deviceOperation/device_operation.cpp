@@ -588,6 +588,17 @@ void DeviceOperation::dimDownCastLight()
     }
 }
 
+void DeviceOperation::resetMotors(QVector<UsbDev::DevCtl::MotorId> motorIDs)
+{
+    if(!m_isDeviceReady) return;
+    auto spsConfig=DeviceSettings::getSingleton()->m_motorChinSpeed;
+    for(auto& motorID:motorIDs)
+    {
+        int speed=spsConfig[motorID];
+        m_devCtl->resetMotor(motorID,speed);
+    }
+}
+
 void DeviceOperation::beep()
 {
     auto devSetting=DeviceSettings::getSingleton();

@@ -8,8 +8,8 @@ Item{
     property var currentProgram: null;
     property var currentCheckResult:null;
     property int clickedDotIndex: -1;
-    property int currentCheckingDotIndex: IcUiQmlApi.appCtrl.checkSvc.currentCheckingDotIndex;
-    property int nextCheckingDotIndex: IcUiQmlApi.appCtrl.checkSvc.nextCheckingDotIndex;
+    property point currentCheckingDotLoc: IcUiQmlApi.appCtrl.checkSvc.currentCheckingDotLoc;
+    property point nextCheckingDotLoc: IcUiQmlApi.appCtrl.checkSvc.nextCheckingDotLoc;
     property alias testOver:displayCanvas.testOver;
     property int os_od: 0;
     property var dynamicSelectedDots:[];
@@ -26,11 +26,11 @@ Item{
     onCurrentCheckResultChanged:
     {
         displayCanvas.requestPaint();
-//        console.log(currentCheckingDotIndex);
+//        console.log(currentCheckingDotLoc);
     }
 
-    onCurrentCheckingDotIndexChanged: {displayCanvas.requestPaint();}
-    onNextCheckingDotIndexChanged: {displayCanvas.requestPaint();}
+    onCurrentCheckingDotLocChanged: {displayCanvas.requestPaint();console.log(currentCheckingDotLoc);}
+    onNextCheckingDotLocChanged: {displayCanvas.requestPaint();console.log(nextCheckingDotLoc);}
 
 
     function resetInputDot()
@@ -684,16 +684,7 @@ Item{
                         {
                             if(dBList[i]===-999)
                             {
-                                if(i===currentCheckingDotIndex)
-                                {
-                                    drawDot(dotList[i],"red");
-                                }
-                                else if(i===nextCheckingDotIndex)
-                                {
-                                    drawDot(dotList[i],"blue");
-                                }
-                                else
-                                    drawDot(dotList[i],"white");
+                               drawDot(dotList[i],"white");
                             }
                             else if(dBList[i]<0)
                                  drawText("<0",dotToPixCoord(dotList[i]).x,dotToPixCoord(dotList[i]).y)
@@ -718,8 +709,12 @@ Item{
                             else  if(dBList[i])
                                 drawDB(dBList[i],{x:0,y:0});
                         }
-
                     }
+                    if(currentCheckingDotLoc.x!==999)
+                        drawDot(currentCheckingDotLoc,"red");
+                    if(nextCheckingDotLoc.x!==999)
+                        drawDot(nextCheckingDotLoc,"blue");
+
                 }
                 else if(currentProgram.type===1)                                // 筛选
                 {
@@ -732,18 +727,7 @@ Item{
 
                             switch (dBList[i])
                             {
-                            case -999:
-                            if(i===currentCheckingDotIndex)
-                            {
-                                drawDot(dotList[i],"red");
-                            }
-                            else if(i===nextCheckingDotIndex)
-                            {
-                                drawDot(dotList[i],"blue");
-                            }
-                            else
-                                drawDot(dotList[i],"white");
-                            break;
+                            case -999: drawDot(dotList[i],"white"); break;
                             case 0:drawUnseen(dotList[i]);break;
                             case 1:drawWeakSeen(dotList[i]);break;
                             case 2:drawSeen(dotList[i]);break;
@@ -774,6 +758,10 @@ Item{
                             }
                         }
                     }
+                    if(currentCheckingDotLoc.x!==999)
+                        drawDot(currentCheckingDotLoc,"red");
+                    if(nextCheckingDotLoc.x!==999)
+                        drawDot(nextCheckingDotLoc,"blue");
 
                 }
                 else                                                        //动态

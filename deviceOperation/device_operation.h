@@ -78,6 +78,7 @@ public:
     void waitMotorStop(QVector<UsbDev::DevCtl::MotorId> motorIDs);
     void lightUpCastLight();
     void dimDownCastLight();
+    void resetMotors(QVector<UsbDev::DevCtl::MotorId> motorIDs);
     void beep();
 
 private:

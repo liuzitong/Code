@@ -24,8 +24,8 @@ class CheckSvc: public QObject
     Q_PROPERTY(bool autoAlignPupil READ getAutoAlignPupil WRITE setAutoAlignPupil NOTIFY autoAlignPupilChanged)
     Q_PROPERTY(bool pupilDiameter READ getPupilDiameter NOTIFY pupilDiameterChanged)
     Q_PROPERTY(QVariantList dynamicSelectedDots WRITE setInputDots)
-    Q_PROPERTY(int nextCheckingDotIndex READ getNextCheckingDotIndex NOTIFY nextCheckingDotIndexChanged)
-    Q_PROPERTY(int currentCheckingDotIndex READ getCurrentCheckingDotIndex NOTIFY currentCheckingDotIndexChanged)
+    Q_PROPERTY(QPointF nextCheckingDotLoc READ getNextCheckingDotLoc NOTIFY nextCheckingDotLocChanged)
+    Q_PROPERTY(QPointF currentCheckingDotLoc READ getCurrentCheckingDotLoc NOTIFY currentCheckingDotLocChanged)
     Q_PROPERTY(bool readyToCheck READ getReadyToCheck WRITE setReadyToCheck NOTIFY readyToCheckChanged)
 
 
@@ -69,20 +69,20 @@ public:
     bool getAutoAlignPupil();void setAutoAlignPupil(bool autoAlign);Q_SIGNAL void autoAlignPupilChanged();
     float getPupilDiameter();Q_SIGNAL void pupilDiameterChanged();
     void setInputDots(QVariantList value);
-    int getCurrentCheckingDotIndex(){return m_currentCheckingDotIndex;}Q_SIGNAL void currentCheckingDotIndexChanged();
-    int getNextCheckingDotIndex(){return m_nextCheckingDotIndex;}Q_SIGNAL void nextCheckingDotIndexChanged();
+    QPointF getCurrentCheckingDotLoc(){return m_currentCheckingDotLoc;}Q_SIGNAL void currentCheckingDotLocChanged();
+    QPointF getNextCheckingDotLoc(){return m_nextCheckingDotLoc;}Q_SIGNAL void nextCheckingDotLocChanged();
     bool getReadyToCheck(){return m_readyToCheck;}void setReadyToCheck(bool value){m_readyToCheck=value;emit readyToCheckChanged();} Q_SIGNAL void readyToCheckChanged();
 //    CheckSvcWorker* getWorker(){return m_worker;}
 
 private:
     CheckSvcWorker* m_worker;
     QThread m_workerThread;
-    int m_checkState=3;                        //0:start,1:checking,2:pausing,3:stopped,4:finished
+    int m_checkState=5;                        //0:start,1:checking,2:pausing,3:stopped,4:finished
     int m_checkedCount=0;
     int m_totalCount=0;
     int m_checkTime=0;
-    int m_currentCheckingDotIndex=-1;
-    int m_nextCheckingDotIndex=-1;
+    QPointF m_currentCheckingDotLoc={999,999};
+    QPointF m_nextCheckingDotLoc={999,999};
     bool m_readyToCheck=false;
     bool m_atCheckingPage=false;
     QList<QPoint> m_dynamicSelectedDots;

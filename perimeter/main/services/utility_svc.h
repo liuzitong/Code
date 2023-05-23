@@ -56,11 +56,12 @@ public:
     int m_checkCountBeforeGetBlindDotCheck;
     int m_blindDotTestDB;
     int m_blindDotTestIncDB;
-    int m_falsePositiveDecDB;
+    int m_falseNegativeDecDB;
     bool m_checkFalseNegAndPos;
     double m_VFImultiplier;
     float m_checkZoneRatio;
     QSize m_realTimeEyePosPicSize;
+    int m_centerPointCheckedWaitingTime;
 
     QVector<QVector<QVector<int>>> m_value_30d_cursorSize_cursorColor;
     QVector<QVector<int>> m_value_30d_cursorSizeIII_ageCorrection;     //cursorSize!=2 ,it's CursorColor
