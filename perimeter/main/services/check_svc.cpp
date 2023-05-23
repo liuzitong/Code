@@ -1355,8 +1355,8 @@ void DynamicCheck::resetData()
         for(int i=0;i<m_totalCount;i++)
         {
             auto angle=2*M_PI*i/m_totalCount;
-            m_records[i].beginLoc={centerDot.x()+distance*qCos(angle),centerDot.y()+distance*qSin(angle)};
-            m_records[i].endLoc=centerDot;
+            m_records[i].beginLoc=centerDot;
+            m_records[i].endLoc={centerDot.x()+distance*qCos(angle),centerDot.y()+distance*qSin(angle)};
             m_records[i].index=i;
             m_records[i].checked=false;
             m_records[i].isAnswered=false;
