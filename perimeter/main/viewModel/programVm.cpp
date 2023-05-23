@@ -23,17 +23,26 @@ StaticProgramVm::StaticProgramVm(const QVariantList &args)
 //       QSqlError daoError = qx::dao::execute_query(query, program_List);
 //       Program_ptr program_ptr=program_List.first();
 
-    Program_ptr program_ptr(new Program);
-    qDebug()<<args[0].toInt();
-    program_ptr->m_id=args[0].toInt();
-    qx::dao::fetch_by_id(program_ptr);
-    auto pp=new StaticProgramModel(program_ptr);
-//    }
-    m_data.reset(pp);
-    ProgramVm::m_data=pp;
-    m_staticDataVm.reset(new StaticProgramDataVm(&m_data->m_data));
-    m_staticParamsVm.reset(new StaticParamsVM(&m_data->m_params));
-    qDebug()<<m_staticParamsVm->getFixedParams()->getStimulationTime();
+
+    if(args.count()==0)
+    {
+        auto pp=new StaticProgramModel();
+        m_data.reset(pp);
+        ProgramVm::m_data=pp;
+        m_staticDataVm.reset(new StaticProgramDataVm(&m_data->m_data));
+        m_staticParamsVm.reset(new StaticParamsVM(&m_data->m_params));
+    }
+    else
+    {
+        Program_ptr program_ptr(new Program);
+        program_ptr->m_id=args[0].toInt();
+        qx::dao::fetch_by_id(program_ptr);
+        auto pp=new StaticProgramModel(program_ptr);
+        m_data.reset(pp);
+        ProgramVm::m_data=pp;
+        m_staticDataVm.reset(new StaticProgramDataVm(&m_data->m_data));
+        m_staticParamsVm.reset(new StaticParamsVM(&m_data->m_params));
+    }
 }
 
 void StaticProgramVm::updateProgram()

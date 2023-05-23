@@ -1144,21 +1144,17 @@ void StaticCheck::ProcessAnswer(bool answered)
                 m_lastCheckeDotType.pop_back();
             }          //下次要刺激的点,是已经检查了的,所以要移除所有下次的点
             m_resultModel->m_data.checkData[lastCheckedDot->index]=lastCheckedDot->DB; //存储结果
-            if(m_programModel->m_params.commonParams.fixationTarget==FixationTarget::centerPoint&&lastCheckedDot->index==int(m_programModel->m_data.dots.size()*2))                //中心点检查完后换灯
+            if(lastCheckedDot->index==int(m_programModel->m_data.dots.size()*2))                //中心点检查完后换灯
             {
                 switch (m_programModel->m_params.commonParams.fixationTarget)
                 {
                 case FixationTarget::centerPoint:
                 {
-                    for(int i=0;i<4;i++)
-                        m_deviceOperation->setLamp(DevOps::LampId::LampId_bigDiamond,i,false);
+                    for(int i=0;i<4;i++) m_deviceOperation->setLamp(DevOps::LampId::LampId_bigDiamond,i,false);
                     m_deviceOperation->setLamp(DevOps::LampId::LampId_centerFixation,0,true);
                     break;
                 }
-                case FixationTarget::bigDiamond:
-                {
-                    break;
-                }
+                case FixationTarget::bigDiamond:break;
                 case FixationTarget::smallDiamond:
                 {
                     for(int i=0;i<4;i++)
@@ -1171,9 +1167,8 @@ void StaticCheck::ProcessAnswer(bool answered)
                 case FixationTarget::bottomPoint:
                 {
                     for(int i=0;i<4;i++)
-                    {
                         if(i!=1) m_deviceOperation->setLamp(DevOps::LampId::LampId_bigDiamond,i,false);
-                    }
+                    break;
                 }
                 }
 
