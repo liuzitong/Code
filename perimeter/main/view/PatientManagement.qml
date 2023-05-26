@@ -510,7 +510,6 @@ Item{
                                                else if(age>=30) y=1;
                                                else y=0;
 
-
                                                return parseFloat(rx1)+x+y;
                                            }
 

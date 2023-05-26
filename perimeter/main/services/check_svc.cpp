@@ -192,7 +192,7 @@ public:
 
     virtual void finished() override;
 
-    QList<QPoint> m_dynamicSelectedDots;
+    QList<QPointF> m_dynamicSelectedDots;
 };
 
 
@@ -206,7 +206,7 @@ public:
     PatientVm* m_patientVm;
     ProgramVm* m_programVm;
     CheckResultVm* m_checkResultVm;
-    QList<QPoint> m_dynamicSelectedDots;
+    QList<QPointF> m_dynamicSelectedDots;
 
 private:
     QSharedPointer<Check> m_check;
@@ -367,40 +367,21 @@ void StaticCheck::resetData()
 //第一次先跑点,直接刺激,第二次跑点,等待上次刺激的应答,然后再刺激,再跑点,再等待上次的应答.(保证再等待应答的同时跑点.)
 void StaticCheck::Checkprocess()
 {
-
     m_alreadyChecked=false;
     auto checkCycleLocAndDB=getCheckCycleLocAndDB();                //存储LastdotType为各种检查
     if(m_error==true) return;                                       //找不到盲点 退出检查
     if(std::get<0>(checkCycleLocAndDB))
     {
-//        qDebug()<<"checkCycleLocAndDB loc:"<<std::get<1>(checkCycleLocAndDB)<<" DB"<<std::get<2>(checkCycleLocAndDB);
         m_lastCheckDotRecord.push_back(nullptr);
         getReadyToStimulate(std::get<1>(checkCycleLocAndDB),std::get<2>(checkCycleLocAndDB));
-//        stimulationIndex=-1;
         emit nextCheckingDotChanged(std::get<1>(checkCycleLocAndDB));
     }
     else
     {
         m_lastCheckDotRecord.push_back(&getCheckDotRecordRef());   //存储lastDotType为commondot 并且存储指针
-//        qDebug()<<"getCheckDotRecordRef loc:"<<dotRec->loc<<" DB:"<<QString::number(dotRec->StimulationDBs.last())<<"upper:"<<QString::number(dotRec->upperBound)<<"lower:"<<QString::number(dotRec->lowerBound);
-
-//        stimulationIndex=m_lastCheckDotRecord.last()->index;
         emit nextCheckingDotChanged(m_lastCheckDotRecord.last()->loc);
-        getReadyToStimulate(m_lastCheckDotRecord.last()->loc,m_lastCheckDotRecord.last()->DB);
-
-
-//        int static count=0;
-//        switch(count)
-//        {
-//        case 0:getReadyToStimulate({-15,0},0);break;
-//        case 1:getReadyToStimulate({15,0},0);break;
-//        case 2:getReadyToStimulate({0,-15},0);break;
-//        case 3:getReadyToStimulate({0,15},0);break;
-//        }
-//        count++;
-//        count%=4;
+        getReadyToStimulate(m_lastCheckDotRecord.last()->loc,m_lastCheckDotRecord.last()->StimulationDBs.last());
     }
-
 
     if(m_stimulated)                               //最开始没刺激过就不需要处理
     {
@@ -413,17 +394,9 @@ void StaticCheck::Checkprocess()
 
     if(m_checkedCount<m_totalCount&&!m_alreadyChecked)                         //如果测试完毕或者是已经得到结果的点就不刺激了
     {
-//        if(m_lastCheckeDotType.last()==LastCheckedDotType::locateBlindDot&&!m_blindDot.isEmpty())      // 盲点如果已经确定就直接跳过
-//        {
-//            std::cout<<"pop second blindDot"<<std::endl;
-//            m_lastCheckeDotType.pop_back();
-//        }
-//        else{
-            stimulate();
-            m_stimulationCount++;
-            m_stimulated=true;
-
-//        }
+        stimulate();
+        m_stimulationCount++;
+        m_stimulated=true;
     }
 }
 
@@ -500,13 +473,8 @@ StaticCheck::DotRecord &StaticCheck::getCheckDotRecordRef()
             }
         }
 
-
-
-
         int zoneNumber;
-//        int zoneNumberExclued=-1;
         QVector<int> arr={zoneRightTop.count(),zoneRightBottom.count(),zoneLeftBottom.count(),zoneLeftTop.count()};
-//        QPair<int,int> maxUnCheckedZone{INT_MIN,-1}/*,minUnCheckedZone{INT_MAX,-1}*/;
 
         int maxCheckedCount=INT_MIN;
 
@@ -515,34 +483,19 @@ StaticCheck::DotRecord &StaticCheck::getCheckDotRecordRef()
             if(arr[i]>maxCheckedCount)
             {
                 maxCheckedCount=arr[i];
-//                maxUnCheckedZone.second=i;
             }
-
-//            if(arr[i]<minUnCheckedZone.first)
-//            {
-//                minUnCheckedZone.first=arr[i];
-//                minUnCheckedZone.second=i;
-//            }
         }
 
 
 
         //随机出区域和参考点坐标
-//        if(/*(maxUnCheckedZone.first-minUnCheckedZone.first)>5&&(*/float(maxUnCheckedZone.first)/float(minUnCheckedZone.first)/*)*/>UtilitySvc::getSingleton()->m_checkZoneRatio)
-//        {
-//            zoneNumberExclued=minUnCheckedZone.second;
-//        }
-
         if(float(maxCheckedCount)/float(zoneRightTop.count())<UtilitySvc::getSingleton()->m_checkZoneRatio) zone.append(QVector<int>(zoneRightTop.count(),0));
         if(float(maxCheckedCount)/float(zoneRightBottom.count())<UtilitySvc::getSingleton()->m_checkZoneRatio) zone.append(QVector<int>(zoneRightBottom.count(),1));
         if(float(maxCheckedCount)/float(zoneLeftBottom.count())<UtilitySvc::getSingleton()->m_checkZoneRatio) zone.append(QVector<int>(zoneLeftBottom.count(),2));
         if(float(maxCheckedCount)/float(zoneLeftTop.count())<UtilitySvc::getSingleton()->m_checkZoneRatio) zone.append(QVector<int>(zoneLeftTop.count(),3));
 
         zoneNumber=zone[qrand()%zone.size()];
-//        qDebug()<<UtilitySvc::getSingleton()->m_checkZoneRatio;
-//        qDebug()<<float(maxUnCheckedZone.first)/float(minUnCheckedZone.first);
-//        qDebug()<<maxUnCheckedZone;
-//        qDebug()<<minUnCheckedZone;
+
         QVector<DotRecord> seletedZoneRecords;
         QVector<DotRecord> seletedZoneCheckedRecords;
         QPointF centerCoord;
@@ -606,20 +559,7 @@ StaticCheck::DotRecord &StaticCheck::getCheckDotRecordRef()
         for(auto&i:m_dotRecords)
         {
             if(!i.checked)
-            {
-
-//                if(m_lastCheckDotRecord.isEmpty()||m_lastCheckDotRecord.first()==nullptr)
-//                {
-//                    unchekedDotIndex.push_back(i.index);
-//                }
-//                else
-//                {
-//                    if(i.index!=m_lastCheckDotRecord.first()->index)                        //必须排除上次的,连续两次可能导致同时是最后一次检查,连续的检查完毕同一个点
-                    {
-                        uncheckedDotIndex.push_back(i.index);                                 //检查的编号加入容器
-                    }
-//                }
-            }
+                uncheckedDotIndex.push_back(i.index);                                 //检查的编号加入容器
         }
 
 
@@ -628,18 +568,6 @@ StaticCheck::DotRecord &StaticCheck::getCheckDotRecordRef()
         {
             selectedDotIndex=uncheckedDotIndex[qrand()%uncheckedDotIndex.count()];
         }
-//        else
-//        {
-//            for(auto&i:m_dotRecords)
-//            {
-//                if(!i.checked)
-//                {
-//                   selectedDotIndex=i.index;
-//                }
-//            }
-//        }
-
-
 
 //        qDebug()<<"unchecked Dots:"<<uncheckedDotIndex;
         auto& selectDot=m_dotRecords[selectedDotIndex];
@@ -791,9 +719,9 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
             else
                 blindDotLoc=UtilitySvc::getSingleton()->m_right_blindDot[m_blindDotLocateIndex];
 
-            std::cout<<"locating blindDOt"<<std::endl;
+            std::cout<<"locating blindDOt"<<blindDotLoc.x()<<","<<blindDotLoc.y()<<std::endl;
             m_lastCheckeDotType.push_back(LastCheckedDotType::locateBlindDot);
-            return {true,blindDotLoc,m_stimulationCount>UtilitySvc::getSingleton()->m_blindDotTestDB};
+            return {true,blindDotLoc,UtilitySvc::getSingleton()->m_blindDotTestDB};
 
         }
 
@@ -893,11 +821,8 @@ bool StaticCheck::waitForAnswer()
 
 void StaticCheck::ProcessAnswer(bool answered)
 {
-
-//    qDebug()<<"Process Answer.";
     auto lastCheckedDot=m_lastCheckDotRecord.takeFirst();
     auto lastCheckedDotType=m_lastCheckeDotType.takeFirst();
-//    qDebug()<<(answered?"anwered":"not answered");
     switch (lastCheckedDotType)
     {
     case LastCheckedDotType::locateBlindDot:
@@ -950,14 +875,10 @@ void StaticCheck::ProcessAnswer(bool answered)
     case LastCheckedDotType::commonCheckDot:
     {
         int dotDB=lastCheckedDot->StimulationDBs.last();
-//        m_resultModel->m_data.realTimeDB[lastCheckedDot->index]=lastCheckedDot->StimulationDBs.toStdVector(); //在check初始化的时候扩充了大小.
         answered?lastCheckedDot->lowerBound=dotDB:lastCheckedDot->upperBound=dotDB;
-//        qDebug()<<"upper:"+QString::number(lastCheckedDot->upperBound);
-//        qDebug()<<"lower:"+QString::number(lastCheckedDot->lowerBound);
         int boundDistance=lastCheckedDot->upperBound-lastCheckedDot->lowerBound;
         switch (m_programModel->m_params.commonParams.strategy)
         {
-//        case StaticParams::CommonParams::Strategy::smartInteractive:
         case StaticParams::CommonParams::Strategy::fullThreshold:
         {
             if(answered&&(dotDB==MaxDB))
@@ -1019,7 +940,7 @@ void StaticCheck::ProcessAnswer(bool answered)
                 lastCheckedDot->DB=52;
                 lastCheckedDot->checked=true;
             }
-            else if(!answered&&(dotDB==MinDB))
+            else if(!answered&&(dotDB=MinDB))
             {
                 lastCheckedDot->DB=-1;
                 lastCheckedDot->checked=true;
@@ -1184,8 +1105,6 @@ void StaticCheck::ProcessAnswer(bool answered)
                     m_lastShortTermCycleCheckedDotIndex.push_back(lastCheckedDot->index);         //加入最近检测点的集合
                     if(m_lastShortTermCycleCheckedDotIndex.size()==m_programModel->m_params.fixedParams.shortTermFluctuationCount)
                     {
-                        std::cout<<"add to shotTermCycle list."<<std::endl;
-                        std::cout<<m_shortTermFlucRecords.size();
                         auto selectedIndex=m_lastShortTermCycleCheckedDotIndex[qrand()%m_lastShortTermCycleCheckedDotIndex.size()];
                         m_lastShortTermCycleCheckedDotIndex.clear();
                         auto dotRecord=m_dotRecords[selectedIndex];
@@ -1196,13 +1115,17 @@ void StaticCheck::ProcessAnswer(bool answered)
                         dotfluc.checked=false;
                         dotfluc.loc=dotRecord.loc;
                         dotfluc.DB=-1;
-                        dotfluc.StimulationDBs.append(dotRecord.DB);
+                        if(dotRecord.DB<0)
+                            dotfluc.StimulationDBs.append(0);
+                        else
+                            dotfluc.StimulationDBs.append(dotRecord.DB);
                         dotfluc.index=m_programModel->m_data.dots.size()+dotRecord.index;   //短周期的话编号加上程序点个数
                         m_shortTermFlucRecords.push_back(dotfluc);
                     }
                 }
             }
         }
+        break;
     }
     }
 }
@@ -1215,10 +1138,8 @@ void StaticCheck::waitAndProcessAnswer()
     else
     {
         answerResult=qrand()%100<50;
-//        answerResult=false;
         UtilitySvc::wait(300);
     }
-    //    QThread::msleep(1000);
     qDebug()<<answerResult;
     ProcessAnswer(answerResult);
 }
@@ -1349,7 +1270,6 @@ void DynamicCheck::resetData()
             case DynamicParams::DynamicDistance::_15:distance=15;break;
         }
         auto centerDot=m_dynamicSelectedDots[0];
-//        if(os_od!=0){centerDot.rx()=-centerDot.rx();}
 
         m_resultModel->m_data.checkData.resize(m_totalCount);
         for(int i=0;i<m_totalCount;i++)
@@ -1363,6 +1283,7 @@ void DynamicCheck::resetData()
 
             auto& checkData=m_resultModel->m_data.checkData[i];
             checkData.start=m_records[i].beginLoc;
+            checkData.end=m_records[i].endLoc;
             checkData.isSeen=false;
             checkData.isChecked=false;
         }
@@ -1374,11 +1295,6 @@ void DynamicCheck::resetData()
         m_resultModel->m_data.checkData.resize(2);
         auto beginDot=m_dynamicSelectedDots[0];
         auto endDot=m_dynamicSelectedDots[1];
-//        if(os_od!=0)
-//        {
-//            beginDot.rx()=-beginDot.rx();
-//            endDot.rx()=-endDot.rx();
-//        }
         m_records.push_back(PathRecord{0,beginDot,endDot,{0,0},false,false});
         break;
     }
@@ -1579,13 +1495,6 @@ void DynamicCheck::ProcessAnswer(QVector<QPointF> answerLoc,PathRecord& record)
         node.isSeen=record.isAnswered;
         node.isChecked=true;
         nodeList[record.index]=node;
-//        qDebug()<<m_resultModel->m_data.checkData.size();
-//        for(auto&i:m_resultModel->m_data.checkData)
-//        {
-//            qDebug()<<i.start.toQPointF();
-//            qDebug()<<i.end.toQPointF();
-//        }
-
     }
 }
 
@@ -1941,9 +1850,9 @@ void Perimeter::CheckSvc::setInputDots(QVariantList value)
     m_dynamicSelectedDots.clear();
     for(auto&i:value)
     {
-        auto radius=i.toMap()["x"].toInt();
-        auto angle=i.toMap()["y"].toInt();
-        m_dynamicSelectedDots.push_back({radius,angle});
+        auto x=i.toMap()["x"].toFloat();
+        auto y=i.toMap()["y"].toFloat();
+        m_dynamicSelectedDots.push_back({x,y});
     }
 }
 

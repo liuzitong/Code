@@ -85,7 +85,7 @@ private:
     QPointF m_nextCheckingDotLoc={999,999};
     bool m_readyToCheck=false;
     bool m_atCheckingPage=false;
-    QList<QPoint> m_dynamicSelectedDots;
+    QList<QPointF> m_dynamicSelectedDots;
     PatientVm* m_patientVm;
     ProgramVm* m_programVm;
     CheckResultVm* m_checkResultVm;

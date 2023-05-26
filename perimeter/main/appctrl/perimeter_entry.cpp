@@ -115,8 +115,6 @@ static void gMsgHandler( QtMsgType type, const QMessageLogContext &ctxt, const Q
 
 int  main ( int argc, char *argv[] )
 {
-
-    std::cout<<"program started."<<std::endl;
     int ret = 0;
     //handle the terminate signal
     signal( SIGTERM, & gSigTerm_Handler );

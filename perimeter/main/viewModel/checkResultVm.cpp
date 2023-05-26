@@ -45,7 +45,7 @@ void StaticCheckResultVm::insert()
     sp->m_time=QDateTime::currentDateTime();
     auto realTimeEyePosPicSize=Perimeter::UtilitySvc::getSingleton()->m_realTimeEyePosPicSize;
     auto imgSize=/*DevOps::DeviceOperation::getSingleton()->m_videoSize;*/m_data->m_videoSize;
-    for(auto& dotImgDatas:m_data->m_imgData)
+    for(auto& dotImgDatas:m_data->m_imgData)                                //图片转换位设置大小并且存储
     {
         count=0;
         for(auto& imgData:dotImgDatas)
@@ -63,7 +63,7 @@ void StaticCheckResultVm::insert()
         }
     }
     qx::dao::insert(sp);
-    qDebug()<<sp->m_id;
+//    qDebug()<<sp->m_id;
     m_data->m_id=sp->m_id;
 
 }

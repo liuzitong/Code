@@ -48,7 +48,7 @@ Item{
             }
             if(strategy===1)
             {
-/*                if(os_od==0)*/ dynamicSelectedDots.push({x:-15,y:0});
+/*                if(os_od==0)*/ dynamicSelectedDots.push({x:-15,y:-1.5});
 //                else dynamicSelectedDots.push(displayCanvas.orthToPolar({x:-15,y:0}));
                 dynamicSelectedDotLen=1;
                 dynamicSelectedDotsReady=true;
@@ -788,7 +788,7 @@ Item{
 //                    console.log(currentCheckResult.resultData.checkData[0].name);
 //                    console.log(currentCheckResult.resultData.checkData[0].start.x);
                     dotList=currentCheckResult.resultData.checkData;
-                    if(currentProgram.params.strategy!==3)
+                    if(currentProgram.params.strategy===0)
                     {
                         for(i=0;i<dotList.length;i++)                                 //连线
                         {
@@ -817,6 +817,31 @@ Item{
                             }
                             else
                                 drawDot(dotList[i].start,"blue");
+                        }
+
+                    }
+                    else if(currentProgram.params.strategy===1||currentProgram.params.strategy===2)
+                    {
+                        for(i=0;i<dotList.length;i++)                                 //连线
+                        {
+                            dot_Begin=dotToPixCoord(dotList[i%dotList.length].end);
+                            dot_End=dotToPixCoord(dotList[(i+1)%dotList.length].end);
+                            ctx.beginPath();
+                            ctx.moveTo(dot_Begin.x,dot_Begin.y);
+                            ctx.lineTo(dot_End.x,dot_End.y);
+                            ctx.closePath();
+                            ctx.strokeStyle = "red";
+                            ctx.stroke();
+                        }
+
+                        for(i=0;i<dotList.length;i++)                               //画点
+                        {
+                            if(dotList[i].isChecked&&dotList[i].isSeen)
+                            {
+                                 drawDot(dotList[i].end,"yellow");
+                            }
+                            else
+                                drawDot(dotList[i].end,"blue");
                         }
 
                     }

@@ -213,6 +213,9 @@ QPointF StaticAnalysisVm::getPixFromPoint(QPointF point, float width, float heig
 
 void StaticAnalysisVm::showReport(int report)
 {
+//    std::cout<<"***********************"<<std::endl;
+//    QElapsedTimer timer;
+//    timer.start();
     auto analysisMethodSvc=AnalysisSvc::getSingleton();
     QImage img480=QImage({480,480}, QImage::Format_RGB32);
     QImage img550=QImage({550,550}, QImage::Format_RGB32);
@@ -280,10 +283,11 @@ void StaticAnalysisVm::showReport(int report)
     {
         filePath="./reports/Screening.lrxml";
     }
-
 //    auto reportEngine = QSharedPointer<LimeReport::ReportEngine>(new LimeReport::ReportEngine());
-    if(UtilitySvc::reportEngine==nullptr) UtilitySvc::reportEngine=new  LimeReport::ReportEngine();
-    UtilitySvc::reportEngine->loadFromFile(filePath);
+    if(UtilitySvc::reportEngine==nullptr) UtilitySvc::reportEngine=new  LimeReport::ReportEngine();         //耗时长
+//    std::cout<<"time cost:"<<timer.elapsed()<<std::endl;
+    UtilitySvc::reportEngine->loadFromFile(filePath);                                                      //耗时长
+//    std::cout<<"time cost:"<<timer.elapsed()<<std::endl;
     if(!TranslateController::isRuntimeLangEng())  UtilitySvc::reportEngine->setReportLanguage(QLocale::Chinese);
     auto manager=UtilitySvc::reportEngine->dataManager();
     manager->clearUserVariables();
@@ -386,10 +390,10 @@ void StaticAnalysisVm::showReport(int report)
     manager->setReportVariable("deviceInfo",tr("Device info")+QString(":")+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("deviceInfo").toString());
     manager->setReportVariable("version", tr("Version")+QString(":")+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("version").toString());
 
-
-    UtilitySvc::reportEngine->setShowProgressDialog(true);
     UtilitySvc::reportEngine->setPreviewScaleType(LimeReport::ScaleType::Percents,50);
-    UtilitySvc::reportEngine->previewReport(/*LimeReport::PreviewHint::ShowAllPreviewBars*/);
+//    std::cout<<"time cost:"<<timer.elapsed()<<std::endl;
+    UtilitySvc::reportEngine->previewReport(/*LimeReport::PreviewHint::ShowAllPreviewBars*/);   //耗时非常长
+//    std::cout<<"time cost:"<<timer.elapsed()<<std::endl;
 }
 
 QObject *StaticAnalysisVm::getResult()
