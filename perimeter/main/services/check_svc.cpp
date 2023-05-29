@@ -10,6 +10,7 @@
 #include "frame_provid_svc.h"
 #include <array>
 #include <QMessageBox>
+#include <perimeter/main/services/keyboard_filter.h>
 //#include <QtConcurrent/QtConcurrent>
 namespace Perimeter
 {
@@ -700,7 +701,7 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
     //测试盲点
     auto commomParams=m_resultModel->m_params.commonParams;
     auto fixedParams=m_resultModel->m_params.fixedParams;
-    if(m_blindDotLocateIndex>=UtilitySvc::getSingleton()->m_left_blindDot.size())
+    if(m_blindDotLocateIndex>=UtilitySvc::getSingleton()->m_left_blindDot.size()+1)
     {
         m_error=true;
         m_errorInfo=tr("Cant't locate blind dot.Turn off blindDot check.");
@@ -713,14 +714,22 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
         //确定盲点,条件是要经历一点测试次数,而且盲为空
         if(m_stimulationCount>=UtilitySvc::getSingleton()->m_checkCountBeforeGetBlindDotCheck&&m_blindDot.isEmpty())
         {
+
             QPoint blindDotLoc;
             if(m_resultModel->m_OS_OD==0)
-                blindDotLoc=UtilitySvc::getSingleton()->m_left_blindDot[m_blindDotLocateIndex];
+            {
+                int index=qMin(m_blindDotLocateIndex,UtilitySvc::getSingleton()->m_left_blindDot.size()-1);
+                blindDotLoc=UtilitySvc::getSingleton()->m_left_blindDot[index];
+            }
             else
-                blindDotLoc=UtilitySvc::getSingleton()->m_right_blindDot[m_blindDotLocateIndex];
+            {
+                int index=qMin(m_blindDotLocateIndex,UtilitySvc::getSingleton()->m_right_blindDot.size()-1);
+                blindDotLoc=UtilitySvc::getSingleton()->m_right_blindDot[index];
+            }
 
-            std::cout<<"locating blindDOt"<<blindDotLoc.x()<<","<<blindDotLoc.y()<<std::endl;
+            std::cout<<"locating blindDot"<<blindDotLoc.x()<<","<<blindDotLoc.y()<<std::endl;
             m_lastCheckeDotType.push_back(LastCheckedDotType::locateBlindDot);
+            m_blindDotLocateIndex++;
             return {true,blindDotLoc,UtilitySvc::getSingleton()->m_blindDotTestDB};
 
         }
@@ -829,8 +838,8 @@ void StaticCheck::ProcessAnswer(bool answered)
     {
         if(!answered)
         {
-            if(m_resultModel->m_OS_OD==0) m_blindDot.push_back(UtilitySvc::getSingleton()->m_left_blindDot[m_blindDotLocateIndex]);
-            else m_blindDot.push_back(UtilitySvc::getSingleton()->m_right_blindDot[m_blindDotLocateIndex]);
+            if(m_resultModel->m_OS_OD==0) m_blindDot.push_back(UtilitySvc::getSingleton()->m_left_blindDot[m_blindDotLocateIndex-2]);
+            else m_blindDot.push_back(UtilitySvc::getSingleton()->m_right_blindDot[m_blindDotLocateIndex-2]);
 
 
             if(m_lastCheckeDotType.last()==LastCheckedDotType::locateBlindDot)                      //如果下一个是盲点
@@ -842,10 +851,6 @@ void StaticCheck::ProcessAnswer(bool answered)
                 m_lastCheckeDotType.pop_back();
             }
             std::cout<<"blinddot located:"<<m_blindDot[0].x()<<","<<m_blindDot[0].y()<<std::endl;
-        }
-        else
-        {
-            m_blindDotLocateIndex++;
         }
         break;
     }
@@ -1137,10 +1142,21 @@ void StaticCheck::waitAndProcessAnswer()
          answerResult=waitForAnswer();
     else
     {
-        answerResult=qrand()%100<50;
-        UtilitySvc::wait(300);
+//        answerResult=qrand()%100<50;
+        if(KeyBoardFilter::needRefresh)
+        {
+            while(!KeyBoardFilter::freshed)
+            {
+                QApplication::processEvents();
+            }
+        }
+        else
+            UtilitySvc::wait(300);
+
+        answerResult=KeyBoardFilter::answered;
+        KeyBoardFilter::freshed=false;
     }
-    qDebug()<<answerResult;
+//    qDebug()<<answerResult;
     ProcessAnswer(answerResult);
 }
 

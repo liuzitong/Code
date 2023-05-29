@@ -12,6 +12,7 @@
 #include "perimeter/main/appctrl/perimeter_appctrl.hxx"
 #include "perimeter/base/common/perimeter_memcntr.hxx"
 #include "perimeter/main/services/translate_svc.h"
+#include "perimeter/main/services/keyboard_filter.h"
 #include "qxpack/indcom/common/qxpack_ic_memcntr.hxx"
 #include "qxpack/indcom/common/qxpack_ic_global.hxx"
 #include "qxpack/indcom/sys/qxpack_ic_eventloopbarrier.hxx"
@@ -151,6 +152,9 @@ int  main ( int argc, char *argv[] )
 //        QObject::connect(eng, &QQmlEngine::quit,[](){qDebug()<<"engquit";});
 
         app.setWindowIcon(QIcon(":/Pics/base-svg/2logo_256_black.svg"));
+        Perimeter::KeyBoardFilter* filter= new Perimeter::KeyBoardFilter();
+//        KeyBoardFilter filter;
+        app.installEventFilter(filter);
         ret = app.exec();
         eng->deleteLater();
 

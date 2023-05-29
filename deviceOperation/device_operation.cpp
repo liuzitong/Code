@@ -28,6 +28,7 @@ DeviceOperation::DeviceOperation()
 //    m_videoTimer.start(500);
 //    connect(&m_videoTimer,&QTimer::timeout,this,[](){std::cout<<"dsfs"<<std::endl;});
     connect(this,&DeviceOperation::updateDevInfo,[](QString str){std::cout<<str.toStdString()+"\n";});
+
     m_workStatusElapsedTimer.start();
     m_currentCastLightDA=m_config.castLightADPresetRef()+DeviceSettings::getSingleton()->m_castLightDAChanged;
 }

@@ -51,7 +51,8 @@ SOURCES += \
     $$PWD/object_wrapper.cpp \
     $$PWD/services/translate_svc.cpp \
     $$PWD/services/utility_svc.cpp \
-    $$PWD/services/frame_provid_svc.cpp
+    $$PWD/services/frame_provid_svc.cpp \
+    $$PWD/services/keyboard_filter.cpp
 
 HEADERS += \
     $$PWD/appctrl/testclass.h \
@@ -60,7 +61,8 @@ HEADERS += \
     $$PWD/object_wrapper.h \
     $$PWD/services/translate_svc.h \
     $$PWD/services/utility_svc.h \
-    $$PWD/services/frame_provid_svc.h
+    $$PWD/services/frame_provid_svc.h \
+    $$PWD/services/keyboard_filter.h
 
 RESOURCES += \
     $$PWD/view/utils/utils.qrc
