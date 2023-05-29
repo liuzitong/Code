@@ -581,7 +581,7 @@ void StaticCheck::stimulate()
 {
     int durationTime=m_programModel->m_params.fixedParams.stimulationTime;
     auto lastCheckedDotType=m_lastCheckeDotType.last();
-    if(lastCheckedDotType!=LastCheckedDotType::falseNegativeTest)               //假阴不开快门
+    if(lastCheckedDotType!=LastCheckedDotType::falsePositiveTest)               //假阳不开快门
     {
 //        qDebug()<<QString("deviation is:")+QString::number(m_deviceOperation->m_deviation);
         m_deviceOperation->waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y,UsbDev::DevCtl::MotorId_Shutter});
@@ -608,6 +608,7 @@ void StaticCheck::stimulate()
     else
     {
         m_deviceOperation->waitForSomeTime(durationTime);           //假阴
+        emit currentCheckingDotChanged({999,999});
         m_resultModel->m_data.fixationDeviation.push_back(-m_deviceOperation->m_deviation);
         std::cout<<"***** jiayin"<<"zuo biao x:"<<debug_Loc.x()<<" "<<"zuobiao y:"<<debug_Loc.y()<<"    yong shi:"<<m_stimulationWaitingForAnswerElapsedTimer.elapsed()<<std::endl;
     }
@@ -745,8 +746,8 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
 
     if(UtilitySvc::getSingleton()->m_checkFalseNegAndPos)
     {
-        if(m_stimulationCount%fixedParams.falseNegativeCycle==m_falseNegCyc)
-//        if(m_stimulationCount%fixedParams.falsePositiveCycle==qrand()%fixedParams.falsePositiveCycle)         //假阳
+        if(m_stimulationCount%fixedParams.falseNegativeCycle==m_falseNegCyc)                            //假阴性：在曾经响应过的位置，再减少几个DB的亮度(即是更亮)再次测试，如响应就正常，不响应则记录一次假阴性。
+//        if(m_stimulationCount%fixedParams.falsePositiveCycle==qrand()%fixedParams.falsePositiveCycle)
         {
             QVector<DotRecord> m_checkedRecords;
             for(auto& recordDot:m_dotRecords)
@@ -763,8 +764,8 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
             m_checkCycleDotList.append({LastCheckedDotType::falseNegativeTest,recordDot.loc,recordDot.DB-UtilitySvc::getSingleton()->m_falseNegativeDecDB});
         }
 
-        if(m_stimulationCount%fixedParams.falsePositiveCycle==m_falsePosCyc)
-//        if(m_stimulationCount%fixedParams.falseNegativeCycle==qrand()%fixedParams.falseNegativeCycle)         //假阴,随机点,到刺激的时候不开快门
+        if(m_stimulationCount%fixedParams.falsePositiveCycle==m_falsePosCyc)     //假阳性：在测试过程中，投射器转动到一定位置,但是快门关闭，如果不响应就正常，如果响应就记录一次假阳性。
+//        if(m_stimulationCount%fixedParams.falseNegativeCycle==qrand()%fixedParams.falseNegativeCycle)
         {
             auto locs=m_programModel->m_data.dots;
             auto loc=locs[qrand()%locs.size()];
@@ -875,6 +876,7 @@ void StaticCheck::ProcessAnswer(bool answered)
         {
             m_resultModel->m_data.falseNegativeCount++;
         }
+        std::cout<<"false Neg:"<<m_resultModel->m_data.falseNegativeCount<<":"<<m_resultModel->m_data.falseNegativeTestCount<<std::endl;
         break;
     }
     case LastCheckedDotType::commonCheckDot:
@@ -1142,19 +1144,21 @@ void StaticCheck::waitAndProcessAnswer()
          answerResult=waitForAnswer();
     else
     {
-//        answerResult=qrand()%100<50;
         if(KeyBoardFilter::needRefresh)
         {
             while(!KeyBoardFilter::freshed)
             {
                 QApplication::processEvents();
             }
+            answerResult=KeyBoardFilter::answered;
+            KeyBoardFilter::freshed=false;
         }
         else
-            UtilitySvc::wait(300);
+        {
 
-        answerResult=KeyBoardFilter::answered;
-        KeyBoardFilter::freshed=false;
+            answerResult=qrand()%100<50;
+            UtilitySvc::wait(300);
+        }
     }
 //    qDebug()<<answerResult;
     ProcessAnswer(answerResult);
