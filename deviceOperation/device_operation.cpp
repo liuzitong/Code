@@ -27,7 +27,7 @@ DeviceOperation::DeviceOperation()
     m_connectTimer.start();
 //    m_videoTimer.start(500);
 //    connect(&m_videoTimer,&QTimer::timeout,this,[](){std::cout<<"dsfs"<<std::endl;});
-    connect(this,&DeviceOperation::updateDevInfo,[](QString str){std::cout<<str.toStdString()+"\n";});
+    connect(this,&DeviceOperation::updateDevInfo,[](QString str){qDebug()<<str;});
 
     m_workStatusElapsedTimer.start();
     m_currentCastLightDA=m_config.castLightADPresetRef()+DeviceSettings::getSingleton()->m_castLightDAChanged;
@@ -474,15 +474,7 @@ void DeviceOperation::openShutter(int durationTime)
 {
     if(!m_isDeviceReady) return;
     auto shutterPos=m_config.shutterOpenPosRef();
-    std::cout<<"openShutter"<<std::endl;
-
     m_devCtl->openShutter(durationTime,shutterPos);
-//    while(qAbs(m_statusData.motorPosition(UsbDev::DevCtl::MotorId_Shutter)-m_config.shutterOpenPosRef())<10)
-//    {
-
-//    }
-//    m_shutterElapsedTimer.restart();
-//    m_shutterElapsedTime=durationTime;
 }
 
 void DeviceOperation::move5Motors(bool isMotorMove[], int MotorPoses[])
@@ -621,8 +613,9 @@ void DeviceOperation::workOnNewStatuData()
     }
     m_statusData=m_devCtl->takeNextPendingStatusData();
     auto eyeglassStatus=m_statusData.eyeglassStatus();
-    if(m_videoOnOff)
+    if(m_isAtCheckingPage)
     {
+        setLamp(LampId::LampId_centerInfrared,0,true);
         if(m_eyeglassStatus!=eyeglassStatus||!m_eyeglassIntialize)
         {
             m_eyeglassStatus=eyeglassStatus;
@@ -635,9 +628,11 @@ void DeviceOperation::workOnNewStatuData()
     }
     else if(m_eyeglassIntialize)
     {
+        setLamp(LampId::LampId_centerInfrared,0,false);
         setLamp(LampId::LampId_eyeglassInfrared,0,false);
         setLamp(LampId::LampId_borderInfrared,0,false);
         m_eyeglassIntialize=false;
+
         std::cout<<"close allInfrared infrared"<<std::endl;
     }
 
@@ -661,9 +656,9 @@ void DeviceOperation::workOnNewStatuData()
 
 
 
-    if(m_videoOnOff!=m_statusData.cameraStatus())
+    if(m_isAtCheckingPage!=m_statusData.cameraStatus())
     {
-        if(m_videoOnOff)
+        if(m_isAtCheckingPage)
         {
             m_devCtl->setFrontVideo(false);
             m_devCtl->setFrontVideo(false);
@@ -715,7 +710,9 @@ void DeviceOperation::workOnNewStatuData()
 void DeviceOperation::workOnNewFrameData()
 {
     m_frameData=m_devCtl->takeNextPendingFrameData();
+    m_frameRawDataLock.lock();
     m_frameRawData=m_frameData.rawData();
+    m_frameRawDataLock.unlock();
     emit newFrameData();
     return;
 //    auto profile=m_profile;

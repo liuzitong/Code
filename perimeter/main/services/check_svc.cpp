@@ -360,7 +360,7 @@ void StaticCheck::resetData()
         }
         m_centerDotRecord=DotRecord{m_totalCount*2,QPointF{0,0},{DB},-initialNumber,false,false,-initialNumber,initialNumber};
     }
-    m_deviceOperation->m_isChecking=true;
+//    m_deviceOperation->m_isChecking=true;
     m_deviceOperation->m_isWaitingForStaticStimulationAnswer=false;
     m_deviceOperation->m_staticStimulationAnswer=false;
 }
@@ -403,7 +403,7 @@ void StaticCheck::Checkprocess()
 
 void StaticCheck::finished()
 {
-    m_deviceOperation->m_isChecking=false;
+//    m_deviceOperation->m_isChecking=false;
     emit currentCheckingDotChanged({999,999});
     emit nextCheckingDotChanged({999,999});
     lightsOff();
@@ -876,7 +876,7 @@ void StaticCheck::ProcessAnswer(bool answered)
         {
             m_resultModel->m_data.falseNegativeCount++;
         }
-        std::cout<<"false Neg:"<<m_resultModel->m_data.falseNegativeCount<<":"<<m_resultModel->m_data.falseNegativeTestCount<<std::endl;
+//        std::cout<<"false Neg:"<<m_resultModel->m_data.falseNegativeCount<<":"<<m_resultModel->m_data.falseNegativeTestCount<<std::endl;
         break;
     }
     case LastCheckedDotType::commonCheckDot:
@@ -1320,7 +1320,7 @@ void DynamicCheck::resetData()
     }
     }
 
-    m_deviceOperation->m_isChecking=true;
+//    m_deviceOperation->m_isChecking=true;
 }
 
 void DynamicCheck::Checkprocess()
@@ -1521,7 +1521,7 @@ void DynamicCheck::ProcessAnswer(QVector<QPointF> answerLoc,PathRecord& record)
 
 void DynamicCheck::finished()
 {
-    m_deviceOperation->m_isChecking=false;
+//    m_deviceOperation->m_isChecking=false;
     lightsOff();
     m_deviceOperation->beep();
     m_deviceOperation->resetMotors({UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
@@ -1821,7 +1821,7 @@ void CheckSvc::stopMovingChin()
 void CheckSvc::enterCheck()
 {
     qDebug()<<"trunOnVideo";
-    DevOps::DeviceOperation::getSingleton()->turnOnVideo();
+    DevOps::DeviceOperation::getSingleton()->enterCheckingPage();
 //    DevOps::DeviceOperation::getSingleton()->lightUpCastLight();
     m_atCheckingPage=true;
 }
@@ -1829,7 +1829,7 @@ void CheckSvc::enterCheck()
 void CheckSvc::leaveCheck()
 {
     qDebug()<<"trunOffVideo";
-    DevOps::DeviceOperation::getSingleton()->turnOffVideo();
+    DevOps::DeviceOperation::getSingleton()->leaveCheckingPage();
     DevOps::DeviceOperation::getSingleton()->dimDownCastLight();
     m_atCheckingPage=false;
 }

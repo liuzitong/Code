@@ -73,7 +73,9 @@ void FrameProvidSvc::setVideoSize(int width, int height)
 
 void FrameProvidSvc::onNewVideoContentReceived(/*QByteArray qa*/)
 {
+    DevOps::DeviceOperation::getSingleton()->m_frameRawDataLock.lock();
     auto rawData=DevOps::DeviceOperation::getSingleton()->m_frameRawData;
+    DevOps::DeviceOperation::getSingleton()->m_frameRawDataLock.unlock();
 //    qDebug()<<"frame provider received "+QString::number(rawData.size());
 
     auto videoSize=DevOps::DeviceOperation::getSingleton()->m_videoSize;

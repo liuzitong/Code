@@ -345,6 +345,20 @@ Item{
             ctx.fill();
         }
 
+        function drawBigDot(dot,color)
+        {
+            var orthCoord;
+            var pixDot=dotToPixCoord(dot);
+            var dotRadius=diameter/180*2.0;
+            var ctx = getContext("2d");
+            ctx.lineWidth = 0;
+            ctx.strokeStyle = color;
+            ctx.beginPath();
+            ctx.arc(pixDot.x, pixDot.y, dotRadius, 0, Math.PI*2);
+            ctx.stroke();
+            ctx.closePath();
+        }
+
 
         function dynamicInputDots(dot)
         {
@@ -710,10 +724,10 @@ Item{
                                 drawDB(dBList[i],{x:0,y:0});
                         }
                     }
+                    if(nextCheckingDotLoc.x!==999)
+                        drawBigDot(nextCheckingDotLoc,"blue");
                     if(currentCheckingDotLoc.x!==999)
                         drawDot(currentCheckingDotLoc,"red");
-                    if(nextCheckingDotLoc.x!==999)
-                        drawDot(nextCheckingDotLoc,"blue");
 
                 }
                 else if(currentProgram.type===1)                                // 筛选
@@ -758,10 +772,10 @@ Item{
                             }
                         }
                     }
+                    if(nextCheckingDotLoc.x!==999)
+                        drawBigDot(nextCheckingDotLoc,"blue");
                     if(currentCheckingDotLoc.x!==999)
                         drawDot(currentCheckingDotLoc,"red");
-                    if(nextCheckingDotLoc.x!==999)
-                        drawDot(nextCheckingDotLoc,"blue");
 
                 }
                 else                                                        //动态

@@ -365,8 +365,8 @@ Item {id:root; width: 1366;height: 691
                         }
                         Row{
                             width: parent.width;height: 20; layoutDirection: Qt.LeftToRight;anchors.bottom: parent.bottom;
-                            Button{text:"video on";width: parent.width/8;height: parent.height; onClicked: IcUiQmlApi.appCtrl.checkSvc.turnOnVideo();}
-                            Button{text:"video off";width: parent.width/8;height: parent.height; onClicked: IcUiQmlApi.appCtrl.checkSvc.turnOffVideo();}
+                            Button{text:"video on";width: parent.width/8;height: parent.height; onClicked: IcUiQmlApi.appCtrl.checkSvc.enterCheckingPage();}
+                            Button{text:"video off";width: parent.width/8;height: parent.height; onClicked: IcUiQmlApi.appCtrl.checkSvc.leaveCheckingPage();}
                             Button{text:"connect";width: parent.width/8;height: parent.height;onClicked:IcUiQmlApi.appCtrl.checkSvc.connectDev();}
                             Button{text:"disconnect";width: parent.width/8;height: parent.height;onClicked:IcUiQmlApi.appCtrl.checkSvc.disconnectDev();}
                         }

@@ -54,8 +54,8 @@ public:
     void moveChinLeft(){if(m_isDeviceReady) moveChin(ChinMoveDirection::Left);}
     void moveChinRight(){if(m_isDeviceReady) moveChin(ChinMoveDirection::Right);}
     void stopMovingChin(){if(m_isDeviceReady) moveChin(ChinMoveDirection::Stop);}
-    void turnOnVideo(){m_videoOnOff=true;}
-    void turnOffVideo(){m_videoOnOff=false;}
+    void enterCheckingPage(){m_isAtCheckingPage=true;}
+    void leaveCheckingPage(){m_isAtCheckingPage=false;}
     static QSharedPointer<DeviceOperation> getSingleton();
     void connectDev();
     void disconnectDev();
@@ -108,12 +108,12 @@ public:
     bool m_autoAlignPupil=true;
     bool m_eyeglassStatus;
     bool m_eyeglassIntialize=false;
-    bool m_isChecking=false;
+//    bool m_isChecking=false;
     bool m_connectDev=false;
     float m_deviation=0;
 //    bool m_deviation_valid;
     QSize m_videoSize;
-    bool m_videoOnOff=false;
+    bool m_isAtCheckingPage=false;
     QSharedPointer<UsbDev::DevCtl> m_devCtl;
 //    UsbDev::DevCtl* m_devCtl;
     UsbDev::Config m_config;
@@ -122,6 +122,7 @@ public:
     QMutex m_statusLock;                      //防止多线程冲突,放入同线程不再需要
     UsbDev::FrameData m_frameData;
     QPoint m_pupilCenterPoint;
+    QMutex m_frameRawDataLock;
     QByteArray m_frameRawData;
     QTimer m_connectTimer;
     QTimer m_videoTimer;
