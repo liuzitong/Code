@@ -79,21 +79,24 @@ void FrameProvidSvc::onNewVideoContentReceived(/*QByteArray qa*/)
 //    qDebug()<<"frame provider received "+QString::number(rawData.size());
 
     auto videoSize=DevOps::DeviceOperation::getSingleton()->m_videoSize;
-
+    auto pupilRadius=DevOps::DeviceOperation::getSingleton()->m_pupilRadius*m_width/videoSize.width();
     auto pupilCenterPoint=DevOps::DeviceOperation::getSingleton()->m_pupilCenterPoint;
     QPoint scalePupilCenterPoint={pupilCenterPoint.x()*m_width/videoSize.width(),pupilCenterPoint.y()*m_height/videoSize.height()};
     if(rawData.size()==videoSize.width()*videoSize.height())
     {
         QImage img((uchar*)rawData.data(),videoSize.width(),videoSize.height(),QImage::Format::Format_Grayscale8);
         auto img2=img.convertToFormat(QImage::Format::Format_ARGB32);
-
-//        img2.setPixelColor(3,3,Qt::yellow);
-//        for(int )
         auto img3=img2.scaled(m_width,m_height,Qt::AspectRatioMode::KeepAspectRatio);
         QPainter painter(&img3);
         painter.setPen(Qt::red);
-        painter.drawEllipse({m_width/2,m_height/2},10,10);
+        if(DevOps::DeviceOperation::getSingleton()->m_pupilResValid)
+        {
+            painter.drawEllipse({scalePupilCenterPoint.x()+m_width/2,scalePupilCenterPoint.y()+m_height/2,},pupilRadius,pupilRadius);
+        }
         drawCrossHair(img3);
+//        if(count%100==0)
+//            img3.save("./img/"+QString::number(count)+".bmp");
+//        count++;
         QVideoFrame frame(img3);
         setFormat(frame.width(),frame.height(),frame.pixelFormat());
         if (m_surface)
@@ -121,11 +124,11 @@ void FrameProvidSvc::drawCrossHair(QImage &img)
 
     {
         int h=img.height()*0.35;
-        for(int w=img.width()*0.35;w<img.width()*0.35+img.height()*0.05;w++)
+        for(int w=img.width()*0.35;w<img.width()*0.35+img.height()*0.06;w++)
         {
             img.setPixelColor(w,h,Qt::yellow);
         }
-        for(int w=img.width()*0.65-img.height()*0.05;w<img.width()*0.65;w++)
+        for(int w=img.width()*0.65-img.height()*0.06;w<img.width()*0.65;w++)
         {
             img.setPixelColor(w,h,Qt::yellow);
         }
@@ -133,11 +136,11 @@ void FrameProvidSvc::drawCrossHair(QImage &img)
 
     {
         int h=img.height()*0.65;
-        for(int w=img.width()*0.35;w<img.width()*0.35+img.height()*0.05;w++)
+        for(int w=img.width()*0.35;w<img.width()*0.35+img.height()*0.06;w++)
         {
             img.setPixelColor(w,h,Qt::yellow);
         }
-        for(int w=img.width()*0.65-img.height()*0.05;w<img.width()*0.65;w++)
+        for(int w=img.width()*0.65-img.height()*0.06;w<img.width()*0.65;w++)
         {
             img.setPixelColor(w,h,Qt::yellow);
         }
@@ -145,11 +148,11 @@ void FrameProvidSvc::drawCrossHair(QImage &img)
 
     {
         int w=img.width()*0.35;
-        for(int h=img.height()*0.35;h<img.height()*0.40;h++)
+        for(int h=img.height()*0.35;h<img.height()*0.41;h++)
         {
             img.setPixelColor(w,h,Qt::yellow);
         }
-        for(int h=img.height()*0.60;h<img.height()*0.65;h++)
+        for(int h=img.height()*0.59;h<img.height()*0.65;h++)
         {
             img.setPixelColor(w,h,Qt::yellow);
         }
@@ -157,11 +160,11 @@ void FrameProvidSvc::drawCrossHair(QImage &img)
 
     {
         int w=img.width()*0.65;
-        for(int h=img.height()*0.35;h<img.height()*0.40;h++)
+        for(int h=img.height()*0.35;h<img.height()*0.41;h++)
         {
             img.setPixelColor(w,h,Qt::yellow);
         }
-        for(int h=img.height()*0.60;h<img.height()*0.65;h++)
+        for(int h=img.height()*0.59;h<img.height()*0.65;h++)
         {
             img.setPixelColor(w,h,Qt::yellow);
         }

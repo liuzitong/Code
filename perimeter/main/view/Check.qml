@@ -220,7 +220,7 @@ Item {id:root; width: 1366;height: 691
                     Rectangle{ width: parent.width*0.25-2;height:parent.height;color: backGroundColor;
                         Item{anchors.fill: parent;anchors.margins: parent.height*0.02;
                             Column{id: column;anchors.fill: parent;spacing:/*(height-videoArea.height-controlPanel.height-eyeOptionsGroup.height)/2*/height*0.03;
-                                Item{id:videoArea; width: parent.width*0.83;height: width*3/4;anchors.horizontalCenter: parent.horizontalCenter;
+                                Item{id:videoArea; width:Math.round(parent.width*0.83/4)*4;height: width*3/4;anchors.horizontalCenter: parent.horizontalCenter;
                                     Rectangle
                                     {   anchors.fill: parent;color:"black";
                                         VideoOutput{
@@ -228,10 +228,11 @@ Item {id:root; width: 1366;height: 691
                                             anchors.fill: parent
                                             focus : visible
                                             id:vedio;
-                                            onWidthChanged:if(frameProvidSvc!==null) frameProvidSvc.setVideoSize(width,height);
-                                            onHeightChanged:if(frameProvidSvc!==null) frameProvidSvc.setVideoSize(width,height);
-
-                                            Component.onCompleted:if(frameProvidSvc!==null) frameProvidSvc.setVideoSize(width,height);
+                                            antialiasing: false
+                                            smooth: false
+                                            onWidthChanged:{if(frameProvidSvc!==null) frameProvidSvc.setVideoSize(width,height);console.log(width);console.log(height);}
+                                            onHeightChanged:{if(frameProvidSvc!==null) frameProvidSvc.setVideoSize(width,height);console.log(width);console.log(height);}
+                                            Component.onCompleted:{if(frameProvidSvc!==null) frameProvidSvc.setVideoSize(width,height);console.log(width);console.log(height);}
                                         }
                                     }
                                 }

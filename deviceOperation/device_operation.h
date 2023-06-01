@@ -122,6 +122,8 @@ public:
     QMutex m_statusLock;                      //防止多线程冲突,放入同线程不再需要
     UsbDev::FrameData m_frameData;
     QPoint m_pupilCenterPoint;
+    int m_pupilRadius;
+    bool m_pupilResValid=false;
     QMutex m_frameRawDataLock;
     QByteArray m_frameRawData;
     QTimer m_connectTimer;
@@ -137,6 +139,7 @@ public:
     bool m_castLightUp=true;
 //    int m_stimulationTime=180;
     QElapsedTimer m_castLightAdjustElapsedTimer;
+    QElapsedTimer m_autoPupilElapsedTimer;
 
 private:
     float m_pupilDiameter=-1;

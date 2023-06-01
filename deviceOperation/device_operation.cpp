@@ -9,6 +9,7 @@
 #include <QApplication>
 #include <thread>
 #include <QtConcurrent/QtConcurrent>
+#include <QPainter>
 #include <QtGlobal>
 #include <iostream>
 
@@ -30,6 +31,7 @@ DeviceOperation::DeviceOperation()
     connect(this,&DeviceOperation::updateDevInfo,[](QString str){qDebug()<<str;});
 
     m_workStatusElapsedTimer.start();
+    m_autoPupilElapsedTimer.start();
     m_currentCastLightDA=m_config.castLightADPresetRef()+DeviceSettings::getSingleton()->m_castLightDAChanged;
 }
 
@@ -615,11 +617,20 @@ void DeviceOperation::workOnNewStatuData()
     auto eyeglassStatus=m_statusData.eyeglassStatus();
     if(m_isAtCheckingPage)
     {
-        setLamp(LampId::LampId_centerInfrared,0,true);
-        if(m_eyeglassStatus!=eyeglassStatus||!m_eyeglassIntialize)
+        if(!m_eyeglassIntialize)
+        {
+            setLamp(LampId::LampId_centerInfrared,0,true);
+            setLamp(LampId::LampId_eyeglassInfrared,0,eyeglassStatus);
+            std::cout<<"open eyeglassInfrared infrared:"<<eyeglassStatus<<std::endl;
+            setLamp(LampId::LampId_borderInfrared,0,!eyeglassStatus);
+            std::cout<<"open borderInfrared infrared:"<<!eyeglassStatus<<std::endl;
+            m_eyeglassIntialize=true;
+            m_eyeglassStatus=eyeglassStatus;
+
+        }
+        if(m_eyeglassStatus!=eyeglassStatus)
         {
             m_eyeglassStatus=eyeglassStatus;
-            m_eyeglassIntialize=true;
             setLamp(LampId::LampId_eyeglassInfrared,0,eyeglassStatus);
             std::cout<<"open eyeglassInfrared infrared:"<<eyeglassStatus<<std::endl;
             setLamp(LampId::LampId_borderInfrared,0,!eyeglassStatus);
@@ -632,7 +643,6 @@ void DeviceOperation::workOnNewStatuData()
         setLamp(LampId::LampId_eyeglassInfrared,0,false);
         setLamp(LampId::LampId_borderInfrared,0,false);
         m_eyeglassIntialize=false;
-
         std::cout<<"close allInfrared infrared"<<std::endl;
     }
 
@@ -712,58 +722,69 @@ void DeviceOperation::workOnNewFrameData()
     m_frameData=m_devCtl->takeNextPendingFrameData();
     m_frameRawDataLock.lock();
     m_frameRawData=m_frameData.rawData();
+    if(m_autoPupilElapsedTimer.elapsed()>=1000)
+    {
+        auto profile=m_profile;
+        auto vc=DeviceDataProcesser::caculatePupilDeviation(m_frameData.rawData(),profile.videoSize().width(),profile.videoSize().height(),m_pupilResValid);
+        std::cout<<"isValid:"<<m_pupilResValid<<std::endl;
+        if(m_pupilResValid)
+        {
+            m_pupilCenterPoint=vc[0];
+            m_pupilRadius=DeviceDataProcesser::caculatePupilDiameter(vc[1],vc[2])/2;
+            std::cout<<"radius:"<<m_pupilRadius<<std::endl;
+            std::cout<<m_pupilCenterPoint.x()<<" "<<m_pupilCenterPoint.y()<<std::endl;
+            auto step=DeviceSettings::getSingleton()->m_pupilAutoAlignStep;
+        //    m_deviation=DeviceDataProcesser::caculateFixationDeviation(m_pupilCenterPoint);
+            if(m_autoAlignPupil/*&&(!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Chin_Hoz)||!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Chin_Vert))*/)                //自动对眼位
+            {
+                int tolerance=DeviceSettings::getSingleton()->m_pupilAutoAlignPixelTolerance;
+                auto spsConfig=DeviceSettings::getSingleton()->m_motorChinSpeed;
+                quint8 sps[2]{spsConfig[0],spsConfig[1]};
+                int motorPos[2]{0};
+    //            if(!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Chin_Hoz))
+    //            {
+    //                if(m_pupilCenterPoint.x()>tolerance)
+    //                {
+    //                    motorPos[0]=m_pupilCenterPoint.x()*step;
+    //                }
+    //                if(m_pupilCenterPoint.x()<-tolerance)
+    //                {
+    //                    motorPos[0]=m_pupilCenterPoint.x()*step;
+    //                }
+    //            }
+
+                if(!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Chin_Hoz)&&qAbs(m_pupilCenterPoint.x())>tolerance)
+                {
+                    motorPos[0]=-m_pupilCenterPoint.x()*step;
+                    m_devCtl->moveChinMotors(sps,motorPos,UsbDev::DevCtl::MoveMethod::Relative);
+                }
+
+                if(!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Chin_Vert)&&qAbs(m_pupilCenterPoint.y())>tolerance)
+                {
+                    motorPos[1]=m_pupilCenterPoint.y()*step;
+                    m_devCtl->moveChinMotors(sps,motorPos,UsbDev::DevCtl::MoveMethod::Relative);
+                }
+            }
+                    //计算瞳孔直径
+//                    if(m_pupilDiameter<0)
+//                    {
+//                        auto pupilDiameter=DeviceDataProcesser::caculatePupilDiameter(vc[1],vc[2])*DeviceSettings::getSingleton()->m_pupilDiameterPixelToMillimeterConstant;
+//                        m_pupilDiameterArr.push_back(pupilDiameter);
+//                        if(m_pupilDiameterArr.size()>=50)
+//                        {
+//                            float sum=0;
+//                            for(auto&i:m_pupilDiameterArr)
+//                            {
+//                                sum+=i;
+//                            }
+//                            m_pupilDiameter=sum/m_pupilDiameterArr.size();
+//                        }
+//                    }
+        }
+        m_autoPupilElapsedTimer.restart();
+    }
     m_frameRawDataLock.unlock();
     emit newFrameData();
-    return;
-//    auto profile=m_profile;
-//    bool valid;
-//    auto vc=DeviceDataProcesser::caculatePupilDeviation(m_frameData.rawData(),profile.videoSize().width(),profile.videoSize().height(),valid);
-//    if(!valid){ return;}
-//    m_pupilCenterPoint=vc[0];
-//    std::cout<<m_pupilCenterPoint.x()<<" "<<m_pupilCenterPoint.y()<<std::endl;
-//    auto step=DeviceSettings::getSingleton()->m_pupilAutoAlignStep;
-//    m_deviation=DeviceDataProcesser::caculateFixationDeviation(m_pupilCenterPoint);
-//    if(m_autoAlignPupil)                //自动对眼位
-//    {
-//        int tolerance=DeviceSettings::getSingleton()->m_pupilAutoAlignPixelTolerance;
-//        auto spsConfig=DeviceSettings::getSingleton()->m_motorChinSpeed;
-//        quint8 sps[2]{spsConfig[0],spsConfig[1]};
-//        int motorPos[2]{0};
-//        if(m_pupilCenterPoint.x()>tolerance)
-//        {
-//            motorPos[0]=step;
-//        }
-//        if(m_pupilCenterPoint.x()<-tolerance)
-//        {
-//            motorPos[0]=-step;
-//        }
-//        if(m_pupilCenterPoint.y()>tolerance)
-//        {
-//            motorPos[1]=step;
-//        }
-//        if(m_pupilCenterPoint.y()<-tolerance)
-//        {
-//            motorPos[1]=-step;
-//        }
-//        m_devCtl->moveChinMotors(sps,motorPos,UsbDev::DevCtl::MoveMethod::Relative);
-
-//    }
-//    //计算瞳孔直径
-//    if(m_pupilDiameter<0)
-//    {
-//        auto pupilDiameter=DeviceDataProcesser::caculatePupilDiameter(vc[1],vc[2]);
-//        m_pupilDiameterArr.push_back(pupilDiameter);
-//        if(m_pupilDiameterArr.size()>=50)
-//        {
-//            float sum=0;
-//            for(auto&i:m_pupilDiameterArr)
-//            {
-//                sum+=i;
-//            }
-//            m_pupilDiameter=sum/m_pupilDiameterArr.size();
-//        }
-//    }
-//    emit newFrameData();
 }
 
 void DeviceOperation::workOnNewProfile()

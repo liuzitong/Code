@@ -99,30 +99,32 @@ CoordMotorPosFocalDistInfo DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoo
 QVector<QPoint> DeviceDataProcesser::caculatePupilDeviation(const QByteArray ba, int width, int height,bool& valid)
 {
     int y_max=0;
-    int y_min=UINT_MAX;
+    int y_min=INT_MAX;
     int x_max=0;
-    int x_min=UINT_MAX;
-    QVector<int> x_vc;
+    int x_min=INT_MAX;
+    QVector<int> x_vc;              //黑点
     QVector<int> y_vc;
-    QVector<int> x_vc2;
+    QVector<int> x_vc2;             //有效黑点
     QVector<int> y_vc2;
     auto pupilGreyLimit=DeviceSettings::getSingleton()->m_pupilGreyLimit;
     auto pupilPixelDiameterLimit=DeviceSettings::getSingleton()->m_pupilPixelDiameterLimit;
     int validCount=0;
-    for(quint32 y=height*0.25;y<height*0.75;y++)
+    for(quint32 y=height*0.35;y<height*0.65;y++)
     {
-        for(quint32 x=width*0.25;x<width*0.75;x++)
+        for(quint32 x=width*0.35;x<width*0.65;x++)
         {
-            if(ba[x+width*y]<pupilGreyLimit)
+//            qDebug()<<quint8(ba[x+width*y]);
+            if(quint8(ba[x+width*y])<pupilGreyLimit)
             {
-//                qDebug()<<ba[x+width*y];
                 x_vc.push_back(x);
                 y_vc.push_back(y);
                 validCount++;
             }
         }
     }
-    if(validCount>0&&validCount<=100*100)
+
+    std::cout<<validCount<<std::endl;
+    if(validCount>width*height*0.05*0.05&&validCount<=width*height*0.2*0.2)
     {
         valid=true;
     }
@@ -131,6 +133,7 @@ QVector<QPoint> DeviceDataProcesser::caculatePupilDeviation(const QByteArray ba,
         valid=false;
         return QVector<QPoint>{{0,0},{0,0},{0,0}};
     }
+
 
     int x_avg,y_avg,sum=0;
     for(int i=0;i<x_vc.length();i++)
@@ -154,7 +157,11 @@ QVector<QPoint> DeviceDataProcesser::caculatePupilDeviation(const QByteArray ba,
             if(x<x_min) x_min=x;
             x_vc2.push_back(x);
         }
+//        qDebug()<<x;
     }
+//    qDebug()<<x_max;
+//    qDebug()<<x_min;
+//    qDebug()<<x_vc2;
 
     for(int i=0;i<y_vc.length();i++)
     {
@@ -165,11 +172,21 @@ QVector<QPoint> DeviceDataProcesser::caculatePupilDeviation(const QByteArray ba,
             if(y<y_min) y_min=y;
             y_vc2.push_back(y);
         }
-
+//        qDebug()<<y;
+//        qDebug()<<y_max;
+//        qDebug()<<y_min;
     }
+
+//    qDebug()<<y_vc2;
+    sum=0;
     for(int i=0;i<x_vc2.length();i++)
     {
         sum+=x_vc2[i];
+    }
+    if(x_vc2.length()==0)
+    {
+        valid=false;
+        return QVector<QPoint>{{0,0},{0,0},{0,0}};
     }
     int x_avg2=sum/x_vc2.length();
     sum=0;
@@ -178,19 +195,31 @@ QVector<QPoint> DeviceDataProcesser::caculatePupilDeviation(const QByteArray ba,
         sum+=y_vc2[i];
     }
     int y_avg2=sum/y_vc2.length();
+    if(x_vc2.length()==0)
+    {
+        valid=false;
+        return QVector<QPoint>{{0,0},{0,0},{0,0}};
+    }
+//    qDebug()<<x_avg2;
+//    qDebug()<<y_avg2;
     QPoint center={int(x_avg2-width*0.5),int(y_avg2-height*0.5)};
-    QPoint topLeft={x_min,y_max};
-    QPoint bottomRight={x_max,y_min};
+    QPoint topLeft={x_min,y_min};
+    qDebug()<<topLeft;
+    QPoint bottomRight={x_max,y_max};
+    qDebug()<<bottomRight;
     return QVector<QPoint>{center,topLeft,bottomRight};
 }
 
 float DeviceDataProcesser::caculatePupilDiameter(QPoint topLeft,QPoint bottomRight)
 {
+//    qDebug()<<"***********************************";
+//    qDebug()<<topLeft;
+//    qDebug()<<bottomRight;
     auto width=bottomRight.x()-topLeft.x();
-    auto height=topLeft.y()-bottomRight.y();
+    auto height=bottomRight.y()-topLeft.y();
     auto pixelDiameter=sqrt(width*height);
-    auto diameter=pixelDiameter*DeviceSettings::getSingleton()->m_pupilDiameterPixelToMillimeterConstant;
-    return diameter;
+//    auto diameter=pixelDiameter*DeviceSettings::getSingleton()->m_pupilDiameterPixelToMillimeterConstant;
+    return pixelDiameter;
 }
 
 int DeviceDataProcesser::caculateFixationDeviation(QPoint point)

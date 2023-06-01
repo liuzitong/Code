@@ -619,15 +619,20 @@ void StaticCheck::stimulate()
 void StaticCheck::getReadyToStimulate(QPointF loc, int DB)
 {
     static bool isMainTable=true;
-    if(loc.x()==0&&loc.y()==0&&m_y_offset==0)
+    int offset;
+    if(loc.x()==0&&loc.y()==0)
     {
-        loc.ry()=y_offsetDiamond;                       //固视点为中心点时候的中心点检查
+        offset=y_offsetDiamond;                       //固视点为中心点时候的中心点检查
     }
+    else
+        offset=m_y_offset;
+
+
 
     isMainTable=UtilitySvc::getIsMainTable(loc,isMainTable);
     if(DB<MinDB) DB=MinDB;
     if(DB>MaxDB) DB=MaxDB;
-    m_deviceOperation->getReadyToStimulate({loc.x(),loc.y()+m_y_offset},int(m_resultModel->m_params.commonParams.cursorSize),DB,isMainTable);
+    m_deviceOperation->getReadyToStimulate({loc.x(),loc.y()+offset},int(m_resultModel->m_params.commonParams.cursorSize),DB,isMainTable);
 
     debug_DB=DB;
     debug_Loc=loc.toPoint();
