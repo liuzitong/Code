@@ -755,18 +755,37 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
 //        if(m_stimulationCount%fixedParams.falsePositiveCycle==qrand()%fixedParams.falsePositiveCycle)
         {
             QVector<DotRecord> m_checkedRecords;
-            for(auto& recordDot:m_dotRecords)
+            if(m_programModel->m_type==Type::ThreshHold)
             {
-                if(recordDot.checked)
+                for(auto& recordDot:m_dotRecords)
                 {
-                    m_checkedRecords.push_back(recordDot);
+                    if(recordDot.checked)
+                    {
+                        m_checkedRecords.push_back(recordDot);
+                    }
                 }
+                if(m_checkedRecords.size()==0) return {false,{0,0},0};
+                auto recordDot=m_checkedRecords[qrand()%m_checkedRecords.size()];
+    //            m_lastCheckeDotType.push_back(LastCheckedDotType::falsePositiveTest);
+    //            return {true,recordDot.loc,recordDot.DB-UtilitySvc::getSingleton()->m_falsePositiveDecDB};
+                m_checkCycleDotList.append({LastCheckedDotType::falseNegativeTest,recordDot.loc,recordDot.DB-UtilitySvc::getSingleton()->m_falseNegativeDecDB});
             }
-            if(m_checkedRecords.size()==0) return {false,{0,0},0};
-            auto recordDot=m_checkedRecords[qrand()%m_checkedRecords.size()];
-//            m_lastCheckeDotType.push_back(LastCheckedDotType::falsePositiveTest);
-//            return {true,recordDot.loc,recordDot.DB-UtilitySvc::getSingleton()->m_falsePositiveDecDB};
-            m_checkCycleDotList.append({LastCheckedDotType::falseNegativeTest,recordDot.loc,recordDot.DB-UtilitySvc::getSingleton()->m_falseNegativeDecDB});
+            else
+            {
+                for(auto& recordDot:m_dotRecords)
+                {
+                    if(recordDot.checked&&recordDot.DB>=2)              //2表示看到,>2表示是阈值
+                    {
+                        m_checkedRecords.push_back(recordDot);
+                    }
+                }
+                if(m_checkedRecords.size()==0) return {false,{0,0},0};
+                auto recordDot=m_checkedRecords[qrand()%m_checkedRecords.size()];
+                if(recordDot.DB==2)
+                    m_checkCycleDotList.append({LastCheckedDotType::falseNegativeTest,recordDot.loc,recordDot.StimulationDBs.first()-UtilitySvc::getSingleton()->m_falseNegativeDecDB});
+                else
+                    m_checkCycleDotList.append({LastCheckedDotType::falseNegativeTest,recordDot.loc,recordDot.DB-UtilitySvc::getSingleton()->m_falseNegativeDecDB});
+            }
         }
 
         if(m_stimulationCount%fixedParams.falsePositiveCycle==m_falsePosCyc)     //假阳性：在测试过程中，投射器转动到一定位置,但是快门关闭，如果不响应就正常，如果响应就记录一次假阳性。
