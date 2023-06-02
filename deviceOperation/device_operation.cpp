@@ -726,7 +726,7 @@ void DeviceOperation::workOnNewFrameData()
     {
         auto profile=m_profile;
         auto vc=DeviceDataProcesser::caculatePupilDeviation(m_frameData.rawData(),profile.videoSize().width(),profile.videoSize().height(),m_pupilResValid);
-        std::cout<<"isValid:"<<m_pupilResValid<<std::endl;
+//        std::cout<<"isValid:"<<m_pupilResValid<<std::endl;
         if(m_pupilResValid)
         {
             m_pupilCenterPoint=vc[0];
@@ -765,21 +765,25 @@ void DeviceOperation::workOnNewFrameData()
                     m_devCtl->moveChinMotors(sps,motorPos,UsbDev::DevCtl::MoveMethod::Relative);
                 }
             }
-                    //计算瞳孔直径
-//                    if(m_pupilDiameter<0)
-//                    {
-//                        auto pupilDiameter=DeviceDataProcesser::caculatePupilDiameter(vc[1],vc[2])*DeviceSettings::getSingleton()->m_pupilDiameterPixelToMillimeterConstant;
-//                        m_pupilDiameterArr.push_back(pupilDiameter);
-//                        if(m_pupilDiameterArr.size()>=50)
-//                        {
-//                            float sum=0;
-//                            for(auto&i:m_pupilDiameterArr)
-//                            {
-//                                sum+=i;
-//                            }
-//                            m_pupilDiameter=sum/m_pupilDiameterArr.size();
-//                        }
-//                    }
+//            计算瞳孔直径
+            if(m_pupilDiameter<0)
+            {
+                auto pupilDiameter=m_pupilRadius*DeviceSettings::getSingleton()->m_pupilDiameterPixelToMillimeterConstant*320/profile.videoSize().width();
+                m_pupilDiameterArr.push_back(pupilDiameter);
+                if(m_pupilDiameterArr.size()>=10)
+                {
+                    float sum=0;
+                    for(auto&i:m_pupilDiameterArr)
+                    {
+                        sum+=i;
+                    }
+                    m_pupilDiameter=sum/m_pupilDiameterArr.size();
+                    m_pupilDiameterArr.clear();
+                    std::cout<<m_pupilDiameter<<std::endl;
+                    emit pupilDiameterChanged();
+                }
+            }
+
         }
         m_autoPupilElapsedTimer.restart();
     }

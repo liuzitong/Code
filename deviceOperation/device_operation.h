@@ -140,9 +140,10 @@ public:
 //    int m_stimulationTime=180;
     QElapsedTimer m_castLightAdjustElapsedTimer;
     QElapsedTimer m_autoPupilElapsedTimer;
+    float m_pupilDiameter=0;
+//    bool m_pupilDiameterAcquired;
 
 private:
-    float m_pupilDiameter=-1;
     bool m_isMainTable;
     QVector<float> m_pupilDiameterArr;
     //视岛坐标和电机坐标

@@ -1568,17 +1568,21 @@ void CheckSvcWorker::initialize()
 {
     std::cout<<("initialize")<<std::endl;
     int type=m_programVm->getType();
+//    auto deviceOperation=m_check->m_deviceOperation.data();
     if(type!=2)
     {
         ((StaticCheck*)m_check.data())->m_resultModel=static_cast<StaticCheckResultVm*>(m_checkResultVm)->getModel();
+//        connect(deviceOperation,&DevOps::DeviceOperation::pupilDiameterChanged,[&](){((StaticCheck*)m_check.data())->m_resultModel->m_data.pupilDiameter=deviceOperation->m_pupilDiameter;emit checkResultChanged();});
     }
 
     else
     {
         ((DynamicCheck*)m_check.data())->m_resultModel=static_cast<DynamicCheckResultVm*>(m_checkResultVm)->getModel();
         ((DynamicCheck*)m_check.data())->m_dynamicSelectedDots=m_dynamicSelectedDots;
+//        connect(deviceOperation,&DevOps::DeviceOperation::pupilDiameterChanged,[&](){((DynamicCheck*)m_check.data())->m_resultModel->m_data.pupilDiameter=deviceOperation->m_pupilDiameter;emit checkResultChanged();});
 //        UtilitySvc::wait(2000);    //等几秒启动
     }
+    m_check->m_deviceOperation->setPupilDiameter(-1.0);
     m_check->m_deviceOperation->lightUpCastLight();
 }
 
@@ -1681,26 +1685,34 @@ void CheckSvcWorker::doWork()
             m_timer.stop();
             m_check->finished();
             setCheckState(5);
-            return;
+            break;
         }
         case 4:                                             //finish
         {
             int type=m_programVm->getType();
             m_check->finished();
             m_timer.stop();
+            auto pupilDiameter=m_check->m_deviceOperation->m_pupilDiameter;
+            if(pupilDiameter<0) pupilDiameter=0;
             if(type!=2)
             {
                 static_cast<StaticCheckResultVm*>(m_checkResultVm)->getResultData()->setTestTimespan(m_time);
+                static_cast<StaticCheckResultVm*>(m_checkResultVm)->getResultData()->setPupilDiameter(pupilDiameter);
             }
             else
             {
                 static_cast<DynamicCheckResultVm*>(m_checkResultVm)->getResultData()->setTestTimespan(m_time);
+                static_cast<DynamicCheckResultVm*>(m_checkResultVm)->getResultData()->setPupilDiameter(pupilDiameter);
             }
             m_checkResultVm->insert();
             m_patientVm->update();
             qDebug()<<("finished");
             emit checkProcessFinished();
             setCheckState(5);
+            break;
+        }
+        case 5:
+        {
             return;
         }
         };
@@ -1732,6 +1744,12 @@ CheckSvc::CheckSvc(QObject *parent)
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::isDeviceReadyChanged,this,&CheckSvc::devReadyChanged);
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::castLightAdjustStatusChanged,this,&CheckSvc::castLightAdjustStatusChanged);
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::pupilDiameterChanged,this,&CheckSvc::pupilDiameterChanged);
+    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::pupilDiameterChanged,
+            [&]()
+    {
+        std::cout<<getPupilDiameter()<<std::endl;
+    }
+    );
 
     connect(&m_castLightDimdownTimer,&QTimer::timeout,[&]()
     {
@@ -1887,6 +1905,11 @@ void CheckSvc::setAutoAlignPupil(bool autoAlign)
 float CheckSvc::getPupilDiameter()
 {
     return DevOps::DeviceOperation::getSingleton()->getPupilDiameter();
+}
+
+void CheckSvc::setPupilDiameter(float diameter)
+{
+    DevOps::DeviceOperation::getSingleton()->m_pupilDiameter=diameter;
 }
 
 void Perimeter::CheckSvc::setInputDots(QVariantList value)

@@ -123,7 +123,7 @@ QVector<QPoint> DeviceDataProcesser::caculatePupilDeviation(const QByteArray ba,
         }
     }
 
-    std::cout<<validCount<<std::endl;
+//    std::cout<<validCount<<std::endl;
     if(validCount>width*height*0.05*0.05&&validCount<=width*height*0.2*0.2)
     {
         valid=true;
@@ -204,9 +204,9 @@ QVector<QPoint> DeviceDataProcesser::caculatePupilDeviation(const QByteArray ba,
 //    qDebug()<<y_avg2;
     QPoint center={int(x_avg2-width*0.5),int(y_avg2-height*0.5)};
     QPoint topLeft={x_min,y_min};
-    qDebug()<<topLeft;
+//    qDebug()<<topLeft;
     QPoint bottomRight={x_max,y_max};
-    qDebug()<<bottomRight;
+//    qDebug()<<bottomRight;
     return QVector<QPoint>{center,topLeft,bottomRight};
 }
 

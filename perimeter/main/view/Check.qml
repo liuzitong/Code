@@ -36,7 +36,9 @@ Item {id:root; width: 1366;height: 691
 //        refresh();
     }
 
-    onCurrentCheckResultChanged:{if(currentCheckResult==null){checkDisplay.clickedDotIndex=-1;realTimeDBRec.visible=false;}}
+    onCurrentCheckResultChanged:{
+        if(currentCheckResult==null){checkDisplay.clickedDotIndex=-1;realTimeDBRec.visible=false;}
+    }
     onCurrentProgramChanged: {
         currentProgram.type!==2?staticParamsSetting.currentProgram=currentProgram:dynamicParamsSetting.currentProgram=currentProgram;
         dynamicParamsSetting.currentProgramChanged();                       //不知道为毛这里要触发一次
@@ -230,9 +232,9 @@ Item {id:root; width: 1366;height: 691
                                             id:vedio;
                                             antialiasing: false
                                             smooth: false
-                                            onWidthChanged:{if(frameProvidSvc!==null) frameProvidSvc.setVideoSize(width,height);console.log(width);console.log(height);}
-                                            onHeightChanged:{if(frameProvidSvc!==null) frameProvidSvc.setVideoSize(width,height);console.log(width);console.log(height);}
-                                            Component.onCompleted:{if(frameProvidSvc!==null) frameProvidSvc.setVideoSize(width,height);console.log(width);console.log(height);}
+                                            onWidthChanged:{if(frameProvidSvc!==null) frameProvidSvc.setVideoSize(width,height);}
+                                            onHeightChanged:{if(frameProvidSvc!==null) frameProvidSvc.setVideoSize(width,height);}
+                                            Component.onCompleted:{if(frameProvidSvc!==null) frameProvidSvc.setVideoSize(width,height);}
                                         }
                                     }
                                 }
@@ -247,9 +249,9 @@ Item {id:root; width: 1366;height: 691
                                     Item{ anchors.fill: parent;anchors.margins: parent.height*0.1;
                                         Column{anchors.fill: parent;spacing: 0.125*height;
                                             Row{width:parent.width;height: parent.height*0.75/3;spacing: width*0.05;
-                                                CusCheckBox{}
+                                                CusCheckBox{id:pupilDiameter;checked:true;}
                                                 CusText{text:lt+qsTr("Pupil diameter"); horizontalAlignment: Text.AlignLeft;width: parent.width*0.5;font.pointSize: fontPointSize;}
-                                                LineEdit{text:currentCheckResult.resultData.pupilDiameter.toFixed(2);width: parent.width*0.25;textInput.readOnly: true;}
+                                                LineEdit{text:(IcUiQmlApi.appCtrl.checkSvc.pupilDiameter>0&&pupilDiameter.checked)?IcUiQmlApi.appCtrl.checkSvc.pupilDiameter.toFixed(2):"";width: parent.width*0.25;textInput.readOnly: true;}
                                             }
                                             Row{id: row;width:parent.width;height: parent.height*0.75/3;spacing: width*0.05;
                                                 CusCheckBox{enabled: false;checked:currentProgram.type!==2?currentProgram.params.commonParams.fixationMonitor>0:currentProgram.params.fixationMonitor>0;}
