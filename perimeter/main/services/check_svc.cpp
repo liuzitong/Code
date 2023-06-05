@@ -530,24 +530,34 @@ StaticCheck::DotRecord &StaticCheck::getCheckDotRecordRef()
 //        qDebug()<<nearestRecords.length();
 //        qDebug()<<nearestRecords[0].loc;
         nearestDist=FLT_MAX;
-        auto& selectedDot=nearestRecords[qrand()%nearestRecords.count()];
+        auto& selectedDot=nearestRecords[qrand()%nearestRecords.count()];//选择点
+
 //        qDebug()<<"selectedDot loc:"<<selectedDot.loc;
         if(selectedDot.StimulationDBs.isEmpty())            //第一次检查要根据周围点的结果赋值,且说明这个点是非baseDot,baseDot会在开始的时候赋值
         {
+            QVector<int> DBsAroundSelectedDot;
 //            qDebug()<<"empty stimDB";
             for(auto&i:seletedZoneCheckedRecords)
             {
 //                qDebug()<<"got  checked";
                 auto dist=sqrt(pow((i.loc.x()-selectedDot.loc.x()),2)+pow((i.loc.y()-selectedDot.loc.y()),2));
-                if(dist<nearestDist)
+                if(dist<nearestDist)                                        //发现更小的距离,之前的值清空
                 {
-                    m_dotRecords[selectedDot.index].StimulationDBs.clear();
+                    DBsAroundSelectedDot.clear();
                     int DB=qMin(qMax(i.DB,0),51);
-                    m_dotRecords[selectedDot.index].StimulationDBs.append(DB);
+                    DBsAroundSelectedDot.append(DB);
                     nearestDist=dist;
-//                    qDebug()<<"appended DB";
+                }
+                else if(dist==nearestDist)                                  //相同加进去
+                {
+                    int DB=qMin(qMax(i.DB,0),51);
+                    DBsAroundSelectedDot.append(DB);
                 }
             }
+            int sum=0;                                                      //求出平均值
+            for(auto&i:DBsAroundSelectedDot){sum+=i;}
+            int stimulationDB=qRound(double(sum)/DBsAroundSelectedDot.length());
+            m_dotRecords[selectedDot.index].StimulationDBs.append(stimulationDB);
         }
 //        qDebug()<<"getCheckDotRecordRef loc inside:"<<m_dotRecords[selectedDot.index].loc<<"DB leng"<<QString::number(m_dotRecords[selectedDot.index].StimulationDBs.count())<<"upper:"<<QString::number(m_dotRecords[selectedDot.index].upperBound)<<"lower:"<<QString::number(m_dotRecords[selectedDot.index].lowerBound);
 //        qDebug()<<" DB:"<<QString::number(m_dotRecords[selectedDot.index].StimulationDBs.last());
@@ -759,7 +769,7 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
             {
                 for(auto& recordDot:m_dotRecords)
                 {
-                    if(recordDot.checked)
+                    if(recordDot.checked&&recordDot.DB>=0)                                          //必须要看到
                     {
                         m_checkedRecords.push_back(recordDot);
                     }
@@ -1744,13 +1754,6 @@ CheckSvc::CheckSvc(QObject *parent)
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::isDeviceReadyChanged,this,&CheckSvc::devReadyChanged);
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::castLightAdjustStatusChanged,this,&CheckSvc::castLightAdjustStatusChanged);
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::pupilDiameterChanged,this,&CheckSvc::pupilDiameterChanged);
-    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::pupilDiameterChanged,
-            [&]()
-    {
-        std::cout<<getPupilDiameter()<<std::endl;
-    }
-    );
-
     connect(&m_castLightDimdownTimer,&QTimer::timeout,[&]()
     {
         if(m_checkState>=3)
