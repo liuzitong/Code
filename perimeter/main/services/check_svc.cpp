@@ -602,10 +602,10 @@ void StaticCheck::stimulate()
         {
         case LastCheckedDotType::blindDotTest:
         case LastCheckedDotType::locateBlindDot:
-        case LastCheckedDotType::falsePositiveTest:m_resultModel->m_data.fixationDeviation.push_back(-m_deviceOperation->m_deviation);break;
+        case LastCheckedDotType::falsePositiveTest:m_resultModel->m_data.fixationDeviation.push_back(-m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation);break;
         case LastCheckedDotType::commonCheckDot:
         {
-            m_resultModel->m_data.fixationDeviation.push_back(m_deviceOperation->m_deviation);
+            m_resultModel->m_data.fixationDeviation.push_back(m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation);
             uint dotIndex=m_lastCheckDotRecord[0]->index;
             m_resultModel->m_data.realTimeDB[dotIndex]=m_lastCheckDotRecord[0]->StimulationDBs.toStdVector(); //在check初始化的时候扩充了大小.
             if(dotIndex<m_programModel->m_data.dots.size()||dotIndex==2*m_programModel->m_data.dots.size())
@@ -619,7 +619,7 @@ void StaticCheck::stimulate()
     {
         m_deviceOperation->waitForSomeTime(durationTime);           //假阴
         emit currentCheckingDotChanged({999,999});
-        m_resultModel->m_data.fixationDeviation.push_back(-m_deviceOperation->m_deviation);
+        m_resultModel->m_data.fixationDeviation.push_back(-m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation);
         std::cout<<"***** jiayin"<<"zuo biao x:"<<debug_Loc.x()<<" "<<"zuobiao y:"<<debug_Loc.y()<<"    yong shi:"<<m_stimulationWaitingForAnswerElapsedTimer.elapsed()<<std::endl;
     }
     m_deviceOperation->m_isWaitingForStaticStimulationAnswer=true;
@@ -1592,7 +1592,8 @@ void CheckSvcWorker::initialize()
 //        connect(deviceOperation,&DevOps::DeviceOperation::pupilDiameterChanged,[&](){((DynamicCheck*)m_check.data())->m_resultModel->m_data.pupilDiameter=deviceOperation->m_pupilDiameter;emit checkResultChanged();});
 //        UtilitySvc::wait(2000);    //等几秒启动
     }
-    m_check->m_deviceOperation->setPupilDiameter(-1.0);
+//    m_check->m_deviceOperation->setPupilDiameter(-1.0);
+    m_check->m_deviceOperation->clearPupilData();
     m_check->m_deviceOperation->lightUpCastLight();
 }
 
@@ -1702,7 +1703,7 @@ void CheckSvcWorker::doWork()
             int type=m_programVm->getType();
             m_check->finished();
             m_timer.stop();
-            auto pupilDiameter=m_check->m_deviceOperation->m_pupilDiameter;
+            auto pupilDiameter=m_check->m_deviceOperation->getPupilDiameter();
             if(pupilDiameter<0) pupilDiameter=0;
             if(type!=2)
             {
