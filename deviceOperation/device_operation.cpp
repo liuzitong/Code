@@ -603,6 +603,11 @@ void DeviceOperation::beep()
     }
 }
 
+void DeviceOperation::clearPupilData()
+{
+    m_devicePupilProcessor.clearData();
+}
+
 
 
 void DeviceOperation::workOnNewStatuData()
@@ -717,78 +722,169 @@ void DeviceOperation::workOnNewStatuData()
     emit newStatusData();
 }
 
+//void DeviceOperation::workOnNewFrameData()
+//{
+//    m_frameData=m_devCtl->takeNextPendingFrameData();
+//    m_frameRawDataLock.lock();
+//    m_frameRawData=m_frameData.rawData();
+//    if(m_autoPupilElapsedTimer.elapsed()>=1000)
+//    {
+//        auto profile=m_profile;
+//        auto vc=DeviceDataProcesser::caculatePupilDeviation(m_frameData.rawData(),profile.videoSize().width(),profile.videoSize().height(),m_pupilResValid);
+//        if(m_pupilResValid)
+//        {
+//            m_pupilCenterPoint=vc[0];
+//            m_pupilRadius=DeviceDataProcesser::caculatePupilDiameter(vc[1],vc[2])/2;
+//            auto step=DeviceSettings::getSingleton()->m_pupilAutoAlignStep;
+//            if(m_autoAlignPupil/*&&(!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Chin_Hoz)||!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Chin_Vert))*/)                //自动对眼位
+//            {
+//                int tolerance=DeviceSettings::getSingleton()->m_pupilAutoAlignPixelTolerance;
+//                auto spsConfig=DeviceSettings::getSingleton()->m_motorChinSpeed;
+//                quint8 sps[2]{spsConfig[0],spsConfig[1]};
+//                int motorPos[2]{0};
+
+//                if(!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Chin_Hoz)&&qAbs(m_pupilCenterPoint.x())>tolerance)
+//                {
+//                    motorPos[0]=-m_pupilCenterPoint.x()*step;
+//                    m_devCtl->moveChinMotors(sps,motorPos,UsbDev::DevCtl::MoveMethod::Relative);
+//                }
+
+//                if(!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Chin_Vert)&&qAbs(m_pupilCenterPoint.y())>tolerance)
+//                {
+//                    motorPos[1]=m_pupilCenterPoint.y()*step;
+//                    m_devCtl->moveChinMotors(sps,motorPos,UsbDev::DevCtl::MoveMethod::Relative);
+//                }
+//            }
+////            计算瞳孔直径
+//            if(m_pupilDiameter<0)
+//            {
+//                auto pupilDiameter=m_pupilRadius*DeviceSettings::getSingleton()->m_pupilDiameterPixelToMillimeterConstant*320/profile.videoSize().width();
+//                m_pupilDiameterArr.push_back(pupilDiameter);
+//                if(m_pupilDiameterArr.size()>=10)
+//                {
+//                    float sum=0;
+//                    for(auto&i:m_pupilDiameterArr)
+//                    {
+//                        sum+=i;
+//                    }
+//                    m_pupilDiameter=sum/m_pupilDiameterArr.size();
+//                    m_pupilDiameterArr.clear();
+//                    std::cout<<m_pupilDiameter<<std::endl;
+//                    emit pupilDiameterChanged();
+//                }
+//            }
+
+//        }
+//        m_autoPupilElapsedTimer.restart();
+//    }
+//    m_frameRawDataLock.unlock();
+//    emit newFrameData();
+//}
+
+
+//void DeviceOperation::workOnNewFrameData()
+//{
+//    m_frameData=m_devCtl->takeNextPendingFrameData();
+//    m_frameRawDataLock.lock();
+//    m_frameRawData=m_frameData.rawData();
+//    m_frameRawDataLock.unlock();
+//    emit newFrameData();
+
+//    if(m_autoPupilElapsedTimer.elapsed()>=200)
+//    {
+//        QImage img((uchar*)m_frameRawData.data(),m_videoSize.width(),m_videoSize.height(),QImage::Format_Grayscale8);
+//        QImage img2=img.scaled(320,240);
+//        QByteArray imgData=QByteArray::fromRawData((char*)img2.bits(),img2.byteCount());
+
+//        m_devicePupilProcessor.processData(imgData);
+//        m_autoPupilElapsedTimer.restart();
+//        emit pupilDiameterChanged();
+//    }
+
+//    if(m_autoPupilElapsedTimer.elapsed()>=1000)
+//    {
+//        auto profile=m_profile;
+//        auto vc=DeviceDataProcesser::caculatePupilDeviation(m_frameData.rawData(),profile.videoSize().width(),profile.videoSize().height(),m_pupilResValid);
+//        if(m_pupilResValid)
+//        {
+//            m_pupilCenterPoint=vc[0];
+//            m_pupilRadius=DeviceDataProcesser::caculatePupilDiameter(vc[1],vc[2])/2;
+//            auto step=DeviceSettings::getSingleton()->m_pupilAutoAlignStep;
+//            if(m_autoAlignPupil)                //自动对眼位
+//            {
+//                int tolerance=DeviceSettings::getSingleton()->m_pupilAutoAlignPixelTolerance;
+//                auto spsConfig=DeviceSettings::getSingleton()->m_motorChinSpeed;
+//                quint8 sps[2]{spsConfig[0],spsConfig[1]};
+//                int motorPos[2]{0};
+
+//                if(!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Chin_Hoz)&&qAbs(m_pupilCenterPoint.x())>tolerance)
+//                {
+//                    motorPos[0]=-m_pupilCenterPoint.x()*step;
+//                    m_devCtl->moveChinMotors(sps,motorPos,UsbDev::DevCtl::MoveMethod::Relative);
+//                }
+
+//                if(!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Chin_Vert)&&qAbs(m_pupilCenterPoint.y())>tolerance)
+//                {
+//                    motorPos[1]=m_pupilCenterPoint.y()*step;
+//                    m_devCtl->moveChinMotors(sps,motorPos,UsbDev::DevCtl::MoveMethod::Relative);
+//                }
+//            }
+////            计算瞳孔直径
+//            if(m_pupilDiameter<0)
+//            {
+
+//            }
+
+//        }
+//        m_autoPupilElapsedTimer.restart();
+//    }
+//}
+
 void DeviceOperation::workOnNewFrameData()
 {
     m_frameData=m_devCtl->takeNextPendingFrameData();
     m_frameRawDataLock.lock();
     m_frameRawData=m_frameData.rawData();
-    if(m_autoPupilElapsedTimer.elapsed()>=1000)
+    m_frameRawDataLock.unlock();
+    emit newFrameData();
+
+
+    if(m_autoPupilElapsedTimer.elapsed()>=m_autoPupilElapsedTime)
     {
-        auto profile=m_profile;
-        auto vc=DeviceDataProcesser::caculatePupilDeviation(m_frameData.rawData(),profile.videoSize().width(),profile.videoSize().height(),m_pupilResValid);
-//        std::cout<<"isValid:"<<m_pupilResValid<<std::endl;
-        if(m_pupilResValid)
+        m_devicePupilProcessor.processData(m_frameRawData,m_videoSize.width(),m_videoSize.height());
+        m_autoPupilElapsedTimer.restart();
+        if(m_devicePupilProcessor.m_pupilResValid)
         {
-            m_pupilCenterPoint=vc[0];
-            m_pupilRadius=DeviceDataProcesser::caculatePupilDiameter(vc[1],vc[2])/2;
-            std::cout<<"radius:"<<m_pupilRadius<<std::endl;
-            std::cout<<m_pupilCenterPoint.x()<<" "<<m_pupilCenterPoint.y()<<std::endl;
-            auto step=DeviceSettings::getSingleton()->m_pupilAutoAlignStep;
-        //    m_deviation=DeviceDataProcesser::caculateFixationDeviation(m_pupilCenterPoint);
-            if(m_autoAlignPupil/*&&(!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Chin_Hoz)||!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Chin_Vert))*/)                //自动对眼位
+            if(m_autoAlignPupil)                //自动对眼位
             {
+                auto step=DeviceSettings::getSingleton()->m_pupilAutoAlignStep;
                 int tolerance=DeviceSettings::getSingleton()->m_pupilAutoAlignPixelTolerance;
                 auto spsConfig=DeviceSettings::getSingleton()->m_motorChinSpeed;
                 quint8 sps[2]{spsConfig[0],spsConfig[1]};
                 int motorPos[2]{0};
-    //            if(!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Chin_Hoz))
-    //            {
-    //                if(m_pupilCenterPoint.x()>tolerance)
-    //                {
-    //                    motorPos[0]=m_pupilCenterPoint.x()*step;
-    //                }
-    //                if(m_pupilCenterPoint.x()<-tolerance)
-    //                {
-    //                    motorPos[0]=m_pupilCenterPoint.x()*step;
-    //                }
-    //            }
 
-                if(!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Chin_Hoz)&&qAbs(m_pupilCenterPoint.x())>tolerance)
+                auto pupilCenterPoint=m_devicePupilProcessor.m_pupilCenterPoint;
+                if(!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Chin_Hoz)&&qAbs(pupilCenterPoint.x())>tolerance)
                 {
-                    motorPos[0]=-m_pupilCenterPoint.x()*step;
+                    motorPos[0]=-pupilCenterPoint.x()*step;
                     m_devCtl->moveChinMotors(sps,motorPos,UsbDev::DevCtl::MoveMethod::Relative);
                 }
 
-                if(!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Chin_Vert)&&qAbs(m_pupilCenterPoint.y())>tolerance)
+                if(!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Chin_Vert)&&qAbs(pupilCenterPoint.y())>tolerance)
                 {
-                    motorPos[1]=m_pupilCenterPoint.y()*step;
+                    motorPos[1]=pupilCenterPoint.y()*step;
                     m_devCtl->moveChinMotors(sps,motorPos,UsbDev::DevCtl::MoveMethod::Relative);
                 }
+                m_autoPupilElapsedTime=1000;
             }
-//            计算瞳孔直径
-            if(m_pupilDiameter<0)
-            {
-                auto pupilDiameter=m_pupilRadius*DeviceSettings::getSingleton()->m_pupilDiameterPixelToMillimeterConstant*320/profile.videoSize().width();
-                m_pupilDiameterArr.push_back(pupilDiameter);
-                if(m_pupilDiameterArr.size()>=10)
-                {
-                    float sum=0;
-                    for(auto&i:m_pupilDiameterArr)
-                    {
-                        sum+=i;
-                    }
-                    m_pupilDiameter=sum/m_pupilDiameterArr.size();
-                    m_pupilDiameterArr.clear();
-                    std::cout<<m_pupilDiameter<<std::endl;
-                    emit pupilDiameterChanged();
-                }
-            }
-
         }
-        m_autoPupilElapsedTimer.restart();
+        else
+        {
+            m_autoPupilElapsedTime=200;
+        }
+        if(m_devicePupilProcessor.m_reflectionResValid)
+            emit pupilDiameterChanged();
     }
-    m_frameRawDataLock.unlock();
-    emit newFrameData();
 }
 
 void DeviceOperation::workOnNewProfile()

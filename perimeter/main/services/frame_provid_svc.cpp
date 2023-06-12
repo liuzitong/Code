@@ -79,9 +79,10 @@ void FrameProvidSvc::onNewVideoContentReceived(/*QByteArray qa*/)
 //    qDebug()<<"frame provider received "+QString::number(rawData.size());
 
     auto videoSize=DevOps::DeviceOperation::getSingleton()->m_videoSize;
-//    auto pupilRadius=DevOps::DeviceOperation::getSingleton()->m_pupilRadius*m_width/videoSize.width();
-//    auto pupilCenterPoint=DevOps::DeviceOperation::getSingleton()->m_pupilCenterPoint;
-//    QPoint scalePupilCenterPoint={pupilCenterPoint.x()*m_width/videoSize.width(),pupilCenterPoint.y()*m_height/videoSize.height()};
+    auto& devicePupilProcessor=DevOps::DeviceOperation::getSingleton()->m_devicePupilProcessor;
+    auto pupilRadius=devicePupilProcessor.m_pupilRadius*m_width/videoSize.width();
+    auto pupilCenterPoint=devicePupilProcessor.m_pupilCenterPoint;
+    QPoint scalePupilCenterPoint={pupilCenterPoint.x()*m_width/videoSize.width(),pupilCenterPoint.y()*m_height/videoSize.height()};
     if(rawData.size()==videoSize.width()*videoSize.height())
     {
         QImage img((uchar*)rawData.data(),videoSize.width(),videoSize.height(),QImage::Format::Format_Grayscale8);
@@ -89,10 +90,14 @@ void FrameProvidSvc::onNewVideoContentReceived(/*QByteArray qa*/)
         auto img3=img2.scaled(m_width,m_height,Qt::AspectRatioMode::KeepAspectRatio);
         QPainter painter(&img3);
         painter.setPen(Qt::red);
-//        if(DevOps::DeviceOperation::getSingleton()->m_pupilResValid)
-//        {
-//            painter.drawEllipse({scalePupilCenterPoint.x()+m_width/2,scalePupilCenterPoint.y()+m_height/2,},pupilRadius,pupilRadius);
-//        }
+        auto& devicePupilProcessor=DevOps::DeviceOperation::getSingleton()->m_devicePupilProcessor;
+        if(devicePupilProcessor.m_pupilResValid)
+        {
+            painter.drawEllipse({scalePupilCenterPoint.x()+m_width/2,scalePupilCenterPoint.y()+m_height/2,},pupilRadius,pupilRadius);
+            painter.drawPoint(devicePupilProcessor.m_reflectionDot[0]);
+            painter.drawPoint(devicePupilProcessor.m_reflectionDot[1]);
+            painter.drawPoint(devicePupilProcessor.m_reflectionDot[2]);
+        }
         drawCrossHair(img3);
 //        if(count%100==0)
 //            img3.save("./img/"+QString::number(count)+".bmp");

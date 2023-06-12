@@ -26,14 +26,16 @@ SOURCES += \
     $$PWD/device_settings.cpp \
     $$PWD/device_operation.cpp \
     $$PWD/device_data.cpp \
-    $$PWD/device_data_processer.cpp
+    $$PWD/device_data_processer.cpp \
+    $$PWD/device_pupil_processor.cpp
 
 HEADERS += \
     $$PWD/device_settings.h \
     $$PWD/device_operation_global.h \
     $$PWD/device_operation.h \
     $$PWD/device_data.h \
-    $$PWD/device_data_processer.h
+    $$PWD/device_data_processer.h \
+    $$PWD/device_pupil_processor.h
 
 #HEADERS_COPY *= $${HEADERS}
 

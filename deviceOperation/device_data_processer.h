@@ -11,15 +11,16 @@ public:
     DeviceDataProcesser()=default;
     static int getFocusMotorPosByDist(int focalDist,int spotSlot);
     static CoordMotorPosFocalDistInfo getXYMotorPosAndFocalDistFromCoord(const QPointF loc,bool isMainDotInfoTable);
-    static QVector<QPoint> caculatePupilDeviation(const QByteArray ba,int width,int height,bool& valid);
-    static float caculatePupilDiameter(QPoint topLeft,QPoint bottomRight);
-    static int caculateFixationDeviation(QPoint point);
-    static QSharedPointer<DeviceDataProcesser> getSingleton();
+//    static QVector<QPoint> caculatePupilDeviation(const QByteArray ba,int width,int height,bool& valid);
+//    static float caculatePupilDiameter(QPoint topLeft,QPoint bottomRight);
+//    static int caculateFixationDeviation(QPoint point);
+//    static QSharedPointer<DeviceDataProcesser> getSingleton();
+
 
 private:
 //    float m_pupilDiameter;
 //    QVector<float> m_pupilDiameters;
-    static QSharedPointer<DeviceDataProcesser> m_singleton;
+//    static QSharedPointer<DeviceDataProcesser> m_singleton;
     /**
      * @brief interPolation
      * @param value 四个点位的值

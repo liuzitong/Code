@@ -15,6 +15,7 @@
 #include <QElapsedTimer>
 #include <QTimer>
 #include <QMutex>
+#include "device_pupil_processor.h"
 
 namespace DevOps{
 using LampId=UsbDev::DevCtl::LampId;
@@ -80,6 +81,7 @@ public:
     void dimDownCastLight();
     void resetMotors(QVector<UsbDev::DevCtl::MotorId> motorIDs);
     void beep();
+    void clearPupilData();
 
 private:
     void moveChin(ChinMoveDirection direction);       //0左,1不动,2右;0上,1不动,2下
@@ -99,9 +101,10 @@ signals:
 public:
     bool getAutoAlignPupil(){return m_autoAlignPupil;}void setAutoAlignPupil(bool value){m_autoAlignPupil=value;emit autoAlignPupilChanged();}Q_SIGNAL void autoAlignPupilChanged();
     bool getIsDeviceReady(){return m_isDeviceReady;}void setIsDeviceReady(bool value){if(m_isDeviceReady!=value){m_isDeviceReady=value;emit isDeviceReadyChanged();}}Q_SIGNAL void isDeviceReadyChanged();
-    float getPupilDiameter(){return m_pupilDiameter;}void setPupilDiameter(float value){m_pupilDiameter=value;emit pupilDiameterChanged();}Q_SIGNAL void pupilDiameterChanged();
+    float getPupilDiameter(){return m_devicePupilProcessor.m_pupilDiameter;}void setPupilDiameter(float value){m_devicePupilProcessor.m_pupilDiameter=value;emit pupilDiameterChanged();}Q_SIGNAL void pupilDiameterChanged();
     int getCastLightAdjustStatus(){return m_castLightAdjustStatus;}void setCastLightAdjustStatus(int value){m_castLightAdjustStatus=value;emit castLightAdjustStatusChanged();}Q_SIGNAL void castLightAdjustStatusChanged();
 public:
+    DevicePupilProcessor m_devicePupilProcessor;
     Status m_status;
     QElapsedTimer m_workStatusElapsedTimer;
     bool m_isDeviceReady=false;
@@ -110,7 +113,7 @@ public:
     bool m_eyeglassIntialize=false;
 //    bool m_isChecking=false;
     bool m_connectDev=false;
-    float m_deviation=0;
+//    float m_deviation=0;
 //    bool m_deviation_valid;
     QSize m_videoSize;
     bool m_isAtCheckingPage=false;
@@ -120,14 +123,11 @@ public:
     UsbDev::Profile m_profile;
     UsbDev::StatusData m_statusData;
     QMutex m_statusLock;                      //防止多线程冲突,放入同线程不再需要
+
     UsbDev::FrameData m_frameData;
-    QPoint m_pupilCenterPoint;
-    int m_pupilRadius;
-    bool m_pupilResValid=false;
-    QMutex m_frameRawDataLock;
-    QByteArray m_frameRawData;
-    QTimer m_connectTimer;
-    QTimer m_videoTimer;
+//    QPoint m_pupilCenterPoint;
+//    int m_pupilRadius;
+//    bool m_pupilResValid=false;
 //    QElapsedTimer m_isStaticCheckPausingTimer;
 //    bool m_isKeepingPressingAnswerPad;
 //    bool m_isStaticCheckPausing;
@@ -138,21 +138,26 @@ public:
     int m_castLightTargetDA;
     bool m_castLightUp=true;
 //    int m_stimulationTime=180;
-    QElapsedTimer m_castLightAdjustElapsedTimer;
-    QElapsedTimer m_autoPupilElapsedTimer;
-    float m_pupilDiameter=0;
+
 //    bool m_pupilDiameterAcquired;
 
 private:
+    QMutex m_frameRawDataLock;
+    QByteArray m_frameRawData;
+    QElapsedTimer m_autoPupilElapsedTimer;
+    int m_autoPupilElapsedTime=200;
+    QTimer m_connectTimer;
+    QTimer m_videoTimer;
+    QElapsedTimer m_castLightAdjustElapsedTimer;
+
+
     bool m_isMainTable;
-    QVector<float> m_pupilDiameterArr;
+//    QVector<float> m_pupilDiameterArr;
     //视岛坐标和电机坐标
     QVector<QPair<QPointF,QPoint>> m_lastDynamicCoordAndXYMotorPos;
     static QSharedPointer<DeviceOperation> m_singleton;
-
-//    QTimer m_statusTimer;
-    QString word;
     void moveToAdjustLight(int motorPosX, int motorPosY, int motorPosFocal);
+//    QTimer m_statusTimer;
 };
 }
 
