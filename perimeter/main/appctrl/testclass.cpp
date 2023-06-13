@@ -20,12 +20,12 @@ namespace Perimeter {
 
 void TestClass::test()
 {
-    createPatientData();
+//    createPatientData();
 //    createCheckResultData();
 //    createDynamicCheckResultData();
 //    createCheckResultVm();
 //    TestReport();
-//    makePicData();
+    makePicData();
 //    makePic();
 //    drawPicData();
 //testData();
@@ -37,11 +37,7 @@ void TestClass::test()
 //     msgBox.exec();
 
 //     DevOps::DeviceOperation::getSingleton()->stopDynamic();
-    static bool aa=true;
-    if(aa)
-    DevOps::DeviceOperation::getSingleton()->lightUpCastLight();
-    else
-    DevOps::DeviceOperation::getSingleton()->dimDownCastLight();
+
 
 
 
@@ -177,34 +173,22 @@ void TestClass::TestReport()
 
 void TestClass::makePicData()
 {
-    StaticCheckResultVm checkResultVm(QVariantList{1});
-    auto resultModel=checkResultVm.getModel();
-    resultModel->m_data.realTimeDB={{22},{24,23},{32,25,14},{32,25,14,44},{13,25,14,32,21},{13,25,44,32,26,42},{13,25,14,32,21},{32,25,14,44},{32,25,14},{24,23},{22}};
+    QByteArray imgData(640*480,0x80);
+    QImage img((uchar*)imgData.data(),640,480,QImage::Format_Grayscale8);
+    img=img.scaled(320,240);
 
-    QByteArray byteArr;
-    byteArr.fill(uchar(255),320*240);
-    auto dbData=resultModel->m_data.realTimeDB;
-    qDebug()<<dbData.size();
-    for(quint8 i=0;i<dbData.size();i++)
+    QString fileDir=R"(./savePics/)"+
+            QString::number(222)+"/"+
+            QString::number(333)+"/"+
+            QString::number(151)+"/"+
+            QString::number(18)+"/";
+
+    QDir dir;
+    if(!dir.exists(fileDir))
     {
-        int number=0;
-        for(quint8 j=0;j<dbData[i].size();j++)
-        {
-            number++;
-            for(int h=0;h<240;h++)
-            {
-                for(int w=0;w<320;w++)
-                {
-                    byteArr.data()[h*320+w]=w*number%255;
-                }
-            }
-            resultModel->m_blob.append(byteArr);
-        }
+        dir.mkpath(fileDir);
     }
-    auto pp=resultModel->ModelToDB();
-    qx::dao::update(pp);
-
-
+    img.save(fileDir+QString::number(5)+".JPEG");
 }
 
 void TestClass::makePic()
@@ -225,17 +209,17 @@ void TestClass::makePic()
 
 void TestClass::drawPicData()
 {
-    StaticCheckResultVm checkResultVm(QVariantList{1});
-    auto resultModel=checkResultVm.getModel();
-    auto pic=resultModel->m_blob;
-    int picCount=pic.size()/(320*240);
-    qDebug()<<picCount;
-    for(int i=0;i<picCount;i++)
-    {
-        auto qa=pic.mid(i*320*240,320*240);
-        QImage img((uchar*)qa.data(),320,240,QImage::Format_Grayscale8);
-        img.save(R"(C:\Users\syseye\Desktop\Pic\fromModel\)"+QString::number(i)+".bmp");
-    }
+//    StaticCheckResultVm checkResultVm(QVariantList{1});
+//    auto resultModel=checkResultVm.getModel();
+//    auto pic=resultModel->m_blob;
+//    int picCount=pic.size()/(320*240);
+//    qDebug()<<picCount;
+//    for(int i=0;i<picCount;i++)
+//    {
+//        auto qa=pic.mid(i*320*240,320*240);
+//        QImage img((uchar*)qa.data(),320,240,QImage::Format_Grayscale8);
+//        img.save(R"(C:\Users\syseye\Desktop\Pic\fromModel\)"+QString::number(i)+".bmp");
+//    }
 //    auto byteArr=QByteArray::fromBase64(base64String.c_str());
 
 }
@@ -259,15 +243,15 @@ void TestClass::serialization()
 
 void TestClass::testData()
 {
-    CheckResult_ptr checkResult_ptr(new CheckResult());
-    checkResult_ptr->m_id=331;
-    qx::dao::fetch_by_id(checkResult_ptr);
+//    CheckResult_ptr checkResult_ptr(new CheckResult());
+//    checkResult_ptr->m_id=331;
+//    qx::dao::fetch_by_id(checkResult_ptr);
 
-    auto blob=checkResult_ptr->m_blob;
-    for(int i=0;i<4;i++)
-    {
-        qDebug()<<QString::number(blob.data()[i]);
-    }
+//    auto blob=checkResult_ptr->m_blob;
+//    for(int i=0;i<4;i++)
+//    {
+//        qDebug()<<QString::number(blob.data()[i]);
+//    }
 }
 
 

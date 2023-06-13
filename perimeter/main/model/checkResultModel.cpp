@@ -37,7 +37,7 @@ StaticCheckResultModel::StaticCheckResultModel(CheckResult_ptr checkResult_ptr):
         m_videoSize.rwidth()=strings[0].toInt();
         m_videoSize.rheight()=strings[1].toInt();
     }
-    m_blob=checkResult_ptr->m_blob;
+//    m_blob=checkResult_ptr->m_blob;
 }
 
 CheckResult_ptr StaticCheckResultModel::ModelToDB()

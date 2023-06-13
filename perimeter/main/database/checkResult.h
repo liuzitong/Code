@@ -18,17 +18,17 @@ public:
     int m_OS_OD;                       //0左眼 OS,1右眼 OD
     QString m_params;
     QString m_data;
-    QByteArray m_blob;
+//    QByteArray m_blob;
     QString m_videoSize;
     QString m_diagnosis;
     QDateTime m_time;
     Patient_ptr m_patient;
     Program_ptr m_program;
     CheckResult() = default;
-    CheckResult(int type,int OS_OD,QString params,QString data,QByteArray blob,QString videoSize,QDateTime time,Patient_ptr patient,Program_ptr program):
-    m_type(type),m_OS_OD(OS_OD),m_params(params),m_data(data),m_blob(blob),m_videoSize(videoSize),m_time(time),m_patient(patient),m_program(program){}
-    CheckResult(long id,int type,int OS_OD,QString params,QString data,QByteArray blob,QString videoSize,QDateTime time,Patient_ptr patient,Program_ptr program):
-    m_id(id),m_type(type),m_OS_OD(OS_OD),m_params(params),m_data(data),m_blob(blob),m_videoSize(videoSize),m_time(time),m_patient(patient),m_program(program){}
+    CheckResult(int type,int OS_OD,QString params,QString data,/*QByteArray blob,*/QString videoSize,QDateTime time,Patient_ptr patient,Program_ptr program):
+    m_type(type),m_OS_OD(OS_OD),m_params(params),m_data(data),/*m_blob(blob),*/m_videoSize(videoSize),m_time(time),m_patient(patient),m_program(program){}
+    CheckResult(long id,int type,int OS_OD,QString params,QString data,/*QByteArray blob,*/QString videoSize,QDateTime time,Patient_ptr patient,Program_ptr program):
+    m_id(id),m_type(type),m_OS_OD(OS_OD),m_params(params),m_data(data),/*m_blob(blob),*/m_videoSize(videoSize),m_time(time),m_patient(patient),m_program(program){}
     virtual ~CheckResult(){}
 };
 

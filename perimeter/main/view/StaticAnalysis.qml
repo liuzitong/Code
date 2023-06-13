@@ -164,6 +164,7 @@ Item
          Rectangle{width:parent.width*0.25;height: parent.height;color:"white";
              GridView{
                  property ListModel listModel:ListModel{}
+                 property string fileDir;
                  boundsBehavior: Flickable.StopAtBounds
                  clip: true
                  id:realTimeEyePosListView
@@ -178,13 +179,18 @@ Item
                      //靠analysisVm的选择点变化,来触发root.realTimePicRefresh,从而刷新
                      root.refresh.connect(function(){visible=false;parent.color="white"});
                      root.realTimePicRefresh.connect(
-                     function(count){
-                         console.log(count);
+                     function(val){
+                         console.log(val);
+                         console.log(val[0]);
+                         console.log(val[1]);
+
+                         var count=val[0];
+                         fileDir=val[1];
                          visible=true;parent.color="grey"
                          listModel.clear();
                          for(var i=0;i<count;i++)
                          {
-                            listModel.append({index:i});
+                            listModel.append({fileDir:fileDir,index:i});
                          }
                      })
                  }
@@ -193,7 +199,7 @@ Item
                      id:realTimeEyePos
                      Item{width: realTimeEyePosListView.width/2;height: width;
                          Image{
-                            property string picSource: "/realTimeEyePosPic/"+index+".bmp";
+                            property string picSource: fileDir+index+".JPEG";
                             anchors.fill: parent;
                             fillMode: Image.PreserveAspectCrop;smooth: false;cache: false;        //to refresh image
                             source: "file:///" + applicationDirPath + picSource;

@@ -80,7 +80,7 @@ void FrameProvidSvc::onNewVideoContentReceived(/*QByteArray qa*/)
 
     auto videoSize=DevOps::DeviceOperation::getSingleton()->m_videoSize;
     auto& devicePupilProcessor=DevOps::DeviceOperation::getSingleton()->m_devicePupilProcessor;
-    auto pupilRadius=devicePupilProcessor.m_pupilRadius*m_width/videoSize.width();
+    int pupilRadius=devicePupilProcessor.m_pupilRadius*m_width/videoSize.width();
     auto pupilCenterPoint=devicePupilProcessor.m_pupilCenterPoint;
     QPoint scalePupilCenterPoint={pupilCenterPoint.x()*m_width/videoSize.width(),pupilCenterPoint.y()*m_height/videoSize.height()};
     if(rawData.size()==videoSize.width()*videoSize.height())
@@ -94,9 +94,12 @@ void FrameProvidSvc::onNewVideoContentReceived(/*QByteArray qa*/)
         if(devicePupilProcessor.m_pupilResValid)
         {
             painter.drawEllipse({scalePupilCenterPoint.x()+m_width/2,scalePupilCenterPoint.y()+m_height/2,},pupilRadius,pupilRadius);
-            painter.drawPoint(devicePupilProcessor.m_reflectionDot[0]);
-            painter.drawPoint(devicePupilProcessor.m_reflectionDot[1]);
-            painter.drawPoint(devicePupilProcessor.m_reflectionDot[2]);
+            if(devicePupilProcessor.m_reflectionResValid)
+            {
+                painter.drawPoint(devicePupilProcessor.m_reflectionDot[0]);
+                painter.drawPoint(devicePupilProcessor.m_reflectionDot[1]);
+                painter.drawPoint(devicePupilProcessor.m_reflectionDot[2]);
+            }
         }
         drawCrossHair(img3);
 //        if(count%100==0)

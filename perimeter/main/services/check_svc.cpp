@@ -1911,10 +1911,6 @@ float CheckSvc::getPupilDiameter()
     return DevOps::DeviceOperation::getSingleton()->getPupilDiameter();
 }
 
-void CheckSvc::setPupilDiameter(float diameter)
-{
-    DevOps::DeviceOperation::getSingleton()->m_pupilDiameter=diameter;
-}
 
 void Perimeter::CheckSvc::setInputDots(QVariantList value)
 {

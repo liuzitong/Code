@@ -11,6 +11,7 @@ Item
 {
     id:root;
     signal refresh();
+    signal realTimePicRefresh(var count);
     property var currentProgram: null;
     property var currentPatient: null;
     property var currentCheckResult: null;
@@ -26,6 +27,8 @@ Item
     property int range: currentProgram.params.commonParams.Range[1];
     width: 1366;
     height: 660;
+    property var selectedDotIndex: staticAnalysisVm.selectedDotIndex;
+    onSelectedDotIndexChanged:{if(currentCheckResult==null) return;var count=currentCheckResult.drawRealTimeEyePosPic(selectedDotIndex);realTimePicRefresh(count);}
     onRefresh:
     {
         var checkResultId=progressAnalysisListVm.selectedResultId;
@@ -268,7 +271,61 @@ Item
         }
 
 
-        Rectangle{width:parent.width*0.25;height: parent.height;color:"white";}
+        Rectangle{width:parent.width*0.25;height: parent.height;color:"white";
+            GridView{
+                property ListModel listModel:ListModel{}
+                property string fileDir;
+                boundsBehavior: Flickable.StopAtBounds
+                clip: true
+                id:realTimeEyePosListView
+                cellWidth: parent.width/2;cellHeight:cellWidth;
+                anchors.fill: parent;
+                delegate: realTimeEyePos
+                model:listModel;
+
+                Component.onCompleted:
+                {
+
+                    //靠analysisVm的选择点变化,来触发root.realTimePicRefresh,从而刷新
+                    root.refresh.connect(function(){visible=false;parent.color="white"});
+                    root.realTimePicRefresh.connect(
+                    function(val){
+                        console.log(val[0]);
+                        console.log(val[1]);
+                        var count=val[0];
+                        fileDir=val[1];
+                        visible=true;parent.color="grey"
+                        listModel.clear();
+                        for(var i=0;i<count;i++)
+                        {
+                           listModel.append({fileDir:fileDir,index:i});
+                        }
+                    })
+                }
+
+                Component{
+                    id:realTimeEyePos
+                    Item{width: realTimeEyePosListView.width/2;height: width;
+                        Image{
+                           property string picSource: fileDir+index+".JEPG";
+                           anchors.fill: parent;
+                           fillMode: Image.PreserveAspectCrop;smooth: false;cache: false;        //to refresh image
+                           source: "file:///" + applicationDirPath + picSource;
+                        }
+                        Rectangle
+                        {
+                            opacity: 0.8;radius: 2;color: "grey";width:CommonSettings.fontPointSize*2.5;height: CommonSettings.fontPointSize*1.6;anchors.top: parent.top; anchors.topMargin: parent.height*0.05; anchors.left: parent.left; anchors.leftMargin:parent.width*0.05;
+                            CusText{ anchors.fill: parent;text:index; color: "white";}
+                        }
+                        Rectangle
+                        {
+                            opacity: 0.8;radius: 2;color: "grey";width: CommonSettings.fontPointSize*4;height:  CommonSettings.fontPointSize*1.6;anchors.bottom: parent.bottom; anchors.bottomMargin: parent.height*0.05; anchors.right: parent.right; anchors.rightMargin:parent.width*0.05;
+                            CusText{ anchors.fill: parent;text:currentCheckResult.resultData.realTimeDB[selectedDotIndex][index]+"DB";color: "white"; }
+                        }
+                    }
+                }
+            }
+        }
     }
 
 }

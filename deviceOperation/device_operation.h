@@ -137,13 +137,13 @@ public:
     int m_currentCastLightDA;
     int m_castLightTargetDA;
     bool m_castLightUp=true;
+    QByteArray m_frameRawData;
+    QMutex m_frameRawDataLock;
 //    int m_stimulationTime=180;
 
 //    bool m_pupilDiameterAcquired;
 
 private:
-    QMutex m_frameRawDataLock;
-    QByteArray m_frameRawData;
     QElapsedTimer m_autoPupilElapsedTimer;
     int m_autoPupilElapsedTime=200;
     QTimer m_connectTimer;

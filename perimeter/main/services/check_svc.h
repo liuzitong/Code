@@ -22,7 +22,7 @@ class CheckSvc: public QObject
     Q_PROPERTY(bool devReady READ getDevReady NOTIFY devReadyChanged)
     Q_PROPERTY(int castLightAdjustStatus READ getCastLightAdjustStatus NOTIFY castLightAdjustStatusChanged)
     Q_PROPERTY(bool autoAlignPupil READ getAutoAlignPupil WRITE setAutoAlignPupil NOTIFY autoAlignPupilChanged)
-    Q_PROPERTY(float pupilDiameter READ getPupilDiameter WRITE setPupilDiameter NOTIFY pupilDiameterChanged)
+    Q_PROPERTY(float pupilDiameter READ getPupilDiameter NOTIFY pupilDiameterChanged)
     Q_PROPERTY(QVariantList dynamicSelectedDots WRITE setInputDots)
     Q_PROPERTY(QPointF nextCheckingDotLoc READ getNextCheckingDotLoc NOTIFY nextCheckingDotLocChanged)
     Q_PROPERTY(QPointF currentCheckingDotLoc READ getCurrentCheckingDotLoc NOTIFY currentCheckingDotLocChanged)
@@ -67,7 +67,7 @@ public:
     bool getDevReady();Q_SIGNAL void devReadyChanged();
     int getCastLightAdjustStatus();Q_SIGNAL void castLightAdjustStatusChanged();
     bool getAutoAlignPupil();void setAutoAlignPupil(bool autoAlign);Q_SIGNAL void autoAlignPupilChanged();
-    float getPupilDiameter();void setPupilDiameter(float diameter);Q_SIGNAL void pupilDiameterChanged();
+    float getPupilDiameter();Q_SIGNAL void pupilDiameterChanged();
     void setInputDots(QVariantList value);
     QPointF getCurrentCheckingDotLoc(){return m_currentCheckingDotLoc;}Q_SIGNAL void currentCheckingDotLocChanged();
     QPointF getNextCheckingDotLoc(){return m_nextCheckingDotLoc;}Q_SIGNAL void nextCheckingDotLocChanged();

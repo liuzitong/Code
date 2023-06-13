@@ -109,6 +109,11 @@ QByteArray DevicePupilProcessor::DataToBlackAndWhite(QByteArray data, int value)
     return data;
 }
 
+double DevicePupilProcessor::getEyeMove(double x, double y, double dx, double dy, double wx, double wy)
+{
+    return 0.0;
+}
+
 QVector<int> DevicePupilProcessor::findPupilAtXY(QByteArray data, int x, int y)
 {
     auto y1=findWhiteY(data,x,y,1);
@@ -158,6 +163,11 @@ int DevicePupilProcessor::findWhiteYLine(QByteArray data,int x,int y)
     return -1;
 }
 
+QVector<int> DevicePupilProcessor::findWhiteDot(QByteArray data, int x, int y, int x1, int y1)
+{
+    return {};
+}
+
 
 bool DevicePupilProcessor::isWhiteYLine(QByteArray data, int x, int y)
 {
@@ -168,6 +178,11 @@ bool DevicePupilProcessor::isWhiteYLine(QByteArray data, int x, int y)
     }
     if(n<=2) return true;
     else return false;
+}
+
+bool DevicePupilProcessor::pupilFeature(QByteArray data, int x, int y, int x1, int y1)
+{
+    return false;
 }
 
 void DevicePupilProcessor::processData(QByteArray data, int width, int height)
@@ -202,10 +217,10 @@ void DevicePupilProcessor::processData(QByteArray data, int width, int height)
 
 QVector<QPointF> DevicePupilProcessor::caculatePupil(const QByteArray ba, int width, int height)
 {
-    int y_max=0;
-    int y_min=INT_MAX;
-    int x_max=0;
-    int x_min=INT_MAX;
+    float y_max=0;
+    float y_min=FLT_MAX;
+    float x_max=0;
+    float x_min=FLT_MAX;
     QVector<int> x_vc;              //黑点
     QVector<int> y_vc;
     QVector<int> x_vc2;             //有效黑点
@@ -309,9 +324,9 @@ QVector<QPointF> DevicePupilProcessor::caculatePupil(const QByteArray ba, int wi
 QVector<QPointF> DevicePupilProcessor::caculateReflectingDot(const QByteArray ba, int width, int height)
 {
     QVector<QPoint> brightPix,leftBrightPix,middleBrightPix,rightBrightPix;
-    for(quint32 y=height*0.35;y<height*0.65;y++)
+    for(int y=height*0.35;y<height*0.65;y++)
     {
-        for(quint32 x=width*0.35;x<width*0.65;x++)
+        for(int x=width*0.35;x<width*0.65;x++)
         {
 //            qDebug()<<quint8(ba[x+width*y]);
             if(quint8(ba[x+width*y])>250)
@@ -326,7 +341,7 @@ QVector<QPointF> DevicePupilProcessor::caculateReflectingDot(const QByteArray ba
 
     if(brightPix.isEmpty()) return {};
 
-    std::sort(brightPix.first(),brightPix.last(),[&](QPoint a,QPoint b){return a.x()<b.x();});
+    std::sort(brightPix.begin(),brightPix.end(),[](QPoint a,QPoint b){return a.x()<b.x();});
 
     leftBrightPix.append(brightPix[0]);
     for(int i=0;i<brightPix.length()-1;i++)

@@ -36,7 +36,7 @@ template <> void qx::register_class(QxClass<CheckResult> &t){
     t.data(&CheckResult::m_OS_OD, "OS_OD");
     t.data(&CheckResult::m_params, "params");
     t.data(&CheckResult::m_data,"data");
-    t.data(&CheckResult::m_blob,"blob");
+//    t.data(&CheckResult::m_blob,"blob");
     t.data(&CheckResult::m_videoSize,"video_size");
     t.data(&CheckResult::m_diagnosis,"diagnosis");
     t.data(&CheckResult::m_time,"time");

@@ -187,7 +187,7 @@ public:
     Q_INVOKABLE virtual ~StaticCheckResultVm()=default;
     Q_INVOKABLE void insert() override;
     Q_INVOKABLE void update() override;
-    Q_INVOKABLE int drawRealTimeEyePosPic(int index);
+    Q_INVOKABLE QVariantList drawRealTimeEyePosPic(int index);
 
     StaticParamsVM* getParams(){return m_params.data();}void setParams(StaticParamsVM* other){*m_params=*other;}
     StaticResultDataVm* getResultData(){return m_resultData.data();}

@@ -290,18 +290,21 @@ Item {id:root; width: 1366;height: 691
                                 anchors.fill: parent;
                                 delegate: realTimeEyePos
                                 model:listModel;
+                                property string fileDir;
                                 Component.onCompleted:
                                 {
 
                                     //靠analysisVm的选择点变化,来触发root.realTimePicRefresh,从而刷新
                                     root.refresh.connect(function(){visible=false;parent.color="white"});
                                     root.realTimePicRefresh.connect(
-                                    function(count){
+                                    function(val){
                                         visible=true;parent.color="grey"
                                         listModel.clear();
+                                        var count=val[0];
+                                        fileDir=val[1];
                                         for(var i=0;i<count;i++)
                                         {
-                                           listModel.append({index:i});
+                                           listModel.append({fileDir:fileDir,index:i});
                                         }
                                     })
                                 }
@@ -310,7 +313,7 @@ Item {id:root; width: 1366;height: 691
                                     id:realTimeEyePos
                                     Item{width: realTimeEyePosListView.width/2;height: width;
                                         Image{
-                                           property string picSource: "/realTimeEyePosPic/"+index+".bmp";
+                                           property string picSource: fileDir+index+".JPEG";
                                            anchors.fill: parent;
                                            fillMode: Image.PreserveAspectCrop;smooth: false;cache: false;        //to refresh image
                                            source: "file:///" + applicationDirPath + picSource;

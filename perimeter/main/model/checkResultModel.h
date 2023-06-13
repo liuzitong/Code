@@ -103,7 +103,7 @@ struct StaticCheckResultModel:public CheckResultModel
     StaticParams m_params;
     StaticResultData m_data;
     QSize m_videoSize;
-    QByteArray m_blob;
+//    QByteArray m_blob;
     QVector<QVector<QByteArray>> m_imgData;
 
     StaticCheckResultModel()=default;

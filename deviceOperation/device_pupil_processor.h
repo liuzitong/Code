@@ -2,7 +2,7 @@
 #define DEVICE_PUPIL_PROCESSOR_H
 #include <QByteArray>
 #include <QPoint>
-#include <device_settings.h>
+#include "device_settings.h"
 namespace DevOps{
 class DevicePupilProcessor
 {
