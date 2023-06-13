@@ -41,7 +41,8 @@ DeviceSettings::DeviceSettings()
     localDataPath=m_rootObj.value("localDataPath").toString();
 
     m_pupilGreyLimit=m_rootObj.value("pupilGreyLimit").toInt();
-    m_pupilPixelDiameterLimit=m_rootObj.value("pupilPixelDiameterLimit").toInt();
+    m_pupilReflectionDotLimit=m_rootObj.value("pupilReflectionDotLimit").toDouble();
+    m_pupilPixelDiameterLimit=m_rootObj.value("pupilPixelDiameterLimit").toDouble();
     m_pupilDiameterPixelToMillimeterConstant=m_rootObj.value("pupilDiameterPixelToMillimeterConstant").toDouble();
     m_pupilDiameterPixelToFixationDeviationConstant=m_rootObj.value("pupilDiameterPixelToFixationDeviationConstant").toDouble();
     m_castLightDADifference=m_rootObj.value("castLightDADifference").toInt();

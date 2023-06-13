@@ -5,6 +5,7 @@
 #include <deviceOperation/device_operation.h>
 #include <QtMath>
 #include "perimeter/main/services/utility_svc.h"
+#include <QDateTime>
 namespace Perimeter
 {
 
@@ -48,6 +49,7 @@ void StaticCheckResultVm::insert()
     qx::dao::insert(sp);
 //    qDebug()<<sp->m_id;
     m_data->m_id=sp->m_id;
+//    int count=0;
     for(int i=0;i<m_data->m_imgData.length();i++)                                //图片转换位设置大小并且存储
     {
         auto& dotImgDatas=m_data->m_imgData[i];
@@ -64,17 +66,21 @@ void StaticCheckResultVm::insert()
                         QString::number(m_data->m_patient_id)+"/"+
                         QString::number(m_data->m_id)+"/"+
                         QString::number(i)+"/";
-
                 QDir dir;
                 if(!dir.exists(fileDir))
                 {
                     dir.mkpath(fileDir);
                 }
-                qDebug()<<fileDir;
                 img.save(fileDir+QString::number(j)+".JPEG");
-//                const char* data=(char*)(img.bits());
-//                QByteArray ba(data,realTimeEyePosPicSize.width()*realTimeEyePosPicSize.height());
-//                sp->m_blob.append(ba);
+
+//                QString fileDir=R"(./savePics/)"+QString::number(m_data->m_id)+"/";
+//                QDir dir;
+//                if(!dir.exists(fileDir))
+//                {
+//                    dir.mkpath(fileDir);
+//                }
+//                img.save(fileDir+QString::number(count)+".JPEG");
+//                count++;
             }
         }
     }
@@ -124,8 +130,8 @@ QVariantList StaticCheckResultVm::drawRealTimeEyePosPic(int index)
 //            img.save(R"(./realTimeEyePosPic/)"+QString::number(i)+".bmp");
 
 //        }
-        QString fileDir=R"(/savePics/)"+
-                QString::number(qCeil(m_data->m_patient_id/100))+"/"+
+        QString fileDir=R"(./savePics/)"+
+                QString::number(m_data->m_patient_id/100)+"/"+
                 QString::number(m_data->m_patient_id)+"/"+
                 QString::number(m_data->m_id)+"/"+
                 QString::number(index)+"/";
@@ -199,5 +205,22 @@ void DynamicCheckResultVm::update()
     qx::dao::update(sp);
 }
 
-
+void CheckResultVm::deleteById(long id)
+{
+    CheckResult_ptr checkResult_ptr(new CheckResult());
+    checkResult_ptr->m_id=id;
+    qx::dao::fetch_by_id(checkResult_ptr);
+    if(checkResult_ptr->m_type!=2)
+    {
+        int patient_id=checkResult_ptr->m_patient->m_id;
+        //删掉眼位图
+        QString fileDir=R"(./savePics/)"+
+                QString::number(patient_id/100)+"/"+
+                QString::number(patient_id)+"/"+
+                QString::number(id);
+        QDir qdir(fileDir);
+        qdir.removeRecursively();
+    }
+    qx::dao::delete_by_id(checkResult_ptr);
+}
 }

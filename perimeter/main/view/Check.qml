@@ -249,9 +249,9 @@ Item {id:root; width: 1366;height: 691
                                     Item{ anchors.fill: parent;anchors.margins: parent.height*0.1;
                                         Column{anchors.fill: parent;spacing: 0.125*height;
                                             Row{width:parent.width;height: parent.height*0.75/3;spacing: width*0.05;
-                                                CusCheckBox{id:pupilDiameter;checked:true;}
+                                                CusCheckBox{id:pupilDiameter;checked:true;visible: false;}
                                                 CusText{text:lt+qsTr("Pupil diameter"); horizontalAlignment: Text.AlignLeft;width: parent.width*0.5;font.pointSize: fontPointSize;}
-                                                LineEdit{text:(IcUiQmlApi.appCtrl.checkSvc.pupilDiameter>0&&pupilDiameter.checked)?IcUiQmlApi.appCtrl.checkSvc.pupilDiameter.toFixed(2):"";width: parent.width*0.25;textInput.readOnly: true;}
+                                                LineEdit{text:(IcUiQmlApi.appCtrl.checkSvc.pupilDiameter>0/*&&pupilDiameter.checked*/)?IcUiQmlApi.appCtrl.checkSvc.pupilDiameter.toFixed(2):"";width: parent.width*0.25;textInput.readOnly: true;}
                                             }
                                             Row{id: row;width:parent.width;height: parent.height*0.75/3;spacing: width*0.05;
                                                 CusCheckBox{enabled: false;checked:currentProgram.type!==2?currentProgram.params.commonParams.fixationMonitor>0:currentProgram.params.fixationMonitor>0;}

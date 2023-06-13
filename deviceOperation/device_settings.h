@@ -35,7 +35,8 @@ public:
     QString localConfigPath,localDataPath;
     QList<QPair<int,int>> m_colorToSlot,m_spotSizeToSlot;
     int m_pupilGreyLimit;
-    int m_pupilPixelDiameterLimit;
+    int m_pupilReflectionDotLimit;
+    double m_pupilPixelDiameterLimit;
     double m_pupilDiameterPixelToMillimeterConstant;
     double m_pupilDiameterPixelToFixationDeviationConstant;
     static QSharedPointer<DeviceSettings> getSingleton();

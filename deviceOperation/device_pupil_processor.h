@@ -20,20 +20,20 @@ public:
     QVector<int> findWhiteDot(QByteArray data,int x,int y,int x1,int y1);
 
 
-    void processData(QByteArray data,int width,int height);
-    QVector<QPointF> caculatePupil(const QByteArray ba,int width,int height);
-    QVector<QPointF> caculateReflectingDot(const  QByteArray ba,int width,int height);
+    void processData(uchar* data,int width,int height);
+    QVector<QPointF> caculatePupil(uchar* ba,int width,int height);
+    QVector<QPointF> caculateReflectingDot(uchar* ba,int width,int height);
     float caculatePupilDiameter(QPointF topLeft,QPointF bottomRight);
     int caculateFixationDeviation(QVector<QPointF> pupil,QVector<QPointF> reflectionDot);
     void clearData();
 
     QVector<QVector<int>> m_pupilData;
-    float m_pupilDiameter;
+    double m_pupilDiameter;
     int m_pupilDeviation;
-    QPoint m_pupilCenterPoint;
-    float m_pupilRadius;
+    QPointF m_pupilCenterPoint;
+    double m_pupilDiameterPix;
     QVector<float> m_pupilDiameterArr;
-    QVector<QPoint> m_reflectionDot;
+    QVector<QPointF> m_reflectionDot;
     bool m_pupilResValid,m_reflectionResValid;
 //    bool m_pupilDataGet;
 };

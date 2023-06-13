@@ -44,7 +44,7 @@ public slots:
      * \brief 接收外部数据源，视频帧
      * \param frame
      */
-    void onNewVideoContentReceived(/*QByteArray qa*/);
+    void onNewVideoContentReceived(QByteArray ba);
 private:
     void drawCrossHair(QImage& img);
     QAbstractVideoSurface *m_surface = NULL;

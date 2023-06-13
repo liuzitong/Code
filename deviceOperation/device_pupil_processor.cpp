@@ -1,5 +1,7 @@
 ﻿#include "device_pupil_processor.h"
 #include <iostream>
+#include <QDebug>
+#include <QtMath>
 namespace DevOps{
 DevicePupilProcessor::DevicePupilProcessor()
 {
@@ -185,151 +187,128 @@ bool DevicePupilProcessor::pupilFeature(QByteArray data, int x, int y, int x1, i
     return false;
 }
 
-void DevicePupilProcessor::processData(QByteArray data, int width, int height)
+void DevicePupilProcessor::processData(uchar* data, int width, int height)
 {
     auto vcPupil=caculatePupil(data,width,height);
     m_pupilResValid=vcPupil.length()>0;
     if(m_pupilResValid)
     {
         m_pupilCenterPoint=vcPupil[0].toPoint();
-        m_pupilRadius=caculatePupilDiameter(vcPupil[1],vcPupil[2])/2;
-        if(m_pupilDiameter==0)
+        m_pupilDiameterPix=caculatePupilDiameter(vcPupil[1],vcPupil[2]);
+
+        auto pupilDiameter=m_pupilDiameterPix*DeviceSettings::getSingleton()->m_pupilDiameterPixelToMillimeterConstant*320/width;
+        if(m_pupilDiameterArr.length()>=20) m_pupilDiameterArr.pop_front();
+        m_pupilDiameterArr.push_back(pupilDiameter);
         {
-            auto pupilDiameter=m_pupilRadius*DeviceSettings::getSingleton()->m_pupilDiameterPixelToMillimeterConstant*320/width;
-            m_pupilDiameterArr.push_back(pupilDiameter);
-            {
-                float sum=0;
-                for(auto&i:m_pupilDiameterArr) sum+=i;
-                m_pupilDiameter=sum/m_pupilDiameterArr.size();
-                m_pupilDiameterArr.clear();
-                std::cout<<m_pupilDiameter<<std::endl;
-            }
+            float sum=0;
+            for(auto&i:m_pupilDiameterArr) sum+=i;
+            m_pupilDiameter=sum/m_pupilDiameterArr.size();
+//            std::cout<<m_pupilDiameter<<std::endl;
         }
+
         auto vcReflectionDot=caculateReflectingDot(data,width,height);
         m_reflectionResValid=vcReflectionDot.length()>0;
+        qDebug()<<"******************************";
+        qDebug()<<m_reflectionResValid;
+        qDebug()<<"******************************";
         if(m_reflectionResValid)
         {
+//            std::cout<<"find reflectionDot."<<std::endl;
             m_reflectionDot={vcReflectionDot[0].toPoint(),vcReflectionDot[1].toPoint(),vcReflectionDot[2].toPoint()};
             m_pupilDeviation=caculateFixationDeviation(vcPupil,vcReflectionDot);
         }
     }
 }
 
-QVector<QPointF> DevicePupilProcessor::caculatePupil(const QByteArray ba, int width, int height)
+QVector<QPointF> DevicePupilProcessor::caculatePupil(uchar* data, int width, int height)
 {
+    auto pupilPixelDiameterLimit=DeviceSettings::getSingleton()->m_pupilPixelDiameterLimit;
+    auto pupilGreyLimit=DeviceSettings::getSingleton()->m_pupilGreyLimit;
     float y_max=0;
     float y_min=FLT_MAX;
     float x_max=0;
     float x_min=FLT_MAX;
-    QVector<int> x_vc;              //黑点
-    QVector<int> y_vc;
-    QVector<int> x_vc2;             //有效黑点
-    QVector<int> y_vc2;
-    auto pupilGreyLimit=DeviceSettings::getSingleton()->m_pupilGreyLimit;
-    auto pupilPixelDiameterLimit=DeviceSettings::getSingleton()->m_pupilPixelDiameterLimit;
+    QVector<QPoint> vc;              //黑点
+    QVector<QPoint> vc2;             //有效黑点
     int validCount=0;
-    for(quint32 y=height*0.35;y<height*0.65;y++)
+    for(int y=height*0.2;y<height*0.8;y++)
     {
-        for(quint32 x=width*0.35;x<width*0.65;x++)
+        for(int x=width*0.2;x<width*0.8;x++)
         {
-//            qDebug()<<quint8(ba[x+width*y]);
-            if(quint8(ba[x+width*y])<pupilGreyLimit)
+            if(quint8(data[x+width*y])<pupilGreyLimit)
             {
-                x_vc.push_back(x);
-                y_vc.push_back(y);
+                vc.push_back({x,y});
                 validCount++;
             }
         }
     }
 
-//    std::cout<<validCount<<std::endl;
-    if(!(validCount>width*height*0.05*0.05&&validCount<=width*height*0.2*0.2))
+    if(vc.length()==0)
     {
         return {};
     }
 
-    float x_avg,y_avg,sum=0;
-    for(int i=0;i<x_vc.length();i++)
+    int x_sum=0,y_sum=0;
+    for(int i=0;i<vc.length();i++)
     {
-        sum+=x_vc[i];
+        x_sum+=vc[i].x();
+        y_sum+=vc[i].y();
     }
-    x_avg=sum/x_vc.length();
-    sum=0;
-    for(int i=0;i<y_vc.length();i++)
-    {
-        sum+=y_vc[i];
-    }
-    y_avg=sum/y_vc.length();
+    float x_avg=x_sum/vc.length();
+    float y_avg=y_sum/vc.length();
 
-    for(int i=0;i<x_vc.length();i++)        //刨开太远的
+    double pupilDiameterEstimated=sqrt(validCount/M_PI*4);
+
+    for(int i=0;i<vc.length();i++)        //刨开太远的
     {
-        auto x=x_vc[i];
-        if(qAbs(int(x-x_avg))<pupilPixelDiameterLimit)
+        auto pix=vc[i];
+        if(qAbs(int(pix.x()-x_avg))<pupilDiameterEstimated*0.55&&qAbs(int(pix.y()-y_avg))<pupilDiameterEstimated*0.55)
         {
-            if(x>x_max) x_max=x;
-            if(x<x_min) x_min=x;
-            x_vc2.push_back(x);
+            if(pix.x()>x_max) x_max=pix.x();
+            if(pix.x()<x_min) x_min=pix.x();
+            if(pix.y()>y_max) y_max=pix.y();
+            if(pix.y()<y_min) y_min=pix.y();
+            vc2.push_back(pix);
         }
-//        qDebug()<<x;
-    }
-//    qDebug()<<x_max;
-//    qDebug()<<x_min;
-//    qDebug()<<x_vc2;
-
-    for(int i=0;i<y_vc.length();i++)                //刨开太远的
-    {
-        auto y=y_vc[i];
-        if(qAbs(int(y-y_avg))<pupilPixelDiameterLimit)
-        {
-            if(y>y_max) y_max=y;
-            if(y<y_min) y_min=y;
-            y_vc2.push_back(y);
-        }
-//        qDebug()<<y;
-//        qDebug()<<y_max;
-//        qDebug()<<y_min;
     }
 
-//    qDebug()<<y_vc2;
-    sum=0;
-    for(int i=0;i<x_vc2.length();i++)
-    {
-        sum+=x_vc2[i];
-    }
-    if(x_vc2.length()==0)
+    if(vc2.length()==0)
     {
         return {};
     }
-    float x_avg2=sum/x_vc2.length();
-    sum=0;
-    for(int i=0;i<y_vc2.length();i++)
+
+    x_sum=0,y_sum=0;
+    for(int i=0;i<vc2.length();i++)
     {
-        sum+=y_vc2[i];
+        x_sum+=vc2[i].x();
+        y_sum+=vc2[i].y();
     }
-    float y_avg2=sum/y_vc2.length();
-    if(x_vc2.length()==0)
-    {
-        return {};
-    }
-//    qDebug()<<x_avg2;
-//    qDebug()<<y_avg2;
-    QPointF center={x_avg2-width*0.5,y_avg2-height*0.5};
+
+    float x_avg2=x_sum/vc2.length();
+    float y_avg2=y_sum/vc2.length();
+
+    QPointF center={x_avg2,y_avg2};
     QPointF topLeft={x_min,y_min};
-//    qDebug()<<topLeft;
     QPointF bottomRight={x_max,y_max};
-//    qDebug()<<bottomRight;
-    return QVector<QPointF>{center,topLeft,bottomRight};
+   if((x_max-x_min<width*pupilPixelDiameterLimit*2&&y_max-y_min<width*pupilPixelDiameterLimit*2)&&(x_max-x_min>width*pupilPixelDiameterLimit*0.5&&y_max-y_min>width*pupilPixelDiameterLimit*0.5))            //太大太小的不是瞳孔
+    {
+        return QVector<QPointF>{center,topLeft,bottomRight};
+    }
+    else
+    {
+        return {};
+    }
 }
 
-QVector<QPointF> DevicePupilProcessor::caculateReflectingDot(const QByteArray ba, int width, int height)
+QVector<QPointF> DevicePupilProcessor::caculateReflectingDot(uchar* ba, int width, int height)
 {
     QVector<QPoint> brightPix,leftBrightPix,middleBrightPix,rightBrightPix;
-    for(int y=height*0.35;y<height*0.65;y++)
+    for(int y=m_pupilCenterPoint.y();y<m_pupilCenterPoint.y()+height*0.10;y++)
     {
-        for(int x=width*0.35;x<width*0.65;x++)
+        for(int x=m_pupilCenterPoint.x()-width*0.07;x<m_pupilCenterPoint.x()+width*0.07;x++)
         {
 //            qDebug()<<quint8(ba[x+width*y]);
-            if(quint8(ba[x+width*y])>250)
+            if(quint8(ba[x+width*y])>DeviceSettings::getSingleton()->m_pupilReflectionDotLimit)
             {
                 brightPix.append({x,y});
 //                x_vc.push_back(x);
@@ -338,6 +317,7 @@ QVector<QPointF> DevicePupilProcessor::caculateReflectingDot(const QByteArray ba
             }
         }
     }
+//    qDebug()<<brightPix;
 
     if(brightPix.isEmpty()) return {};
 
@@ -346,27 +326,53 @@ QVector<QPointF> DevicePupilProcessor::caculateReflectingDot(const QByteArray ba
     leftBrightPix.append(brightPix[0]);
     for(int i=0;i<brightPix.length()-1;i++)
     {
+        int dist=pow((brightPix[i].x()-brightPix[i+1].x()),2)+pow((brightPix[i].y()-brightPix[i+1].y()),2);
         if(middleBrightPix.isEmpty())
         {
-            if(pow((brightPix[i].x()-brightPix[i+1].x()),2)+pow((brightPix[i].y()-brightPix[i+1].y()),2)<2*2)
+            if(dist<5*5)
             {
                 leftBrightPix.append(brightPix[i+1]);
             }
-            else
-                middleBrightPix.append(brightPix[i+1]);
+            else if(dist>15*15)
+            {
+                if(leftBrightPix.length()>4)
+                    middleBrightPix.append(brightPix[i+1]);
+                else
+                {
+                    leftBrightPix.clear();
+                    leftBrightPix.append(brightPix[i+1]);
+                }
+            }
         }
         else if(rightBrightPix.isEmpty())
         {
-            if(pow((brightPix[i].x()-brightPix[i+1].x()),2)+pow((brightPix[i].y()-brightPix[i+1].y()),2)<2*2)
+            if(dist<3*3)
             {
                 middleBrightPix.append(brightPix[i+1]);
             }
-            else
-                rightBrightPix.append(brightPix[i+1]);
+            else if(dist>15*15)
+            {
+                if(middleBrightPix.length()>4)
+                    rightBrightPix.append(brightPix[i+1]);
+                else
+                {
+                    middleBrightPix.clear();
+                    middleBrightPix.append(brightPix[i+1]);
+                }
+            }
         }
         else
         {
-            rightBrightPix.append(brightPix[i+1]);
+            if(dist<3*3)
+            {
+                rightBrightPix.append(brightPix[i+1]);
+            }
+            else if(dist>15*15)
+            {
+                rightBrightPix.clear();
+                rightBrightPix.append(brightPix[i+1]);
+            }
+
         }
     }
     if(!leftBrightPix.isEmpty()&&!middleBrightPix.isEmpty()&&!rightBrightPix.isEmpty())

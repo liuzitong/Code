@@ -274,11 +274,10 @@ void AnalysisLobbyListVm::deleteCheckResult(int id)
         }
     }
     Exit:
-        CheckResult_ptr checkResult_ptr(new CheckResult());
-        checkResult_ptr->m_id=id;
-        qx::dao::delete_by_id(checkResult_ptr);
-
-
+//        CheckResult_ptr checkResult_ptr(new CheckResult());
+//        checkResult_ptr->m_id=id;
+//        qx::dao::delete_by_id(checkResult_ptr);
+        CheckResultVm::deleteById(id);
 }
 
 void AnalysisLobbyListVm::refreshData()

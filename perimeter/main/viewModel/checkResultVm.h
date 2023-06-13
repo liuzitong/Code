@@ -162,6 +162,7 @@ public:
     Q_INVOKABLE virtual ~CheckResultVm()=default;
     virtual void insert(){};
     virtual void update(){};
+    static void deleteById(long id);
     int getID(){return m_data->m_id;}void setID(int value){m_data->m_id=value;}
     int getType(){return int(m_data->m_type);}void setType(int value){m_data->m_type=Type(value);}
     int getOS_OD(){return m_data->m_OS_OD;}void setOS_OD(int value){m_data->m_OS_OD=value;}

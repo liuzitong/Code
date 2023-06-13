@@ -3,7 +3,6 @@
 #include <QList>
 #include <vector>
 
-
 namespace Perimeter{
 
 enum PatientRoles
@@ -105,7 +104,6 @@ public:
 PatientListModelVm::PatientListModelVm(const QVariantList &)
 {
     m_obj = perimeter_new( PatientListModelVmPriv, this );
-//    qDebug()<<"PatientListModelVm gogogogogo";
 }
 
 PatientListModelVm::~PatientListModelVm()
@@ -114,11 +112,7 @@ PatientListModelVm::~PatientListModelVm()
         perimeter_delete(m_obj,PatientListModelVmPriv);
 }
 
-//PatientListModel::PatientListModel(Patient_List patient_list)
-//{
-//    m_obj = perimeter_new( PatientListModelPriv, this );
-//    setPatientList(patient_list);
-//}
+
 
 void PatientListModelVm::setPatientList(Patient_List patient_list)
 {
@@ -167,17 +161,7 @@ void PatientListModelVm::deletePatients()
     emit selectedCountChanged();
 }
 
-//void PatientListModelVm::addPatient(QString patientId, QString name, int sex, QDate date,QDateTime updateTime)
-//{
-//    Patient_ptr patient_ptr(new Patient(patientId,name,Patient::sex(sex),date,updateTime));
-//    QSqlError daoError = qx::dao::insert(patient_ptr);
 
-//}
-
-//void PatientListModelVm::hello()
-//{
-// qDebug()<<"patientModelList says hello";
-//}
 
 void PatientListModelVm:: deletePatient(long id)
 {
@@ -191,8 +175,24 @@ void PatientListModelVm:: deletePatient(long id)
     query.bind(":id",(int)id);
     daoError = qx::dao::call_query(query);
     bCommit = (bCommit && ! daoError.isValid());
-    qAssert(bCommit);
-    db.commit();
+    if(db.commit())
+    {
+        //删掉眼位图
+        QString fileDir=R"(./savePics/)"+
+                QString::number(id/100)+"/"+
+                QString::number(id);
+        QDir qdir(fileDir);
+        qdir.removeRecursively();
+        fileDir=R"(./savePics/)"+
+            QString::number(id/100);
+        QDir qdir2(fileDir);
+//        auto list=qdir2.entryList(QDir::NoDotAndDotDot);
+//        qDebug()<<list;
+        if(qdir2.entryList(QDir::NoDotAndDotDot).length()==0)
+        {
+            qdir2.removeRecursively();
+        }
+    }
 }
 
 

@@ -94,7 +94,7 @@ public slots:
 signals:
     void workStatusChanged();
     void newStatusData();
-    void newFrameData();
+    void newFrameData(QByteArray ba);
     void newProfile();
     void newConfig();
     void updateDevInfo(QString info);
@@ -140,7 +140,6 @@ public:
     QByteArray m_frameRawData;
     QMutex m_frameRawDataLock;
 //    int m_stimulationTime=180;
-
 //    bool m_pupilDiameterAcquired;
 
 private:

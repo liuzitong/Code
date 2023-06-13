@@ -71,49 +71,20 @@ void FrameProvidSvc::setVideoSize(int width, int height)
 
 
 
-void FrameProvidSvc::onNewVideoContentReceived(/*QByteArray qa*/)
+void FrameProvidSvc::onNewVideoContentReceived(QByteArray ba)
 {
-    DevOps::DeviceOperation::getSingleton()->m_frameRawDataLock.lock();
-    auto rawData=DevOps::DeviceOperation::getSingleton()->m_frameRawData;
-    DevOps::DeviceOperation::getSingleton()->m_frameRawDataLock.unlock();
-//    qDebug()<<"frame provider received "+QString::number(rawData.size());
-
     auto videoSize=DevOps::DeviceOperation::getSingleton()->m_videoSize;
-    auto& devicePupilProcessor=DevOps::DeviceOperation::getSingleton()->m_devicePupilProcessor;
-    int pupilRadius=devicePupilProcessor.m_pupilRadius*m_width/videoSize.width();
-    auto pupilCenterPoint=devicePupilProcessor.m_pupilCenterPoint;
-    QPoint scalePupilCenterPoint={pupilCenterPoint.x()*m_width/videoSize.width(),pupilCenterPoint.y()*m_height/videoSize.height()};
-    if(rawData.size()==videoSize.width()*videoSize.height())
-    {
-        QImage img((uchar*)rawData.data(),videoSize.width(),videoSize.height(),QImage::Format::Format_Grayscale8);
-        auto img2=img.convertToFormat(QImage::Format::Format_ARGB32);
-        auto img3=img2.scaled(m_width,m_height,Qt::AspectRatioMode::KeepAspectRatio);
-        QPainter painter(&img3);
-        painter.setPen(Qt::red);
-        auto& devicePupilProcessor=DevOps::DeviceOperation::getSingleton()->m_devicePupilProcessor;
-        if(devicePupilProcessor.m_pupilResValid)
-        {
-            painter.drawEllipse({scalePupilCenterPoint.x()+m_width/2,scalePupilCenterPoint.y()+m_height/2,},pupilRadius,pupilRadius);
-            if(devicePupilProcessor.m_reflectionResValid)
-            {
-                painter.drawPoint(devicePupilProcessor.m_reflectionDot[0]);
-                painter.drawPoint(devicePupilProcessor.m_reflectionDot[1]);
-                painter.drawPoint(devicePupilProcessor.m_reflectionDot[2]);
-            }
-        }
-        drawCrossHair(img3);
-//        if(count%100==0)
-//            img3.save("./img/"+QString::number(count)+".bmp");
-//        count++;
-        QVideoFrame frame(img3);
-        setFormat(frame.width(),frame.height(),frame.pixelFormat());
-        if (m_surface)
-            m_surface->present(frame);
-    }
+    QImage img((uchar*)ba.data(),videoSize.width(),videoSize.height(),QImage::Format::Format_ARGB32);
+    img=img.scaled(m_width,m_height,Qt::AspectRatioMode::KeepAspectRatio);
+    drawCrossHair(img);
+    QVideoFrame frame(img);
+    setFormat(frame.width(),frame.height(),frame.pixelFormat());
+    if (m_surface)
+        m_surface->present(frame);
 }
 
 
-void FrameProvidSvc::drawCrossHair(QImage &img)
+void FrameProvidSvc::drawCrossHair(QImage &img)         //可以用drawLine替换,哎不过懒得弄了
 {
     {
         int h=img.height()*0.5;

@@ -12,6 +12,7 @@
 #include <QPainter>
 #include <QtGlobal>
 #include <iostream>
+#include <QtMath>
 
 //#include <QQmlEngine>
 
@@ -31,6 +32,7 @@ DeviceOperation::DeviceOperation()
     connect(this,&DeviceOperation::updateDevInfo,[](QString str){qDebug()<<str;});
 
     m_workStatusElapsedTimer.start();
+    m_autoPupilElapsedTime=100;
     m_autoPupilElapsedTimer.start();
     m_currentCastLightDA=m_config.castLightADPresetRef()+DeviceSettings::getSingleton()->m_castLightDAChanged;
 }
@@ -846,45 +848,67 @@ void DeviceOperation::workOnNewFrameData()
     m_frameRawDataLock.lock();
     m_frameRawData=m_frameData.rawData();
     m_frameRawDataLock.unlock();
-    emit newFrameData();
-
+    auto data=m_frameData.rawData();
+    m_devicePupilProcessor.processData((uchar*)data.data(),m_videoSize.width(),m_videoSize.height());
+    QImage img((uchar*)data.data(),m_videoSize.width(),m_videoSize.height(),QImage::Format_Grayscale8);
+    img=img.convertToFormat(QImage::Format_ARGB32);
+    if(m_devicePupilProcessor.m_pupilResValid)
+    {
+        QPainter painter(&img);
+        painter.setPen(Qt::red);
+        painter.drawEllipse(m_devicePupilProcessor.m_pupilCenterPoint,m_devicePupilProcessor.m_pupilDiameterPix/2,m_devicePupilProcessor.m_pupilDiameterPix/2);
+        if(m_devicePupilProcessor.m_reflectionResValid)
+        {
+            for(auto&i:m_devicePupilProcessor.m_reflectionDot)
+            {
+                painter.setPen(Qt::green);
+                painter.drawEllipse({qRound(i.x()),qRound(i.y())},3,3);
+            }
+        }
+    }
+    QByteArray ba=QByteArray((char*)img.bits(),img.byteCount());
 
     if(m_autoPupilElapsedTimer.elapsed()>=m_autoPupilElapsedTime)
     {
-        m_devicePupilProcessor.processData(m_frameRawData,m_videoSize.width(),m_videoSize.height());
         m_autoPupilElapsedTimer.restart();
         if(m_devicePupilProcessor.m_pupilResValid)
         {
             if(m_autoAlignPupil)                //自动对眼位
             {
+
                 auto step=DeviceSettings::getSingleton()->m_pupilAutoAlignStep;
                 int tolerance=DeviceSettings::getSingleton()->m_pupilAutoAlignPixelTolerance;
                 auto spsConfig=DeviceSettings::getSingleton()->m_motorChinSpeed;
                 quint8 sps[2]{spsConfig[0],spsConfig[1]};
                 int motorPos[2]{0};
 
-                auto pupilCenterPoint=m_devicePupilProcessor.m_pupilCenterPoint;
-                if(!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Chin_Hoz)&&qAbs(pupilCenterPoint.x())>tolerance)
+                QPointF pupilDeviation={m_devicePupilProcessor.m_pupilCenterPoint.x()-0.5*m_videoSize.width(),m_devicePupilProcessor.m_pupilCenterPoint.y()-0.5*m_videoSize.height()};
+                if(!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Chin_Hoz)&&qAbs(pupilDeviation.x())>tolerance)
                 {
-                    motorPos[0]=-pupilCenterPoint.x()*step;
+                    motorPos[0]=-pupilDeviation.x()*step;
                     m_devCtl->moveChinMotors(sps,motorPos,UsbDev::DevCtl::MoveMethod::Relative);
+                    m_autoPupilElapsedTime=2000;
+                }
+                else
+                {
+                     m_autoPupilElapsedTime=100;
                 }
 
-                if(!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Chin_Vert)&&qAbs(pupilCenterPoint.y())>tolerance)
+                if(!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Chin_Vert)&&qAbs(pupilDeviation.y())>tolerance)
                 {
-                    motorPos[1]=pupilCenterPoint.y()*step;
+                    motorPos[1]=pupilDeviation.y()*step;
                     m_devCtl->moveChinMotors(sps,motorPos,UsbDev::DevCtl::MoveMethod::Relative);
+                    m_autoPupilElapsedTime=2000;
                 }
-                m_autoPupilElapsedTime=1000;
+                else
+                {
+                    m_autoPupilElapsedTime=100;
+                }
             }
         }
-        else
-        {
-            m_autoPupilElapsedTime=200;
-        }
-        if(m_devicePupilProcessor.m_reflectionResValid)
-            emit pupilDiameterChanged();
     }
+    emit newFrameData(ba);
+    emit pupilDiameterChanged();
 }
 
 void DeviceOperation::workOnNewProfile()

@@ -609,7 +609,11 @@ void StaticCheck::stimulate()
             uint dotIndex=m_lastCheckDotRecord[0]->index;
             m_resultModel->m_data.realTimeDB[dotIndex]=m_lastCheckDotRecord[0]->StimulationDBs.toStdVector(); //在check初始化的时候扩充了大小.
             if(dotIndex<m_programModel->m_data.dots.size()||dotIndex==2*m_programModel->m_data.dots.size())
+            {
+                m_deviceOperation->m_frameRawDataLock.lock();
                 m_resultModel->m_imgData[dotIndex].push_back(m_deviceOperation->m_frameRawData);
+                m_deviceOperation->m_frameRawDataLock.unlock();
+            }
             break;
         }
         default:break;
