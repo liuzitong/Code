@@ -224,24 +224,39 @@ QVector<QPointF> DevicePupilProcessor::caculatePupil(uchar* data, int width, int
 {
     auto pupilPixelDiameterLimit=DeviceSettings::getSingleton()->m_pupilPixelDiameterLimit;
     auto pupilGreyLimit=DeviceSettings::getSingleton()->m_pupilGreyLimit;
+    auto reflectionDotLimit=DeviceSettings::getSingleton()->m_pupilReflectionDotLimit;
     float y_max=0;
     float y_min=FLT_MAX;
     float x_max=0;
     float x_min=FLT_MAX;
     QVector<QPoint> vc;              //黑点
     QVector<QPoint> vc2;             //有效黑点
-    int validCount=0;
-    for(int y=height*0.2;y<height*0.8;y++)
+    for(int y=height*0.3;y<height*0.7;y++)
     {
-        for(int x=width*0.2;x<width*0.8;x++)
+        int x_min=INT_MAX;
+        int x_max=0;
+        for(int x=width*0.3;x<width*0.7;x++)
         {
-            if(quint8(data[x+width*y])<pupilGreyLimit)
+            int gapCount=0;
+            QVector<QPoint> vc_line;             //每一行
+            if(quint8(data[x+width*y])<pupilGreyLimit)  //黑点或者反光点
             {
-                vc.push_back({x,y});
-                validCount++;
+                if(x>x_max) x_max=x;
+                if(x<x_min) x_min=x;
+                if((vc_line.length()>0&&x-vc_line.last().x()>2)&&(data[qRound(float(x+vc_line.last().x())/2)+width*y]<reflectionDotLimit)) gapCount++;
+                if(x_max-x_min<width*pupilPixelDiameterLimit*2&&gapCount<=2)                //不能太大和有太多空隙,排除眉毛
+                {
+                    vc_line.push_back({x,y});
+                }
+                else
+                {
+                    vc_line.clear();
+                }
             }
+             vc.append(vc_line);
         }
     }
+
 
     if(vc.length()==0)
     {
@@ -257,7 +272,7 @@ QVector<QPointF> DevicePupilProcessor::caculatePupil(uchar* data, int width, int
     float x_avg=x_sum/vc.length();
     float y_avg=y_sum/vc.length();
 
-    double pupilDiameterEstimated=sqrt(validCount/M_PI*4);
+    double pupilDiameterEstimated=sqrt(vc.length()/M_PI*4);
 
     for(int i=0;i<vc.length();i++)        //刨开太远的
     {
