@@ -199,7 +199,7 @@ Item
                      id:realTimeEyePos
                      Item{width: realTimeEyePosListView.width/2;height: width;
                          Image{
-                            property string picSource: fileDir+index+".JPEG";
+                            property string picSource: fileDir+index+".BMP";
                             anchors.fill: parent;
                             fillMode: Image.PreserveAspectCrop;smooth: false;cache: false;        //to refresh image
                             source: "file:///" + applicationDirPath + picSource;

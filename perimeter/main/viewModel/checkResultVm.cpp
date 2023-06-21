@@ -71,7 +71,7 @@ void StaticCheckResultVm::insert()
                 {
                     dir.mkpath(fileDir);
                 }
-                img.save(fileDir+QString::number(j)+".JPEG");
+                img.save(fileDir+QString::number(j)+".BMP");
 
 //                QString fileDir=R"(./savePics/)"+QString::number(m_data->m_id)+"/";
 //                QDir dir;
@@ -112,7 +112,7 @@ QVariantList StaticCheckResultVm::drawRealTimeEyePosPic(int index)
             for(int i=0;i<imgs.length();i++)
             {
                 QImage img((uchar*)imgs[i].data(),imgSize.width(),imgSize.height(),QImage::Format_Grayscale8);
-                img.save(R"(./realTimeEyePosPic/)"+QString::number(i)+".JPEG");
+                img.save(R"(./realTimeEyePosPic/)"+QString::number(i)+".BMP");
             }
         }
         return {imgs.size(),QString(R"(./realTimeEyePosPic/)")};

@@ -249,7 +249,7 @@ Item {id:root; width: 1366;height: 691
                                     Item{ anchors.fill: parent;anchors.margins: parent.height*0.1;
                                         Column{anchors.fill: parent;spacing: 0.125*height;
                                             Row{width:parent.width;height: parent.height*0.75/3;spacing: width*0.05;
-                                                CusCheckBox{id:pupilDiameter;checked:true;visible: false;}
+                                                CusCheckBox{id:pupilDiameter;checked:true;visible: true;onCheckedChanged:checkSvc.measurePupil=checked;}
                                                 CusText{text:lt+qsTr("Pupil diameter"); horizontalAlignment: Text.AlignLeft;width: parent.width*0.5;font.pointSize: fontPointSize;}
                                                 LineEdit{text:(IcUiQmlApi.appCtrl.checkSvc.pupilDiameter>0/*&&pupilDiameter.checked*/)?IcUiQmlApi.appCtrl.checkSvc.pupilDiameter.toFixed(2):"";width: parent.width*0.25;textInput.readOnly: true;}
                                             }
@@ -259,7 +259,7 @@ Item {id:root; width: 1366;height: 691
                                                 Image {source: "qrc:/Pics/capture-svg/btn_alarm.svg";height:parent.height*0.6; anchors.verticalCenter: parent.verticalCenter;width: height; }
                                             }
                                             Row{width:parent.width;height: parent.height*0.75/3;spacing: width*0.05;
-                                                CusCheckBox{id:deviationCheckBox;checked:true;}
+                                                CusCheckBox{id:deviationCheckBox;checked:true;onCheckedChanged:checkSvc.measureDeviation=checked;}
                                                 CusText{text:lt+qsTr("Fixation deviation"); horizontalAlignment: Text.AlignLeft;width: parent.width*0.25;font.pointSize: fontPointSize;}
                                             }
                                         }
@@ -313,7 +313,7 @@ Item {id:root; width: 1366;height: 691
                                     id:realTimeEyePos
                                     Item{width: realTimeEyePosListView.width/2;height: width;
                                         Image{
-                                           property string picSource: fileDir+index+".JPEG";
+                                           property string picSource: fileDir+index+".BMP";
                                            anchors.fill: parent;
                                            fillMode: Image.PreserveAspectCrop;smooth: false;cache: false;        //to refresh image
                                            source: "file:///" + applicationDirPath + picSource;
@@ -368,13 +368,15 @@ Item {id:root; width: 1366;height: 691
                                     IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::DynamicCheckResultVm",root.currentCheckResult);
                                 root.currentCheckResult=null;
                             }
+
                         }
-                        Row{
-                            width: parent.width;height: 20; layoutDirection: Qt.LeftToRight;anchors.bottom: parent.bottom;
-                            Button{text:"video on";width: parent.width/8;height: parent.height; onClicked: IcUiQmlApi.appCtrl.checkSvc.enterCheckingPage();}
-                            Button{text:"video off";width: parent.width/8;height: parent.height; onClicked: IcUiQmlApi.appCtrl.checkSvc.leaveCheckingPage();}
-                            Button{text:"connect";width: parent.width/8;height: parent.height;onClicked:IcUiQmlApi.appCtrl.checkSvc.connectDev();}
-                            Button{text:"disconnect";width: parent.width/8;height: parent.height;onClicked:IcUiQmlApi.appCtrl.checkSvc.disconnectDev();}
+                        Rectangle{
+                            width: parent.width;height: 20; anchors.bottom: parent.bottom;color: "white";opacity: 0.5;visible: checkDisplay.tip!="";
+                            CusText {anchors.fill: parent;verticalAlignment: Text.AlignVCenter;text: checkDisplay.tip;}
+//                            Button{text:"video on";width: parent.width/8;height: parent.height; onClicked: IcUiQmlApi.appCtrl.checkSvc.enterCheckingPage();}
+//                            Button{text:"video off";width: parent.width/8;height: parent.height; onClicked: IcUiQmlApi.appCtrl.checkSvc.leaveCheckingPage();}
+//                            Button{text:"connect";width: parent.width/8;height: parent.height;onClicked:IcUiQmlApi.appCtrl.checkSvc.connectDev();}
+//                            Button{text:"disconnect";width: parent.width/8;height: parent.height;onClicked:IcUiQmlApi.appCtrl.checkSvc.disconnectDev();}
                         }
 
                     }

@@ -21,7 +21,9 @@ Item{
     property int boundaryShowRange:IcUiQmlApi.appCtrl.utilitySvc.boundaryShowRange;
     property int dynamicCircleRadius: 0;
     property int lastStrategy;
+    property string tip;
     signal clearResult();
+    onTipChanged:{console.log(tip);}
 
     onCurrentCheckResultChanged:
     {
@@ -31,7 +33,24 @@ Item{
 
     onCurrentCheckingDotLocChanged: {displayCanvas.requestPaint();console.log(currentCheckingDotLoc);}
     onNextCheckingDotLocChanged: {displayCanvas.requestPaint();console.log(nextCheckingDotLoc);}
+    onDynamicSelectedDotsReadyChanged:{setTip();}
 
+    function setTip()
+    {
+        if(dynamicSelectedDotsReady)
+            tip="";
+        else
+        {
+            switch(currentProgram.params.strategy)
+            {
+            case 0:
+            case 1:tip="";break;
+            case 2:tip="Choose one dot,Left click to add dot,right click to remove last selected dot.";break;
+            case 3:tip="Choose two dots,two dots must inside same circle.Left click to add dot,right click to remove last selected dot.";break;
+            default:break;
+            }
+        }
+    }
 
     function resetInputDot()
     {
@@ -77,6 +96,7 @@ Item{
             if(currentProgram.params.dynamicDistance===2) dynamicCircleRadius=15;
         }
         resetInputDot();
+        if(currentProgram.type===2) setTip();
         displayCanvas.requestPaint();
     }
     onOs_odChanged:

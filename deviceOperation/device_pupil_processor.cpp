@@ -222,7 +222,8 @@ void DevicePupilProcessor::processData(uchar* data, int width, int height)
 
 QVector<QPointF> DevicePupilProcessor::caculatePupil(uchar* data, int width, int height)
 {
-    auto pupilPixelDiameterLimit=DeviceSettings::getSingleton()->m_pupilPixelDiameterLimit;
+    auto pupilPixelDiameterMaxLimit=DeviceSettings::getSingleton()->m_pupilPixelDiameterMaxLimit;
+    auto pupilPixelDiameterMinLimit=DeviceSettings::getSingleton()->m_pupilPixelDiameterMinLimit;
     auto pupilGreyLimit=DeviceSettings::getSingleton()->m_pupilGreyLimit;
     auto reflectionDotLimit=DeviceSettings::getSingleton()->m_pupilReflectionDotLimit;
     float y_max=0;
@@ -244,7 +245,7 @@ QVector<QPointF> DevicePupilProcessor::caculatePupil(uchar* data, int width, int
                 if(x>x_max) x_max=x;
                 if(x<x_min) x_min=x;
                 if((vc_line.length()>0&&x-vc_line.last().x()>2)&&(data[qRound(float(x+vc_line.last().x())/2)+width*y]<reflectionDotLimit)) gapCount++;
-                if(x_max-x_min<width*pupilPixelDiameterLimit*2&&gapCount<=2)                //不能太大和有太多空隙,排除眉毛
+                if(x_max-x_min<width*pupilPixelDiameterMaxLimit&&gapCount<=2)                //不能太大和有太多空隙,排除眉毛
                 {
                     vc_line.push_back({x,y});
                 }
@@ -305,7 +306,7 @@ QVector<QPointF> DevicePupilProcessor::caculatePupil(uchar* data, int width, int
     QPointF center={x_avg2,y_avg2};
     QPointF topLeft={x_min,y_min};
     QPointF bottomRight={x_max,y_max};
-   if((x_max-x_min<width*pupilPixelDiameterLimit*2&&y_max-y_min<width*pupilPixelDiameterLimit*2)&&(x_max-x_min>width*pupilPixelDiameterLimit*0.5&&y_max-y_min>width*pupilPixelDiameterLimit*0.5))            //太大太小的不是瞳孔
+   if((x_max-x_min<width*pupilPixelDiameterMaxLimit&&y_max-y_min<width*pupilPixelDiameterMaxLimit)&&(x_max-x_min>width*pupilPixelDiameterMinLimit&&y_max-y_min>width*pupilPixelDiameterMinLimit))            //太大太小的不是瞳孔
     {
         return QVector<QPointF>{center,topLeft,bottomRight};
     }
@@ -318,9 +319,9 @@ QVector<QPointF> DevicePupilProcessor::caculatePupil(uchar* data, int width, int
 QVector<QPointF> DevicePupilProcessor::caculateReflectingDot(uchar* ba, int width, int height)
 {
     QVector<QPoint> brightPix,leftBrightPix,middleBrightPix,rightBrightPix;
-    for(int y=m_pupilCenterPoint.y();y<m_pupilCenterPoint.y()+height*0.10;y++)
+    for(int y=m_pupilCenterPoint.y();y<m_pupilCenterPoint.y()+height*0.12;y++)
     {
-        for(int x=m_pupilCenterPoint.x()-width*0.07;x<m_pupilCenterPoint.x()+width*0.07;x++)
+        for(int x=m_pupilCenterPoint.x()-width*0.08;x<m_pupilCenterPoint.x()+width*0.08;x++)
         {
 //            qDebug()<<quint8(ba[x+width*y]);
             if(quint8(ba[x+width*y])>DeviceSettings::getSingleton()->m_pupilReflectionDotLimit)

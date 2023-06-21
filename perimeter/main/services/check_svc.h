@@ -27,7 +27,9 @@ class CheckSvc: public QObject
     Q_PROPERTY(QPointF nextCheckingDotLoc READ getNextCheckingDotLoc NOTIFY nextCheckingDotLocChanged)
     Q_PROPERTY(QPointF currentCheckingDotLoc READ getCurrentCheckingDotLoc NOTIFY currentCheckingDotLocChanged)
     Q_PROPERTY(bool readyToCheck READ getReadyToCheck WRITE setReadyToCheck NOTIFY readyToCheckChanged)
-
+    Q_PROPERTY(QString tips READ getTips WRITE setTips NOTIFY tipsChanged)
+    Q_PROPERTY(bool measurePupil READ getMeasurePupil WRITE setMeasurePupil NOTIFY measurePupilChanged)
+    Q_PROPERTY(bool measureDeviation READ getMeasureDeviation WRITE setMeasureDeviation NOTIFY measureDeviationChanged)
 
 
 
@@ -72,11 +74,15 @@ public:
     QPointF getCurrentCheckingDotLoc(){return m_currentCheckingDotLoc;}Q_SIGNAL void currentCheckingDotLocChanged();
     QPointF getNextCheckingDotLoc(){return m_nextCheckingDotLoc;}Q_SIGNAL void nextCheckingDotLocChanged();
     bool getReadyToCheck(){return m_readyToCheck;}void setReadyToCheck(bool value){m_readyToCheck=value;emit readyToCheckChanged();} Q_SIGNAL void readyToCheckChanged();
+    QString getTips(){return m_tips;}void setTips(QString value){m_tips=value;emit tipsChanged();}Q_SIGNAL void tipsChanged();
+    bool getMeasurePupil(){return m_measurePupil;}void setMeasurePupil(bool value){m_measurePupil=value;emit measurePupilChanged();}Q_SIGNAL void measurePupilChanged();
+    bool getMeasureDeviation(){return m_measureDeviation;}void setMeasureDeviation(bool value){m_measureDeviation=value;emit measureDeviationChanged();}Q_SIGNAL void measureDeviationChanged();
 //    CheckSvcWorker* getWorker(){return m_worker;}
 
 private:
     CheckSvcWorker* m_worker;
     QThread m_workerThread;
+    QString m_tips;
     int m_checkState=5;                        //0:start,1:checking,2:pausing,3:stopped,4:finished
     int m_checkedCount=0;
     int m_totalCount=0;
@@ -85,6 +91,9 @@ private:
     QPointF m_nextCheckingDotLoc={999,999};
     bool m_readyToCheck=false;
     bool m_atCheckingPage=false;
+    bool m_measurePupil=true;
+    bool m_measureDeviation=true;
+
     QList<QPointF> m_dynamicSelectedDots;
     PatientVm* m_patientVm;
     ProgramVm* m_programVm;

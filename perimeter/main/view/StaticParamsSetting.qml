@@ -105,10 +105,6 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                         CusText{text:lt+qsTr("Strategy"); anchors.left: parent.left; anchors.leftMargin: 0;width: parent.width*0.45;horizontalAlignment: Text.AlignLeft;font.pointSize:fontPointSize;}
                                         CusComboBox{
                                             property var strategies: currentProgram.data.strategies;
-//                                            property var threshold:["全阈值","智能交互式","快速智能交互式"];
-//                                            property var model: [/*"二区法","三区法","量化缺损","单刺激"*/];
-//                                            property var threshold:[];
-//                                            property var screening:[];
                                             property var listModel: ListModel{}
                                             width: parent.width*0.5; anchors.right: parent.right;
                                             model:/*currentProgram===null?null:currentProgram.type===0?threshold:screening;*/listModel;
@@ -161,42 +157,6 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                             }
                                         }
                                     }
-//                                    Item{
-//                                        width: parent.width; height:parent.parent.rowHeight;
-//                                        CusText{text:lt+qsTr("Strategy mode"); anchors.left: parent.left; anchors.leftMargin: 0;width: parent.width*0.45;horizontalAlignment: Text.AlignLeft;font.pointSize:fontPointSize;}
-//                                        CusComboBox{
-//                                            property var listModel: ListModel{}
-//                                            property var strategyModes: currentProgram.data.strategyModes;
-//                                            enabled: currentProgram.type===0;
-//                                            width: parent.width*0.5; anchors.right: parent.right;
-//                                            model:listModel;
-//                                            currentIndex: currentProgram===null?0:currentProgram.params.commonParams.strategyMode;
-//                                            Component.onCompleted:
-//                                            {
-//                                                idPopup.ok.connect(function(){currentProgram.params.commonParams.strategyMode=currentIndex;});
-//                                                IcUiQmlApi.appCtrl.settings.langTriggerChanged.connect(onStrategyModesChanged);
-//                                            }
-//                                            onStrategyModesChanged:{
-//                                                var i;
-//                                                listModel.clear();
-//                                                if(currentProgram.type===0)
-//                                                {
-//                                                    for(i=0;i<strategyModes.length;i++)
-//                                                    {
-//                                                        switch (strategyModes[i])
-//                                                        {
-//                                                        case 0:listModel.append({modelData:lt+qsTr("Age related")});break;
-//                                                        case 1:listModel.append({modelData:lt+qsTr("Threshold related")});break;
-//                                                        }
-//                                                        if(currentProgram.params.commonParams.strategyMode===strategyModes[i])
-//                                                        {
-//                                                            currentIndex=i;
-//                                                        }
-//                                                    }
-//                                                }
-//                                            }
-//                                        }
-//                                    }
                                     Item{
                                         width: parent.width; height:parent.parent.rowHeight;
                                         CusText{text:lt+qsTr("Cursor size"); anchors.left: parent.left; anchors.leftMargin: 0;width: parent.width*0.45;horizontalAlignment: Text.AlignLeft;font.pointSize:fontPointSize;}
@@ -272,6 +232,7 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                        width: parent.width; height:parent.parent.rowHeight;
                                        CusText{text:lt+qsTr("Short term fluctuation"); anchors.left: parent.left; anchors.leftMargin: 0;width: parent.width*0.45;horizontalAlignment: Text.AlignLeft;font.pointSize:fontPointSize;}
                                        CusComboBox{
+                                            enabled: currentProgram.type===0;
                                             width: parent.width*0.5; anchors.right: parent.right;model:[lt+qsTr("On"),lt+qsTr("Off")];currentIndex:currentProgram===null?0:currentProgram.params.commonParams.shortTermFluctuation?0:1;
                                             Component.onCompleted: {idPopup.ok.connect(function(){currentProgram.params.commonParams.shortTermFluctuation=(currentIndex==0?true:false);})}
                                        }

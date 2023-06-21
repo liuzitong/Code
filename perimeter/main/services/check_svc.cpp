@@ -241,6 +241,7 @@ signals:
     void totalCountChanged(int count);
     void checkTimeChanged(int secs);
     void sendErrorInfo(QString error);
+    void tipChanged(QString tip);
     void stop();
     void currentCheckingDotChanged(QPointF loc);
     void nextCheckingDotChanged(QPointF loc);
@@ -621,10 +622,10 @@ void StaticCheck::stimulate()
     }
     else
     {
-        m_deviceOperation->waitForSomeTime(durationTime);           //假阴
+        m_deviceOperation->waitForSomeTime(durationTime);           //假阳
         emit currentCheckingDotChanged({999,999});
         m_resultModel->m_data.fixationDeviation.push_back(-m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation);
-        std::cout<<"***** jiayin"<<"zuo biao x:"<<debug_Loc.x()<<" "<<"zuobiao y:"<<debug_Loc.y()<<"    yong shi:"<<m_stimulationWaitingForAnswerElapsedTimer.elapsed()<<std::endl;
+        std::cout<<"***** jiayang"<<"zuo biao x:"<<debug_Loc.x()<<" "<<"zuobiao y:"<<debug_Loc.y()<<"    yong shi:"<<m_stimulationWaitingForAnswerElapsedTimer.elapsed()<<std::endl;
     }
     m_deviceOperation->m_isWaitingForStaticStimulationAnswer=true;
     m_stimulationWaitingForAnswerElapsedTimer.restart();
@@ -766,39 +767,58 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
     if(UtilitySvc::getSingleton()->m_checkFalseNegAndPos)
     {
         if(m_stimulationCount%fixedParams.falseNegativeCycle==m_falseNegCyc)                            //假阴性：在曾经响应过的位置，再减少几个DB的亮度(即是更亮)再次测试，如响应就正常，不响应则记录一次假阴性。
-//        if(m_stimulationCount%fixedParams.falsePositiveCycle==qrand()%fixedParams.falsePositiveCycle)
         {
-            QVector<DotRecord> m_checkedRecords;
+            QVector<DotRecord> checkedRecords;
+            int maxDB=0;
             if(m_programModel->m_type==Type::ThreshHold)
             {
                 for(auto& recordDot:m_dotRecords)
                 {
                     if(recordDot.checked&&recordDot.DB>=0)                                          //必须要看到
                     {
-                        m_checkedRecords.push_back(recordDot);
+                        checkedRecords.push_back(recordDot);
+                        if(recordDot.DB>maxDB) maxDB=recordDot.DB;
                     }
                 }
-                if(m_checkedRecords.size()==0) return {false,{0,0},0};
-                auto recordDot=m_checkedRecords[qrand()%m_checkedRecords.size()];
-    //            m_lastCheckeDotType.push_back(LastCheckedDotType::falsePositiveTest);
-    //            return {true,recordDot.loc,recordDot.DB-UtilitySvc::getSingleton()->m_falsePositiveDecDB};
+
+                if(checkedRecords.size()==0) return {false,{0,0},0};
+                QVector<QVector<DotRecord>> recordsSet;
+                recordsSet.resize(maxDB/5);
+                for(auto& recordDot:checkedRecords)
+                {
+                    int set=(maxDB-recordDot.DB)/5;
+                    recordsSet[set].push_back(recordDot);
+                }
+
+                QVector<DotRecord> highestDBRecords;
+                for(int i=0;i<recordsSet.size();i++)
+                {
+                    highestDBRecords.append(recordsSet[i]);
+                    if(highestDBRecords.size()>=3) break;
+                }
+
+                auto recordDot=highestDBRecords[qrand()%highestDBRecords.size()];
+                std::cout<<"false Neg:"<<recordDot.DB<<std::endl;
+                std::cout<<UtilitySvc::getSingleton()->m_falseNegativeDecDB<<std::endl;;
                 m_checkCycleDotList.append({LastCheckedDotType::falseNegativeTest,recordDot.loc,recordDot.DB-UtilitySvc::getSingleton()->m_falseNegativeDecDB});
             }
             else
             {
                 for(auto& recordDot:m_dotRecords)
                 {
-                    if(recordDot.checked&&recordDot.DB>=2)              //2表示看到,>2表示是阈值
+                    if(recordDot.checked&&recordDot.DB>=2&&recordDot.DB<=15)              //2表示看到,>2表示是阈值且缺陷深度不能太大
                     {
-                        m_checkedRecords.push_back(recordDot);
+                        checkedRecords.push_back(recordDot);
                     }
                 }
-                if(m_checkedRecords.size()==0) return {false,{0,0},0};
-                auto recordDot=m_checkedRecords[qrand()%m_checkedRecords.size()];
+                if(checkedRecords.size()==0) return {false,{0,0},0};
+
+                auto& recordDot=checkedRecords[qrand()%checkedRecords.size()];
+                std::cout<<"false Neg:"<<recordDot.DB<<std::endl;
                 if(recordDot.DB==2)
                     m_checkCycleDotList.append({LastCheckedDotType::falseNegativeTest,recordDot.loc,recordDot.StimulationDBs.first()-UtilitySvc::getSingleton()->m_falseNegativeDecDB});
                 else
-                    m_checkCycleDotList.append({LastCheckedDotType::falseNegativeTest,recordDot.loc,recordDot.DB-UtilitySvc::getSingleton()->m_falseNegativeDecDB});
+                    m_checkCycleDotList.append({LastCheckedDotType::falseNegativeTest,recordDot.loc,recordDot.StimulationDBs.first()+4-recordDot.DB-UtilitySvc::getSingleton()->m_falseNegativeDecDB});
             }
         }
 
@@ -1618,6 +1638,7 @@ void CheckSvcWorker::prepareToCheck()
         m_check->lightsOff();
         m_check->lightsOn();
         m_check->m_deviceOperation->setCursorColorAndCursorSize(int(cursorColor),int(cursorSize));
+        UtilitySvc::wait(100);
         m_check->m_deviceOperation->waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y});
     }
     else
@@ -1633,6 +1654,7 @@ void CheckSvcWorker::prepareToCheck()
         m_check->lightsOn();
         m_check->m_deviceOperation->setCursorColorAndCursorSize(int(cursorColor),int(cursorSize));
         m_check->m_deviceOperation->setDB(brightness);
+        UtilitySvc::wait(100);
         m_check->m_deviceOperation->waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y});
         connect(this,&CheckSvcWorker::stop,[&](){m_check->m_deviceOperation->stopDynamic();});
     }
@@ -1749,6 +1771,7 @@ CheckSvc::CheckSvc(QObject *parent)
     connect(m_worker,&CheckSvcWorker::checkTimeChanged,this, &CheckSvc::setCheckTime);
     connect(m_worker,&CheckSvcWorker::currentCheckingDotChanged,[&](QPointF value){m_currentCheckingDotLoc=value;qDebug()<<value;emit currentCheckingDotLocChanged();});
     connect(m_worker,&CheckSvcWorker::nextCheckingDotChanged,[&](QPointF value){m_nextCheckingDotLoc=value;emit nextCheckingDotLocChanged();});
+    connect(m_worker,&CheckSvcWorker::tipChanged,this,&CheckSvc::setTips);
     connect(m_worker,&CheckSvcWorker::sendErrorInfo,this, [](QString errorInfo)
     {
         QMessageBox msgBox;

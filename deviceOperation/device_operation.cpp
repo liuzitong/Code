@@ -119,11 +119,13 @@ void DeviceOperation::setCursorColorAndCursorSize(int color, int spot)
     {
         int focalPos=config.focusPosForSpotAndColorChangeRef();
         int motorPos[5]{0,0,focalPos,color_Circl_Motor_Steps*10,spot_Circl_Motor_Steps*10};
+        waitForSomeTime(100);
         waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
          //移动焦距电机电机到联动位置,一边转动颜色和光斑
         m_devCtl->move5Motors(std::array<quint8, 5>{0,0,sps[2],0,0}.data(),motorPos);
         m_devCtl->move5Motors(std::array<quint8, 5>{0,0,0,1,1}.data(),motorPos,UsbDev::DevCtl::MoveMethod::Relative);
         //焦距电机停止就停止,颜色和光斑
+        waitForSomeTime(100);
         waitMotorStop({UsbDev::DevCtl::MotorId_Focus});
         m_devCtl->move5Motors(std::array<quint8, 5>{1,1,1,1,1}.data(),std::array<int, 5>{0,0,0,0,0}.data(),UsbDev::DevCtl::MoveMethod::Relative);
     }
@@ -131,6 +133,7 @@ void DeviceOperation::setCursorColorAndCursorSize(int color, int spot)
         //移动光斑和颜色电机到目标位置
         int motorPos[5]{0,0,0,colorPos,sizePos}; //单个电机绝对位置不可行
         quint8 speed[5]{0,0,0,sps[3],sps[4]};
+        waitForSomeTime(100);
         waitMotorStop({UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Focus});
         m_devCtl->move5Motors(speed,motorPos);
     }
@@ -139,6 +142,7 @@ void DeviceOperation::setCursorColorAndCursorSize(int color, int spot)
          //转一圈拖动光斑和颜色
         int  motorPos[5]{0,0,0,color_Circl_Motor_Steps,spot_Circl_Motor_Steps};
         quint8 speed[5]{0,0,0,sps[3],sps[4]};
+        waitForSomeTime(100);
         waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
         m_devCtl->move5Motors(speed,motorPos,UsbDev::DevCtl::Relative);
     }
@@ -146,6 +150,7 @@ void DeviceOperation::setCursorColorAndCursorSize(int color, int spot)
         //脱离防止干扰误差
         int motorPos[5]={0,0,0,-1000,-1000};
         quint8 speed[5]{0,0,0,sps[3],sps[4]};
+        waitForSomeTime(100);
         waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
         m_devCtl->move5Motors(speed,motorPos,UsbDev::DevCtl::Relative);
     }
@@ -153,9 +158,11 @@ void DeviceOperation::setCursorColorAndCursorSize(int color, int spot)
          //焦距电机脱离颜色和光斑
         int motorPos[5]={0, 0, 10000, 0 ,0};
         quint8 speed[5]{0,0,sps[2],0,0};
+        waitForSomeTime(100);
         waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_Focus});
         m_devCtl->move5Motors(speed,motorPos,UsbDev::DevCtl::Relative);
     }
+    waitForSomeTime(100);
     waitMotorStop({UsbDev::DevCtl::MotorId_Focus});
     m_status.color=color;
     m_status.spot=spot;
@@ -318,14 +325,21 @@ void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB,bool
 //    std::cout<<"waiting shutter close"<<std::endl;
 //    std::cout<<m_statusData.motorPosition(UsbDev::DevCtl::MotorId_Shutter)<<std::endl;;
 //    std::cout<<m_config.shutterOpenPosRef()<<std::endl;
-    waitForSomeTime(180);
-    while(qAbs(m_statusData.motorPosition(UsbDev::DevCtl::MotorId_Shutter)-m_config.shutterOpenPosRef())<20)
+//    waitForSomeTime(20);
+//    qDebug()<<m_statusData.motorPosition(UsbDev::DevCtl::MotorId_Shutter);
+//    waitForSomeTime(20);
+//    qDebug()<<m_statusData.motorPosition(UsbDev::DevCtl::MotorId_Shutter);
+//    waitForSomeTime(20);
+//    qDebug()<<m_statusData.motorPosition(UsbDev::DevCtl::MotorId_Shutter);
+//    waitForSomeTime(20);
+//    qDebug()<<m_statusData.motorPosition(UsbDev::DevCtl::MotorId_Shutter);
+    waitForSomeTime(50);
+    while(qAbs(m_statusData.motorPosition(UsbDev::DevCtl::MotorId_Shutter)-m_config.shutterOpenPosRef())<70)
     {
         QApplication::processEvents();
     }
-    waitForSomeTime(50);
-//    std::cout<<"done waiting"<<std::endl;
     move5Motors(isMotorMove,motorPos);
+    waitForSomeTime(50);
 }
 
 
@@ -337,6 +351,7 @@ void DeviceOperation::adjustCastLight()
     int size=DeviceSettings::getSingleton()->m_castLightTargetSize;
     setCursorColorAndCursorSize(color,size);
     moveToAdjustLight(m_config.xMotorPosForLightCorrectionRef(),m_config.yMotorPosForLightCorrectionRef(),m_config.focalLengthMotorPosForLightCorrectionRef());
+    waitForSomeTime(100);
     waitMotorStop({UsbDev::DevCtl::MotorId_Color,
                    UsbDev::DevCtl::MotorId_Light_Spot,
                    UsbDev::DevCtl::MotorId_Focus,
@@ -370,6 +385,7 @@ void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSiz
     motorPos[0]=beginPos.motorX;
     motorPos[1]=beginPos.motorY;
     motorPos[2]=focalMotorPos;
+    waitForSomeTime(100);
     waitMotorStop({UsbDev::DevCtl::MotorId_Color,
                    UsbDev::DevCtl::MotorId_Light_Spot,
                    UsbDev::DevCtl::MotorId_Focus,
@@ -453,6 +469,7 @@ void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSiz
     auto config=DeviceData::getSingleton()->m_config;
     if(m_isDeviceReady)
     {
+        waitForSomeTime(100);
         waitMotorStop({UsbDev::DevCtl::MotorId_Color,
                        UsbDev::DevCtl::MotorId_Light_Spot,
                        UsbDev::DevCtl::MotorId_Focus,
@@ -505,7 +522,7 @@ void DeviceOperation::waitMotorStop(QVector<UsbDev::DevCtl::MotorId> motorIDs)
     do
     {
         QApplication::processEvents();
-    }while(getMotorsBusy(motorIDs)||(mstimer.elapsed()<100));
+    }while(getMotorsBusy(motorIDs)/*||(mstimer.elapsed()<100)*/);
 }
 
 void DeviceOperation::waitForSomeTime(int time)
@@ -713,6 +730,7 @@ void DeviceOperation::workOnNewStatuData()
         {
             setCastLightAdjustStatus(3);
             openShutter(0);
+            waitForSomeTime(100);
             waitMotorStop({UsbDev::DevCtl::MotorId_Shutter});
             m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA*0.3);
 
