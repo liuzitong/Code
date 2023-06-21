@@ -49,7 +49,8 @@
     "pupilDiameterPixelToFixationDeviationConstant": 0.25,
     "pupilDiameterPixelToMillimeterConstant": 0.171875,
     "pupilGreyLimit": 50,
-    "pupilPixelDiameterLimit": 0.1,
+    "pupilPixelDiameterMaxLimit": 0.2,
+    "pupilPixelDiameterMinLimit": 0.05,
     "pupilReflectionDotLimit": 200,
     "spotSizeToSlot": [
         {

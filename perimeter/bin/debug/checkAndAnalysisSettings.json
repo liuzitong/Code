@@ -2,7 +2,7 @@
     "checkCountBeforeGetBlindDotCheck":3,
     "blindDotTestDB":10,
     "blindDotTestIncDB":5,
-    "falsePositiveDecDB":10,
+    "falseNegativeDecDB":10,
     "VFImultiplier":1.0,
     "checkFalseNegAndPos":true,
     "realTimeEyePosPicSize":"320*240",
