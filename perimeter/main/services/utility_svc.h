@@ -59,6 +59,7 @@ public:
     int m_falseNegativeDecDB;
     bool m_checkFalseNegAndPos;
     double m_VFImultiplier;
+    int m_deviationLimit;
     float m_checkZoneRatio;
     QSize m_realTimeEyePosPicSize;
     int m_centerPointCheckedWaitingTime;

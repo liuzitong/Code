@@ -1242,6 +1242,18 @@ void StaticCheck::checkWaiting()
         }
     }
 
+    if(m_programModel->m_params.commonParams.fixationMonitor==FixationMonitor::alarmAndPause||m_programModel->m_params.commonParams.fixationMonitor==FixationMonitor::onlyAlarm)
+    {
+        m_deviceOperation->beep();
+        if(m_programModel->m_params.commonParams.fixationMonitor==FixationMonitor::alarmAndPause)
+        {
+            while(m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation>UtilitySvc::getSingleton()->m_deviationLimit)
+            {
+                QApplication::processEvents();
+            }
+        }
+    }
+
     if(isPaused)
     {
         UtilitySvc::wait(m_programModel->m_params.fixedParams.intervalTime);                //最小等待时间

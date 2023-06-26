@@ -105,10 +105,12 @@ UtilitySvc::UtilitySvc()
         m_blindDotTestDB=jo["blindDotTestDB"].toInt();
         m_blindDotTestIncDB=jo["blindDotTestIncDB"].toInt();
         m_falseNegativeDecDB=jo["falseNegativeDecDB"].toInt();
+        m_deviationLimit=jo["deviationLimit"].toInt();
         m_VFImultiplier=jo["VFImultiplier"].toDouble();
         m_checkFalseNegAndPos=jo["checkFalseNegAndPos"].toBool();
         m_checkZoneRatio=jo["checkZoneRatio"].toDouble();
         m_centerPointCheckedWaitingTime=jo["centerPointCheckedWaitingTime"].toInt();
+
         QStringList strs=jo["realTimeEyePosPicSize"].toString().split("*");
         if(strs.size()==2)
         {
