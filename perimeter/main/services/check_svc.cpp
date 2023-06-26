@@ -26,6 +26,7 @@ public:
     int m_checkedCount,m_totalCount;   //只计算通常点数,短周期,中心点,以及周期测试不计入内.m_checkedCount=m_totalCount就测试完成.在doWork里面结束测试循环.
     int *m_checkState;
     bool m_error=false;
+    bool m_measurePupilDiameter;
     QString m_errorInfo;
     QSharedPointer<UtilitySvc> m_utilitySvc=UtilitySvc::getSingleton();
     QSharedPointer<DevOps::DeviceOperation> m_deviceOperation=DevOps::DeviceOperation::getSingleton();
@@ -87,15 +88,13 @@ private:
     QVector<std::tuple<LastCheckedDotType,QPointF, int>> m_checkCycleDotList;       //存储待测试盲点测试,假阴,假阳等信息
     QElapsedTimer m_stimulationWaitingForAnswerElapsedTimer;      //开门开启等待应答
     bool m_alreadyChecked;
-
-
     int debug_DB;
     QPoint debug_Loc;
-
 
 public:
     QSharedPointer<StaticCheckResultModel> m_resultModel;
     QSharedPointer<StaticProgramModel> m_programModel;
+    bool m_measurePupilDeviation;
     StaticCheck()=default;
 //    ~StaticCheck()=default;
     ~StaticCheck(){
@@ -208,6 +207,8 @@ public:
     ProgramVm* m_programVm;
     CheckResultVm* m_checkResultVm;
     QList<QPointF> m_dynamicSelectedDots;
+    bool m_measurePupilDeviation;
+    bool m_measurePupilDiameter;
 
 private:
     QSharedPointer<Check> m_check;
@@ -233,6 +234,9 @@ public slots:
     }
     void doWork();
 
+    void workOnMeasureDeviationChanged(bool value){m_measurePupilDeviation=value;emit measureDeviationChanged(value);}
+    void workOnMeasurePupilChanged(bool value){m_measurePupilDiameter=value;emit measurePupilChanged(value);}
+
 signals:
     void checkStateChanged();
     void checkResultChanged();
@@ -246,7 +250,8 @@ signals:
     void currentCheckingDotChanged(QPointF loc);
     void nextCheckingDotChanged(QPointF loc);
     void readyToCheck(bool isReady);
-
+    void measureDeviationChanged(bool value);
+    void measurePupilChanged(bool value);
 };
 
 void Check::lightsOff()
@@ -598,15 +603,16 @@ void StaticCheck::stimulate()
         m_deviceOperation->waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y,UsbDev::DevCtl::MotorId_Shutter});
         m_deviceOperation->openShutter(durationTime);
         emit currentCheckingDotChanged(debug_Loc);
-        std::cout<<"***** DB shi:"<<debug_DB<<"    "<<"zuo biao x:"<<debug_Loc.x()<<" "<<"zuobiao y:"<<debug_Loc.y()<<"    yong shi:"<<m_stimulationWaitingForAnswerElapsedTimer.elapsed()<<std::endl;
+        std::cout<<"***** DB shi:"<<debug_DB<<"    "<<"zuo biao x:"<<debug_Loc.x()<<" "<<"zuobiao y:"<<debug_Loc.y()<<"    yong shi:"<<m_stimulationWaitingForAnswerElapsedTimer.elapsed()<<"   deviation:"<<m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation<<std::endl;
         switch (lastCheckedDotType)
         {
         case LastCheckedDotType::blindDotTest:
         case LastCheckedDotType::locateBlindDot:
-        case LastCheckedDotType::falsePositiveTest:m_resultModel->m_data.fixationDeviation.push_back(-m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation);break;
+        case LastCheckedDotType::falsePositiveTest:if(m_measurePupilDeviation) m_resultModel->m_data.fixationDeviation.push_back(-m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation);break;
         case LastCheckedDotType::commonCheckDot:
         {
-            m_resultModel->m_data.fixationDeviation.push_back(m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation);
+            if(m_measurePupilDeviation)
+                m_resultModel->m_data.fixationDeviation.push_back(m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation);
             uint dotIndex=m_lastCheckDotRecord[0]->index;
             m_resultModel->m_data.realTimeDB[dotIndex]=m_lastCheckDotRecord[0]->StimulationDBs.toStdVector(); //在check初始化的时候扩充了大小.
             if(dotIndex<m_programModel->m_data.dots.size()||dotIndex==2*m_programModel->m_data.dots.size())
@@ -798,8 +804,8 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
                 }
 
                 auto recordDot=highestDBRecords[qrand()%highestDBRecords.size()];
-                std::cout<<"false Neg:"<<recordDot.DB<<std::endl;
-                std::cout<<UtilitySvc::getSingleton()->m_falseNegativeDecDB<<std::endl;;
+//                std::cout<<"false Neg:"<<recordDot.DB<<std::endl;
+//                std::cout<<UtilitySvc::getSingleton()->m_falseNegativeDecDB<<std::endl;;
                 m_checkCycleDotList.append({LastCheckedDotType::falseNegativeTest,recordDot.loc,recordDot.DB-UtilitySvc::getSingleton()->m_falseNegativeDecDB});
             }
             else
@@ -877,13 +883,11 @@ bool StaticCheck::waitForAnswer()
             m_deviceOperation->m_staticStimulationAnswer=false;
             answer=true;
             UtilitySvc::wait(m_programModel->m_params.fixedParams.leastWaitingTime);                //最小等待时间
+            m_answeredTimes.append(m_stimulationWaitingForAnswerElapsedTimer.elapsed());
         }
         else
             QApplication::processEvents();
     }
-//    std::cout<<std::endl;
-//    std::cout<<(QString("answer Time is:")+QString::number(m_stimulationWaitingForAnswerElapsedTimer.elapsed())).toStdString()<<std::endl;
-    m_answeredTimes.append(m_stimulationWaitingForAnswerElapsedTimer.elapsed());
     return answer;                       //超出时间应答
 }
 
@@ -1616,6 +1620,7 @@ void CheckSvcWorker::initialize()
 //        connect(deviceOperation,&DevOps::DeviceOperation::pupilDiameterChanged,[&](){((DynamicCheck*)m_check.data())->m_resultModel->m_data.pupilDiameter=deviceOperation->m_pupilDiameter;emit checkResultChanged();});
 //        UtilitySvc::wait(2000);    //等几秒启动
     }
+
 //    m_check->m_deviceOperation->setPupilDiameter(-1.0);
     m_check->m_deviceOperation->clearPupilData();
     m_check->m_deviceOperation->lightUpCastLight();
@@ -1624,7 +1629,6 @@ void CheckSvcWorker::initialize()
 void CheckSvcWorker::prepareToCheck()
 {
     int type=m_programVm->getType();
-    qDebug()<<type;
     if(type!=2)
     {
         m_check.reset(new StaticCheck());
@@ -1633,6 +1637,19 @@ void CheckSvcWorker::prepareToCheck()
         ((StaticCheck*)m_check.data())->m_programModel=static_cast<StaticProgramVm*>(m_programVm)->getModel();
         connect(((StaticCheck*)m_check.data()),&StaticCheck::currentCheckingDotChanged,this,&CheckSvcWorker::currentCheckingDotChanged);
         connect(((StaticCheck*)m_check.data()),&StaticCheck::nextCheckingDotChanged,this,&CheckSvcWorker::nextCheckingDotChanged);
+        connect(this,&CheckSvcWorker::measureDeviationChanged,m_check.data(),[&](bool value)
+        {
+            ((StaticCheck*)m_check.data())->m_measurePupilDeviation=value;
+            if(((StaticCheck*)m_check.data())->m_resultModel!=nullptr)
+                ((StaticCheck*)m_check.data())->m_resultModel->m_data.fixationDeviation.clear();
+        });
+        ((StaticCheck*)m_check.data())->m_measurePupilDeviation=m_measurePupilDeviation;
+        connect(this,&CheckSvcWorker::measurePupilChanged,m_check.data(),[&](bool value){
+            ((StaticCheck*)m_check.data())->m_measurePupilDiameter=value;
+            if(((StaticCheck*)m_check.data())->m_resultModel!=nullptr)
+                ((StaticCheck*)m_check.data())->m_resultModel->m_data.pupilDiameter=0;
+        });
+        m_check->m_measurePupilDiameter=m_measurePupilDeviation;
         auto cursorSize=((StaticCheck*)m_check.data())->m_programModel->m_params.commonParams.cursorSize;
         auto cursorColor=((StaticCheck*)m_check.data())->m_programModel->m_params.commonParams.cursorColor;
         m_check->lightsOff();
@@ -1647,6 +1664,12 @@ void CheckSvcWorker::prepareToCheck()
         m_check->m_checkState=m_checkState;
         m_check->m_patientModel=m_patientVm->getModel();
         ((DynamicCheck*)m_check.data())->m_programModel=static_cast<DynamicProgramVm*>(m_programVm)->getModel();
+        connect(this,&CheckSvcWorker::measurePupilChanged,m_check.data(),[&](bool value){
+            ((DynamicCheck*)m_check.data())->m_measurePupilDiameter=value;
+            if(((DynamicCheck*)m_check.data())->m_resultModel!=nullptr)
+                ((DynamicCheck*)m_check.data())->m_resultModel->m_data.pupilDiameter=0;
+        });
+        m_check->m_measurePupilDiameter=m_measurePupilDeviation;
         auto cursorSize=((DynamicCheck*)m_check.data())->m_programModel->m_params.cursorSize;
         auto cursorColor=((DynamicCheck*)m_check.data())->m_programModel->m_params.cursorColor;
         auto brightness=((DynamicCheck*)m_check.data())->m_programModel->m_params.brightness;
@@ -1658,6 +1681,9 @@ void CheckSvcWorker::prepareToCheck()
         m_check->m_deviceOperation->waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y});
         connect(this,&CheckSvcWorker::stop,[&](){m_check->m_deviceOperation->stopDynamic();});
     }
+
+
+
     m_check->initialize();
     UtilitySvc::wait(500);    //等几秒启动
     emit readyToCheck(true);
@@ -1763,13 +1789,17 @@ CheckSvc::CheckSvc(QObject *parent)
     m_worker = new CheckSvcWorker();
     m_worker->moveToThread(&m_workerThread);
     m_worker->m_timer.moveToThread(&m_workerThread);
+    m_worker->m_measurePupilDeviation=m_measurePupilDeviation;
+    m_worker->m_measurePupilDiameter=m_measurePupilDiameter;
     DevOps::DeviceOperation::getSingleton()->moveToThread(&m_workerThread);
     connect(m_worker,&CheckSvcWorker::checkResultChanged,this, &CheckSvc::checkResultChanged);
     connect(m_worker,&CheckSvcWorker::checkStateChanged,this, &CheckSvc::checkStateChanged);
     connect(m_worker,&CheckSvcWorker::checkedCountChanged,this, &CheckSvc::setCheckedCount);
     connect(m_worker,&CheckSvcWorker::totalCountChanged,this, &CheckSvc::setTotalCount);
     connect(m_worker,&CheckSvcWorker::checkTimeChanged,this, &CheckSvc::setCheckTime);
-    connect(m_worker,&CheckSvcWorker::currentCheckingDotChanged,[&](QPointF value){m_currentCheckingDotLoc=value;qDebug()<<value;emit currentCheckingDotLocChanged();});
+    connect(this,&CheckSvc::measureDeviationChanged,m_worker,&CheckSvcWorker::workOnMeasureDeviationChanged);
+    connect(this,&CheckSvc::measurePupilChanged,m_worker,&CheckSvcWorker::workOnMeasurePupilChanged);
+    connect(m_worker,&CheckSvcWorker::currentCheckingDotChanged,[&](QPointF value){m_currentCheckingDotLoc=value;emit currentCheckingDotLocChanged();});
     connect(m_worker,&CheckSvcWorker::nextCheckingDotChanged,[&](QPointF value){m_nextCheckingDotLoc=value;emit nextCheckingDotLocChanged();});
     connect(m_worker,&CheckSvcWorker::tipChanged,this,&CheckSvc::setTips);
     connect(m_worker,&CheckSvcWorker::sendErrorInfo,this, [](QString errorInfo)

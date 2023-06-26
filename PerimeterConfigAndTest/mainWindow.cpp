@@ -335,7 +335,10 @@ void MainWindow::refreshConfigDataByUI()
 {
     bool ok;
     m_config.deviceIDRef()=ui->lineEdit_deviceSerialNo->text().toInt(&ok);                              //if(!ok) return;
+    qDebug()<<m_config.centerFixationLampDARef();
+    qDebug()<<ui->lineEdit_centralLightDA->text();
     m_config.centerFixationLampDARef()=ui->lineEdit_centralLightDA->text().toInt(&ok);                  //if(!ok) return;
+    qDebug()<<m_config.centerFixationLampDARef();
     m_config.bigDiamondfixationLampDAPtr()[0]=ui->lineEdit_bigDiamond1DA->text().toShort(&ok);            //if(!ok) return;
     m_config.bigDiamondfixationLampDAPtr()[1]=ui->lineEdit_bigDiamond2DA->text().toShort(&ok);            //if(!ok) return;
     m_config.bigDiamondfixationLampDAPtr()[2]=ui->lineEdit_bigDiamond3DA->text().toShort(&ok);            //if(!ok) return;
@@ -366,6 +369,7 @@ void MainWindow::refreshConfigDataByUI()
     m_config.focalLengthMotorPosForLightCorrectionRef()=ui->lineEdit_lightCorrectionFocus->text().toInt(&ok);
     m_config.xMotorPosForLightCorrectionRef()=ui->lineEdit_lightCorrectionX->text().toInt(&ok);
     m_config.yMotorPosForLightCorrectionRef()=ui->lineEdit_lightCorrectionY->text().toInt(&ok);
+    qDebug()<<m_config.centerFixationLampDARef();
 
 }
 
@@ -540,7 +544,7 @@ void MainWindow::updateProfile()
 void MainWindow::updateConfig()
 {
     showDevInfo("Config Got.");
-    memcpy(m_config.dataPtr(),m_devCtl->config().dataPtr(),m_config.dataLen());
+    memcpy(m_config.dataPtr(),m_devCtl->config().dataPtr(),UsbDev::Config::dataLen());
     refreshConfigUI();
 }
 
@@ -1040,6 +1044,9 @@ void MainWindow::readLocalConfig(QString filePath)
 
 void MainWindow::on_action_updateConfigToLower_triggered()
 {
+    qDebug()<<m_config.centerFixationLampDARef();
+    refreshConfigDataByUI();
+    qDebug()<<m_config.centerFixationLampDARef();
     m_devCtl->saveConfig(m_config);
 }
 

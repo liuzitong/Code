@@ -7,7 +7,7 @@
     "castLightDAChangeStep": 10,
     "castLightDAChanged": 170,
     "castLightDADifference": 50,
-    "castLightLastAdjustedDate": "2023/06/21",
+    "castLightLastAdjustedDate": "2023/06/26",
     "castLightTargetColor": 0,
     "castLightTargetDA": 15000,
     "castLightTargetSize": 5,
@@ -44,9 +44,10 @@
         1,
         1
     ],
+    "pixelDistFromPupilCenterToMiddleReflectionDot": 13,
     "pupilAutoAlignPixelTolerance": 10,
     "pupilAutoAlignStep": 170,
-    "pupilDiameterPixelToFixationDeviationConstant": 0.25,
+    "pupilDeviationPixelToNumberConstant": 0.5,
     "pupilDiameterPixelToMillimeterConstant": 0.171875,
     "pupilGreyLimit": 50,
     "pupilPixelDiameterMaxLimit": 0.2,
@@ -77,5 +78,6 @@
             "Slot": 5,
             "spotSize": 0
         }
-    ]
+    ],
+    "useLocalConfig": false
 }

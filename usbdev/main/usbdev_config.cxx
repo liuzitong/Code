@@ -201,9 +201,7 @@ static qint16  gReadData_Le_I16( const unsigned char *buff )
 // ============================================================================
 Config :: Config ( )
 {
-    gRegInQt();
-    ConfigPriv::buildIfNull( & m_obj );
-    memset(dataPtr(),-1,dataLen());
+    gRegInQt(); m_obj = nullptr;
 }
 
 // ============================================================================
@@ -250,37 +248,32 @@ Config :: Config ( const QByteArray &ba )
     const unsigned char *buff = reinterpret_cast<const unsigned char*>( ba.constData());
     ConfigPriv::buildIfNull( & d );
     auto *priv = T_PrivPtr( d );
-    priv->crcVeryficationRef()=gReadData_Le_I32(&buff[0]);
-    priv->deviceIDRef()=gReadData_Le_I32(&buff[4]);
-    priv->centerFixationLampDARef()=gReadData_Le_I16(&buff[8]);
-    memcpy(priv->bigDiamondfixationLampDAPtr(),&buff[10],8);
-    memcpy(priv->smallDiamondFixationLampDAPtr(),&buff[18],8);
-    priv->yellowBackgroundLampDARef()=gReadData_Le_I16(&buff[26]);
-    memcpy(priv->whiteBackgroundLampDAPtr(),&buff[28],6);
-    priv->centerInfraredLampDARef()=gReadData_Le_I16(&buff[34]);
-    priv->borderInfraredLampDARef()=gReadData_Le_I16(&buff[36]);
-    priv->eyeglassFrameLampDARef()=gReadData_Le_I16(&buff[38]);
-    memcpy(priv->environmentAlarmLightDAPtr(),&buff[40],4);
-    memcpy(priv->pupilGreyThresholdDAPtr(),&buff[44],4);
-    memcpy(priv->switchColorMotorPosPtr(),&buff[48],20);
-    memcpy(priv->switchLightSpotMotorPosPtr(),&buff[68],24);
-    priv->focusPosForSpotAndColorChangeRef()=gReadData_Le_I32(&buff[92]);
-    priv->shutterOpenPosRef()=gReadData_Le_I32(&buff[96]);
-    priv->mainTableCenterXCorrectionRef()=gReadData_Le_I32(&buff[100]);
-    priv->mainTableCenterYCorrectionRef()=gReadData_Le_I32(&buff[104]);
-    priv->secondaryTableCenterXCorrectionRef()=gReadData_Le_I32(&buff[108]);
-    priv->secondaryTableCenterYCorrectionRef()=gReadData_Le_I32(&buff[112]);
-    priv->maximunProjectionLightADPresetRef()=gReadData_Le_I32(&buff[116]);
-    priv->xMotorPosForLightCorrectionRef()=gReadData_Le_I32(&buff[120]);
-    priv->yMotorPosForLightCorrectionRef()=gReadData_Le_I32(&buff[124]);
-    priv->focalLengthMotorPosForLightCorrectionRef()=gReadData_Le_I32(&buff[128]);
-//    priv->xMotorPosForDiamondCenterTestRef()=gReadData_Le_I32(&buff[144]);
-//    priv->yMotorPosForDiamondCenterTestRef()=gReadData_Le_I32(&buff[148]);
-//    memcpy( priv->focalLengthMotorPosForDiamondCenterTestPtr(),&buff[152],28);
-//    memcpy( priv->focalLengthMotorPosMappingPtr(),&buff[132],600);
-    memcpy (priv->DbPosMappingPtr(),&buff[132],416);
-//    memcpy(priv->stepTimePtr(),&buff[1296],28);
-//    priv->stepLengthRef()=gReadData_Le_I32(&buff[1324]);
+//    priv->crcVeryficationRef()=gReadData_Le_I32(&buff[0]);
+//    priv->deviceIDRef()=gReadData_Le_I32(&buff[4]);
+//    priv->centerFixationLampDARef()=gReadData_Le_I16(&buff[8]);
+//    memcpy(priv->bigDiamondfixationLampDAPtr(),&buff[10],8);
+//    memcpy(priv->smallDiamondFixationLampDAPtr(),&buff[18],8);
+//    priv->yellowBackgroundLampDARef()=gReadData_Le_I16(&buff[26]);
+//    memcpy(priv->whiteBackgroundLampDAPtr(),&buff[28],6);
+//    priv->centerInfraredLampDARef()=gReadData_Le_I16(&buff[34]);
+//    priv->borderInfraredLampDARef()=gReadData_Le_I16(&buff[36]);
+//    priv->eyeglassFrameLampDARef()=gReadData_Le_I16(&buff[38]);
+//    memcpy(priv->environmentAlarmLightDAPtr(),&buff[40],4);
+//    memcpy(priv->pupilGreyThresholdDAPtr(),&buff[44],4);
+//    memcpy(priv->switchColorMotorPosPtr(),&buff[48],20);
+//    memcpy(priv->switchLightSpotMotorPosPtr(),&buff[68],24);
+//    priv->focusPosForSpotAndColorChangeRef()=gReadData_Le_I32(&buff[92]);
+//    priv->shutterOpenPosRef()=gReadData_Le_I32(&buff[96]);
+//    priv->mainTableCenterXCorrectionRef()=gReadData_Le_I32(&buff[100]);
+//    priv->mainTableCenterYCorrectionRef()=gReadData_Le_I32(&buff[104]);
+//    priv->secondaryTableCenterXCorrectionRef()=gReadData_Le_I32(&buff[108]);
+//    priv->secondaryTableCenterYCorrectionRef()=gReadData_Le_I32(&buff[112]);
+//    priv->maximunProjectionLightADPresetRef()=gReadData_Le_I32(&buff[116]);
+//    priv->xMotorPosForLightCorrectionRef()=gReadData_Le_I32(&buff[120]);
+//    priv->yMotorPosForLightCorrectionRef()=gReadData_Le_I32(&buff[124]);
+//    priv->focalLengthMotorPosForLightCorrectionRef()=gReadData_Le_I32(&buff[128]);
+//    memcpy (priv->DbPosMappingPtr(),&buff[132],416);
+    memcpy(&priv->crcVeryficationRef(),buff,dataLen());
     m_obj = d;
 }
 

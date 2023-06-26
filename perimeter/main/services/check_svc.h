@@ -75,8 +75,8 @@ public:
     QPointF getNextCheckingDotLoc(){return m_nextCheckingDotLoc;}Q_SIGNAL void nextCheckingDotLocChanged();
     bool getReadyToCheck(){return m_readyToCheck;}void setReadyToCheck(bool value){m_readyToCheck=value;emit readyToCheckChanged();} Q_SIGNAL void readyToCheckChanged();
     QString getTips(){return m_tips;}void setTips(QString value){m_tips=value;emit tipsChanged();}Q_SIGNAL void tipsChanged();
-    bool getMeasurePupil(){return m_measurePupil;}void setMeasurePupil(bool value){m_measurePupil=value;emit measurePupilChanged();}Q_SIGNAL void measurePupilChanged();
-    bool getMeasureDeviation(){return m_measureDeviation;}void setMeasureDeviation(bool value){m_measureDeviation=value;emit measureDeviationChanged();}Q_SIGNAL void measureDeviationChanged();
+    bool getMeasurePupil(){return m_measurePupilDiameter;}void setMeasurePupil(bool value){m_measurePupilDiameter=value;emit measurePupilChanged(value);}Q_SIGNAL void measurePupilChanged(bool value);
+    bool getMeasureDeviation(){return m_measurePupilDeviation;}void setMeasureDeviation(bool value){m_measurePupilDeviation=value;emit measureDeviationChanged(value);}Q_SIGNAL void measureDeviationChanged(bool value);
 //    CheckSvcWorker* getWorker(){return m_worker;}
 
 private:
@@ -91,8 +91,8 @@ private:
     QPointF m_nextCheckingDotLoc={999,999};
     bool m_readyToCheck=false;
     bool m_atCheckingPage=false;
-    bool m_measurePupil=true;
-    bool m_measureDeviation=true;
+    bool m_measurePupilDiameter=true;
+    bool m_measurePupilDeviation=true;
 
     QList<QPointF> m_dynamicSelectedDots;
     PatientVm* m_patientVm;

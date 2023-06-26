@@ -28,8 +28,8 @@ public:
     void clearData();
 
     QVector<QVector<int>> m_pupilData;
-    double m_pupilDiameter;
-    int m_pupilDeviation;
+    double m_pupilDiameter=0;
+    int m_pupilDeviation=0;
     QPointF m_pupilCenterPoint;
     double m_pupilDiameterPix;
     QVector<float> m_pupilDiameterArr;

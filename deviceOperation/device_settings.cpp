@@ -34,6 +34,7 @@ DeviceSettings::DeviceSettings()
 
     m_PID = m_rootObj.value("PID").toString();
     m_VID = m_rootObj.value("VID").toString();
+    m_useLocalConfig=m_rootObj.value("useLocalConfig").toBool();
 
     m_pupilAutoAlignPixelTolerance=m_rootObj.value("pupilAutoAlignPixelTolerance").toInt();
     m_pupilAutoAlignStep=m_rootObj.value("pupilAutoAlignStep").toInt();
@@ -44,8 +45,9 @@ DeviceSettings::DeviceSettings()
     m_pupilReflectionDotLimit=m_rootObj.value("pupilReflectionDotLimit").toDouble();
     m_pupilPixelDiameterMaxLimit=m_rootObj.value("pupilPixelDiameterMaxLimit").toDouble();
     m_pupilPixelDiameterMinLimit=m_rootObj.value("pupilPixelDiameterMinLimit").toDouble();
+    m_pixelDistFromPupilCenterToMiddleReflectionDot=m_rootObj.value("pixelDistFromPupilCenterToMiddleReflectionDot").toInt();
     m_pupilDiameterPixelToMillimeterConstant=m_rootObj.value("pupilDiameterPixelToMillimeterConstant").toDouble();
-    m_pupilDiameterPixelToFixationDeviationConstant=m_rootObj.value("pupilDiameterPixelToFixationDeviationConstant").toDouble();
+    m_pupilDeviationPixelToNumberConstant=m_rootObj.value("pupilDeviationPixelToNumberConstant").toDouble();
     m_castLightDADifference=m_rootObj.value("castLightDADifference").toInt();
     m_castLightTagetDA=m_rootObj.value("castLightTargetDA").toInt();
     m_castLightDAChangeStep=m_rootObj.value("castLightDAChangeStep").toInt();

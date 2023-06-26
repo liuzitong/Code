@@ -23,18 +23,16 @@ QSharedPointer<DeviceOperation> DeviceOperation::m_singleton=nullptr;
 
 DeviceOperation::DeviceOperation()
 {
-    m_config=DeviceData::getSingleton()->m_config;
+//    m_config=DeviceData::getSingleton()->m_config;
     m_connectTimer.setInterval(120000);
     connect(&m_connectTimer,&QTimer::timeout,this,&DeviceOperation::connectOrdisConnectDev);
     m_connectTimer.start();
 //    m_videoTimer.start(500);
-//    connect(&m_videoTimer,&QTimer::timeout,this,[](){std::cout<<"dsfs"<<std::endl;});
     connect(this,&DeviceOperation::updateDevInfo,[](QString str){qDebug()<<str;});
 
     m_workStatusElapsedTimer.start();
     m_autoPupilElapsedTime=100;
     m_autoPupilElapsedTimer.start();
-    m_currentCastLightDA=m_config.castLightADPresetRef()+DeviceSettings::getSingleton()->m_castLightDAChanged;
 }
 
 
@@ -113,7 +111,9 @@ void DeviceOperation::setCursorColorAndCursorSize(int color, int spot)
 
 
     int colorPos=config.switchColorMotorPosPtr()[colorSlot];
+    qDebug()<<colorPos;
     int sizePos=config.switchLightSpotMotorPosPtr()[spotSlot];
+    qDebug()<<sizePos;
     int  color_Circl_Motor_Steps=profile.motorRange(UsbDev::DevCtl::MotorId_Color).second-profile.motorRange(UsbDev::DevCtl::MotorId_Color).first;
     int  spot_Circl_Motor_Steps=profile.motorRange(UsbDev::DevCtl::MotorId_Light_Spot).second-profile.motorRange(UsbDev::DevCtl::MotorId_Light_Spot).first;
     {
@@ -350,6 +350,9 @@ void DeviceOperation::adjustCastLight()
     int color=DeviceSettings::getSingleton()->m_castLightTargetColor;
     int size=DeviceSettings::getSingleton()->m_castLightTargetSize;
     setCursorColorAndCursorSize(color,size);
+    qDebug()<<m_config.xMotorPosForLightCorrectionRef();
+    qDebug()<<m_config.yMotorPosForLightCorrectionRef();
+    qDebug()<<m_config.focalLengthMotorPosForLightCorrectionRef();
     moveToAdjustLight(m_config.xMotorPosForLightCorrectionRef(),m_config.yMotorPosForLightCorrectionRef(),m_config.focalLengthMotorPosForLightCorrectionRef());
     waitForSomeTime(100);
     waitMotorStop({UsbDev::DevCtl::MotorId_Color,
@@ -360,6 +363,7 @@ void DeviceOperation::adjustCastLight()
                    });
     waitForSomeTime(200);
     openShutter(65535);
+    m_currentCastLightDA=m_config.castLightADPresetRef()+DeviceSettings::getSingleton()->m_castLightDAChanged;
     m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA);
     waitForSomeTime(200);
     m_castLightAdjustStatus=2;
@@ -466,7 +470,7 @@ void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSiz
         m_devCtl->sendDynamicData(totalframe,totalframe-1,dataLen,&dotArr[stepPerFrame*3*(totalframe-1)]);     //最后一帧
     waitForSomeTime(1000);
     qDebug()<<("开始移动");
-    auto config=DeviceData::getSingleton()->m_config;
+    auto config=m_config;
     if(m_isDeviceReady)
     {
         waitForSomeTime(100);
@@ -905,7 +909,7 @@ void DeviceOperation::workOnNewFrameData()
                 {
                     motorPos[0]=-pupilDeviation.x()*step;
                     m_devCtl->moveChinMotors(sps,motorPos,UsbDev::DevCtl::MoveMethod::Relative);
-                    m_autoPupilElapsedTime=2000;
+                    m_autoPupilElapsedTime=200;
                 }
                 else
                 {
@@ -916,7 +920,7 @@ void DeviceOperation::workOnNewFrameData()
                 {
                     motorPos[1]=pupilDeviation.y()*step;
                     m_devCtl->moveChinMotors(sps,motorPos,UsbDev::DevCtl::MoveMethod::Relative);
-                    m_autoPupilElapsedTime=2000;
+                    m_autoPupilElapsedTime=200;
                 }
                 else
                 {
@@ -954,6 +958,7 @@ void DeviceOperation::workOnNewConfig()
 {
     qDebug()<<"work on new config";
     m_config=m_devCtl->config();
+
     if(!m_isDeviceReady&&!m_profile.isEmpty()&&!m_config.isEmpty())
     {
         setIsDeviceReady(true);
@@ -986,6 +991,10 @@ void DeviceOperation::workOnWorkStatusChanged(int status)
         connect(m_devCtl.data(),&UsbDev::DevCtl::newFrameData,this,&DeviceOperation::workOnNewFrameData);
         connect(m_devCtl.data(),&UsbDev::DevCtl::newProfile,this,&DeviceOperation::workOnNewProfile);
         connect(m_devCtl.data(),&UsbDev::DevCtl::newConfig,this,&DeviceOperation::workOnNewConfig);
+        if(DeviceSettings::getSingleton()->m_useLocalConfig)
+            m_config=DeviceData::getSingleton()->m_config;
+        else
+            m_devCtl->readConfig();
 //        waitForSomeTime(8000);                                          //目前config获取会导致阻塞 所以需要多等一下
 //        adjustCastLight();
     }

@@ -443,7 +443,11 @@ float DevicePupilProcessor::caculatePupilDiameter(QPointF topLeft,QPointF bottom
 
 int DevicePupilProcessor::caculateFixationDeviation(QVector<QPointF> pupil, QVector<QPointF> reflectionDot)
 {
-    return 0;
+    auto middleDot=reflectionDot[1];
+    double distX=pupil[0].x()-middleDot.x();
+    double distY=pupil[0].y()-(middleDot.y()-DeviceSettings::getSingleton()->m_pixelDistFromPupilCenterToMiddleReflectionDot);
+    auto deviation=qRound(sqrt(distX*distX+distY*distY)*DeviceSettings::getSingleton()->m_pupilDeviationPixelToNumberConstant);
+    return deviation;
 }
 
 void DevicePupilProcessor::clearData()

@@ -18,6 +18,7 @@ public:
 
     QString m_VID,m_PID;
     QJsonObject m_rootObj;
+    bool m_useLocalConfig;
     int m_pupilAutoAlignPixelTolerance;
     int m_castLightDADifference;
     int m_castLightTagetDA;
@@ -38,8 +39,9 @@ public:
     int m_pupilReflectionDotLimit;
     double m_pupilPixelDiameterMaxLimit;
     double m_pupilPixelDiameterMinLimit;
+    int m_pixelDistFromPupilCenterToMiddleReflectionDot;
     double m_pupilDiameterPixelToMillimeterConstant;
-    double m_pupilDiameterPixelToFixationDeviationConstant;
+    double m_pupilDeviationPixelToNumberConstant;
     static QSharedPointer<DeviceSettings> getSingleton();
     static QSharedPointer<DeviceSettings> m_singleton;
 

@@ -176,7 +176,7 @@ void   DevCtl_Worker :: init( bool req_emit )
             emit updateInfo("connection succeed.");
             this->cmd_ClearCache();
             this->cmd_ReadProfile( req_emit );
-//            this->cmd_ReadConfig (req_emit);                          //以后要加上
+//            this->cmd_ReadConfig (req_emit);                          //这个还是改成主动读取,方便调试软件设置config
         } else {
             m_wks = DevCtl::WorkStatus_E_UnExpected;
             if ( req_emit ) { emit this->workStatusChanged( DevCtl::WorkStatus_E_UnExpected ); }
@@ -319,8 +319,10 @@ bool   DevCtl_Worker :: cmd_ReadConfig( bool req_emit )
     if ( ret&&this->isDeviceWork()) {
         updateInfo("recv. config data succeeded.");
         updateIOInfo(QString("Config R:")+buffToQStr(reinterpret_cast<const char*>(dataPtr),Config::dataLen()));
-        Config config( QByteArray::fromRawData( reinterpret_cast<const char*>(dataPtr), sizeof(Config::dataLen())));
-        if ( ! config.isEmpty()) { if ( req_emit ){ emit this->newConfig(config); }}
+        auto ba=QByteArray::fromRawData( reinterpret_cast<const char*>(dataPtr), Config::dataLen());
+        Config config(ba );
+        if ( ! config.isEmpty())
+        { if ( req_emit ){ emit this->newConfig(config); }}
         m_config = config;
     }
     delete [] dataPtr;
@@ -965,6 +967,8 @@ static DevCtlPriv *  gCreateDevCtlPriv( DevCtl *dev, quint32 vid_pid, quint32 cf
     QObject::connect( priv, SIGNAL(updateIOInfo(QString)), dev, SIGNAL(updateIOInfo(QString)));
     QObject::connect( priv, SIGNAL(updateRefreshInfo(QString)), dev, SIGNAL(updateRefreshInfo(QString)));
     QObject::connect( priv, SIGNAL(updateRefreshIOInfo(QString)), dev, SIGNAL(updateRefreshIOInfo(QString)));
+
+
     return priv;
 }
 
@@ -991,6 +995,9 @@ DevCtl :: DevCtl( quint32 vid_pid, quint32 cfg_id, bool )
         Q_RETURN_ARG( int, wks )
     );
     T_PrivPtr( m_obj )->workStatus() = static_cast<DevCtl::WorkStatus>( wks );
+
+
+    connect(this,&DevCtl::newConfig,[&](){qDebug()<<"OOOOOOOOOOOOOOO";});
 }
 
 // ============================================================================
