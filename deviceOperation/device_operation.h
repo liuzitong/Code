@@ -35,6 +35,7 @@ class DEVICEOPERATIONSHARED_EXPORT DeviceOperation:public QObject
     Q_PROPERTY(bool isDeviceReady READ getIsDeviceReady WRITE setIsDeviceReady NOTIFY isDeviceReadyChanged)
     Q_PROPERTY(int castLightAdjustStatus READ getCastLightAdjustStatus WRITE setCastLightAdjustStatus NOTIFY castLightAdjustStatusChanged)
     Q_PROPERTY(bool pupilDiameter READ getPupilDiameter WRITE setPupilDiameter NOTIFY pupilDiameterChanged)
+    Q_PROPERTY(bool envLightAlarm READ getEnvLightAlarm WRITE setEnvLightAlarm NOTIFY envLightAlarmChanged)
 
 public:
 
@@ -45,6 +46,12 @@ public:
         Up,
         Down,
         Stop,
+    };
+
+    enum class BackgroundLight
+    {
+        yellow,
+        white
     };
 
     DeviceOperation();
@@ -60,7 +67,7 @@ public:
     static QSharedPointer<DeviceOperation> getSingleton();
     void connectDev();
     void disconnectDev();
-    void connectOrdisConnectDev();
+//    void connectOrdisConnectDev();
     void getReadyToStimulate(QPointF loc,int spotSize,int DB,bool isMainDotInfoTable);
     void adjustCastLight();
     void dynamicStimulate(QPointF begin, QPointF end, int cursorSize,int speedLevel,bool isMainDotInfoTable);
@@ -81,6 +88,7 @@ public:
     void dimDownCastLight();
     void resetMotors(QVector<UsbDev::DevCtl::MotorId> motorIDs);
     void beep();
+    void alarm();
     void clearPupilData();
 
 private:
@@ -98,14 +106,16 @@ signals:
     void newProfile();
     void newConfig();
     void updateDevInfo(QString info);
+
 public:
     bool getAutoAlignPupil(){return m_autoAlignPupil;}void setAutoAlignPupil(bool value){m_autoAlignPupil=value;emit autoAlignPupilChanged();}Q_SIGNAL void autoAlignPupilChanged();
     bool getIsDeviceReady(){return m_isDeviceReady;}void setIsDeviceReady(bool value){if(m_isDeviceReady!=value){m_isDeviceReady=value;emit isDeviceReadyChanged();}}Q_SIGNAL void isDeviceReadyChanged();
+    bool getEnvLightAlarm(){return m_envLightAlarm;}void setEnvLightAlarm(bool value){if(m_envLightAlarm!=value){m_envLightAlarm=value;emit envLightAlarmChanged();}}Q_SIGNAL void envLightAlarmChanged();
     float getPupilDiameter(){return m_devicePupilProcessor.m_pupilDiameter;}void setPupilDiameter(float value){m_devicePupilProcessor.m_pupilDiameter=value;emit pupilDiameterChanged();}Q_SIGNAL void pupilDiameterChanged();
     int getCastLightAdjustStatus(){return m_castLightAdjustStatus;}void setCastLightAdjustStatus(int value){m_castLightAdjustStatus=value;emit castLightAdjustStatusChanged();}Q_SIGNAL void castLightAdjustStatusChanged();
 public:
     DevicePupilProcessor m_devicePupilProcessor;
-    Status m_status;
+    Status m_status={-1,-1};
     QElapsedTimer m_workStatusElapsedTimer;
     bool m_isDeviceReady=false;
     bool m_autoAlignPupil=true;
@@ -139,15 +149,17 @@ public:
     bool m_castLightUp=true;
     QByteArray m_frameRawData;
     QMutex m_frameRawDataLock;
+    BackgroundLight m_backgroundLight;
 //    int m_stimulationTime=180;
 //    bool m_pupilDiameterAcquired;
 
 private:
     QElapsedTimer m_autoPupilElapsedTimer;
     int m_autoPupilElapsedTime=200;
-    QTimer m_connectTimer;
-    QTimer m_videoTimer;
+//    QElapsedTimer m_reconnectTimer;
+//    QTimer m_videoTimer;
     QElapsedTimer m_castLightAdjustElapsedTimer;
+    bool m_envLightAlarm=false;
 
 
     bool m_isMainTable;

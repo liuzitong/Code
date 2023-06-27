@@ -37,18 +37,25 @@ Item{
 
     function setTip()
     {
-        if(dynamicSelectedDotsReady)
-            tip="";
+        if(currentProgram.type===2)
+        {
+            if(dynamicSelectedDotsReady)
+                tip="";
+            else
+            {
+                switch(currentProgram.params.strategy)
+                {
+                case 0:
+                case 1:tip="";break;
+                case 2:tip="Choose one dot,Left click to add dot,right click to remove last selected dot.";break;
+                case 3:tip="Choose two dots,two dots must inside same circle.Left click to add dot,right click to remove last selected dot.";break;
+                default:break;
+                }
+            }
+        }
         else
         {
-            switch(currentProgram.params.strategy)
-            {
-            case 0:
-            case 1:tip="";break;
-            case 2:tip="Choose one dot,Left click to add dot,right click to remove last selected dot.";break;
-            case 3:tip="Choose two dots,two dots must inside same circle.Left click to add dot,right click to remove last selected dot.";break;
-            default:break;
-            }
+            tip="";
         }
     }
 
@@ -96,7 +103,7 @@ Item{
             if(currentProgram.params.dynamicDistance===2) dynamicCircleRadius=15;
         }
         resetInputDot();
-        if(currentProgram.type===2) setTip();
+        setTip();
         displayCanvas.requestPaint();
     }
     onOs_odChanged:

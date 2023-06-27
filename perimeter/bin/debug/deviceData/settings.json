@@ -5,11 +5,11 @@
     "beepDuration": 200,
     "beepInterval": 200,
     "castLightDAChangeStep": 10,
-    "castLightDAChanged": 180,
+    "castLightDAChanged": 150,
     "castLightDADifference": 50,
-    "castLightLastAdjustedDate": "2023/06/26",
-    "castLightTargetDA": 15000,
+    "castLightLastAdjustedDate": "2023/06/27",
     "castLightTargetColor": 0,
+    "castLightTargetDA": 15000,
     "castLightTargetSize": 5,
     "colorToSlot": [
         {
@@ -50,7 +50,7 @@
     "pupilDeviationPixelToNumberConstant": 0.5,
     "pupilDiameterPixelToMillimeterConstant": 0.171875,
     "pupilGreyLimit": 60,
-    "pupilPixelDiameterMaxLimit": 0.15,
+    "pupilPixelDiameterMaxLimit": 0.18,
     "pupilPixelDiameterMinLimit": 0.03,
     "pupilReflectionDotLimit": 150,
     "spotSizeToSlot": [

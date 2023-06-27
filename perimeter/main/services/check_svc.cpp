@@ -26,6 +26,7 @@ public:
     int m_checkedCount,m_totalCount;   //只计算通常点数,短周期,中心点,以及周期测试不计入内.m_checkedCount=m_totalCount就测试完成.在doWork里面结束测试循环.
     int *m_checkState;
     bool m_error=false;
+    bool m_reqPause=false;
     bool m_measurePupilDiameter;
     QString m_errorInfo;
     QSharedPointer<UtilitySvc> m_utilitySvc=UtilitySvc::getSingleton();
@@ -226,10 +227,12 @@ public slots:
 
     void connectDev()
     {
+        DevOps::DeviceOperation::getSingleton()->m_connectDev=true;
         DevOps::DeviceOperation::getSingleton()->connectDev();    //连接设备
     }
     void disconnectDev()
     {
+        DevOps::DeviceOperation::getSingleton()->m_connectDev=false;
         DevOps::DeviceOperation::getSingleton()->disconnectDev();    //连接设备
     }
     void doWork();
@@ -1247,9 +1250,13 @@ void StaticCheck::checkWaiting()
         m_deviceOperation->beep();
         if(m_programModel->m_params.commonParams.fixationMonitor==FixationMonitor::alarmAndPause)
         {
-            while(m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation>UtilitySvc::getSingleton()->m_deviationLimit)
+            if(m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation>UtilitySvc::getSingleton()->m_deviationLimit)
             {
-                QApplication::processEvents();
+                m_reqPause=true;
+            }
+            else
+            {
+                m_reqPause=false;
             }
         }
     }
@@ -1632,10 +1639,11 @@ void CheckSvcWorker::initialize()
 //        connect(deviceOperation,&DevOps::DeviceOperation::pupilDiameterChanged,[&](){((DynamicCheck*)m_check.data())->m_resultModel->m_data.pupilDiameter=deviceOperation->m_pupilDiameter;emit checkResultChanged();});
 //        UtilitySvc::wait(2000);    //等几秒启动
     }
-
+    auto deviceOperation=DevOps::DeviceOperation::getSingleton();
+//
 //    m_check->m_deviceOperation->setPupilDiameter(-1.0);
-    m_check->m_deviceOperation->clearPupilData();
-    m_check->m_deviceOperation->lightUpCastLight();
+    deviceOperation->clearPupilData();
+    deviceOperation->lightUpCastLight();
 }
 
 void CheckSvcWorker::prepareToCheck()
@@ -1743,6 +1751,12 @@ void CheckSvcWorker::doWork()
                 if(m_check->m_checkedCount==m_check->m_totalCount) setCheckState(4);
 
             }
+            if(m_check->m_reqPause)
+            {
+                setCheckState(2);
+                m_check->m_reqPause=false;
+            }
+
             emit checkedCountChanged(m_check->m_checkedCount);
             emit checkResultChanged();
             QApplication::processEvents();
@@ -1803,6 +1817,7 @@ CheckSvc::CheckSvc(QObject *parent)
     m_worker->m_timer.moveToThread(&m_workerThread);
     m_worker->m_measurePupilDeviation=m_measurePupilDeviation;
     m_worker->m_measurePupilDiameter=m_measurePupilDiameter;
+
     DevOps::DeviceOperation::getSingleton()->moveToThread(&m_workerThread);
     connect(m_worker,&CheckSvcWorker::checkResultChanged,this, &CheckSvc::checkResultChanged);
     connect(m_worker,&CheckSvcWorker::checkStateChanged,this, &CheckSvc::checkStateChanged);
@@ -1822,8 +1837,24 @@ CheckSvc::CheckSvc(QObject *parent)
     });
     connect(m_worker,&CheckSvcWorker::readyToCheck,[&](bool isReady){setReadyToCheck(isReady);});
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::isDeviceReadyChanged,this,&CheckSvc::devReadyChanged);
+//    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::isDeviceReadyChanged,[&](){
+//        if(DevOps::DeviceOperation::getSingleton().data()->m_isDeviceReady)
+//        {
+//            qDebug()<<"********************now it's ready";
+//        }
+//        else
+//        {
+//             qDebug()<<"********************now it's not not ready";
+//        }
+
+//    });
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::castLightAdjustStatusChanged,this,&CheckSvc::castLightAdjustStatusChanged);
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::pupilDiameterChanged,this,&CheckSvc::pupilDiameterChanged);
+    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::envLightAlarmChanged,this,&CheckSvc::envLightAlarmChanged);
+    connect(this,&CheckSvc::envLightAlarmChanged,[&](){
+        qDebug()<<getEnvLightAlarm();
+    });
+    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::isDeviceReadyChanged,[&](){if(m_checkState==1) m_checkState=2;});
     connect(&m_castLightDimdownTimer,&QTimer::timeout,[&]()
     {
         if(m_checkState>=3)
@@ -1990,6 +2021,11 @@ void Perimeter::CheckSvc::setInputDots(QVariantList value)
         auto y=i.toMap()["y"].toFloat();
         m_dynamicSelectedDots.push_back({x,y});
     }
+}
+
+bool CheckSvc::getEnvLightAlarm()
+{
+    return DevOps::DeviceOperation::getSingleton()->getEnvLightAlarm();
 }
 
 

@@ -19,7 +19,6 @@ public:
     int findWhiteYLine(QByteArray data,int x,int y);
     QVector<int> findWhiteDot(QByteArray data,int x,int y,int x1,int y1);
 
-
     void processData(uchar* data,int width,int height);
     QVector<QPointF> caculatePupil(uchar* ba,int width,int height);
     QVector<QPointF> caculateReflectingDot(uchar* ba,int width,int height);

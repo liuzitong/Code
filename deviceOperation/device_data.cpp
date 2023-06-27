@@ -23,7 +23,9 @@ DeviceData::DeviceData()
 {
     auto settings=DeviceSettings::getSingleton();
     QString configPath=settings->localConfigPath;
+    qDebug()<<configPath;
     QString dataPath=settings->localDataPath;
+    qDebug()<<dataPath;
     if(!readLocalConfig(configPath)) qDebug()<<"read config error!";
     if(!readLocalData(dataPath)) qDebug()<<"read local data error!";
 //    qDebug()<<m_config.shutterOpenPosRef();
@@ -53,7 +55,7 @@ bool DeviceData::readLocalConfig(QString filePath)
             {
                 return false;
             }
-            memcpy(m_config.dataPtr(),data,m_config.dataLen());
+            m_config=UsbDev::Config(data);
         }
         file.flush();
         file.close();

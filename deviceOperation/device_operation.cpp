@@ -23,52 +23,38 @@ QSharedPointer<DeviceOperation> DeviceOperation::m_singleton=nullptr;
 
 DeviceOperation::DeviceOperation()
 {
-//    m_config=DeviceData::getSingleton()->m_config;
-    m_connectTimer.setInterval(120000);
-    connect(&m_connectTimer,&QTimer::timeout,this,&DeviceOperation::connectOrdisConnectDev);
-    m_connectTimer.start();
-//    m_videoTimer.start(500);
+//    connect(&m_connectTimer,&QTimer::timeout,this,&DeviceOperation::connectDev);
     connect(this,&DeviceOperation::updateDevInfo,[](QString str){qDebug()<<str;});
 
     m_workStatusElapsedTimer.start();
     m_autoPupilElapsedTime=100;
     m_autoPupilElapsedTimer.start();
+//    m_reconnectTimer.start();
 }
 
 
 DeviceOperation::~DeviceOperation()
 {
-    m_connectTimer.stop();
+//    m_connectTimer.stop();
 }
 
 //被checkSvcWorker 调用
 void DeviceOperation::connectDev()
 {
-    m_status={-1,-1};
-    m_connectDev=true;
-    connectOrdisConnectDev();
-}
-
-void DeviceOperation::disconnectDev()
-{
-    m_connectDev=false;
-}
-
-void DeviceOperation::connectOrdisConnectDev()
-{
-    if(m_connectDev&&m_devCtl==nullptr)
+    if(m_devCtl==nullptr)
     {
-        updateDevInfo("connecting.\n");
+        updateDevInfo("connecting.");
         auto deviceSettings=DeviceSettings::getSingleton();
         quint32 vid_pid=deviceSettings->m_VID.toInt(nullptr,16)<<16|deviceSettings->m_PID.toInt(nullptr,16);
         m_devCtl.reset(UsbDev::DevCtl::createInstance(vid_pid));
         connect(m_devCtl.data(),&UsbDev::DevCtl::workStatusChanged,this,&DeviceOperation::workOnWorkStatusChanged);
     }
-    if(!m_connectDev&&m_devCtl!=nullptr)
-    {
-        m_devCtl.reset(nullptr);
-        setIsDeviceReady(false);
-    }
+}
+
+void DeviceOperation::disconnectDev()
+{
+    m_devCtl.reset(nullptr);
+    setIsDeviceReady(false);
 }
 
 
@@ -174,13 +160,13 @@ void DeviceOperation::setLamp(LampId id, int index, bool onOff)
     int da=0;
     if(onOff)
     {
-        auto config=DeviceData::getSingleton()->m_config;
+        auto config=m_config;
         switch (id)
         {
         case LampId::LampId_centerFixation:da=config.centerFixationLampDARef();break;
         case LampId::LampId_bigDiamond:da=config.bigDiamondfixationLampDAPtr()[index];break;
         case LampId::LampId_smallDiamond:da=config.smallDiamondFixationLampDAPtr()[index];break;
-        case LampId::LampId_yellowBackground:da=config.yellowBackgroundLampDARef();break;
+        case LampId::LampId_yellowBackground:da=config.yellowBackgroundLampDARef();m_backgroundLight=BackgroundLight::yellow;break;
         case LampId::LampId_centerInfrared:da=config.centerFixationLampDARef();break;
         case LampId::LampId_borderInfrared:da=config.borderInfraredLampDARef();break;
         case LampId::LampId_eyeglassInfrared:da=config.eyeglassFrameLampDARef();break;
@@ -195,10 +181,13 @@ void DeviceOperation::setLamp(LampId id, int index, bool onOff)
 void DeviceOperation::setWhiteLamp(bool onOff)
 {
     if(!m_isDeviceReady) return;
-    auto config=DeviceData::getSingleton()->m_config;
-    auto whiteLampDaPtr=config.whiteBackgroundLampDAPtr();
+//    auto config=DeviceData::getSingleton()->m_config;
+    auto whiteLampDaPtr=m_config.whiteBackgroundLampDAPtr();
     if(onOff)
+    {
         m_devCtl->setWhiteLamp(whiteLampDaPtr[0],whiteLampDaPtr[1],whiteLampDaPtr[2]);
+        m_backgroundLight=BackgroundLight::white;
+    }
     else
         m_devCtl->setWhiteLamp(0,0,0);
 }
@@ -626,6 +615,14 @@ void DeviceOperation::beep()
     }
 }
 
+void DeviceOperation::alarm()
+{
+    if(m_isDeviceReady)
+    {
+        m_devCtl->beep(5,100,100);
+    }
+}
+
 void DeviceOperation::clearPupilData()
 {
     m_devicePupilProcessor.clearData();
@@ -645,7 +642,7 @@ void DeviceOperation::workOnNewStatuData()
     auto eyeglassStatus=m_statusData.eyeglassStatus();
     if(m_isAtCheckingPage)
     {
-        if(!m_eyeglassIntialize)
+        if(!m_eyeglassIntialize)   //开红外
         {
             setLamp(LampId::LampId_centerInfrared,0,true);
             setLamp(LampId::LampId_eyeglassInfrared,0,eyeglassStatus);
@@ -664,8 +661,23 @@ void DeviceOperation::workOnNewStatuData()
             setLamp(LampId::LampId_borderInfrared,0,!eyeglassStatus);
             std::cout<<"open borderInfrared infrared:"<<!eyeglassStatus<<std::endl;
         }
+
+
+        int envLightAlarmDA;
+        if(m_backgroundLight==BackgroundLight::white)
+        {
+            envLightAlarmDA=m_config.environmentAlarmLightDAPtr()[0];
+        }
+        else
+        {
+            envLightAlarmDA=m_config.environmentAlarmLightDAPtr()[1];
+        }
+//        qDebug()<<envLightAlarmDA;
+//        qDebug()<<m_statusData.envLightDA();
+
+        setEnvLightAlarm(m_statusData.envLightDA()>envLightAlarmDA);
     }
-    else if(m_eyeglassIntialize)
+    else if(m_eyeglassIntialize)        //关红外
     {
         setLamp(LampId::LampId_centerInfrared,0,false);
         setLamp(LampId::LampId_eyeglassInfrared,0,false);
@@ -673,7 +685,6 @@ void DeviceOperation::workOnNewStatuData()
         m_eyeglassIntialize=false;
         std::cout<<"close allInfrared infrared"<<std::endl;
     }
-
 
 
     if(m_statusData.answerpadStatus()&&m_isWaitingForStaticStimulationAnswer)
@@ -877,7 +888,7 @@ void DeviceOperation::workOnNewFrameData()
     if(m_devicePupilProcessor.m_pupilResValid)
     {
         QPainter painter(&img);
-        painter.setPen(Qt::red);
+        painter.setPen(QPen{Qt::red,2});
         painter.drawEllipse(m_devicePupilProcessor.m_pupilCenterPoint,m_devicePupilProcessor.m_pupilDiameterPix/2,m_devicePupilProcessor.m_pupilDiameterPix/2);
         if(m_devicePupilProcessor.m_reflectionResValid)
         {
@@ -978,7 +989,7 @@ void DeviceOperation::workOnNewConfig()
 
 void DeviceOperation::workOnWorkStatusChanged(int status)
 {
-    if(m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_OK)
+    if(m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_ConnectToDev)
     {
         qDebug()<<"in connecting.";
     }
@@ -986,6 +997,7 @@ void DeviceOperation::workOnWorkStatusChanged(int status)
     {
         qDebug()<<"Connect Successfully.";
         updateDevInfo("Connect Successfully.");
+//        m_connectTimer.stop();
         connect(m_devCtl.data(),&UsbDev::DevCtl::updateInfo,this,&DeviceOperation::updateDevInfo);
         connect(m_devCtl.data(),&UsbDev::DevCtl::newStatusData,this,&DeviceOperation::workOnNewStatuData);
         connect(m_devCtl.data(),&UsbDev::DevCtl::newFrameData,this,&DeviceOperation::workOnNewFrameData);
@@ -998,8 +1010,9 @@ void DeviceOperation::workOnWorkStatusChanged(int status)
 //        waitForSomeTime(8000);                                          //目前config获取会导致阻塞 所以需要多等一下
 //        adjustCastLight();
     }
-    else if(m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_Disconnected||m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_Disconnected)
+    else if(/*m_reconnectTimer.elapsed()>=10000&&*/(m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_Disconnected||m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_Disconnected))
     {
+        qDebug()<<"Disconnected";
         if(m_devCtl!=nullptr)
         {
             disconnect(m_devCtl.data(),&UsbDev::DevCtl::workStatusChanged,this,&DeviceOperation::workOnWorkStatusChanged);
@@ -1011,6 +1024,12 @@ void DeviceOperation::workOnWorkStatusChanged(int status)
             m_devCtl.reset(nullptr);
         }
         setIsDeviceReady(false);
+//        m_reconnectTimer.restart();
+        if(m_connectDev)
+        {
+            waitForSomeTime(10000);
+            connectDev();
+        }
     }
     emit workStatusChanged();
 }
