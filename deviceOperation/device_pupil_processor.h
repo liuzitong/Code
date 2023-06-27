@@ -34,6 +34,8 @@ public:
     QVector<float> m_pupilDiameterArr;
     QVector<QPointF> m_reflectionDot;
     bool m_pupilResValid,m_reflectionResValid;
+    int m_pupilGreyLimit;
+    int m_pupilReflectionDotWhiteLimit;
 //    bool m_pupilDataGet;
 };
 }

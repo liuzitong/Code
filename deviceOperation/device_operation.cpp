@@ -969,6 +969,11 @@ void DeviceOperation::workOnNewConfig()
 {
     qDebug()<<"work on new config";
     m_config=m_devCtl->config();
+    m_devicePupilProcessor.m_pupilGreyLimit=m_config.pupilGreyThresholdDAPtr()[0];
+    m_devicePupilProcessor.m_pupilReflectionDotWhiteLimit=m_config.pupilGreyThresholdDAPtr()[1];
+    qDebug()<<m_devicePupilProcessor.m_pupilGreyLimit;
+    qDebug()<<m_devicePupilProcessor.m_pupilReflectionDotWhiteLimit;
+
 
     if(!m_isDeviceReady&&!m_profile.isEmpty()&&!m_config.isEmpty())
     {

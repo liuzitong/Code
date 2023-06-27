@@ -27,7 +27,7 @@ public:
     int *m_checkState;
     bool m_error=false;
     bool m_reqPause=false;
-    bool m_measurePupilDiameter;
+//    bool m_measurePupilDiameter;
     QString m_errorInfo;
     QSharedPointer<UtilitySvc> m_utilitySvc=UtilitySvc::getSingleton();
     QSharedPointer<DevOps::DeviceOperation> m_deviceOperation=DevOps::DeviceOperation::getSingleton();
@@ -303,6 +303,7 @@ void StaticCheck::resetData()
     m_lastCheckDotRecord.clear();
     m_lastCheckeDotType.clear();
     m_checkCycleDotList.clear();
+
 
     auto fixedParams=m_resultModel->m_params.fixedParams;
     m_fiaxationViewLossCyc=qrand()%fixedParams.fixationViewLossCycle;
@@ -607,6 +608,7 @@ void StaticCheck::stimulate()
         m_deviceOperation->openShutter(durationTime);
         emit currentCheckingDotChanged(debug_Loc);
         std::cout<<"***** DB shi:"<<debug_DB<<"    "<<"zuo biao x:"<<debug_Loc.x()<<" "<<"zuobiao y:"<<debug_Loc.y()<<"    yong shi:"<<m_stimulationWaitingForAnswerElapsedTimer.elapsed()<<"   deviation:"<<m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation<<std::endl;
+        qDebug()<<m_resultModel->m_data.fixationDeviation;
         switch (lastCheckedDotType)
         {
         case LastCheckedDotType::blindDotTest:
@@ -616,6 +618,7 @@ void StaticCheck::stimulate()
         {
             if(m_measurePupilDeviation)
                 m_resultModel->m_data.fixationDeviation.push_back(m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation);
+
             uint dotIndex=m_lastCheckDotRecord[0]->index;
             m_resultModel->m_data.realTimeDB[dotIndex]=m_lastCheckDotRecord[0]->StimulationDBs.toStdVector(); //在check初始化的时候扩充了大小.
             if(dotIndex<m_programModel->m_data.dots.size()||dotIndex==2*m_programModel->m_data.dots.size())
@@ -632,10 +635,12 @@ void StaticCheck::stimulate()
     else
     {
         m_deviceOperation->waitForSomeTime(durationTime);           //假阳
+        if(m_measurePupilDeviation)
+            m_resultModel->m_data.fixationDeviation.push_back(-m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation);
         emit currentCheckingDotChanged({999,999});
-        m_resultModel->m_data.fixationDeviation.push_back(-m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation);
         std::cout<<"***** jiayang"<<"zuo biao x:"<<debug_Loc.x()<<" "<<"zuobiao y:"<<debug_Loc.y()<<"    yong shi:"<<m_stimulationWaitingForAnswerElapsedTimer.elapsed()<<std::endl;
     }
+
     m_deviceOperation->m_isWaitingForStaticStimulationAnswer=true;
     m_stimulationWaitingForAnswerElapsedTimer.restart();
 }
@@ -1659,17 +1664,20 @@ void CheckSvcWorker::prepareToCheck()
         connect(((StaticCheck*)m_check.data()),&StaticCheck::nextCheckingDotChanged,this,&CheckSvcWorker::nextCheckingDotChanged);
         connect(this,&CheckSvcWorker::measureDeviationChanged,m_check.data(),[&](bool value)
         {
+            std::cout<<"hahahaahah"<<std::endl;
             ((StaticCheck*)m_check.data())->m_measurePupilDeviation=value;
             if(((StaticCheck*)m_check.data())->m_resultModel!=nullptr)
                 ((StaticCheck*)m_check.data())->m_resultModel->m_data.fixationDeviation.clear();
+            emit checkResultChanged();
         });
         ((StaticCheck*)m_check.data())->m_measurePupilDeviation=m_measurePupilDeviation;
-        connect(this,&CheckSvcWorker::measurePupilChanged,m_check.data(),[&](bool value){
-            ((StaticCheck*)m_check.data())->m_measurePupilDiameter=value;
-            if(((StaticCheck*)m_check.data())->m_resultModel!=nullptr)
-                ((StaticCheck*)m_check.data())->m_resultModel->m_data.pupilDiameter=0;
-        });
-        m_check->m_measurePupilDiameter=m_measurePupilDeviation;
+//        connect(this,&CheckSvcWorker::measurePupilChanged,m_check.data(),[&](bool value){
+//            ((StaticCheck*)m_check.data())->m_measurePupilDiameter=value;
+//            if(((StaticCheck*)m_check.data())->m_resultModel!=nullptr)
+//                ((StaticCheck*)m_check.data())->m_resultModel->m_data.pupilDiameter=0;
+//            emit checkResultChanged();
+//        });
+//        m_check->m_measurePupilDiameter=m_measurePupilDeviation;
         auto cursorSize=((StaticCheck*)m_check.data())->m_programModel->m_params.commonParams.cursorSize;
         auto cursorColor=((StaticCheck*)m_check.data())->m_programModel->m_params.commonParams.cursorColor;
         m_check->lightsOff();
@@ -1684,12 +1692,13 @@ void CheckSvcWorker::prepareToCheck()
         m_check->m_checkState=m_checkState;
         m_check->m_patientModel=m_patientVm->getModel();
         ((DynamicCheck*)m_check.data())->m_programModel=static_cast<DynamicProgramVm*>(m_programVm)->getModel();
-        connect(this,&CheckSvcWorker::measurePupilChanged,m_check.data(),[&](bool value){
-            ((DynamicCheck*)m_check.data())->m_measurePupilDiameter=value;
-            if(((DynamicCheck*)m_check.data())->m_resultModel!=nullptr)
-                ((DynamicCheck*)m_check.data())->m_resultModel->m_data.pupilDiameter=0;
-        });
-        m_check->m_measurePupilDiameter=m_measurePupilDeviation;
+//        connect(this,&CheckSvcWorker::measurePupilChanged,m_check.data(),[&](bool value){
+//            ((DynamicCheck*)m_check.data())->m_measurePupilDiameter=value;
+//            if(((DynamicCheck*)m_check.data())->m_resultModel!=nullptr)
+//                ((DynamicCheck*)m_check.data())->m_resultModel->m_data.pupilDiameter=0;
+//            emit checkResultChanged();
+//        });
+//        m_check->m_measurePupilDiameter=m_measurePupilDeviation;
         auto cursorSize=((DynamicCheck*)m_check.data())->m_programModel->m_params.cursorSize;
         auto cursorColor=((DynamicCheck*)m_check.data())->m_programModel->m_params.cursorColor;
         auto brightness=((DynamicCheck*)m_check.data())->m_programModel->m_params.brightness;
@@ -1781,8 +1790,11 @@ void CheckSvcWorker::doWork()
             int type=m_programVm->getType();
             m_check->finished();
             m_timer.stop();
-            auto pupilDiameter=m_check->m_deviceOperation->getPupilDiameter();
-            if(pupilDiameter<0) pupilDiameter=0;
+            double pupilDiameter=0;
+            if(m_measurePupilDiameter)
+            {
+                pupilDiameter=m_check->m_deviceOperation->getPupilDiameter();
+            }
             if(type!=2)
             {
                 static_cast<StaticCheckResultVm*>(m_checkResultVm)->getResultData()->setTestTimespan(m_time);

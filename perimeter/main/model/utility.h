@@ -9,6 +9,7 @@
 #include <QString>
 #include <sstream>
 #include <perimeter/main/model/Params.h>
+#include <QDebug>
 //#include <perimeter/main/model/utility.cpp>
 
 
@@ -32,6 +33,7 @@ public:
     template<typename T>
     T static QStringToEntity(QString str)
     {
+        qDebug()<<str;
         T t;
         std::stringstream ss;
         ss<<str.toStdString();

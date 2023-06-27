@@ -3,7 +3,7 @@
     "blindDotTestDB":10,
     "blindDotTestIncDB":5,
     "falseNegativeDecDB":10,
-    "deviationLimit":12,
+    "deviationLimit":4,
     "VFImultiplier":1.0,
     "checkFalseNegAndPos":true,
     "realTimeEyePosPicSize":"320*240",

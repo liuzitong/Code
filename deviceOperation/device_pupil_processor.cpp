@@ -191,6 +191,7 @@ void DevicePupilProcessor::processData(uchar* data, int width, int height)
 {
     auto vcPupil=caculatePupil(data,width,height);
     m_pupilResValid=vcPupil.length()>0;
+    m_pupilDeviation=6;
     if(m_pupilResValid)
     {
         m_pupilCenterPoint=vcPupil[0].toPoint();
@@ -224,8 +225,8 @@ QVector<QPointF> DevicePupilProcessor::caculatePupil(uchar* data, int width, int
 {
     auto pupilPixelDiameterMaxLimit=DeviceSettings::getSingleton()->m_pupilPixelDiameterMaxLimit;
     auto pupilPixelDiameterMinLimit=DeviceSettings::getSingleton()->m_pupilPixelDiameterMinLimit;
-    auto pupilGreyLimit=DeviceSettings::getSingleton()->m_pupilGreyLimit;
-    auto reflectionDotLimit=DeviceSettings::getSingleton()->m_pupilReflectionDotLimit;
+    auto pupilGreyLimit=m_pupilGreyLimit;
+    auto reflectionDotLimit=m_pupilReflectionDotWhiteLimit;
     float y_max=0;
     float y_min=FLT_MAX;
     float x_max=0;
@@ -326,7 +327,7 @@ QVector<QPointF> DevicePupilProcessor::caculateReflectingDot(uchar* ba, int widt
         for(int x=m_pupilCenterPoint.x()-width*0.08;x<m_pupilCenterPoint.x()+width*0.08;x++)
         {
 //            qDebug()<<quint8(ba[x+width*y]);
-            if(quint8(ba[x+width*y])>DeviceSettings::getSingleton()->m_pupilReflectionDotLimit)
+            if(quint8(ba[x+width*y])>m_pupilReflectionDotWhiteLimit)
             {
                 brightPix.append({x,y});
 //                x_vc.push_back(x);
