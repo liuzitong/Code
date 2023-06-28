@@ -5192,7 +5192,7 @@
                   </sizepolicy>
                  </property>
                  <property name="title">
-                  <string>瞳孔灰度阈值:</string>
+                  <string>瞳孔识别阈值:</string>
                  </property>
                  <layout class="QHBoxLayout" name="horizontalLayout_63">
                   <property name="leftMargin">
@@ -5210,7 +5210,7 @@
                   <item>
                    <widget class="QLabel" name="label_367">
                     <property name="text">
-                     <string>白背景光:</string>
+                     <string>瞳孔灰度:</string>
                     </property>
                    </widget>
                   </item>
@@ -5227,7 +5227,7 @@
                   <item>
                    <widget class="QLabel" name="label_366">
                     <property name="text">
-                     <string>黄背景光:</string>
+                     <string>反光点亮度:</string>
                     </property>
                    </widget>
                   </item>

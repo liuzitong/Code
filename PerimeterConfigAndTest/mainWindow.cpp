@@ -1032,7 +1032,7 @@ void MainWindow::readLocalConfig(QString filePath)
                 showDevInfo(QString("文件长度应为:")+QString::number(m_config.dataLen()));
                 return;
             }
-            memcpy(m_config.dataPtr(),data,m_config.dataLen());
+            m_config=UsbDev::Config(data);
 
         }
         file.flush();
