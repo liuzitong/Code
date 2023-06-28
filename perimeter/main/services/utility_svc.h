@@ -60,6 +60,7 @@ public:
     bool m_checkFalseNegAndPos;
     double m_VFImultiplier;
     int m_deviationLimit;
+    int m_pauseCheckDeviationCount;
     float m_checkZoneRatio;
     QSize m_realTimeEyePosPicSize;
     int m_centerPointCheckedWaitingTime;

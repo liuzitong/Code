@@ -84,6 +84,7 @@ private:
     int m_blindDotLocateIndex=0;
     int m_stimulationCount=0;                   //刺激次数到了测试盲点位置
     bool m_stimulated;
+    int m_deviationCount=0;
     QVector<DotRecord*> m_lastCheckDotRecord;
     QVector<LastCheckedDotType> m_lastCheckeDotType;
     QVector<std::tuple<LastCheckedDotType,QPointF, int>> m_checkCycleDotList;       //存储待测试盲点测试,假阴,假阳等信息
@@ -291,6 +292,7 @@ void StaticCheck::resetData()
     m_autoAdaptTime=0;
     m_blindDotLocateIndex=0;
     m_stimulationCount=0;
+    m_deviationCount=0;
     m_stimulated=false;
     m_alreadyChecked=false;
     m_isStartWithBaseDots=false;
@@ -620,6 +622,7 @@ void StaticCheck::stimulate()
                 m_resultModel->m_data.fixationDeviation.push_back(m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation);
 
             uint dotIndex=m_lastCheckDotRecord[0]->index;
+            qDebug()<<m_resultModel->m_data.realTimeDB.size();
             m_resultModel->m_data.realTimeDB[dotIndex]=m_lastCheckDotRecord[0]->StimulationDBs.toStdVector(); //在check初始化的时候扩充了大小.
             if(dotIndex<m_programModel->m_data.dots.size()||dotIndex==2*m_programModel->m_data.dots.size())
             {
@@ -797,10 +800,10 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
 
                 if(checkedRecords.size()==0) return {false,{0,0},0};
                 QVector<QVector<DotRecord>> recordsSet;
-                recordsSet.resize(maxDB/5);
+                recordsSet.resize(qRound(double(maxDB)/5));
                 for(auto& recordDot:checkedRecords)
                 {
-                    int set=(maxDB-recordDot.DB)/5;
+                    int set=qMax(qRound(double(maxDB-recordDot.DB)/5)-1,0);
                     recordsSet[set].push_back(recordDot);
                 }
 
@@ -891,11 +894,11 @@ bool StaticCheck::waitForAnswer()
             m_deviceOperation->m_staticStimulationAnswer=false;
             answer=true;
             UtilitySvc::wait(m_programModel->m_params.fixedParams.leastWaitingTime);                //最小等待时间
-            m_answeredTimes.append(m_stimulationWaitingForAnswerElapsedTimer.elapsed());
         }
         else
             QApplication::processEvents();
     }
+    m_answeredTimes.append(m_stimulationWaitingForAnswerElapsedTimer.elapsed());
     return answer;                       //超出时间应答
 }
 
@@ -1250,19 +1253,21 @@ void StaticCheck::checkWaiting()
         }
     }
 
-    if(m_programModel->m_params.commonParams.fixationMonitor==FixationMonitor::alarmAndPause||m_programModel->m_params.commonParams.fixationMonitor==FixationMonitor::onlyAlarm)
+    if(m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation>UtilitySvc::getSingleton()->m_deviationLimit&&(m_programModel->m_params.commonParams.fixationMonitor==FixationMonitor::alarmAndPause||m_programModel->m_params.commonParams.fixationMonitor==FixationMonitor::onlyAlarm))
     {
         m_deviceOperation->beep();
         if(m_programModel->m_params.commonParams.fixationMonitor==FixationMonitor::alarmAndPause)
         {
-            if(m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation>UtilitySvc::getSingleton()->m_deviationLimit)
+            m_deviationCount++;
+            if(m_deviationCount>=UtilitySvc::getSingleton()->m_pauseCheckDeviationCount)
             {
                 m_reqPause=true;
+                m_deviationCount=0;
             }
-            else
-            {
-                m_reqPause=false;
-            }
+        }
+        else
+        {
+            m_reqPause=false;
         }
     }
 

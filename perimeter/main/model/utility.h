@@ -33,7 +33,6 @@ public:
     template<typename T>
     T static QStringToEntity(QString str)
     {
-        qDebug()<<str;
         T t;
         std::stringstream ss;
         ss<<str.toStdString();

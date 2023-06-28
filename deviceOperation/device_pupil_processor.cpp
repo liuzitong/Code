@@ -191,7 +191,7 @@ void DevicePupilProcessor::processData(uchar* data, int width, int height)
 {
     auto vcPupil=caculatePupil(data,width,height);
     m_pupilResValid=vcPupil.length()>0;
-    m_pupilDeviation=6;
+    m_pupilDeviation=13;
     if(m_pupilResValid)
     {
         m_pupilCenterPoint=vcPupil[0].toPoint();

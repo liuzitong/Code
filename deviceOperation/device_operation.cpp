@@ -459,7 +459,6 @@ void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSiz
         m_devCtl->sendDynamicData(totalframe,totalframe-1,dataLen,&dotArr[stepPerFrame*3*(totalframe-1)]);     //最后一帧
     waitForSomeTime(1000);
     qDebug()<<("开始移动");
-    auto config=m_config;
     if(m_isDeviceReady)
     {
         waitForSomeTime(100);

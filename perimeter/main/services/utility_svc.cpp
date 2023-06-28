@@ -106,6 +106,7 @@ UtilitySvc::UtilitySvc()
         m_blindDotTestIncDB=jo["blindDotTestIncDB"].toInt();
         m_falseNegativeDecDB=jo["falseNegativeDecDB"].toInt();
         m_deviationLimit=jo["deviationLimit"].toInt();
+        m_pauseCheckDeviationCount=jo["pauseCheckDeviationCount"].toInt();
         m_VFImultiplier=jo["VFImultiplier"].toDouble();
         m_checkFalseNegAndPos=jo["checkFalseNegAndPos"].toBool();
         m_checkZoneRatio=jo["checkZoneRatio"].toDouble();

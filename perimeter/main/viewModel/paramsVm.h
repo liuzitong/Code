@@ -43,7 +43,7 @@ public:
     bool getCenterDotCheck(){return m_data->centerDotCheck;}void setCenterDotCheck(bool value){m_data->centerDotCheck=value;}
     bool getShortTermFluctuation(){return m_data->shortTermFluctuation;}void setShortTermFluctuation(bool value){m_data->shortTermFluctuation=value;}
     int getFixationTarget(){return int(m_data->fixationTarget);}void setFixationTarget(int value){m_data->fixationTarget=FixationTarget(value);}
-    int getFixationMonitor(){return int(m_data->fixationMonitor);}void setFixationMonitor(bool value){m_data->fixationMonitor=FixationMonitor(value);}
+    int getFixationMonitor(){return int(m_data->fixationMonitor);}void setFixationMonitor(int value){m_data->fixationMonitor=FixationMonitor(value);}
     bool getBlindDotTest(){return m_data->blindDotTest;}void setBlindDotTest(bool value){m_data->blindDotTest=value;}
 private:
     StaticParams::CommonParams* m_data;
