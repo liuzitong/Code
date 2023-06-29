@@ -249,7 +249,7 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                        width: parent.width; height:parent.parent.rowHeight;
                                        CusText{text:lt+qsTr("Eye move alarm mode"); anchors.left: parent.left; anchors.leftMargin: 0;width: parent.width*0.45;horizontalAlignment: Text.AlignLeft;font.pointSize:fontPointSize;}
                                        CusComboBox{
-                                           width: parent.width*0.5; anchors.right: parent.right;model:[lt+qsTr("No alarm"),lt+qsTr("Only alarm"),lt+qsTr("Alarm and pause")];currentIndex:currentProgram===null?0:currentProgram.params.commonParams.fixationMonitor;
+                                           width: parent.width*0.5; anchors.right: parent.right;model:[lt+qsTr("Only alarm"),lt+qsTr("Alarm and pause")];currentIndex:currentProgram===null?0:currentProgram.params.commonParams.fixationMonitor;
                                            Component.onCompleted: {idPopup.ok.connect(function(){currentProgram.params.commonParams.fixationMonitor=currentIndex;})}
                                        }
                                    }

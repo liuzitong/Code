@@ -20,7 +20,7 @@ enum class CursorColor{white,red,blue};
 enum class CursorSize{I,II,III,IV,V};
 enum class BackGroundColor{white,yellow};
 enum class FixationTarget{centerPoint,smallDiamond,bigDiamond,bottomPoint};
-enum class FixationMonitor{dontAlarm,onlyAlarm,alarmAndPause};
+enum class FixationMonitor{onlyAlarm,alarmAndPause};
 enum class Type { ThreshHold=0, Screening,Dynamic  };
 enum class Category { ThreshHold=0, Screening,Special,Dynamic,Custom  };
 

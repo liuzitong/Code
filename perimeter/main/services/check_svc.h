@@ -30,6 +30,7 @@ class CheckSvc: public QObject
     Q_PROPERTY(QString tips READ getTips WRITE setTips NOTIFY tipsChanged)
     Q_PROPERTY(bool measurePupil READ getMeasurePupil WRITE setMeasurePupil NOTIFY measurePupilChanged)
     Q_PROPERTY(bool measureDeviation READ getMeasureDeviation WRITE setMeasureDeviation NOTIFY measureDeviationChanged)
+    Q_PROPERTY(bool eyeMoveAlarm READ getEyeMoveAlarm WRITE setEyeMoveAlarm NOTIFY eyeMoveAlarmChanged)
     Q_PROPERTY(bool envLightAlarm READ getEnvLightAlarm NOTIFY envLightAlarmChanged)
 
 
@@ -77,6 +78,7 @@ public:
     QString getTips(){return m_tips;}void setTips(QString value){m_tips=value;emit tipsChanged();}Q_SIGNAL void tipsChanged();
     bool getMeasurePupil(){return m_measurePupilDiameter;}void setMeasurePupil(bool value){m_measurePupilDiameter=value;emit measurePupilChanged(value);}Q_SIGNAL void measurePupilChanged(bool value);
     bool getMeasureDeviation(){return m_measurePupilDeviation;}void setMeasureDeviation(bool value){m_measurePupilDeviation=value;emit measureDeviationChanged(value);}Q_SIGNAL void measureDeviationChanged(bool value);
+    bool getEyeMoveAlarm(){return m_eyeMoveAlarm;}void setEyeMoveAlarm(bool value){m_eyeMoveAlarm=value;emit eyeMoveAlarmChanged(m_eyeMoveAlarm);}Q_SIGNAL void eyeMoveAlarmChanged(bool value);
     bool getEnvLightAlarm();Q_SIGNAL void envLightAlarmChanged();
 //    CheckSvcWorker* getWorker(){return m_worker;}
 
@@ -92,8 +94,9 @@ private:
     QPointF m_nextCheckingDotLoc={999,999};
     bool m_readyToCheck=false;
     bool m_atCheckingPage=false;
-    bool m_measurePupilDiameter=true;
-    bool m_measurePupilDeviation=true;
+    bool m_measurePupilDiameter;
+    bool m_measurePupilDeviation;
+    bool m_eyeMoveAlarm;
 
     QList<QPointF> m_dynamicSelectedDots;
     PatientVm* m_patientVm;

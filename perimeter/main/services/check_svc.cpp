@@ -27,7 +27,8 @@ public:
     int *m_checkState;
     bool m_error=false;
     bool m_reqPause=false;
-//    bool m_measurePupilDiameter;
+    bool m_eyeMoveAlarm;
+    int m_deviationCount=0;
     QString m_errorInfo;
     QSharedPointer<UtilitySvc> m_utilitySvc=UtilitySvc::getSingleton();
     QSharedPointer<DevOps::DeviceOperation> m_deviceOperation=DevOps::DeviceOperation::getSingleton();
@@ -84,7 +85,6 @@ private:
     int m_blindDotLocateIndex=0;
     int m_stimulationCount=0;                   //刺激次数到了测试盲点位置
     bool m_stimulated;
-    int m_deviationCount=0;
     QVector<DotRecord*> m_lastCheckDotRecord;
     QVector<LastCheckedDotType> m_lastCheckeDotType;
     QVector<std::tuple<LastCheckedDotType,QPointF, int>> m_checkCycleDotList;       //存储待测试盲点测试,假阴,假阳等信息
@@ -187,6 +187,8 @@ private:
 
     void ProcessAnswer(QVector<QPointF> answerLocs,PathRecord& record);
 
+    void checkWaiting();
+
 
     // Check interface
 public:
@@ -211,6 +213,7 @@ public:
     QList<QPointF> m_dynamicSelectedDots;
     bool m_measurePupilDeviation;
     bool m_measurePupilDiameter;
+    bool m_eyeMoveAlarm;
 
 private:
     QSharedPointer<Check> m_check;
@@ -240,6 +243,7 @@ public slots:
 
     void workOnMeasureDeviationChanged(bool value){m_measurePupilDeviation=value;emit measureDeviationChanged(value);}
     void workOnMeasurePupilChanged(bool value){m_measurePupilDiameter=value;emit measurePupilChanged(value);}
+    void workOnEyeMoveAlarmChanged(bool value){m_eyeMoveAlarm=value;emit eyeMoveAlarmChanged(value);}
 
 signals:
     void checkStateChanged();
@@ -256,6 +260,7 @@ signals:
     void readyToCheck(bool isReady);
     void measureDeviationChanged(bool value);
     void measurePupilChanged(bool value);
+    void eyeMoveAlarmChanged(bool value);
 };
 
 void Check::lightsOff()
@@ -1253,7 +1258,10 @@ void StaticCheck::checkWaiting()
         }
     }
 
-    if(m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation>UtilitySvc::getSingleton()->m_deviationLimit&&(m_programModel->m_params.commonParams.fixationMonitor==FixationMonitor::alarmAndPause||m_programModel->m_params.commonParams.fixationMonitor==FixationMonitor::onlyAlarm))
+//    qDebug()<<int(m_programModel->m_params.commonParams.fixationMonitor);
+//    qDebug()<<m_eyeMoveAlarm;
+
+    if(m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation>UtilitySvc::getSingleton()->m_deviationLimit&&m_eyeMoveAlarm)
     {
         m_deviceOperation->beep();
         if(m_programModel->m_params.commonParams.fixationMonitor==FixationMonitor::alarmAndPause)
@@ -1420,6 +1428,7 @@ void DynamicCheck::Checkprocess()
     stimulate(record.beginLoc,record.endLoc);
     auto answerLoc=waitForAnswer();
     ProcessAnswer(answerLoc,record);
+    checkWaiting();
 }
 
 int DynamicCheck::getPathRecordIndex()
@@ -1609,6 +1618,44 @@ void DynamicCheck::ProcessAnswer(QVector<QPointF> answerLoc,PathRecord& record)
     }
 }
 
+void DynamicCheck::checkWaiting()
+{
+    bool isPaused=false;
+    QElapsedTimer timer;
+    timer.start();
+    while(m_deviceOperation->getAnswerPadStatus())
+    {
+        QApplication::processEvents();
+        if(timer.elapsed()>300)
+        {
+            std::cout<<"pausing";
+            isPaused=true;
+            timer.restart();
+        }
+    }
+
+    qDebug()<<int(m_programModel->m_params.fixationMonitor);
+
+    if(m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation>UtilitySvc::getSingleton()->m_deviationLimit&&m_eyeMoveAlarm)
+    {
+        m_deviceOperation->beep();
+        if(m_programModel->m_params.fixationMonitor==FixationMonitor::alarmAndPause)
+        {
+            m_deviationCount++;
+            if(m_deviationCount>=UtilitySvc::getSingleton()->m_pauseCheckDeviationCount)
+            {
+                m_reqPause=true;
+                m_deviationCount=0;
+            }
+        }
+        else
+        {
+            m_reqPause=false;
+        }
+    }
+
+}
+
 
 void DynamicCheck::finished()
 {
@@ -1669,20 +1716,12 @@ void CheckSvcWorker::prepareToCheck()
         connect(((StaticCheck*)m_check.data()),&StaticCheck::nextCheckingDotChanged,this,&CheckSvcWorker::nextCheckingDotChanged);
         connect(this,&CheckSvcWorker::measureDeviationChanged,m_check.data(),[&](bool value)
         {
-            std::cout<<"hahahaahah"<<std::endl;
             ((StaticCheck*)m_check.data())->m_measurePupilDeviation=value;
             if(((StaticCheck*)m_check.data())->m_resultModel!=nullptr)
                 ((StaticCheck*)m_check.data())->m_resultModel->m_data.fixationDeviation.clear();
             emit checkResultChanged();
         });
         ((StaticCheck*)m_check.data())->m_measurePupilDeviation=m_measurePupilDeviation;
-//        connect(this,&CheckSvcWorker::measurePupilChanged,m_check.data(),[&](bool value){
-//            ((StaticCheck*)m_check.data())->m_measurePupilDiameter=value;
-//            if(((StaticCheck*)m_check.data())->m_resultModel!=nullptr)
-//                ((StaticCheck*)m_check.data())->m_resultModel->m_data.pupilDiameter=0;
-//            emit checkResultChanged();
-//        });
-//        m_check->m_measurePupilDiameter=m_measurePupilDeviation;
         auto cursorSize=((StaticCheck*)m_check.data())->m_programModel->m_params.commonParams.cursorSize;
         auto cursorColor=((StaticCheck*)m_check.data())->m_programModel->m_params.commonParams.cursorColor;
         m_check->lightsOff();
@@ -1697,13 +1736,6 @@ void CheckSvcWorker::prepareToCheck()
         m_check->m_checkState=m_checkState;
         m_check->m_patientModel=m_patientVm->getModel();
         ((DynamicCheck*)m_check.data())->m_programModel=static_cast<DynamicProgramVm*>(m_programVm)->getModel();
-//        connect(this,&CheckSvcWorker::measurePupilChanged,m_check.data(),[&](bool value){
-//            ((DynamicCheck*)m_check.data())->m_measurePupilDiameter=value;
-//            if(((DynamicCheck*)m_check.data())->m_resultModel!=nullptr)
-//                ((DynamicCheck*)m_check.data())->m_resultModel->m_data.pupilDiameter=0;
-//            emit checkResultChanged();
-//        });
-//        m_check->m_measurePupilDiameter=m_measurePupilDeviation;
         auto cursorSize=((DynamicCheck*)m_check.data())->m_programModel->m_params.cursorSize;
         auto cursorColor=((DynamicCheck*)m_check.data())->m_programModel->m_params.cursorColor;
         auto brightness=((DynamicCheck*)m_check.data())->m_programModel->m_params.brightness;
@@ -1715,9 +1747,8 @@ void CheckSvcWorker::prepareToCheck()
         m_check->m_deviceOperation->waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y});
         connect(this,&CheckSvcWorker::stop,[&](){m_check->m_deviceOperation->stopDynamic();});
     }
-
-
-
+    connect(this,&CheckSvcWorker::eyeMoveAlarmChanged,[&](bool eyeMoveAlarm){m_check->m_eyeMoveAlarm=eyeMoveAlarm;});
+    m_check->m_eyeMoveAlarm=m_eyeMoveAlarm;
     m_check->initialize();
     UtilitySvc::wait(500);    //等几秒启动
     emit readyToCheck(true);
@@ -1843,6 +1874,7 @@ CheckSvc::CheckSvc(QObject *parent)
     connect(m_worker,&CheckSvcWorker::checkTimeChanged,this, &CheckSvc::setCheckTime);
     connect(this,&CheckSvc::measureDeviationChanged,m_worker,&CheckSvcWorker::workOnMeasureDeviationChanged);
     connect(this,&CheckSvc::measurePupilChanged,m_worker,&CheckSvcWorker::workOnMeasurePupilChanged);
+    connect(this,&CheckSvc::eyeMoveAlarmChanged,m_worker,&CheckSvcWorker::workOnEyeMoveAlarmChanged);
     connect(m_worker,&CheckSvcWorker::currentCheckingDotChanged,[&](QPointF value){m_currentCheckingDotLoc=value;emit currentCheckingDotLocChanged();});
     connect(m_worker,&CheckSvcWorker::nextCheckingDotChanged,[&](QPointF value){m_nextCheckingDotLoc=value;emit nextCheckingDotLocChanged();});
     connect(m_worker,&CheckSvcWorker::tipChanged,this,&CheckSvc::setTips);
