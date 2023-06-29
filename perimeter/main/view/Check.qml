@@ -251,7 +251,7 @@ Item {id:root; width: 1366;height: 691
                                             Row{width:parent.width;height: parent.height*0.75/3;spacing: width*0.05;
                                                 CusCheckBox{id:pupilDiameter;checked:true;visible: true;onCheckedChanged:checkSvc.measurePupil=checked;}
                                                 CusText{text:lt+qsTr("Pupil diameter"); horizontalAlignment: Text.AlignLeft;width: parent.width*0.5;font.pointSize: fontPointSize;}
-                                                LineEdit{text:(IcUiQmlApi.appCtrl.checkSvc.pupilDiameter>0&&pupilDiameter.checked)?IcUiQmlApi.appCtrl.checkSvc.pupilDiameter.toFixed(2):"";width: parent.width*0.25;textInput.readOnly: true;}
+                                                LineEdit{text:(IcUiQmlApi.appCtrl.checkSvc.pupilDiameter>0&&pupilDiameter.checked)?IcUiQmlApi.appCtrl.checkSvc.pupilDiameter.toFixed(2):"";width: parent.width*0.25;textInput.readOnly:true;}
                                             }
                                             Row{id: row;width:parent.width;height: parent.height*0.75/3;spacing: width*0.05;
                                                 CusCheckBox{enabled: false;checked:currentProgram.type!==2?currentProgram.params.commonParams.fixationMonitor>0:currentProgram.params.fixationMonitor>0;}
@@ -259,9 +259,9 @@ Item {id:root; width: 1366;height: 691
                                                 Image {source: "qrc:/Pics/capture-svg/btn_alarm.svg";height:parent.height*0.6; anchors.verticalCenter: parent.verticalCenter;width: height; }
                                             }
                                             Row{width:parent.width;height: parent.height*0.75/3;spacing: width*0.05;
-                                                CusCheckBox{id:deviationCheckBox;checked:true;enabled:currentProgram.type!==2;onCheckedChanged:checkSvc.measureDeviation=checked;}
+                                                CusCheckBox{id:deviationCheckBox;checked:true;onCheckedChanged:checkSvc.measureDeviation=checked;}
                                                 CusText{text:lt+qsTr("Fixation deviation"); horizontalAlignment: Text.AlignLeft;width: parent.width*0.25;font.pointSize: fontPointSize;}
-                                                Component.onCompleted: {root.currentProgramChanged.connect(function(){if(currentProgram.type===2){deviationCheckBox.checked=false;}});}
+                                                Component.onCompleted: {root.currentProgramChanged.connect(function(){console.log(currentProgram.type);if(currentProgram.type===2){enabled=false;deviationCheckBox.checked=false;}else {enabled=true;deviationCheckBox.checked=true;}});}
                                             }
                                         }
                                     }

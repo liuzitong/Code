@@ -352,7 +352,6 @@ void DeviceOperation::adjustCastLight()
                    });
     waitForSomeTime(200);
     openShutter(65535);
-    m_currentCastLightDA=m_config.castLightADPresetRef()+DeviceSettings::getSingleton()->m_castLightDAChanged;
     m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA);
     waitForSomeTime(200);
     m_castLightAdjustStatus=2;
@@ -579,7 +578,7 @@ void DeviceOperation::lightUpCastLight()
     if(m_isDeviceReady&&!m_castLightUp)
     {
         m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA);
-        std::cout<<"cast light Up"<<std::endl;
+        std::cout<<"cast light Up:"<<m_currentCastLightDA<<std::endl;
         m_castLightUp=true;
     }
 }
@@ -589,7 +588,7 @@ void DeviceOperation::dimDownCastLight()
     if(m_isDeviceReady&&m_castLightUp)
     {
         m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA*0.3);
-        std::cout<<"cast light Down"<<std::endl;
+        std::cout<<"cast light Down"<<m_currentCastLightDA*0.3<<std::endl;
         m_castLightUp=false;
     }
 }
@@ -950,6 +949,7 @@ void DeviceOperation::workOnNewProfile()
     m_videoSize=m_profile.videoSize();
     if(!m_isDeviceReady&&!m_profile.isEmpty()&&!m_config.isEmpty())
     {
+        m_currentCastLightDA=m_config.castLightADPresetRef()+DeviceSettings::getSingleton()->m_castLightDAChanged;
         setIsDeviceReady(true);
         auto date=QDate::currentDate();
         auto lastAdjustedDate=QDate::fromString(DeviceSettings::getSingleton()->m_castLightLastAdjustedDate,"yyyy/MM/dd");
@@ -972,10 +972,11 @@ void DeviceOperation::workOnNewConfig()
     m_devicePupilProcessor.m_pupilReflectionDotWhiteLimit=m_config.pupilGreyThresholdDAPtr()[1];
     qDebug()<<m_devicePupilProcessor.m_pupilGreyLimit;
     qDebug()<<m_devicePupilProcessor.m_pupilReflectionDotWhiteLimit;
-
+    qDebug()<<m_config.castLightADPresetRef();
 
     if(!m_isDeviceReady&&!m_profile.isEmpty()&&!m_config.isEmpty())
     {
+        m_currentCastLightDA=m_config.castLightADPresetRef()+DeviceSettings::getSingleton()->m_castLightDAChanged;
         setIsDeviceReady(true);
         auto date=QDate::currentDate();
         auto lastAdjustedDate=QDate::fromString(DeviceSettings::getSingleton()->m_castLightLastAdjustedDate,"yyyy/MM/dd");

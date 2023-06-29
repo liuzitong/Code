@@ -233,11 +233,11 @@ QVector<QPointF> DevicePupilProcessor::caculatePupil(uchar* data, int width, int
     float x_min=FLT_MAX;
     QVector<QPoint> vc;              //黑点
     QVector<QPoint> vc2;             //有效黑点
-    for(int y=height*0.3;y<height*0.7;y++)
+    for(int y=height*0.35;y<height*0.65;y++)
     {
         int x_min=INT_MAX;
         int x_max=0;
-        for(int x=width*0.2;x<width*0.8;x++)
+        for(int x=width*0.35;x<width*0.65;x++)
         {
             int gapCount=0;
             QVector<QPoint> vc_line;             //每一行
@@ -322,9 +322,9 @@ QVector<QPointF> DevicePupilProcessor::caculatePupil(uchar* data, int width, int
 QVector<QPointF> DevicePupilProcessor::caculateReflectingDot(uchar* ba, int width, int height)
 {
     QVector<QPoint> brightPix,leftBrightPix,middleBrightPix,rightBrightPix;
-    for(int y=m_pupilCenterPoint.y()-height*0.08;y<m_pupilCenterPoint.y()+height*0.10;y++)
+    for(int y=m_pupilCenterPoint.y()-height*0.12;y<m_pupilCenterPoint.y()+height*0.08;y++)
     {
-        for(int x=m_pupilCenterPoint.x()-width*0.08;x<m_pupilCenterPoint.x()+width*0.08;x++)
+        for(int x=m_pupilCenterPoint.x()-width*0.06;x<m_pupilCenterPoint.x()+width*0.06;x++)
         {
 //            qDebug()<<quint8(ba[x+width*y]);
             if(quint8(ba[x+width*y])>m_pupilReflectionDotWhiteLimit)
