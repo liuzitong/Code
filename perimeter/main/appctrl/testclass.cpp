@@ -25,7 +25,7 @@ void TestClass::test()
 //    createDynamicCheckResultData();
 //    createCheckResultVm();
 //    TestReport();
-    makePicData();
+//    makePicData();
 //    makePic();
 //    drawPicData();
 //testData();
@@ -39,7 +39,9 @@ void TestClass::test()
 //     DevOps::DeviceOperation::getSingleton()->stopDynamic();
 
 
-
+    QImage img({320,320});
+    AnalysisSvc::getSingleton()->drawWords(img,{"Pattern Deviation not","Shown for serverely","Depressed fields. Refer","to Total Deviation"});
+    img.save("./haha.bmp");
 
 }
 

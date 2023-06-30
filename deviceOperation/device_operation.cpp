@@ -25,7 +25,6 @@ DeviceOperation::DeviceOperation()
 {
 //    connect(&m_connectTimer,&QTimer::timeout,this,&DeviceOperation::connectDev);
     connect(this,&DeviceOperation::updateDevInfo,[](QString str){qDebug()<<str;});
-
     m_workStatusElapsedTimer.start();
     m_autoPupilElapsedTime=100;
     m_autoPupilElapsedTimer.start();
@@ -192,8 +191,6 @@ void DeviceOperation::setWhiteLamp(bool onOff)
         m_devCtl->setWhiteLamp(0,0,0);
 }
 
-
-
 bool DeviceOperation::getAnswerPadStatus()
 {
     return m_statusData.answerpadStatus();
@@ -302,26 +299,7 @@ void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB,bool
     motorPos[2]=focalMotorPos;
     motorPos[3]=config.DbPosMappingPtr()[DB][0];
     motorPos[4]=config.DbPosMappingPtr()[DB][1];
-
     bool isMotorMove[5]{true,true,true,true,true};
-//    waitMotorStop({UsbDev::DevCtl::MotorId_Color,
-//                   UsbDev::DevCtl::MotorId_Light_Spot,
-//                   UsbDev::DevCtl::MotorId_Focus,
-//                   UsbDev::DevCtl::MotorId_X,
-//                   UsbDev::DevCtl::MotorId_Y
-//                   });
-
-//    std::cout<<"waiting shutter close"<<std::endl;
-//    std::cout<<m_statusData.motorPosition(UsbDev::DevCtl::MotorId_Shutter)<<std::endl;;
-//    std::cout<<m_config.shutterOpenPosRef()<<std::endl;
-//    waitForSomeTime(20);
-//    qDebug()<<m_statusData.motorPosition(UsbDev::DevCtl::MotorId_Shutter);
-//    waitForSomeTime(20);
-//    qDebug()<<m_statusData.motorPosition(UsbDev::DevCtl::MotorId_Shutter);
-//    waitForSomeTime(20);
-//    qDebug()<<m_statusData.motorPosition(UsbDev::DevCtl::MotorId_Shutter);
-//    waitForSomeTime(20);
-//    qDebug()<<m_statusData.motorPosition(UsbDev::DevCtl::MotorId_Shutter);
     waitForSomeTime(50);
     while(qAbs(m_statusData.motorPosition(UsbDev::DevCtl::MotorId_Shutter)-m_config.shutterOpenPosRef())<70)
     {
@@ -414,9 +392,7 @@ void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSiz
     qDebug()<<"start:"<<begin;
     qDebug()<<"end:"<<end;
     qDebug()<<QString("分割为%1个点,X步长为%2,Y步长为%3.").arg(QString::number(stepCount)).arg(QString::number(stepLengthX)).arg(QString::number(stepLengthY));
-
     m_lastDynamicCoordAndXYMotorPos.resize(stepCount);
-
 
     for(int i=0;i<stepCount;i++)
     {
@@ -426,16 +402,9 @@ void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSiz
         dotArr[i*3+0]=coordMotorPosFocalDistInfoTemp.motorX;
         dotArr[i*3+1]=coordMotorPosFocalDistInfoTemp.motorY;
         dotArr[i*3+2]=DeviceDataProcesser::getFocusMotorPosByDist(coordMotorPosFocalDistInfoTemp.focalDist,spotSlot);
-//        qDebug()<<QString("第%1个点,X坐标:%2,Y坐标:%3,X电机坐标%4,Y电机坐标%5,焦距电机坐标%6.")
-//                   .arg(QString::number(i)).arg(QString::number( coordSpacePosInfoTemp.x())).arg(QString::number(coordSpacePosInfoTemp.y())).
-//                    arg(QString::number( dotArr[i*3+0])).arg(QString::number( dotArr[i*3+1])).arg(QString::number( dotArr[i*3+2]));
         m_lastDynamicCoordAndXYMotorPos[i]={coordSpacePosInfoTemp,{coordMotorPosFocalDistInfoTemp.motorX,coordMotorPosFocalDistInfoTemp.motorY}};
 
     }
-
-
-
-
 
     qDebug()<<("发送移动数据");
     constexpr int maxPackageLen=512;
@@ -626,11 +595,8 @@ void DeviceOperation::clearPupilData()
     m_devicePupilProcessor.clearData();
 }
 
-
-
 void DeviceOperation::workOnNewStatuData()
 {
-
     if(m_workStatusElapsedTimer.elapsed()>=5000)
     {
         m_workStatusElapsedTimer.restart();
@@ -670,9 +636,6 @@ void DeviceOperation::workOnNewStatuData()
         {
             envLightAlarmDA=m_config.environmentAlarmLightDAPtr()[1];
         }
-//        qDebug()<<envLightAlarmDA;
-//        qDebug()<<m_statusData.envLightDA();
-
         setEnvLightAlarm(m_statusData.envLightDA()>envLightAlarmDA);
     }
     else if(m_eyeglassIntialize)        //关红外
@@ -684,24 +647,10 @@ void DeviceOperation::workOnNewStatuData()
         std::cout<<"close allInfrared infrared"<<std::endl;
     }
 
-
     if(m_statusData.answerpadStatus()&&m_isWaitingForStaticStimulationAnswer)
     {
-//        if(m_isStaticCheckPausingTimer.elapsed()>200)
-//        {
-//            m_isStaticCheckPausing=true;
-//        }
         m_staticStimulationAnswer=true;
     }
-//    else
-//    {
-//        m_isStaticCheckPausing=false;
-//        m_isStaticCheckPausingTimer.restart();
-//    }
-
-
-
-
 
     if(m_isAtCheckingPage!=m_statusData.cameraStatus())
     {
@@ -755,124 +704,6 @@ void DeviceOperation::workOnNewStatuData()
     emit newStatusData();
 }
 
-//void DeviceOperation::workOnNewFrameData()
-//{
-//    m_frameData=m_devCtl->takeNextPendingFrameData();
-//    m_frameRawDataLock.lock();
-//    m_frameRawData=m_frameData.rawData();
-//    if(m_autoPupilElapsedTimer.elapsed()>=1000)
-//    {
-//        auto profile=m_profile;
-//        auto vc=DeviceDataProcesser::caculatePupilDeviation(m_frameData.rawData(),profile.videoSize().width(),profile.videoSize().height(),m_pupilResValid);
-//        if(m_pupilResValid)
-//        {
-//            m_pupilCenterPoint=vc[0];
-//            m_pupilRadius=DeviceDataProcesser::caculatePupilDiameter(vc[1],vc[2])/2;
-//            auto step=DeviceSettings::getSingleton()->m_pupilAutoAlignStep;
-//            if(m_autoAlignPupil/*&&(!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Chin_Hoz)||!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Chin_Vert))*/)                //自动对眼位
-//            {
-//                int tolerance=DeviceSettings::getSingleton()->m_pupilAutoAlignPixelTolerance;
-//                auto spsConfig=DeviceSettings::getSingleton()->m_motorChinSpeed;
-//                quint8 sps[2]{spsConfig[0],spsConfig[1]};
-//                int motorPos[2]{0};
-
-//                if(!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Chin_Hoz)&&qAbs(m_pupilCenterPoint.x())>tolerance)
-//                {
-//                    motorPos[0]=-m_pupilCenterPoint.x()*step;
-//                    m_devCtl->moveChinMotors(sps,motorPos,UsbDev::DevCtl::MoveMethod::Relative);
-//                }
-
-//                if(!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Chin_Vert)&&qAbs(m_pupilCenterPoint.y())>tolerance)
-//                {
-//                    motorPos[1]=m_pupilCenterPoint.y()*step;
-//                    m_devCtl->moveChinMotors(sps,motorPos,UsbDev::DevCtl::MoveMethod::Relative);
-//                }
-//            }
-////            计算瞳孔直径
-//            if(m_pupilDiameter<0)
-//            {
-//                auto pupilDiameter=m_pupilRadius*DeviceSettings::getSingleton()->m_pupilDiameterPixelToMillimeterConstant*320/profile.videoSize().width();
-//                m_pupilDiameterArr.push_back(pupilDiameter);
-//                if(m_pupilDiameterArr.size()>=10)
-//                {
-//                    float sum=0;
-//                    for(auto&i:m_pupilDiameterArr)
-//                    {
-//                        sum+=i;
-//                    }
-//                    m_pupilDiameter=sum/m_pupilDiameterArr.size();
-//                    m_pupilDiameterArr.clear();
-//                    std::cout<<m_pupilDiameter<<std::endl;
-//                    emit pupilDiameterChanged();
-//                }
-//            }
-
-//        }
-//        m_autoPupilElapsedTimer.restart();
-//    }
-//    m_frameRawDataLock.unlock();
-//    emit newFrameData();
-//}
-
-
-//void DeviceOperation::workOnNewFrameData()
-//{
-//    m_frameData=m_devCtl->takeNextPendingFrameData();
-//    m_frameRawDataLock.lock();
-//    m_frameRawData=m_frameData.rawData();
-//    m_frameRawDataLock.unlock();
-//    emit newFrameData();
-
-//    if(m_autoPupilElapsedTimer.elapsed()>=200)
-//    {
-//        QImage img((uchar*)m_frameRawData.data(),m_videoSize.width(),m_videoSize.height(),QImage::Format_Grayscale8);
-//        QImage img2=img.scaled(320,240);
-//        QByteArray imgData=QByteArray::fromRawData((char*)img2.bits(),img2.byteCount());
-
-//        m_devicePupilProcessor.processData(imgData);
-//        m_autoPupilElapsedTimer.restart();
-//        emit pupilDiameterChanged();
-//    }
-
-//    if(m_autoPupilElapsedTimer.elapsed()>=1000)
-//    {
-//        auto profile=m_profile;
-//        auto vc=DeviceDataProcesser::caculatePupilDeviation(m_frameData.rawData(),profile.videoSize().width(),profile.videoSize().height(),m_pupilResValid);
-//        if(m_pupilResValid)
-//        {
-//            m_pupilCenterPoint=vc[0];
-//            m_pupilRadius=DeviceDataProcesser::caculatePupilDiameter(vc[1],vc[2])/2;
-//            auto step=DeviceSettings::getSingleton()->m_pupilAutoAlignStep;
-//            if(m_autoAlignPupil)                //自动对眼位
-//            {
-//                int tolerance=DeviceSettings::getSingleton()->m_pupilAutoAlignPixelTolerance;
-//                auto spsConfig=DeviceSettings::getSingleton()->m_motorChinSpeed;
-//                quint8 sps[2]{spsConfig[0],spsConfig[1]};
-//                int motorPos[2]{0};
-
-//                if(!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Chin_Hoz)&&qAbs(m_pupilCenterPoint.x())>tolerance)
-//                {
-//                    motorPos[0]=-m_pupilCenterPoint.x()*step;
-//                    m_devCtl->moveChinMotors(sps,motorPos,UsbDev::DevCtl::MoveMethod::Relative);
-//                }
-
-//                if(!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Chin_Vert)&&qAbs(m_pupilCenterPoint.y())>tolerance)
-//                {
-//                    motorPos[1]=m_pupilCenterPoint.y()*step;
-//                    m_devCtl->moveChinMotors(sps,motorPos,UsbDev::DevCtl::MoveMethod::Relative);
-//                }
-//            }
-////            计算瞳孔直径
-//            if(m_pupilDiameter<0)
-//            {
-
-//            }
-
-//        }
-//        m_autoPupilElapsedTimer.restart();
-//    }
-//}
-
 void DeviceOperation::workOnNewFrameData()
 {
     m_frameData=m_devCtl->takeNextPendingFrameData();
@@ -906,7 +737,6 @@ void DeviceOperation::workOnNewFrameData()
         {
             if(m_autoAlignPupil)                //自动对眼位
             {
-
                 auto step=DeviceSettings::getSingleton()->m_pupilAutoAlignStep;
                 int tolerance=DeviceSettings::getSingleton()->m_pupilAutoAlignPixelTolerance;
                 auto spsConfig=DeviceSettings::getSingleton()->m_motorChinSpeed;
@@ -1029,12 +859,11 @@ void DeviceOperation::workOnWorkStatusChanged(int status)
             m_devCtl.reset(nullptr);
         }
         setIsDeviceReady(false);
-//        m_reconnectTimer.restart();
-        if(m_connectDev)
-        {
-            waitForSomeTime(10000);
-            connectDev();
-        }
+//        if(m_connectDev)
+//        {
+//            waitForSomeTime(10000);
+//            connectDev();
+//        }
     }
     emit workStatusChanged();
 }

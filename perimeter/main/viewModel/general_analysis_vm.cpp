@@ -115,10 +115,18 @@ StaticAnalysisVm::StaticAnalysisVm(const QVariantList &args)
 
 
             analysisMethodSvc->drawText(m_dev,m_locs,m_range,m_OS_OD,img,DrawType::Dev);img.save(m_previewFolder+"TotalDeviation.bmp");
-            analysisMethodSvc->drawText(m_mDev,m_locs,m_range,m_OS_OD,img,DrawType::MDev);img.save(m_previewFolder+"PatternDeviation.bmp");
-
             analysisMethodSvc->drawPE(m_peDev,m_locs,m_range,img);img.save(m_previewFolder+"TotalPE.bmp");
-            analysisMethodSvc->drawPE(m_peMDev,m_locs,m_range,img);img.save(m_previewFolder+"PatternPE.bmp");
+            if(m_md<-5)
+            {
+                analysisMethodSvc->drawWords(img,{"Pattern Deviation not","Shown for serverely","Depressed fields. Refer","to Total Deviation"});
+                img.save(m_previewFolder+"PatternDeviation.bmp");;img.save(m_previewFolder+"PatternPE.bmp");
+            }
+            else
+            {
+                analysisMethodSvc->drawText(m_mDev,m_locs,m_range,m_OS_OD,img,DrawType::MDev);img.save(m_previewFolder+"PatternDeviation.bmp");
+                analysisMethodSvc->drawPE(m_peMDev,m_locs,m_range,img);img.save(m_previewFolder+"PatternPE.bmp");
+            }
+
 
         }
         else if(report==1)
@@ -134,7 +142,14 @@ StaticAnalysisVm::StaticAnalysisVm(const QVariantList &args)
             analysisMethodSvc->drawText(m_values,m_locs,m_range,m_OS_OD,img,DrawType::DB);img.save(m_previewFolder+"dBDiagram.bmp");
             analysisMethodSvc->drawGray(m_values,m_locs,m_range,m_innerRange,img);img.save(m_previewFolder+"gray.bmp");
             analysisMethodSvc->drawPE(m_peDev,m_locs,m_range,img);img.save(m_previewFolder+"TotalPE.bmp");
-            analysisMethodSvc->drawPE(m_peMDev,m_locs,m_range,img);img.save(m_previewFolder+"PatternPE.bmp");
+            if(m_md<-5)
+            {
+                analysisMethodSvc->drawWords(img,{"Pattern Deviation not","Shown for serverely","Depressed fields. Refer","to Total Deviation"});
+                img.save(m_previewFolder+"PatternPE.bmp");
+            }
+            else
+                analysisMethodSvc->drawPE(m_peMDev,m_locs,m_range,img);img.save(m_previewFolder+"PatternPE.bmp");
+
         }
         else if(report==3)
         {
@@ -233,10 +248,18 @@ void StaticAnalysisVm::showReport(int report)
             analysisMethodSvc->drawGray(m_values,m_locs,m_range,m_innerRange,img480);img480.save(m_reportFolder+"gray.bmp");
 
             analysisMethodSvc->drawText(m_dev,m_locs,m_range,m_OS_OD,img480,DrawType::Dev,1.0,true);img480.save(m_reportFolder+"TotalDeviation.bmp");
-            analysisMethodSvc->drawText(m_mDev,m_locs,m_range,m_OS_OD,img480,DrawType::MDev,1.0,true);img480.save(m_reportFolder+"PatternDeviation.bmp");
-
             analysisMethodSvc->drawPE(m_peDev,m_locs,m_range,img480);img480.save(m_reportFolder+"TotalPE.bmp");
-            analysisMethodSvc->drawPE(m_peMDev,m_locs,m_range,img480);img480.save(m_reportFolder+"PatternPE.bmp");
+            if(m_md<-5)
+            {
+                analysisMethodSvc->drawWords(img480,{"Pattern Deviation not","Shown for serverely","Depressed fields. Refer","to Total Deviation"},1.0,true);
+                img480.save(m_reportFolder+"PatternDeviation.bmp");img480.save(m_reportFolder+"PatternPE.bmp");
+            }
+            else
+            {
+                analysisMethodSvc->drawText(m_mDev,m_locs,m_range,m_OS_OD,img480,DrawType::MDev,1.0,true);img480.save(m_reportFolder+"PatternDeviation.bmp");
+                analysisMethodSvc->drawPE(m_peMDev,m_locs,m_range,img480);img480.save(m_reportFolder+"PatternPE.bmp");
+            }
+
         }
         else if(report==1)
         {
@@ -249,7 +272,13 @@ void StaticAnalysisVm::showReport(int report)
             analysisMethodSvc->drawText(m_values,m_locs,m_range,m_OS_OD,img480,DrawType::DB,1.0,true);img480.save(m_reportFolder+"dBDiagram.bmp");
             analysisMethodSvc->drawGray(m_values,m_locs,m_range,m_innerRange,img480);img480.save(m_reportFolder+"gray.bmp");
             analysisMethodSvc->drawPE(m_peDev,m_locs,m_range,img480);img480.save(m_reportFolder+"TotalPE.bmp");
-            analysisMethodSvc->drawPE(m_peMDev,m_locs,m_range,img480);img480.save(m_reportFolder+"PatternPE.bmp");
+            if(m_md<-5)
+            {
+                analysisMethodSvc->drawWords(img480,{"Pattern Deviation not","Shown for serverely","Depressed fields. Refer","to Total Deviation"},1.0,true);
+                img480.save(m_reportFolder+"PatternPE.bmp");
+            }
+            else
+                analysisMethodSvc->drawPE(m_peMDev,m_locs,m_range,img480);img480.save(m_reportFolder+"PatternPE.bmp");
         }
         else if(report==3)
         {

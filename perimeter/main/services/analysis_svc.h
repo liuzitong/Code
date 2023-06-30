@@ -51,6 +51,8 @@ public:
 
     void drawRoundCrossPixScale(int range,QImage& img);
 
+    void drawWords(QImage& img,QVector<QString> words,float minificationFactor=1.0,bool isReport=false);
+
     void drawText(QVector<int> values,QVector<QPointF> locs,int range,int OS_OD,QImage& img,DrawType type/*包括了一般情况和 dev mdev*/,float minificationFactor=1.0,bool isReport=false);             //db,dev,mdev
 
     void drawGray(QVector<int> values,QVector<QPointF> locs,int range,int innerRange,QImage& img);

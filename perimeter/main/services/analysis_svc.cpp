@@ -780,6 +780,22 @@ void AnalysisSvc::drawRoundCrossPixScale(int range, QImage &img)
     }
 }
 
+void AnalysisSvc::drawWords(QImage &img, QVector<QString> words,float minificationFactor,bool isReport)
+{
+    img.fill(qRgb(255, 255, 255));
+    QPainter painter(&img);
+    int fontPixSize=qMin(int(img.width()/18*minificationFactor),!isReport?16:32)*1.3;
+    QFont font("consolas");
+    font.setPixelSize(fontPixSize);
+    painter.setFont(font);
+
+    for(int i=0;i<words.length();i++)
+    {
+        const QRect rectangle = QRect(fontPixSize*0.5,fontPixSize*4+i*fontPixSize*1.5,img.width()-fontPixSize,fontPixSize*1.2);
+        painter.drawText(rectangle,Qt::AlignLeft,words[i]);
+    }
+}
+
 void AnalysisSvc::drawText(QVector<int> values,QVector<QPointF> locs,int range,int OS_OD,QImage& img,DrawType type,float minificationFactor,bool isReport)
 {
     img.fill(qRgb(255, 255, 255));
