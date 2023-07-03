@@ -204,7 +204,7 @@ class CheckSvcWorker : public QObject
 {
     Q_OBJECT
 public:
-    QTimer m_timer;
+    QTimer m_timer;                             //记录检查时间
     int m_time=0;
     int* m_checkState;
     PatientVm* m_patientVm;
@@ -231,12 +231,14 @@ public slots:
 
     void connectDev()
     {
-        DevOps::DeviceOperation::getSingleton()->m_connectDev=true;
+//        DevOps::DeviceOperation::getSingleton()->m_connectDev=true;
+        DevOps::DeviceOperation::getSingleton()->m_reconnectTimer.start();
         DevOps::DeviceOperation::getSingleton()->connectDev();    //连接设备
     }
     void disconnectDev()
     {
-        DevOps::DeviceOperation::getSingleton()->m_connectDev=false;
+//        DevOps::DeviceOperation::getSingleton()->m_connectDev=false;
+        DevOps::DeviceOperation::getSingleton()->m_reconnectTimer.stop();
         DevOps::DeviceOperation::getSingleton()->disconnectDev();    //连接设备
     }
     void doWork();
@@ -1784,6 +1786,10 @@ void CheckSvcWorker::doWork()
         }
         case 1:                                             //check
         {
+            while(!DevOps::DeviceOperation::getSingleton()->m_reconnected)
+            {
+                QApplication::processEvents();
+            }
 //            qDebug()<<("Checking");
             m_check->Checkprocess();
             if(m_check->m_error)
@@ -1867,6 +1873,7 @@ CheckSvc::CheckSvc(QObject *parent)
     m_worker->m_measurePupilDiameter=m_measurePupilDiameter;
 
     DevOps::DeviceOperation::getSingleton()->moveToThread(&m_workerThread);
+    DevOps::DeviceOperation::getSingleton()->m_reconnectTimer.moveToThread(&m_workerThread);
     connect(m_worker,&CheckSvcWorker::checkResultChanged,this, &CheckSvc::checkResultChanged);
     connect(m_worker,&CheckSvcWorker::checkStateChanged,this, &CheckSvc::checkStateChanged);
     connect(m_worker,&CheckSvcWorker::checkedCountChanged,this, &CheckSvc::setCheckedCount);

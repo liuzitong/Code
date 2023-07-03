@@ -99,6 +99,8 @@ public slots:
     void workOnNewProfile();
     void workOnNewConfig();
     void workOnWorkStatusChanged(int status);
+    void reconnect();
+
 signals:
     void workStatusChanged();
     void newStatusData();
@@ -117,6 +119,7 @@ public:
     DevicePupilProcessor m_devicePupilProcessor;
     Status m_status={-1,-1};
     QElapsedTimer m_workStatusElapsedTimer;
+    QTimer m_reconnectTimer;
     bool m_isDeviceReady=false;
     bool m_autoAlignPupil=true;
     bool m_eyeglassStatus;
@@ -147,6 +150,7 @@ public:
     int m_currentCastLightDA;
     int m_castLightTargetDA;
     bool m_castLightUp=false;
+    bool m_reconnected=true;
     QByteArray m_frameRawData;
     QMutex m_frameRawDataLock;
     BackgroundLight m_backgroundLight;
@@ -154,9 +158,9 @@ public:
 //    bool m_pupilDiameterAcquired;
 
 private:
+
     QElapsedTimer m_autoPupilElapsedTimer;
-    int m_autoPupilElapsedTime=200;
-//    QElapsedTimer m_reconnectTimer;
+    int m_autoPupilElapsedTime=100;
 //    QTimer m_videoTimer;
     QElapsedTimer m_castLightAdjustElapsedTimer;
     bool m_envLightAlarm=false;

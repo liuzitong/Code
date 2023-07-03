@@ -23,10 +23,10 @@ QSharedPointer<DeviceOperation> DeviceOperation::m_singleton=nullptr;
 
 DeviceOperation::DeviceOperation()
 {
-//    connect(&m_connectTimer,&QTimer::timeout,this,&DeviceOperation::connectDev);
+    connect(&m_reconnectTimer,&QTimer::timeout,this,&DeviceOperation::reconnect);
+    m_reconnectTimer.setInterval(100);
     connect(this,&DeviceOperation::updateDevInfo,[](QString str){qDebug()<<str;});
     m_workStatusElapsedTimer.start();
-    m_autoPupilElapsedTime=100;
     m_autoPupilElapsedTimer.start();
 //    m_reconnectTimer.start();
 }
@@ -54,6 +54,13 @@ void DeviceOperation::disconnectDev()
 {
     m_devCtl.reset(nullptr);
     setIsDeviceReady(false);
+}
+
+void DeviceOperation::reconnect()
+{
+    m_reconnected=false;
+    disconnectDev();
+    connectDev();
 }
 
 
@@ -597,6 +604,7 @@ void DeviceOperation::clearPupilData()
 
 void DeviceOperation::workOnNewStatuData()
 {
+    m_reconnectTimer.start();
     if(m_workStatusElapsedTimer.elapsed()>=5000)
     {
         m_workStatusElapsedTimer.restart();
@@ -842,6 +850,7 @@ void DeviceOperation::workOnWorkStatusChanged(int status)
             m_config=DeviceData::getSingleton()->m_config;
         else
             m_devCtl->readConfig();
+        m_reconnected=true;
 //        waitForSomeTime(8000);                                          //目前config获取会导致阻塞 所以需要多等一下
 //        adjustCastLight();
     }
@@ -858,6 +867,7 @@ void DeviceOperation::workOnWorkStatusChanged(int status)
             disconnect(m_devCtl.data(),&UsbDev::DevCtl::newConfig,this,&DeviceOperation::workOnNewConfig);
             m_devCtl.reset(nullptr);
         }
+        m_reconnected=true;
         setIsDeviceReady(false);
 //        if(m_connectDev)
 //        {
@@ -867,5 +877,7 @@ void DeviceOperation::workOnWorkStatusChanged(int status)
     }
     emit workStatusChanged();
 }
+
+
 }
 
