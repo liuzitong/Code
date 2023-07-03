@@ -207,12 +207,12 @@ Item
                          Rectangle
                          {
                              opacity: 0.8;radius: 2;color: "grey";width:CommonSettings.fontPointSize*2.5;height: CommonSettings.fontPointSize*1.6;anchors.top: parent.top; anchors.topMargin: parent.height*0.05; anchors.left: parent.left; anchors.leftMargin:parent.width*0.05;
-                             CusText{ anchors.fill: parent;text:index; color: "white";}
+                             CusText{ anchors.fill: parent;text:index+1; color: "white";}
                          }
                          Rectangle
                          {
                              opacity: 0.8;radius: 2;color: "grey";width: CommonSettings.fontPointSize*4;height:  CommonSettings.fontPointSize*1.6;anchors.bottom: parent.bottom; anchors.bottomMargin: parent.height*0.05; anchors.right: parent.right; anchors.rightMargin:parent.width*0.05;
-                             CusText{ anchors.fill: parent;text:currentCheckResult.resultData.realTimeDB[selectedDotIndex][index]+"DB";color: "white"; }
+                             CusText{ anchors.fill: parent;text:currentCheckResult.resultData.realTimeDB[selectedDotIndex][index]+"DB";color: "orange"; }
                          }
                      }
                  }

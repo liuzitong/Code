@@ -867,17 +867,5 @@ void DeviceOperation::workOnWorkStatusChanged(int status)
     }
     emit workStatusChanged();
 }
-
-
-
-//void DeviceOperation::workOnWorkStatusChanged()
-//{
-//    if(m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_Disconnected)
-//    {
-//        setIsDeviceReady(false);
-//        connectDev();
-//    }
-//    emit workStatusChanged();
-//}
 }
 
