@@ -204,16 +204,8 @@ Item
                             fillMode: Image.PreserveAspectCrop;smooth: false;cache: false;        //to refresh image
                             source: "file:///" + applicationDirPath + picSource;
                          }
-                         Rectangle
-                         {
-                             opacity: 0.8;radius: 2;color: "grey";width:CommonSettings.fontPointSize*2.5;height: CommonSettings.fontPointSize*1.6;anchors.top: parent.top; anchors.topMargin: parent.height*0.05; anchors.left: parent.left; anchors.leftMargin:parent.width*0.05;
-                             CusText{ anchors.fill: parent;text:index+1; color: "white";}
-                         }
-                         Rectangle
-                         {
-                             opacity: 0.8;radius: 2;color: "grey";width: CommonSettings.fontPointSize*4;height:  CommonSettings.fontPointSize*1.6;anchors.bottom: parent.bottom; anchors.bottomMargin: parent.height*0.05; anchors.right: parent.right; anchors.rightMargin:parent.width*0.05;
-                             CusText{ anchors.fill: parent;text:currentCheckResult.resultData.realTimeDB[selectedDotIndex][index]+"DB";color: "orange"; }
-                         }
+                         CusText{width:CommonSettings.fontPointSize*2.5;height: CommonSettings.fontPointSize*1.6;anchors.top: parent.top; anchors.topMargin: parent.height*0.05; anchors.left: parent.left; anchors.leftMargin:parent.width*0.05;text:index+1; horizontalAlignment: Text.AlignLeft; verticalAlignment: Text.AlignTop; color: "yellow";}
+                         CusText{width:CommonSettings.fontPointSize*2.5;height: CommonSettings.fontPointSize*1.6;anchors.bottom: parent.bottom; anchors.bottomMargin: parent.height*0.05; anchors.right: parent.right; anchors.rightMargin:parent.width*0.05;text:currentCheckResult.resultData.realTimeDB[checkDisplay.clickedDotIndex][index]+"DB"; verticalAlignment: Text.AlignBottom; horizontalAlignment: Text.AlignRight;color: "yellow"; }
                      }
                  }
              }

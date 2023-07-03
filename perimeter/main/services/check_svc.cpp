@@ -796,7 +796,7 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
             {
                 for(auto& recordDot:m_dotRecords)
                 {
-                    if(recordDot.checked&&recordDot.DB>=0)                                          //必须要看到
+                    if(recordDot.checked&&recordDot.DB>0)                                          //必须要看到
                     {
                         checkedRecords.push_back(recordDot);
                         if(recordDot.DB>maxDB) maxDB=recordDot.DB;
@@ -805,10 +805,10 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
 
                 if(checkedRecords.size()==0) return {false,{0,0},0};
                 QVector<QVector<DotRecord>> recordsSet;
-                recordsSet.resize(qRound(double(maxDB)/5));
+                recordsSet.resize(qCeil(double(maxDB)/5));
                 for(auto& recordDot:checkedRecords)
                 {
-                    int set=qMax(qRound(double(maxDB-recordDot.DB)/5)-1,0);
+                    int set=qMax(qCeil(double(maxDB-recordDot.DB)/5)-1,0);
                     recordsSet[set].push_back(recordDot);
                 }
 
@@ -1340,6 +1340,7 @@ void DynamicCheck::initialize()
 
 void DynamicCheck::resetData()
 {
+    m_deviceOperation->setDB(m_programModel->m_params.brightness);
     qsrand(QTime::currentTime().msec());
     m_resultModel->m_patient_id=m_patientModel->m_id;
     m_resultModel->m_program_id=m_programModel->m_id;
@@ -1742,7 +1743,6 @@ void CheckSvcWorker::prepareToCheck()
         m_check->lightsOff();
         m_check->lightsOn();
         m_check->m_deviceOperation->setCursorColorAndCursorSize(int(cursorColor),int(cursorSize));
-        m_check->m_deviceOperation->setDB(brightness);
         UtilitySvc::wait(100);
         m_check->m_deviceOperation->waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y});
         connect(this,&CheckSvcWorker::stop,[&](){m_check->m_deviceOperation->stopDynamic();});
