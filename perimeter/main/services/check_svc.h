@@ -19,7 +19,9 @@ class CheckSvc: public QObject
     Q_PROPERTY(int checkedCount READ getCheckedCount WRITE setCheckedCount NOTIFY checkedCountChanged)
     Q_PROPERTY(int totalCount READ getTotalCount WRITE setTotalCount NOTIFY totalCountChanged)
     Q_PROPERTY(int checkTime READ getCheckTime WRITE setCheckTime NOTIFY checkTimeChanged)
-    Q_PROPERTY(bool devReady READ getDevReady NOTIFY devReadyChanged)
+//    Q_PROPERTY(bool devReady READ getDevReady NOTIFY devReadyChanged)
+//    Q_PROPERTY(bool devReconnecting READ getReconnecting NOTIFY reconnectingChanged)
+    Q_PROPERTY(int deviceStatus READ getDeviceStatus NOTIFY deviceStatusChanged)
     Q_PROPERTY(int castLightAdjustStatus READ getCastLightAdjustStatus NOTIFY castLightAdjustStatusChanged)
     Q_PROPERTY(bool autoAlignPupil READ getAutoAlignPupil WRITE setAutoAlignPupil NOTIFY autoAlignPupilChanged)
     Q_PROPERTY(float pupilDiameter READ getPupilDiameter NOTIFY pupilDiameterChanged)
@@ -32,6 +34,7 @@ class CheckSvc: public QObject
     Q_PROPERTY(bool measureDeviation READ getMeasureDeviation WRITE setMeasureDeviation NOTIFY measureDeviationChanged)
     Q_PROPERTY(bool eyeMoveAlarm READ getEyeMoveAlarm WRITE setEyeMoveAlarm NOTIFY eyeMoveAlarmChanged)
     Q_PROPERTY(bool envLightAlarm READ getEnvLightAlarm NOTIFY envLightAlarmChanged)
+    Q_PROPERTY(bool debugMode READ getDebugMode)
 
 
 
@@ -67,7 +70,9 @@ public:
     int getCheckedCount(){return m_checkedCount;}void setCheckedCount(int value){m_checkedCount=value;emit checkedCountChanged();}Q_SIGNAL void checkedCountChanged();
     int getTotalCount(){return m_totalCount;}void setTotalCount(int value){m_totalCount=value;emit totalCountChanged();}Q_SIGNAL void totalCountChanged();
     int getCheckTime(){return m_checkTime;}void setCheckTime(int value){m_checkTime=value;/*qDebug()<<"checkTime:"+QString::number(m_checkTime);*/emit checkTimeChanged();}Q_SIGNAL void checkTimeChanged();
-    bool getDevReady();Q_SIGNAL void devReadyChanged();
+//    bool getDevReady();Q_SIGNAL void devReadyChanged();
+    int getDeviceStatus();Q_SIGNAL void deviceStatusChanged();
+//    bool getReconnecting();Q_SIGNAL void reconnectingChanged();
     int getCastLightAdjustStatus();Q_SIGNAL void castLightAdjustStatusChanged();
     bool getAutoAlignPupil();void setAutoAlignPupil(bool autoAlign);Q_SIGNAL void autoAlignPupilChanged();
     float getPupilDiameter();Q_SIGNAL void pupilDiameterChanged();
@@ -76,10 +81,11 @@ public:
     QPointF getNextCheckingDotLoc(){return m_nextCheckingDotLoc;}Q_SIGNAL void nextCheckingDotLocChanged();
     bool getReadyToCheck(){return m_readyToCheck;}void setReadyToCheck(bool value){m_readyToCheck=value;emit readyToCheckChanged();} Q_SIGNAL void readyToCheckChanged();
     QString getTips(){return m_tips;}void setTips(QString value){m_tips=value;emit tipsChanged();}Q_SIGNAL void tipsChanged();
-    bool getMeasurePupil(){return m_measurePupilDiameter;}void setMeasurePupil(bool value){m_measurePupilDiameter=value;emit measurePupilChanged(value);}Q_SIGNAL void measurePupilChanged(bool value);
-    bool getMeasureDeviation(){return m_measurePupilDeviation;}void setMeasureDeviation(bool value){m_measurePupilDeviation=value;emit measureDeviationChanged(value);}Q_SIGNAL void measureDeviationChanged(bool value);
-    bool getEyeMoveAlarm(){return m_eyeMoveAlarm;}void setEyeMoveAlarm(bool value){m_eyeMoveAlarm=value;emit eyeMoveAlarmChanged(m_eyeMoveAlarm);}Q_SIGNAL void eyeMoveAlarmChanged(bool value);
+    bool getMeasurePupil();void setMeasurePupil(bool value);Q_SIGNAL void measurePupilChanged(bool value);
+    bool getMeasureDeviation();void setMeasureDeviation(bool value);Q_SIGNAL void measureDeviationChanged(bool value);
+    bool getEyeMoveAlarm();void setEyeMoveAlarm(bool value);Q_SIGNAL void eyeMoveAlarmChanged(bool value);
     bool getEnvLightAlarm();Q_SIGNAL void envLightAlarmChanged();
+    bool getDebugMode();
 //    CheckSvcWorker* getWorker(){return m_worker;}
 
 private:
@@ -94,9 +100,9 @@ private:
     QPointF m_nextCheckingDotLoc={999,999};
     bool m_readyToCheck=false;
     bool m_atCheckingPage=false;
-    bool m_measurePupilDiameter;
-    bool m_measurePupilDeviation;
-    bool m_eyeMoveAlarm;
+//    bool m_measurePupilDiameter;
+//    bool m_measurePupilDeviation;
+//    bool m_eyeMoveAlarm;
 
     QList<QPointF> m_dynamicSelectedDots;
     PatientVm* m_patientVm;

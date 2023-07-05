@@ -211,9 +211,9 @@ public:
     ProgramVm* m_programVm;
     CheckResultVm* m_checkResultVm;
     QList<QPointF> m_dynamicSelectedDots;
-    bool m_measurePupilDeviation;
-    bool m_measurePupilDiameter;
-    bool m_eyeMoveAlarm;
+    bool m_measurePupilDeviation=true;
+    bool m_measurePupilDiameter=true;
+    bool m_eyeMoveAlarm=false;
 
 private:
     QSharedPointer<Check> m_check;
@@ -231,18 +231,20 @@ public slots:
 
     void connectDev()
     {
-        DevOps::DeviceOperation::getSingleton()->m_connectDev=true;
+//        DevOps::DeviceOperation::getSingleton()->m_connectDev=true;
+//        DevOps::DeviceOperation::getSingleton()->m_reconnectTimer.start();
         DevOps::DeviceOperation::getSingleton()->connectDev();    //连接设备
     }
     void disconnectDev()
     {
-        DevOps::DeviceOperation::getSingleton()->m_connectDev=false;
+//        DevOps::DeviceOperation::getSingleton()->m_reconnectTimer.stop();
+//        DevOps::DeviceOperation::getSingleton()->m_connectDev=false;
         DevOps::DeviceOperation::getSingleton()->disconnectDev();    //连接设备
     }
     void doWork();
 
     void workOnMeasureDeviationChanged(bool value){m_measurePupilDeviation=value;emit measureDeviationChanged(value);}
-    void workOnMeasurePupilChanged(bool value){m_measurePupilDiameter=value;emit measurePupilChanged(value);}
+    void workOnMeasurePupilChanged(bool value){m_measurePupilDiameter=value;}
     void workOnEyeMoveAlarmChanged(bool value){m_eyeMoveAlarm=value;emit eyeMoveAlarmChanged(value);}
 
 signals:
@@ -259,7 +261,6 @@ signals:
     void nextCheckingDotChanged(QPointF loc);
     void readyToCheck(bool isReady);
     void measureDeviationChanged(bool value);
-    void measurePupilChanged(bool value);
     void eyeMoveAlarmChanged(bool value);
 };
 
@@ -385,6 +386,7 @@ void StaticCheck::resetData()
 //第一次先跑点,直接刺激,第二次跑点,等待上次刺激的应答,然后再刺激,再跑点,再等待上次的应答.(保证再等待应答的同时跑点.)
 void StaticCheck::Checkprocess()
 {
+    std::cout<<"getReadyToStimulate..........."<<std::endl;
     m_alreadyChecked=false;
     auto checkCycleLocAndDB=getCheckCycleLocAndDB();                //存储LastdotType为各种检查
     if(m_error==true) return;                                       //找不到盲点 退出检查
@@ -401,15 +403,17 @@ void StaticCheck::Checkprocess()
         getReadyToStimulate(m_lastCheckDotRecord.last()->loc,m_lastCheckDotRecord.last()->StimulationDBs.last());
     }
 
+    std::cout<<"waitAndProcessAnswer..........."<<std::endl;
     if(m_stimulated)                               //最开始没刺激过就不需要处理
     {
         m_stimulated=false;
         waitAndProcessAnswer();                             //取出commonDot 并且取出指针,处理的时候可能发现下一个是已经检查出结果的点,这个时候就选择不刺激置m_alreadyChecked为true
         emit checkResultChanged();
     }
-
+    std::cout<<"checkWaiting..........."<<std::endl;
     checkWaiting();
 
+    std::cout<<"stimulate..........."<<std::endl;
     if(m_checkedCount<m_totalCount&&!m_alreadyChecked)                         //如果测试完毕或者是已经得到结果的点就不刺激了
     {
         stimulate();
@@ -892,6 +896,7 @@ bool StaticCheck::waitForAnswer()
     bool answer=false;
     while((m_stimulationWaitingForAnswerElapsedTimer.elapsed()<waitTime)&&(!answer))   //应答时间内
     {
+        if(m_deviceOperation->m_deviceStatus!=2) return false;
         if(m_deviceOperation->m_staticStimulationAnswer)
         {
 
@@ -924,8 +929,7 @@ void StaticCheck::ProcessAnswer(bool answered)
             if(m_lastCheckeDotType.last()==LastCheckedDotType::locateBlindDot)                      //如果下一个是盲点
             {
                 m_alreadyChecked=true;
-                if(m_deviceOperation->m_isDeviceReady)
-                    m_deviceOperation->move5Motors(std::array<bool,5>{false,false,false,false,false}.data(),std::array<int,5>{0,0,0,0,0}.data());       //盲点已经确定就没必要跑点了,早点停止可以立即跑下一个点
+                m_deviceOperation->move5Motors(std::array<bool,5>{false,false,false,false,false}.data(),std::array<int,5>{0,0,0,0,0}.data());       //盲点已经确定就没必要跑点了,早点停止可以立即跑下一个点
                 m_lastCheckDotRecord.pop_back();
                 m_lastCheckeDotType.pop_back();
             }
@@ -1144,8 +1148,7 @@ void StaticCheck::ProcessAnswer(bool answered)
             if(m_lastCheckDotRecord.last()!=nullptr&&m_lastCheckDotRecord.last()->index==lastCheckedDot->index)
             {
                 m_alreadyChecked=true;
-                if(m_deviceOperation->m_isDeviceReady)
-                    m_deviceOperation->move5Motors(std::array<bool,5>{false,false,false,false,false}.data(),std::array<int,5>{0,0,0,0,0}.data());       //没必要跑点了,早点停止可以立即跑下一个点
+                m_deviceOperation->move5Motors(std::array<bool,5>{false,false,false,false,false}.data(),std::array<int,5>{0,0,0,0,0}.data());       //没必要跑点了,早点停止可以立即跑下一个点
                 m_lastCheckDotRecord.pop_back();
                 m_lastCheckeDotType.pop_back();
             }          //下次要刺激的点,是已经检查了的,所以要移除所有下次的点
@@ -1218,10 +1221,11 @@ void StaticCheck::ProcessAnswer(bool answered)
 void StaticCheck::waitAndProcessAnswer()
 {
     bool answerResult;
-    if(m_deviceOperation->m_isDeviceReady)
+    if(m_deviceOperation->m_deviceStatus==2)
          answerResult=waitForAnswer();
-    else
+    else if(m_deviceOperation->m_deviceStatus==0)
     {
+        qDebug()<<"into kebordd!!!!!!!!!!!!*******************************";
         if(KeyBoardFilter::needRefresh)
         {
             while(!KeyBoardFilter::freshed)
@@ -1249,6 +1253,7 @@ void StaticCheck::checkWaiting()
     timer.start();
     while(m_deviceOperation->getAnswerPadStatus())
     {
+        if(m_deviceOperation->m_deviceStatus!=2) return;
         QApplication::processEvents();
         if(timer.elapsed()>300)
         {
@@ -1425,10 +1430,14 @@ void DynamicCheck::resetData()
 
 void DynamicCheck::Checkprocess()
 {
+    std::cout<<"stimulate............."<<std::endl;
     auto& record=m_records[getPathRecordIndex()];
     stimulate(record.beginLoc,record.endLoc);
+    std::cout<<"waitForAnswer............."<<std::endl;
     auto answerLoc=waitForAnswer();
+    std::cout<<"ProcessAnswer............."<<std::endl;
     ProcessAnswer(answerLoc,record);
+    std::cout<<"checkWaiting............."<<std::endl;
     checkWaiting();
 }
 
@@ -1452,7 +1461,7 @@ void DynamicCheck::stimulate(QPointF begin, QPointF end)
 QVector<QPointF> DynamicCheck::waitForAnswer()
 {
     static int watiForAnswerCount=0;
-    if(!m_deviceOperation->getSingleton()->getIsDeviceReady())
+    if(m_deviceOperation->m_deviceStatus==0)
     {
         UtilitySvc::wait(50);  //刷新下状态
         UtilitySvc::wait(1000);  //虚拟测试表示耗费时间
@@ -1481,12 +1490,16 @@ QVector<QPointF> DynamicCheck::waitForAnswer()
         return answerLocs;
     }
     while(!m_deviceOperation->getDynamicMoveStatus())
+    {
+        if(m_deviceOperation->m_deviceStatus!=2) return {};
         QApplication::processEvents();          //等待刷新状态
+    }
     QVector<QPointF> answerLocs;
     if(m_programModel->m_params.strategy==DynamicParams::Strategy::straightLine)
     {
         while(m_deviceOperation->getDynamicMoveStatus())
         {
+            if(m_deviceOperation->m_deviceStatus!=2) return {};
             if(m_deviceOperation->getAnswerPadStatus())
             {
                 auto answerLoc=m_deviceOperation->getDyanmicAnswerPos();
@@ -1499,6 +1512,7 @@ QVector<QPointF> DynamicCheck::waitForAnswer()
         Wait:
         while(m_deviceOperation->getDynamicMoveStatus()) //等待松开
         {
+            if(m_deviceOperation->m_deviceStatus!=2) return {};
             if(m_deviceOperation->getAnswerPadStatus())
             {
                 QApplication::processEvents();
@@ -1512,6 +1526,7 @@ QVector<QPointF> DynamicCheck::waitForAnswer()
         End:
         while(m_deviceOperation->getDynamicMoveStatus())
         {
+            if(m_deviceOperation->m_deviceStatus!=2) return {};
             if(m_deviceOperation->getAnswerPadStatus())
             {
                 auto answerLoc=m_deviceOperation->getDyanmicAnswerPos();
@@ -1527,8 +1542,10 @@ QVector<QPointF> DynamicCheck::waitForAnswer()
     {
         while(true)
         {
+            if(m_deviceOperation->m_deviceStatus!=2) return {};
             while(m_deviceOperation->getDynamicMoveStatus())
             {
+                if(m_deviceOperation->m_deviceStatus!=2) return {};
                 if(m_deviceOperation->getAnswerPadStatus())
                 {
                     auto answerLoc=m_deviceOperation->getDyanmicAnswerPos();
@@ -1626,6 +1643,7 @@ void DynamicCheck::checkWaiting()
     timer.start();
     while(m_deviceOperation->getAnswerPadStatus())
     {
+        if(m_deviceOperation->m_deviceStatus!=2) return;
         QApplication::processEvents();
         if(timer.elapsed()>300)
         {
@@ -1739,7 +1757,6 @@ void CheckSvcWorker::prepareToCheck()
         ((DynamicCheck*)m_check.data())->m_programModel=static_cast<DynamicProgramVm*>(m_programVm)->getModel();
         auto cursorSize=((DynamicCheck*)m_check.data())->m_programModel->m_params.cursorSize;
         auto cursorColor=((DynamicCheck*)m_check.data())->m_programModel->m_params.cursorColor;
-        auto brightness=((DynamicCheck*)m_check.data())->m_programModel->m_params.brightness;
         m_check->lightsOff();
         m_check->lightsOn();
         m_check->m_deviceOperation->setCursorColorAndCursorSize(int(cursorColor),int(cursorSize));
@@ -1747,7 +1764,11 @@ void CheckSvcWorker::prepareToCheck()
         m_check->m_deviceOperation->waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y});
         connect(this,&CheckSvcWorker::stop,[&](){m_check->m_deviceOperation->stopDynamic();});
     }
-    connect(this,&CheckSvcWorker::eyeMoveAlarmChanged,[&](bool eyeMoveAlarm){m_check->m_eyeMoveAlarm=eyeMoveAlarm;});
+    connect(this,&CheckSvcWorker::eyeMoveAlarmChanged,[&](bool eyeMoveAlarm){
+        qDebug()<<eyeMoveAlarm;
+        m_check->m_eyeMoveAlarm=eyeMoveAlarm;
+    });
+    qDebug()<<m_eyeMoveAlarm;
     m_check->m_eyeMoveAlarm=m_eyeMoveAlarm;
     m_check->initialize();
     UtilitySvc::wait(500);    //等几秒启动
@@ -1785,17 +1806,15 @@ void CheckSvcWorker::doWork()
         case 1:                                             //check
         {
 //            qDebug()<<("Checking");
+            if(*m_checkState==3) break;
             m_check->Checkprocess();
             if(m_check->m_error)
             {
                 setCheckState(3);
                 emit sendErrorInfo(m_check->m_errorInfo);
             }
-            if(*m_checkState!=3)                //有可能外部结束后,后面把它覆盖为完成,就剩1个点的时候出现此情况.
-            {
-                if(m_check->m_checkedCount==m_check->m_totalCount) setCheckState(4);
 
-            }
+            if(m_check->m_checkedCount==m_check->m_totalCount) setCheckState(4);
             if(m_check->m_reqPause)
             {
                 setCheckState(2);
@@ -1863,9 +1882,10 @@ CheckSvc::CheckSvc(QObject *parent)
     m_worker = new CheckSvcWorker();
     m_worker->moveToThread(&m_workerThread);
     m_worker->m_timer.moveToThread(&m_workerThread);
-    m_worker->m_measurePupilDeviation=m_measurePupilDeviation;
-    m_worker->m_measurePupilDiameter=m_measurePupilDiameter;
-
+//    m_worker->m_measurePupilDeviation=m_measurePupilDeviation;
+//    m_worker->m_measurePupilDiameter=m_measurePupilDiameter;
+    m_worker->m_checkState=&m_checkState;
+    DevOps::DeviceOperation::getSingleton()->m_reconnectTimer.moveToThread(&m_workerThread);
     DevOps::DeviceOperation::getSingleton()->moveToThread(&m_workerThread);
     connect(m_worker,&CheckSvcWorker::checkResultChanged,this, &CheckSvc::checkResultChanged);
     connect(m_worker,&CheckSvcWorker::checkStateChanged,this, &CheckSvc::checkStateChanged);
@@ -1885,7 +1905,13 @@ CheckSvc::CheckSvc(QObject *parent)
         msgBox.exec();
     });
     connect(m_worker,&CheckSvcWorker::readyToCheck,[&](bool isReady){setReadyToCheck(isReady);});
-    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::isDeviceReadyChanged,this,&CheckSvc::devReadyChanged);
+//    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::isDeviceReadyChanged,this,&CheckSvc::devReadyChanged);
+    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::deviceStatusChanged,this,[&]()
+    {
+        if(m_checkState<=2) {setCheckState(3);}
+        qDebug()<<DevOps::DeviceOperation::getSingleton().data()->m_deviceStatus;
+        emit deviceStatusChanged();
+    });
 //    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::isDeviceReadyChanged,[&](){
 //        if(DevOps::DeviceOperation::getSingleton().data()->m_isDeviceReady)
 //        {
@@ -1903,7 +1929,7 @@ CheckSvc::CheckSvc(QObject *parent)
     connect(this,&CheckSvc::envLightAlarmChanged,[&](){
         qDebug()<<getEnvLightAlarm();
     });
-    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::isDeviceReadyChanged,[&](){if(m_checkState==1) m_checkState=2;});
+//    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::isDeviceReadyChanged,[&](){if(m_checkState<=2){m_checkState=3;}});
     connect(&m_castLightDimdownTimer,&QTimer::timeout,[&]()
     {
         if(m_checkState>=3)
@@ -1929,7 +1955,6 @@ void CheckSvc::start()
 //        qDebug()<<QString::number(m_checkResultVm->getPatient_id());
 //    }
     m_worker->m_checkResultVm=m_checkResultVm;
-    m_worker->m_checkState=&m_checkState;
     if(m_programVm->getType()==2) m_worker->m_dynamicSelectedDots=m_dynamicSelectedDots;
     setCheckState(0);
     qDebug()<<"start command";
@@ -2034,9 +2059,14 @@ void CheckSvc::castlightUp()
     if(m_atCheckingPage) DevOps::DeviceOperation::getSingleton()->lightUpCastLight();
 }
 
-bool CheckSvc::getDevReady()
+//bool CheckSvc::getDevReady()
+//{
+//    return DevOps::DeviceOperation::getSingleton()->getIsDeviceReady();
+//}
+
+int CheckSvc::getDeviceStatus()
 {
-    return DevOps::DeviceOperation::getSingleton()->getIsDeviceReady();
+    return DevOps::DeviceOperation::getSingleton()->getDeviceStatus();
 }
 
 int CheckSvc::getCastLightAdjustStatus()
@@ -2072,9 +2102,26 @@ void Perimeter::CheckSvc::setInputDots(QVariantList value)
     }
 }
 
+bool CheckSvc::getMeasurePupil(){return m_worker->m_measurePupilDiameter;}
+
+void CheckSvc::setMeasurePupil(bool value){m_worker->m_measurePupilDiameter=value;emit measurePupilChanged(value);}
+
+bool CheckSvc::getMeasureDeviation(){return m_worker->m_measurePupilDeviation;}
+
+void CheckSvc::setMeasureDeviation(bool value){m_worker->m_measurePupilDeviation=value;emit measureDeviationChanged(value);}
+
+bool CheckSvc::getEyeMoveAlarm(){return m_worker->m_eyeMoveAlarm;}
+
+void CheckSvc::setEyeMoveAlarm(bool value){m_worker->m_eyeMoveAlarm=value;emit eyeMoveAlarmChanged(value);}
+
 bool CheckSvc::getEnvLightAlarm()
 {
     return DevOps::DeviceOperation::getSingleton()->getEnvLightAlarm();
+}
+
+bool CheckSvc::getDebugMode()
+{
+    return UtilitySvc::getSingleton()->m_debugMode;
 }
 
 

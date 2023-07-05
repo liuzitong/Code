@@ -32,7 +32,9 @@ class DEVICEOPERATIONSHARED_EXPORT DeviceOperation:public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool autoAlignPupil READ getAutoAlignPupil WRITE setAutoAlignPupil NOTIFY autoAlignPupilChanged)
-    Q_PROPERTY(bool isDeviceReady READ getIsDeviceReady WRITE setIsDeviceReady NOTIFY isDeviceReadyChanged)
+//    Q_PROPERTY(bool isDeviceReady READ getIsDeviceReady WRITE setIsDeviceReady NOTIFY isDeviceReadyChanged)
+//    Q_PROPERTY(bool reconnecting READ getReconnecting WRITE setReconnecting NOTIFY reconnectingChanged)
+    Q_PROPERTY(int deviceStatus READ getDeviceStatus WRITE setDeviceStatus NOTIFY deviceStatusChanged)
     Q_PROPERTY(int castLightAdjustStatus READ getCastLightAdjustStatus WRITE setCastLightAdjustStatus NOTIFY castLightAdjustStatusChanged)
     Q_PROPERTY(bool pupilDiameter READ getPupilDiameter WRITE setPupilDiameter NOTIFY pupilDiameterChanged)
     Q_PROPERTY(bool envLightAlarm READ getEnvLightAlarm WRITE setEnvLightAlarm NOTIFY envLightAlarmChanged)
@@ -54,14 +56,15 @@ public:
         white
     };
 
+
     DeviceOperation();
     ~DeviceOperation();
 //    static void Initialize();
-    void moveChinUp(){if(m_isDeviceReady) moveChin(ChinMoveDirection::Up);}
-    void moveChinDown(){if(m_isDeviceReady) moveChin(ChinMoveDirection::Down);}
-    void moveChinLeft(){if(m_isDeviceReady) moveChin(ChinMoveDirection::Left);}
-    void moveChinRight(){if(m_isDeviceReady) moveChin(ChinMoveDirection::Right);}
-    void stopMovingChin(){if(m_isDeviceReady) moveChin(ChinMoveDirection::Stop);}
+    void moveChinUp(){if(m_deviceStatus==2) moveChin(ChinMoveDirection::Up);}
+    void moveChinDown(){if(m_deviceStatus==2) moveChin(ChinMoveDirection::Down);}
+    void moveChinLeft(){if(m_deviceStatus==2) moveChin(ChinMoveDirection::Left);}
+    void moveChinRight(){if(m_deviceStatus==2) moveChin(ChinMoveDirection::Right);}
+    void stopMovingChin(){if(m_deviceStatus==2) moveChin(ChinMoveDirection::Stop);}
     void enterCheckingPage(){m_isAtCheckingPage=true;}
     void leaveCheckingPage(){m_isAtCheckingPage=false;}
     static QSharedPointer<DeviceOperation> getSingleton();
@@ -99,6 +102,7 @@ public slots:
     void workOnNewProfile();
     void workOnNewConfig();
     void workOnWorkStatusChanged(int status);
+    void reconnectDev();
 signals:
     void workStatusChanged();
     void newStatusData();
@@ -109,20 +113,25 @@ signals:
 
 public:
     bool getAutoAlignPupil(){return m_autoAlignPupil;}void setAutoAlignPupil(bool value){m_autoAlignPupil=value;emit autoAlignPupilChanged();}Q_SIGNAL void autoAlignPupilChanged();
-    bool getIsDeviceReady(){return m_isDeviceReady;}void setIsDeviceReady(bool value){if(m_isDeviceReady!=value){m_isDeviceReady=value;emit isDeviceReadyChanged();}}Q_SIGNAL void isDeviceReadyChanged();
+//    bool getIsDeviceReady(){return m_isDeviceReady;}void setIsDeviceReady(bool value){if(m_isDeviceReady!=value){m_isDeviceReady=value;emit isDeviceReadyChanged();}}Q_SIGNAL void isDeviceReadyChanged();
+//    bool getReconnecting(){return m_reconnecting;}void setReconnecting(bool value){if(m_reconnecting!=value){m_reconnecting=value;emit reconnectingChanged();}}Q_SIGNAL void reconnectingChanged();
+    int getDeviceStatus(){return m_deviceStatus;}void setDeviceStatus(int value){if(m_deviceStatus!=value){m_deviceStatus=value;emit deviceStatusChanged();}}Q_SIGNAL void deviceStatusChanged();
     bool getEnvLightAlarm(){return m_envLightAlarm;}void setEnvLightAlarm(bool value){if(m_envLightAlarm!=value){m_envLightAlarm=value;emit envLightAlarmChanged();}}Q_SIGNAL void envLightAlarmChanged();
     float getPupilDiameter(){return m_devicePupilProcessor.m_pupilDiameter;}void setPupilDiameter(float value){m_devicePupilProcessor.m_pupilDiameter=value;emit pupilDiameterChanged();}Q_SIGNAL void pupilDiameterChanged();
     int getCastLightAdjustStatus(){return m_castLightAdjustStatus;}void setCastLightAdjustStatus(int value){m_castLightAdjustStatus=value;emit castLightAdjustStatusChanged();}Q_SIGNAL void castLightAdjustStatusChanged();
 public:
     DevicePupilProcessor m_devicePupilProcessor;
     Status m_status={-1,-1};
+    QTimer m_reconnectTimer;
     QElapsedTimer m_workStatusElapsedTimer;
-    bool m_isDeviceReady=false;
+//    bool m_isDeviceReady=false;
+//    bool m_reconnecting=false;
+    int m_deviceStatus=0;                    // 0:初始未连接 1:断联处于重联状态 2:已连接
     bool m_autoAlignPupil=true;
     bool m_eyeglassStatus;
     bool m_eyeglassIntialize=false;
 //    bool m_isChecking=false;
-    bool m_connectDev=false;
+//    bool m_connectDev=false;
 //    float m_deviation=0;
 //    bool m_deviation_valid;
     QSize m_videoSize;
@@ -155,8 +164,8 @@ public:
 
 private:
     QElapsedTimer m_autoPupilElapsedTimer;
-    int m_autoPupilElapsedTime=200;
-//    QElapsedTimer m_reconnectTimer;
+    QElapsedTimer m_reconnectingElapsedTimer;
+    int m_autoPupilElapsedTime=100;
 //    QTimer m_videoTimer;
     QElapsedTimer m_castLightAdjustElapsedTimer;
     bool m_envLightAlarm=false;

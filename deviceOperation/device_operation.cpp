@@ -23,12 +23,12 @@ QSharedPointer<DeviceOperation> DeviceOperation::m_singleton=nullptr;
 
 DeviceOperation::DeviceOperation()
 {
-//    connect(&m_connectTimer,&QTimer::timeout,this,&DeviceOperation::connectDev);
+    connect(&m_reconnectTimer,&QTimer::timeout,this,&DeviceOperation::reconnectDev);
     connect(this,&DeviceOperation::updateDevInfo,[](QString str){qDebug()<<str;});
     m_workStatusElapsedTimer.start();
-    m_autoPupilElapsedTime=100;
     m_autoPupilElapsedTimer.start();
-//    m_reconnectTimer.start();
+    m_reconnectingElapsedTimer.start();
+    m_reconnectTimer.setInterval(2000);
 }
 
 
@@ -43,6 +43,7 @@ void DeviceOperation::connectDev()
     if(m_devCtl==nullptr)
     {
         updateDevInfo("connecting.");
+//        m_reconnectTimer.start();
         auto deviceSettings=DeviceSettings::getSingleton();
         quint32 vid_pid=deviceSettings->m_VID.toInt(nullptr,16)<<16|deviceSettings->m_PID.toInt(nullptr,16);
         m_devCtl.reset(UsbDev::DevCtl::createInstance(vid_pid));
@@ -53,9 +54,19 @@ void DeviceOperation::connectDev()
 void DeviceOperation::disconnectDev()
 {
     m_devCtl.reset(nullptr);
-    setIsDeviceReady(false);
+//    setIsDeviceReady(false);
+    setDeviceStatus(0);
 }
 
+void DeviceOperation::reconnectDev()
+{
+    if(m_reconnectingElapsedTimer.elapsed()<=10000) return;
+    m_eyeglassIntialize=false;
+    qDebug()<<"reconnecting";
+    m_devCtl.reset(nullptr);
+    setDeviceStatus(1);
+    connectDev();
+}
 
 QSharedPointer<DeviceOperation> DeviceOperation::getSingleton()
 {
@@ -68,7 +79,7 @@ QSharedPointer<DeviceOperation> DeviceOperation::getSingleton()
 
 void DeviceOperation::setCursorColorAndCursorSize(int color, int spot)
 {
-    if(!m_isDeviceReady) return;
+    if(m_deviceStatus!=2) return;
     if(m_status.color==color&&m_status.spot==spot) return;             //变换到改变光斑颜色位置
     std::cout<<"setCursorColorAndCursorSize"<<std::endl;
     auto profile=m_profile;
@@ -155,7 +166,7 @@ void DeviceOperation::setCursorColorAndCursorSize(int color, int spot)
 
 void DeviceOperation::setLamp(LampId id, int index, bool onOff)
 {
-    if(!m_isDeviceReady) return;
+    if(m_deviceStatus!=2) return;
     int da=0;
     if(onOff)
     {
@@ -179,7 +190,7 @@ void DeviceOperation::setLamp(LampId id, int index, bool onOff)
 
 void DeviceOperation::setWhiteLamp(bool onOff)
 {
-    if(!m_isDeviceReady) return;
+    if(m_deviceStatus!=2) return;
 //    auto config=DeviceData::getSingleton()->m_config;
     auto whiteLampDaPtr=m_config.whiteBackgroundLampDAPtr();
     if(onOff)
@@ -203,7 +214,7 @@ bool DeviceOperation::getDynamicMoveStatus()
 
 QPointF DeviceOperation::getDyanmicAnswerPos()
 {
-    if(!m_isDeviceReady)
+    if(m_deviceStatus!=2)
     {
         return m_lastDynamicCoordAndXYMotorPos[qrand()%m_lastDynamicCoordAndXYMotorPos.size()].first;
     }
@@ -239,7 +250,7 @@ bool DeviceOperation::getMotorsBusy(QVector<UsbDev::DevCtl::MotorId> motorIDs)
 
 void DeviceOperation::setDB(int DB)
 {
-    if(!m_isDeviceReady) return;
+    if(m_deviceStatus!=2) return;
 //    if(m_status.DB==DB) return;
 //    auto config=m_devCtl->config();
     UsbDev::Config config;
@@ -280,7 +291,7 @@ void DeviceOperation::moveToAdjustLight(int motorPosX,int motorPosY,int motorPos
 void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB,bool isMainDotInfoTable)
 {
     m_isMainTable=isMainDotInfoTable;
-    if(!m_isDeviceReady) return;
+    if(m_deviceStatus!=2) return;
     auto coordSpacePosInfo=DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoord(loc,isMainDotInfoTable);
     auto spotSizeToSlot=DeviceSettings::getSingleton()->m_spotSizeToSlot;
     int spotSlot;
@@ -303,6 +314,7 @@ void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB,bool
     waitForSomeTime(50);
     while(qAbs(m_statusData.motorPosition(UsbDev::DevCtl::MotorId_Shutter)-m_config.shutterOpenPosRef())<70)
     {
+        if(m_deviceStatus!=2) return;
         QApplication::processEvents();
     }
     move5Motors(isMotorMove,motorPos);
@@ -412,7 +424,7 @@ void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSiz
     int totalframe=ceil((float)stepCount/stepPerFrame);
     for(int i=0;i<totalframe-1;i++)
     {
-        if(m_isDeviceReady)
+        if(m_deviceStatus==2)
             m_devCtl->sendDynamicData(totalframe,i,512,&dotArr[stepPerFrame*3*i]);                        //一般帧
     }
 
@@ -423,11 +435,11 @@ void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSiz
 //    qDebug()<<remainStep;
 //    qDebug()<<dataLen;
 //    qDebug()<<stepPerFrame*3*(totalframe-1);
-    if(m_isDeviceReady)
+    if(m_deviceStatus==2)
         m_devCtl->sendDynamicData(totalframe,totalframe-1,dataLen,&dotArr[stepPerFrame*3*(totalframe-1)]);     //最后一帧
     waitForSomeTime(1000);
     qDebug()<<("开始移动");
-    if(m_isDeviceReady)
+    if(m_deviceStatus==2)
     {
         waitForSomeTime(100);
         waitMotorStop({UsbDev::DevCtl::MotorId_Color,
@@ -446,14 +458,14 @@ void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSiz
 
 void DeviceOperation::stopDynamic()
 {
-    if(!m_isDeviceReady) return;
+    if(m_deviceStatus!=2) return;
     std::cout<<"stop Dynamic"<<std::endl;
     m_devCtl->stopDyanmic();
 }
 
 void DeviceOperation::openShutter(int durationTime)
 {
-    if(!m_isDeviceReady) return;
+    if(m_deviceStatus!=2) return;
     auto shutterPos=m_config.shutterOpenPosRef();
     m_devCtl->openShutter(durationTime,shutterPos);
 }
@@ -469,18 +481,18 @@ void DeviceOperation::move5Motors(bool isMotorMove[], int MotorPoses[])
             sps[i]=spsConfig[i];
         }
     }
-    if(m_isDeviceReady)
+    if(m_deviceStatus==2)
         m_devCtl->move5Motors(sps,MotorPoses);
 }
 
 void DeviceOperation::waitMotorStop(QVector<UsbDev::DevCtl::MotorId> motorIDs)
 {
-    if(!m_isDeviceReady)
-        return;
+    if(m_deviceStatus!=2) return;
     QElapsedTimer mstimer;
     mstimer.restart();//必须先等一会儿刷新状态
     do
     {
+        if(m_deviceStatus!=2) return;
         QApplication::processEvents();
     }while(getMotorsBusy(motorIDs)/*||(mstimer.elapsed()<100)*/);
 }
@@ -497,7 +509,7 @@ void DeviceOperation::waitForSomeTime(int time)
 
 void DeviceOperation::moveChin(ChinMoveDirection direction)
 {
-    if(!m_isDeviceReady) return;
+    if(m_deviceStatus!=2) return;
     auto profile=m_devCtl->profile();
     auto spsConfig=DeviceSettings::getSingleton()->m_motorChinSpeed;
 
@@ -544,7 +556,7 @@ void DeviceOperation::moveChin(ChinMoveDirection direction)
 
 void DeviceOperation::lightUpCastLight()
 {
-    if(m_isDeviceReady&&!m_castLightUp)
+    if(m_deviceStatus==2&&!m_castLightUp)
     {
         m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA);
         std::cout<<"cast light Up:"<<m_currentCastLightDA<<std::endl;
@@ -554,7 +566,7 @@ void DeviceOperation::lightUpCastLight()
 
 void DeviceOperation::dimDownCastLight()
 {
-    if(m_isDeviceReady&&m_castLightUp)
+    if(m_deviceStatus==2&&m_castLightUp)
     {
         m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA*0.3);
         std::cout<<"cast light Down"<<m_currentCastLightDA*0.3<<std::endl;
@@ -564,7 +576,7 @@ void DeviceOperation::dimDownCastLight()
 
 void DeviceOperation::resetMotors(QVector<UsbDev::DevCtl::MotorId> motorIDs)
 {
-    if(!m_isDeviceReady) return;
+    if(m_deviceStatus!=2) return;
     auto spsConfig=DeviceSettings::getSingleton()->m_motorChinSpeed;
     for(auto& motorID:motorIDs)
     {
@@ -576,7 +588,7 @@ void DeviceOperation::resetMotors(QVector<UsbDev::DevCtl::MotorId> motorIDs)
 void DeviceOperation::beep()
 {
     auto devSetting=DeviceSettings::getSingleton();
-    if(m_isDeviceReady)
+    if(m_deviceStatus==2)
     {
         m_devCtl->beep(devSetting->m_beepCount,devSetting->m_beepDuration,devSetting->m_beepInterval);
     }
@@ -584,7 +596,7 @@ void DeviceOperation::beep()
 
 void DeviceOperation::alarm()
 {
-    if(m_isDeviceReady)
+    if(m_deviceStatus==2)
     {
         m_devCtl->beep(5,100,100);
     }
@@ -597,6 +609,7 @@ void DeviceOperation::clearPupilData()
 
 void DeviceOperation::workOnNewStatuData()
 {
+    m_reconnectTimer.start();
     if(m_workStatusElapsedTimer.elapsed()>=5000)
     {
         m_workStatusElapsedTimer.restart();
@@ -666,7 +679,7 @@ void DeviceOperation::workOnNewStatuData()
 
     }
 
-    if(m_castLightAdjustStatus==2&&m_castLightAdjustElapsedTimer.elapsed()>=500&&m_isDeviceReady)
+    if(m_castLightAdjustStatus==2&&m_castLightAdjustElapsedTimer.elapsed()>=500&&m_deviceStatus==2)
     {
         updateDevInfo("keep adjust castLightDa");
         int tagetDA=DeviceSettings::getSingleton()->m_castLightTagetDA;
@@ -774,13 +787,13 @@ void DeviceOperation::workOnNewFrameData()
 
 void DeviceOperation::workOnNewProfile()
 {
+    if(!m_profile.isEmpty()) return;
     qDebug()<<"work on new Profile";
     m_profile=m_devCtl->profile();
     m_videoSize=m_profile.videoSize();
-    if(!m_isDeviceReady&&!m_profile.isEmpty()&&!m_config.isEmpty())
+    if(!m_profile.isEmpty()&&!m_config.isEmpty())
     {
         m_currentCastLightDA=m_config.castLightADPresetRef()+DeviceSettings::getSingleton()->m_castLightDAChanged;
-        setIsDeviceReady(true);
         auto date=QDate::currentDate();
         auto lastAdjustedDate=QDate::fromString(DeviceSettings::getSingleton()->m_castLightLastAdjustedDate,"yyyy/MM/dd");
         bool adjusted=((date.year()==lastAdjustedDate.year())&&(date.month()==lastAdjustedDate.month())&&(date.day()==lastAdjustedDate.day()));
@@ -796,6 +809,7 @@ void DeviceOperation::workOnNewProfile()
 
 void DeviceOperation::workOnNewConfig()
 {
+    if(!m_config.isEmpty()) return;
     qDebug()<<"work on new config";
     m_config=m_devCtl->config();
     m_devicePupilProcessor.m_pupilGreyLimit=m_config.pupilGreyThresholdDAPtr()[0];
@@ -804,17 +818,15 @@ void DeviceOperation::workOnNewConfig()
     qDebug()<<m_devicePupilProcessor.m_pupilReflectionDotWhiteLimit;
     qDebug()<<m_config.castLightADPresetRef();
 
-    if(!m_isDeviceReady&&!m_profile.isEmpty()&&!m_config.isEmpty())
+    if(!m_profile.isEmpty()&&!m_config.isEmpty())
     {
         m_currentCastLightDA=m_config.castLightADPresetRef()+DeviceSettings::getSingleton()->m_castLightDAChanged;
-        setIsDeviceReady(true);
         auto date=QDate::currentDate();
         auto lastAdjustedDate=QDate::fromString(DeviceSettings::getSingleton()->m_castLightLastAdjustedDate,"yyyy/MM/dd");
         bool adjusted=((date.year()==lastAdjustedDate.year())&&(date.month()==lastAdjustedDate.month())&&(date.day()==lastAdjustedDate.day()));
         if(adjusted)
         {
             setCastLightAdjustStatus(3);
-//            m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA*0.3);
             dimDownCastLight();
         }
         else
@@ -844,6 +856,9 @@ void DeviceOperation::workOnWorkStatusChanged(int status)
             m_devCtl->readConfig();
 //        waitForSomeTime(8000);                                          //目前config获取会导致阻塞 所以需要多等一下
 //        adjustCastLight();
+        setDeviceStatus(2);
+//        setIsDeviceReady(true);
+
     }
     else if(/*m_reconnectTimer.elapsed()>=10000&&*/(m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_Disconnected||m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_Disconnected))
     {
@@ -858,7 +873,8 @@ void DeviceOperation::workOnWorkStatusChanged(int status)
             disconnect(m_devCtl.data(),&UsbDev::DevCtl::newConfig,this,&DeviceOperation::workOnNewConfig);
             m_devCtl.reset(nullptr);
         }
-        setIsDeviceReady(false);
+//        setIsDeviceReady(false);
+//        setDeviceStatus(0);
 //        if(m_connectDev)
 //        {
 //            waitForSomeTime(10000);

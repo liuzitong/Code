@@ -71,6 +71,16 @@ Rectangle {
                         CusButton{
                             type:"click";isAnime: false;underImageText.text: lt+qsTr("Login");underImageText.color: "white"; fontSize: height/4;rec.visible: false;width:image.sourceSize.width;imageSrc: "qrc:/Pics/base-svg/menu_login.svg";pressImageSrc: "qrc:/Pics/base-svg/menu_login_select.svg";
                         }
+                        CusText
+                        {
+                            width: parent.width*0.2;
+                            height: parent.height;
+                            anchors.left: parent.left;
+                            anchors.leftMargin: parent.width*0.07;
+                            text:IcUiQmlApi.appCtrl.checkSvc.deviceStatus===1?qsTr("Device is reconnecting"):"";
+                            color: "Red";
+                        }
+
                         Flow{
                             id:contentSwitcher
 //                            property string contentType: "patientManagement";

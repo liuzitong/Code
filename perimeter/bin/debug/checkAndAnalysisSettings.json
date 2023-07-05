@@ -1,4 +1,5 @@
 {
+    "debugMode":false,
     "checkCountBeforeGetBlindDotCheck":3,
     "blindDotTestDB":10,
     "blindDotTestIncDB":5,

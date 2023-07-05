@@ -32,6 +32,17 @@ Item {id:root; width: 1366;height: 691
     Component.onCompleted:{
         frameProvidSvc=IcUiQmlApi.appCtrl.frameProvidSvc;
         checkSvc.checkResultChanged.connect(currentCheckResultChanged);
+        checkSvc.deviceStatusChanged.connect(function()
+        {
+            if(currentCheckResult!=null)
+            {
+                if(currentProgram.type!==2)
+                    IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::StaticCheckResultVm",currentCheckResult);
+                else
+                    IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::DynamicCheckResultVm",currentCheckResult);
+                currentCheckResult=null;
+            }
+        });
         IcUiQmlApi.appCtrl.checkSvc.connectDev();
 //        refresh();
     }
@@ -254,7 +265,7 @@ Item {id:root; width: 1366;height: 691
                                                 LineEdit{text:(IcUiQmlApi.appCtrl.checkSvc.pupilDiameter>0&&pupilDiameter.checked)?IcUiQmlApi.appCtrl.checkSvc.pupilDiameter.toFixed(2):"";width: parent.width*0.25;textInput.readOnly:true;}
                                             }
                                             Row{id: row;width:parent.width;height: parent.height*0.75/3;spacing: width*0.05;
-                                                CusCheckBox{id:eyeMoveAlarm;checked:true;onCheckedChanged:checkSvc.eyeMoveAlarm=checked;}
+                                                CusCheckBox{id:eyeMoveAlarm;checked:false;onCheckedChanged:checkSvc.eyeMoveAlarm=checked;}
                                                 CusText{text:lt+qsTr("Eye move alarm"); horizontalAlignment: Text.AlignLeft;width: parent.width*0.50;font.pointSize: fontPointSize;}
                                                 Image {source: "qrc:/Pics/capture-svg/btn_alarm.svg";height:parent.height*0.6; anchors.verticalCenter: parent.verticalCenter;width: height; }
                                             }
@@ -406,7 +417,7 @@ Item {id:root; width: 1366;height: 691
                     Item{anchors.fill: parent;anchors.margins:parent.height*0.15;
                         Flow{height: parent.height;spacing: height*0.8;anchors.horizontalCenter: parent.horizontalCenter;
                             CusButton{
-                                enabled:IcUiQmlApi.appCtrl.checkSvc.checkState===5&&IcUiQmlApi.appCtrl.checkSvc.readyToCheck;text:lt+qsTr("Select program");width:IcUiQmlApi.appCtrl.settings.isRuntimeLangEng?height*4:height*2.5;
+                                enabled:IcUiQmlApi.appCtrl.checkSvc.checkState===5&&IcUiQmlApi.appCtrl.checkSvc.readyToCheck&&IcUiQmlApi.appCtrl.checkSvc.deviceStatus===2;text:lt+qsTr("Select program");width:IcUiQmlApi.appCtrl.settings.isRuntimeLangEng?height*4:height*2.5;
                                 onClicked:
                                 {
                                     if(currentCheckResult!==null)
@@ -423,7 +434,7 @@ Item {id:root; width: 1366;height: 691
                             CusButton{
                                 id:paramsSetting;
                                 text:lt+qsTr("Params setting");
-                                enabled:(currentProgram!==null&&IcUiQmlApi.appCtrl.checkSvc.checkState===5)&&IcUiQmlApi.appCtrl.checkSvc.readyToCheck;
+                                enabled:(currentProgram!==null&&IcUiQmlApi.appCtrl.checkSvc.checkState===5)&&IcUiQmlApi.appCtrl.checkSvc.readyToCheck&&IcUiQmlApi.appCtrl.checkSvc.deviceStatus===2;
                                 width:IcUiQmlApi.appCtrl.settings.isRuntimeLangEng?height*4:height*2.5;
                                 onClicked:if(currentProgram.type!==2){ staticParamsSetting.open();} else {/*dynamicParamsSetting.currentProgramChanged();console.log(currentProgram.params.brightness);*/dynamicParamsSetting.open();}
                             }
@@ -436,7 +447,7 @@ Item {id:root; width: 1366;height: 691
                             id:checkControl
                             height: parent.height;spacing: height*0.8;anchors.horizontalCenter: parent.horizontalCenter;
                             CusButton{
-                                enabled: /*IcUiQmlApi.appCtrl.checkSvc.devReady&&IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus===3&&*/IcUiQmlApi.appCtrl.checkSvc.readyToCheck&&(currentProgram.type!==2||checkDisplay.dynamicSelectedDotsReady)&&!(checkState===3||checkState===4);
+                                enabled: (IcUiQmlApi.appCtrl.checkSvc.debugMode||(IcUiQmlApi.appCtrl.checkSvc.deviceStatus===2&&IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus===3))&&IcUiQmlApi.appCtrl.checkSvc.readyToCheck&&(currentProgram.type!==2||checkDisplay.dynamicSelectedDotsReady)&&!(checkState===3||checkState===4);
                                 property int checkState: IcUiQmlApi.appCtrl.checkSvc.checkState;
                                 text:{if(checkState===3||checkState===4||checkState===5) return lt+qsTr("Start");if(checkState===2) return lt+qsTr("Resume");if(checkState===0||checkState===1) return lt+qsTr("Pause")}
                                 onClicked:{
@@ -508,7 +519,11 @@ Item {id:root; width: 1366;height: 691
                                         currentCheckResult=null;
                                     }
                                     os_od.value=os_od.value==0?1:0;
-
+//                                    console.log( IcUiQmlApi.appCtrl.checkSvc.deviceStatus);
+//                                    console.log( IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus===3);
+//                                    console.log( IcUiQmlApi.appCtrl.checkSvc.readyToCheck);
+//                                    console.log(currentProgram.type!==2||checkDisplay.dynamicSelectedDotsReady);
+//                                    console.log(IcUiQmlApi.appCtrl.checkSvc.checkState);
                                 }
                             }
                         }

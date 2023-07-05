@@ -533,7 +533,10 @@ Item{
             Item{height: parent.height;width:parent.width*0.6;
                 CusButton{text:lt+qsTr("Exit");onClicked:Qt.quit()}
                 Flow{height: parent.height;spacing: height*0.8;anchors.horizontalCenter: parent.horizontalCenter
-                    CusButton{text:lt+qsTr("Recheck");enabled:currentPatient!==null&&lastProgram!==null/*&&IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus===3*/;onClicked:root.changePage("check",{lastProgram:lastProgram,type:"reCheck"})}
+                    CusButton{text:lt+qsTr("Recheck");
+                        enabled:currentPatient!==null&&lastProgram!==null&&(IcUiQmlApi.appCtrl.checkSvc.debugMode||IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus===3&&IcUiQmlApi.appCtrl.checkSvc.deviceStatus===2);
+                        onClicked:root.changePage("check",{lastProgram:lastProgram,type:"reCheck"})
+                    }
                     CusButton{id:patientReviseButton;enabled: false;text:lt+qsTr("Modify");
                         onClicked:
                         {
@@ -568,10 +571,15 @@ Item{
                 }
             }
             Flow{height:parent.height; layoutDirection: Qt.RightToLeft;width:parent.width*0.4;spacing: height*0.8;
-                CusButton{text:lt+qsTr("Check");enabled:currentPatient!==null&&(!IcUiQmlApi.appCtrl.checkSvc.devReady||IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus===3);
+                CusButton{
+                    text:lt+qsTr("Check");
+//                    enabled: true;
+                    enabled:currentPatient!==null&&(IcUiQmlApi.appCtrl.checkSvc.debugMode||(IcUiQmlApi.appCtrl.checkSvc.deviceStatus===2&&IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus===3));
                     onClicked:
                     {
                         root.changePage("check",{lastProgram:null,type:"check"});
+//                        console.log(IcUiQmlApi.appCtrl.checkSvc.deviceStatus);
+//                        console.log(IcUiQmlApi.appCtrl.checkSvc.debugMode);
                     }
                 }
                 CusButton{id:patientSaveButton;text:lt+qsTr("Save");/*enabled: false;*/

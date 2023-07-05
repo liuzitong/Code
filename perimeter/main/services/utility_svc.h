@@ -64,6 +64,7 @@ public:
     float m_checkZoneRatio;
     QSize m_realTimeEyePosPicSize;
     int m_centerPointCheckedWaitingTime;
+    bool m_debugMode;
 
     QVector<QVector<QVector<int>>> m_value_30d_cursorSize_cursorColor;
     QVector<QVector<int>> m_value_30d_cursorSizeIII_ageCorrection;     //cursorSize!=2 ,it's CursorColor
