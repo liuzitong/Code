@@ -4,7 +4,7 @@ Item{
     id:root
     height: parent.height;
     width: height;
-    property bool checked: false;
+    property alias checked: image.checked;
     property string imageSrc:"qrc:/Pics/base-svg/btn_checkbox_1normal.svg";
     property string hoverImageSrc: "qrc:/Pics/base-svg/btn_checkbox_2hover.svg";
     property string pressImageSrc: "qrc:/Pics/base-svg/btn_checkbox_3press.svg";
@@ -15,17 +15,20 @@ Item{
     Rectangle{id:rec;anchors.fill: parent;color:backGroundColor;z:-1;radius:parent.height/5;}
 
     Image {
+        property bool checked: false;
+        property bool hovered: false;
         id: image
-        source: checked?"qrc:/Pics/base-svg/btn_checkbox_3press.svg":"qrc:/Pics/base-svg/btn_checkbox_1normal.svg";
+        source: checked?"qrc:/Pics/base-svg/btn_checkbox_3press.svg":hovered?"qrc:/Pics/base-svg/btn_checkbox_2hover.svg":"qrc:/Pics/base-svg/btn_checkbox_1normal.svg";
         anchors.fill: parent;
     }
 
     MouseArea{
+        z:1;
         hoverEnabled: true;
         anchors.fill: parent
-        onClicked:{if(checked) {image.source=imageSrc}else{image.source=pressImageSrc;} checked=!checked;root.clicked();}
-        onEntered:{if(!checked){image.source=hoverImageSrc;} rec.color="white";}
-        onExited:{if(!checked)/* image.source=pressImageSrc:*/image.source=imageSrc;rec.color=backGroundColor;}
+        onClicked:{checked=!checked;root.clicked();}
+        onEntered:{image.hovered=true;}
+        onExited:{image.hovered=false;}
     }
 }
 
