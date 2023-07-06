@@ -1,4 +1,4 @@
-import QtQuick 2.0
+﻿import QtQuick 2.0
 import QtQml 2.2
 Item{
     id:root
@@ -8,14 +8,16 @@ Item{
     property string imageSrc:"qrc:/Pics/base-svg/btn_checkbox_1normal.svg";
     property string hoverImageSrc: "qrc:/Pics/base-svg/btn_checkbox_2hover.svg";
     property string pressImageSrc: "qrc:/Pics/base-svg/btn_checkbox_3press.svg";
-    property string backGroundColor:enabled? "#f0f2f3":"#989898";
+    property string backGroundColor:enabled? "#f0f2f3":"#c0c0c0";
     signal clicked;
+
+
+    Rectangle{id:rec;anchors.fill: parent;color:backGroundColor;z:-1;radius:parent.height/5;}
 
     Image {
         id: image
         source: checked?"qrc:/Pics/base-svg/btn_checkbox_3press.svg":"qrc:/Pics/base-svg/btn_checkbox_1normal.svg";
         anchors.fill: parent;
-        Rectangle{id:rec;anchors.fill: parent;color:backGroundColor;z:-1;radius:parent.height/5;}
     }
 
     MouseArea{

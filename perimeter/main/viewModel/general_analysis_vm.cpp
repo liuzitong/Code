@@ -118,7 +118,7 @@ StaticAnalysisVm::StaticAnalysisVm(const QVariantList &args)
             analysisMethodSvc->drawPE(m_peDev,m_locs,m_range,img);img.save(m_previewFolder+"TotalPE.bmp");
             if(m_md<-5)
             {
-                analysisMethodSvc->drawWords(img,{"Pattern Deviation not","Shown for serverely","Depressed fields. Refer","to Total Deviation"});
+                analysisMethodSvc->drawWords(img,{tr("Pattern Deviation not"),tr("Shown for serverely"),tr("Depressed fields. Refer"),tr("to Total Deviation")});
                 img.save(m_previewFolder+"PatternDeviation.bmp");;img.save(m_previewFolder+"PatternPE.bmp");
             }
             else
@@ -144,7 +144,7 @@ StaticAnalysisVm::StaticAnalysisVm(const QVariantList &args)
             analysisMethodSvc->drawPE(m_peDev,m_locs,m_range,img);img.save(m_previewFolder+"TotalPE.bmp");
             if(m_md<-5)
             {
-                analysisMethodSvc->drawWords(img,{"Pattern Deviation not","Shown for serverely","Depressed fields. Refer","to Total Deviation"});
+                analysisMethodSvc->drawWords(img,{tr("Pattern Deviation not"),tr("Shown for serverely"),tr("Depressed fields. Refer"),tr("to Total Deviation")});
                 img.save(m_previewFolder+"PatternPE.bmp");
             }
             else
@@ -251,7 +251,7 @@ void StaticAnalysisVm::showReport(int report)
             analysisMethodSvc->drawPE(m_peDev,m_locs,m_range,img480);img480.save(m_reportFolder+"TotalPE.bmp");
             if(m_md<-5)
             {
-                analysisMethodSvc->drawWords(img480,{"Pattern Deviation not","Shown for serverely","Depressed fields. Refer","to Total Deviation"},1.0,true);
+                analysisMethodSvc->drawWords(img480,{tr("Pattern Deviation not"),tr("Shown for serverely"),tr("Depressed fields. Refer"),tr("to Total Deviation")},1.0,true);
                 img480.save(m_reportFolder+"PatternDeviation.bmp");img480.save(m_reportFolder+"PatternPE.bmp");
             }
             else
@@ -274,7 +274,7 @@ void StaticAnalysisVm::showReport(int report)
             analysisMethodSvc->drawPE(m_peDev,m_locs,m_range,img480);img480.save(m_reportFolder+"TotalPE.bmp");
             if(m_md<-5)
             {
-                analysisMethodSvc->drawWords(img480,{"Pattern Deviation not","Shown for serverely","Depressed fields. Refer","to Total Deviation"},1.0,true);
+                analysisMethodSvc->drawWords(img480,{tr("Pattern Deviation not"),tr("Shown for serverely"),tr("Depressed fields. Refer"),tr("to Total Deviation")},1.0,true);
                 img480.save(m_reportFolder+"PatternPE.bmp");
             }
             else

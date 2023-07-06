@@ -163,7 +163,7 @@ Column {
                         height: parent.height;width: height*3.5;
                         enabled: currentCheckResult!==null;
                         property var listModel:ListModel {}
-                        property var reportNames: [[lt+qsTr("Single"),lt+qsTr("Three in one"),lt+qsTr("Overview"),lt+qsTr("Three in one"),lt+qsTr("Threshold")],[lt+qsTr("Screening")],[lt+qsTr("Dynamic"),lt+qsTr("Dyanmic data")]]
+                        property var reportNames: [[lt+qsTr("Single"),lt+qsTr("Three in one"),lt+qsTr("Overview"),lt+qsTr("Three in one"),lt+qsTr("Threshold")],[lt+qsTr("Screening")],[lt+qsTr("Dynamic"),lt+qsTr("Dynamic data")]]
                         comboBox.model: listModel;popDirectionDown: false;complexType: true;
                         button.text: lt+qsTr("Analysis");
                         button.onClicked:

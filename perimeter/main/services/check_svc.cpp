@@ -11,7 +11,8 @@
 #include <array>
 #include <QMessageBox>
 #include <perimeter/main/services/keyboard_filter.h>
-//#include <QtConcurrent/QtConcurrent>
+#include <QtConcurrent/QtConcurrent>
+
 namespace Perimeter
 {
 constexpr int MaxDB=51;
@@ -386,7 +387,7 @@ void StaticCheck::resetData()
 //第一次先跑点,直接刺激,第二次跑点,等待上次刺激的应答,然后再刺激,再跑点,再等待上次的应答.(保证再等待应答的同时跑点.)
 void StaticCheck::Checkprocess()
 {
-    std::cout<<"getReadyToStimulate..........."<<std::endl;
+//    std::cout<<"getReadyToStimulate..........."<<std::endl;
     m_alreadyChecked=false;
     auto checkCycleLocAndDB=getCheckCycleLocAndDB();                //存储LastdotType为各种检查
     if(m_error==true) return;                                       //找不到盲点 退出检查
@@ -403,17 +404,17 @@ void StaticCheck::Checkprocess()
         getReadyToStimulate(m_lastCheckDotRecord.last()->loc,m_lastCheckDotRecord.last()->StimulationDBs.last());
     }
 
-    std::cout<<"waitAndProcessAnswer..........."<<std::endl;
+//    std::cout<<"waitAndProcessAnswer..........."<<std::endl;
     if(m_stimulated)                               //最开始没刺激过就不需要处理
     {
         m_stimulated=false;
         waitAndProcessAnswer();                             //取出commonDot 并且取出指针,处理的时候可能发现下一个是已经检查出结果的点,这个时候就选择不刺激置m_alreadyChecked为true
         emit checkResultChanged();
     }
-    std::cout<<"checkWaiting..........."<<std::endl;
+//    std::cout<<"checkWaiting..........."<<std::endl;
     checkWaiting();
 
-    std::cout<<"stimulate..........."<<std::endl;
+//    std::cout<<"stimulate..........."<<std::endl;
     if(m_checkedCount<m_totalCount&&!m_alreadyChecked)                         //如果测试完毕或者是已经得到结果的点就不刺激了
     {
         stimulate();
@@ -1430,14 +1431,14 @@ void DynamicCheck::resetData()
 
 void DynamicCheck::Checkprocess()
 {
-    std::cout<<"stimulate............."<<std::endl;
+//    std::cout<<"stimulate............."<<std::endl;
     auto& record=m_records[getPathRecordIndex()];
     stimulate(record.beginLoc,record.endLoc);
-    std::cout<<"waitForAnswer............."<<std::endl;
+//    std::cout<<"waitForAnswer............."<<std::endl;
     auto answerLoc=waitForAnswer();
-    std::cout<<"ProcessAnswer............."<<std::endl;
+//    std::cout<<"ProcessAnswer............."<<std::endl;
     ProcessAnswer(answerLoc,record);
-    std::cout<<"checkWaiting............."<<std::endl;
+//    std::cout<<"checkWaiting............."<<std::endl;
     checkWaiting();
 }
 
@@ -1494,7 +1495,39 @@ QVector<QPointF> DynamicCheck::waitForAnswer()
         if(m_deviceOperation->m_deviceStatus!=2) return {};
         QApplication::processEvents();          //等待刷新状态
     }
+
+    bool end=false;
+    QElapsedTimer elapsedTimer;
+    elapsedTimer.start();
     QVector<QPointF> answerLocs;
+    QtConcurrent::run([&](){
+        while (!end)
+        {
+            if(elapsedTimer.elapsed()>=1500)
+            {
+                elapsedTimer.restart();
+                if(m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation>UtilitySvc::getSingleton()->m_deviationLimit&&m_eyeMoveAlarm)
+                {
+                    m_deviceOperation->beep();
+                    if(m_programModel->m_params.fixationMonitor==FixationMonitor::alarmAndPause)
+                    {
+                        m_deviationCount++;
+                        if(m_deviationCount>=UtilitySvc::getSingleton()->m_pauseCheckDeviationCount)
+                        {
+                            m_reqPause=true;
+                            m_deviationCount=0;
+                        }
+                    }
+                    else
+                    {
+                        m_reqPause=false;
+                    }
+                }
+            }
+        }
+    });
+
+
     if(m_programModel->m_params.strategy==DynamicParams::Strategy::straightLine)
     {
         while(m_deviceOperation->getDynamicMoveStatus())
@@ -1571,6 +1604,7 @@ QVector<QPointF> DynamicCheck::waitForAnswer()
         }
     }
     Exit:
+    end=true;
     m_deviceOperation->openShutter(0);
     m_deviceOperation->waitMotorStop({UsbDev::DevCtl::MotorId_Shutter});
     if(m_deviceOperation->getDynamicMoveStatus())
@@ -1652,27 +1686,6 @@ void DynamicCheck::checkWaiting()
             timer.restart();
         }
     }
-
-    qDebug()<<int(m_programModel->m_params.fixationMonitor);
-
-    if(m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation>UtilitySvc::getSingleton()->m_deviationLimit&&m_eyeMoveAlarm)
-    {
-        m_deviceOperation->beep();
-        if(m_programModel->m_params.fixationMonitor==FixationMonitor::alarmAndPause)
-        {
-            m_deviationCount++;
-            if(m_deviationCount>=UtilitySvc::getSingleton()->m_pauseCheckDeviationCount)
-            {
-                m_reqPause=true;
-                m_deviationCount=0;
-            }
-        }
-        else
-        {
-            m_reqPause=false;
-        }
-    }
-
 }
 
 
@@ -1808,6 +1821,8 @@ void CheckSvcWorker::doWork()
 //            qDebug()<<("Checking");
             if(*m_checkState==3) break;
             m_check->Checkprocess();
+            qDebug()<<"m_checkReqPuase:";
+            qDebug()<<m_check->m_reqPause;
             if(m_check->m_error)
             {
                 setCheckState(3);
@@ -1829,7 +1844,7 @@ void CheckSvcWorker::doWork()
         case 2:                                             //pause
         {
 //            qDebug()<<("pausing");
-            UtilitySvc::wait(500);
+            QApplication::processEvents();
             break;
         }
         case 3:                                             //stop

@@ -44,7 +44,6 @@ Item
                             model: [{name:lt+qsTr("Eye move alarm mode"),param:fixationMonitor[params.fixationMonitor]},{name:lt+qsTr("Check time"),param:Math.floor(timeSpan/60)+":"+timeSpan%60}]
                            CusText{text:modelData.name+":  "+modelData.param; horizontalAlignment: Text.AlignLeft;height:textHeight;width: parent.width;}
                         }
-    //                        CusText{text:"固视监测";  horizontalAlignment: Text.AlignLeft;height:textHeight;width: parent.width;}
                     }
                     Column{width:parent.width;height: parent.height*0.15;spacing: textHeight*0.5;
                         Repeater{
@@ -143,12 +142,13 @@ Item
                                         width:parent.width;height:scrollView.height/20;
                                         Repeater
                                         {
-                                            model:[modelData.name,
+                                            model:[
+                                                modelData.name,
                                                 Math.round(CusUtils.orthToPolar(modelData.start).x),
                                                 Math.round(CusUtils.orthToPolar(modelData.start).y),
                                                 Math.round(CusUtils.orthToPolar(modelData.end).x),
                                                 Math.round(CusUtils.orthToPolar(modelData.end).y),
-                                                modelData.isSeen?(lt+qsTr("Seen")):(lt+qsTr("UnSeen"))]
+                                                modelData.isSeen?(qsTr("Seen")+lt):(qsTr("UnSeen")+lt)]           //lt必须在后面,不然会报错
                                             CusText{width:parent.width/6;height: parent.height;font.pointSize:fontPointSize;text:modelData;}
                                         }
                                     }

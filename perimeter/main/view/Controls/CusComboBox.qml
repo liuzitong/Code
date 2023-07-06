@@ -1,4 +1,4 @@
-import QtQuick 2.6
+﻿import QtQuick 2.6
 import QtQuick.Controls 2.2
 
 ComboBox {
@@ -7,7 +7,7 @@ ComboBox {
     property string borderColor:"#bdc0c6"
     property string borderColorPressed:"Brown"
     property string imageSrc: "qrc:/Pics/base-svg/btn_drop_down.svg";
-    property string backgroundColor:enabled?"#dcdee0":"#a0a0a0"
+    property string backgroundColor:enabled?"#dcdee0":"#c0c0c0"
     font.family:"Microsoft YaHei"
     font.pointSize:height*0.30;
     height: parent.height;

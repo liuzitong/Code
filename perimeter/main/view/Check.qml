@@ -172,7 +172,7 @@ Item {id:root; width: 1366;height: 691
                                         }
                                     }
                                 }
-                                Rectangle{ width: parent.width;height: parent.height*0.28; anchors.horizontalCenter: parent.horizontalCenter; border.color:backGroundBorderColor; color: currentProgram.type===null? backGroundColor:currentProgram.type!==2?backGroundColor:"grey";radius: width*0.03;
+                                Rectangle{ width: parent.width;height: parent.height*0.28; anchors.horizontalCenter: parent.horizontalCenter; border.color:backGroundBorderColor; color: currentProgram.type===null? backGroundColor:currentProgram.type!==2?backGroundColor:"#c0c0c0";radius: width*0.03;
                                     Item{ anchors.fill: parent;anchors.margins: parent.height*0.1;
                                         Column{anchors.fill: parent;spacing: 0.175*height;
                                             Row{width:parent.width;height: parent.height*0.65/3;spacing: width*0.05;
@@ -271,8 +271,8 @@ Item {id:root; width: 1366;height: 691
                                             }
                                             Row{width:parent.width;height: parent.height*0.75/3;spacing: width*0.05;
                                                 CusCheckBox{id:deviationCheckBox;checked:true;onCheckedChanged:checkSvc.measureDeviation=checked;}
-                                                CusText{text:lt+qsTr("Fixation deviation"); horizontalAlignment: Text.AlignLeft;width: parent.width*0.25;font.pointSize: fontPointSize;}
-                                                Component.onCompleted: {root.currentProgramChanged.connect(function(){console.log(currentProgram.type);if(currentProgram.type===2){enabled=false;deviationCheckBox.checked=false;}else {enabled=true;deviationCheckBox.checked=true;}});}
+                                                CusText{text:lt+qsTr("Fixation deviation"); horizontalAlignment: Text.AlignLeft;width: parent.width*0.25;font.pointSize: fontPointSize;enabled:currentProgram.type!==2 }
+                                                Component.onCompleted: {root.currentProgramChanged.connect(function(){if(currentProgram.type===2){deviationCheckBox.checked=false;deviationCheckBox.enabled=false;}else {deviationCheckBox.enabled=true;deviationCheckBox.checked=true;}});}
                                             }
                                         }
                                     }

@@ -77,7 +77,7 @@ Rectangle {
                             height: parent.height;
                             anchors.left: parent.left;
                             anchors.leftMargin: parent.width*0.07;
-                            text:IcUiQmlApi.appCtrl.checkSvc.deviceStatus===1?qsTr("Device is reconnecting"):"";
+                            text:IcUiQmlApi.appCtrl.checkSvc.deviceStatus===1?(qsTr("Device is reconnecting")+lt):"";
                             color: "Red";
                         }
 

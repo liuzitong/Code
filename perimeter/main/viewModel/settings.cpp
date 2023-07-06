@@ -41,11 +41,11 @@ void Settings::save()
         {"defaultProgramType",m_defaultProgramType},
         {"programUnlockPwd",m_programUnlockPwd}
     };
-    changeLang();
     QJsonDocument jsonDoc;
     jsonDoc.setObject(jo);
     jsonFile.write(jsonDoc.toJson());
     jsonFile.close();
+    changeLang();
 }
 
 void Settings::changeLang()
