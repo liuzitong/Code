@@ -92,7 +92,7 @@ private:
     CheckSvcWorker* m_worker;
     QThread m_workerThread;
     QString m_tips;
-    int m_checkState=5;                        //0:start,1:checking,2:pausing,3:stopped,4:finished
+    int m_checkState=5;                        //0:start,1:checking,2:pausing,3:stopping,4:finishing,5:stopped,6:finished.
     int m_checkedCount=0;
     int m_totalCount=0;
     int m_checkTime=0;

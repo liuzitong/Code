@@ -620,7 +620,7 @@ void StaticCheck::stimulate()
         m_deviceOperation->openShutter(durationTime);
         emit currentCheckingDotChanged(debug_Loc);
         std::cout<<"***** DB shi:"<<debug_DB<<"    "<<"zuo biao x:"<<debug_Loc.x()<<" "<<"zuobiao y:"<<debug_Loc.y()<<"    yong shi:"<<m_stimulationWaitingForAnswerElapsedTimer.elapsed()<<"   deviation:"<<m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation<<std::endl;
-        qDebug()<<m_resultModel->m_data.fixationDeviation;
+//        qDebug()<<m_resultModel->m_data.fixationDeviation;
         switch (lastCheckedDotType)
         {
         case LastCheckedDotType::blindDotTest:
@@ -1879,13 +1879,11 @@ void CheckSvcWorker::doWork()
             m_patientVm->update();
             qDebug()<<("finished");
             emit checkProcessFinished();
-            setCheckState(5);
+            setCheckState(6);
             break;
         }
         case 5:
-        {
-            return;
-        }
+        case 6:return;
         };
     }
 }

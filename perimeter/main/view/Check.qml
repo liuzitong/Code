@@ -34,7 +34,7 @@ Item {id:root; width: 1366;height: 691
         checkSvc.checkResultChanged.connect(currentCheckResultChanged);
         checkSvc.deviceStatusChanged.connect(function()
         {
-            if(currentCheckResult!=null)
+            if(currentCheckResult!=null&&IcUiQmlApi.appCtrl.checkSvc.checkState!==6)
             {
                 if(currentProgram.type!==2)
                     IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::StaticCheckResultVm",currentCheckResult);
@@ -396,7 +396,7 @@ Item {id:root; width: 1366;height: 691
                     Item{anchors.fill: parent; anchors.margins:parent.height*0.15;
                         CusButton
                         {
-                            enabled: IcUiQmlApi.appCtrl.checkSvc.checkState>=3;
+                            enabled: IcUiQmlApi.appCtrl.checkSvc.checkState===5||IcUiQmlApi.appCtrl.checkSvc.checkState===6;
                             text:lt+qsTr("Back");onClicked:
                             {
                                 if(currentCheckResult!==null)
@@ -417,7 +417,7 @@ Item {id:root; width: 1366;height: 691
                     Item{anchors.fill: parent;anchors.margins:parent.height*0.15;
                         Flow{height: parent.height;spacing: height*0.8;anchors.horizontalCenter: parent.horizontalCenter;
                             CusButton{
-                                enabled:IcUiQmlApi.appCtrl.checkSvc.checkState===5&&IcUiQmlApi.appCtrl.checkSvc.readyToCheck&&IcUiQmlApi.appCtrl.checkSvc.deviceStatus===2;text:lt+qsTr("Select program");width:IcUiQmlApi.appCtrl.settings.isRuntimeLangEng?height*4:height*2.5;
+                                enabled:(IcUiQmlApi.appCtrl.checkSvc.checkState===5||IcUiQmlApi.appCtrl.checkSvc.checkState===6)&&IcUiQmlApi.appCtrl.checkSvc.readyToCheck&&IcUiQmlApi.appCtrl.checkSvc.deviceStatus===2;text:lt+qsTr("Select program");width:IcUiQmlApi.appCtrl.settings.isRuntimeLangEng?height*4:height*2.5;
                                 onClicked:
                                 {
                                     if(currentCheckResult!==null)
@@ -434,7 +434,7 @@ Item {id:root; width: 1366;height: 691
                             CusButton{
                                 id:paramsSetting;
                                 text:lt+qsTr("Params setting");
-                                enabled:(currentProgram!==null&&IcUiQmlApi.appCtrl.checkSvc.checkState===5)&&IcUiQmlApi.appCtrl.checkSvc.readyToCheck&&IcUiQmlApi.appCtrl.checkSvc.deviceStatus===2;
+                                enabled:(currentProgram!==null&&(IcUiQmlApi.appCtrl.checkSvc.checkState===5||IcUiQmlApi.appCtrl.checkSvc.checkState===6))&&IcUiQmlApi.appCtrl.checkSvc.readyToCheck&&IcUiQmlApi.appCtrl.checkSvc.deviceStatus===2;
                                 width:IcUiQmlApi.appCtrl.settings.isRuntimeLangEng?height*4:height*2.5;
                                 onClicked:if(currentProgram.type!==2){ staticParamsSetting.open();} else {/*dynamicParamsSetting.currentProgramChanged();console.log(currentProgram.params.brightness);*/dynamicParamsSetting.open();}
                             }
@@ -449,7 +449,7 @@ Item {id:root; width: 1366;height: 691
                             CusButton{
                                 enabled: (IcUiQmlApi.appCtrl.checkSvc.debugMode||(IcUiQmlApi.appCtrl.checkSvc.deviceStatus===2&&IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus===3))&&IcUiQmlApi.appCtrl.checkSvc.readyToCheck&&(currentProgram.type!==2||checkDisplay.dynamicSelectedDotsReady)&&!(checkState===3||checkState===4);
                                 property int checkState: IcUiQmlApi.appCtrl.checkSvc.checkState;
-                                text:{if(checkState===3||checkState===4||checkState===5) return lt+qsTr("Start");if(checkState===2) return lt+qsTr("Resume");if(checkState===0||checkState===1) return lt+qsTr("Pause")}
+                                text:{if(checkState===5||checkState===6) return lt+qsTr("Start");if(checkState===2) return lt+qsTr("Resume");if(checkState===0||checkState===1) return lt+qsTr("Pause")}
                                 onClicked:{
                                     IcUiQmlApi.appCtrl.checkSvc.dynamicSelectedDots=checkDisplay.dynamicSelectedDots;     //动态输入点
                                     if(checkState>2)
@@ -507,7 +507,7 @@ Item {id:root; width: 1366;height: 691
                                 }}
                             CusButton{
                                 text:lt+qsTr("Switch eye");
-                                enabled: IcUiQmlApi.appCtrl.checkSvc.checkState>2;
+                                enabled:IcUiQmlApi.appCtrl.checkSvc.checkState===5||IcUiQmlApi.appCtrl.checkSvc.checkState===6;
                                 onClicked:
                                 {
                                     if(currentCheckResult!=null)
@@ -531,7 +531,7 @@ Item {id:root; width: 1366;height: 691
                         CusComboBoxButton{
                             height: parent.height; anchors.right: parent.right; anchors.rightMargin: 0;width: height*3.5;
 //                            enabled: currentCheckResult!==null;
-                            enabled: currentCheckResult!==null&&IcUiQmlApi.appCtrl.checkSvc.checkState===5;
+                            enabled: currentCheckResult!==null&&IcUiQmlApi.appCtrl.checkSvc.checkState===6;
                             property var listModel:ListModel {}
                             property var reportNames: [[lt+qsTr("Single"),lt+qsTr("Three in one"),lt+qsTr("Overview"),lt+qsTr("Three in one"),lt+qsTr("Threshold")],[lt+qsTr("Screening")],[lt+qsTr("Dynamic"),lt+qsTr("Dyanmic data")]]
                             comboBox.model: listModel;popDirectionDown: false;complexType: true;

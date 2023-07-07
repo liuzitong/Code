@@ -28,7 +28,7 @@ DeviceOperation::DeviceOperation()
     m_workStatusElapsedTimer.start();
     m_autoPupilElapsedTimer.start();
     m_reconnectingElapsedTimer.start();
-    m_reconnectTimer.setInterval(2000);
+    m_reconnectTimer.setInterval(3000);
 }
 
 
@@ -61,6 +61,7 @@ void DeviceOperation::disconnectDev()
 void DeviceOperation::reconnectDev()
 {
     if(m_reconnectingElapsedTimer.elapsed()<=10000) return;
+    m_reconnectingElapsedTimer.restart();
     m_eyeglassIntialize=false;
     qDebug()<<"reconnecting";
     m_devCtl.reset(nullptr);
@@ -610,7 +611,7 @@ void DeviceOperation::clearPupilData()
 void DeviceOperation::workOnNewStatuData()
 {
     m_reconnectTimer.start();
-    if(m_workStatusElapsedTimer.elapsed()>=5000)
+    if(m_workStatusElapsedTimer.elapsed()>=1000)
     {
         m_workStatusElapsedTimer.restart();
         updateDevInfo("receive new workStatus");
