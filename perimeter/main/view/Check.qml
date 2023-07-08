@@ -426,7 +426,7 @@ Item {id:root; width: 1366;height: 691
                     Item{anchors.fill: parent;anchors.margins:parent.height*0.15;
                         Flow{height: parent.height;spacing: height*0.8;anchors.horizontalCenter: parent.horizontalCenter;
                             CusButton{
-                                enabled:(IcUiQmlApi.appCtrl.checkSvc.checkState===5||IcUiQmlApi.appCtrl.checkSvc.checkState===6)&&IcUiQmlApi.appCtrl.checkSvc.readyToCheck&&IcUiQmlApi.appCtrl.checkSvc.deviceStatus===2;text:lt+qsTr("Select program");width:IcUiQmlApi.appCtrl.settings.isRuntimeLangEng?height*4:height*2.5;
+                                enabled:(IcUiQmlApi.appCtrl.checkSvc.checkState===5||IcUiQmlApi.appCtrl.checkSvc.checkState===6)&&(IcUiQmlApi.appCtrl.checkSvc.readyToCheck&&IcUiQmlApi.appCtrl.checkSvc.deviceStatus===2||IcUiQmlApi.appCtrl.checkSvc.debugMode);text:lt+qsTr("Select program");width:IcUiQmlApi.appCtrl.settings.isRuntimeLangEng?height*4:height*2.5;
                                 onClicked:
                                 {
                                     if(currentCheckResult!==null)
@@ -443,7 +443,7 @@ Item {id:root; width: 1366;height: 691
                             CusButton{
                                 id:paramsSetting;
                                 text:lt+qsTr("Params setting");
-                                enabled:(currentProgram!==null&&(IcUiQmlApi.appCtrl.checkSvc.checkState===5||IcUiQmlApi.appCtrl.checkSvc.checkState===6))&&IcUiQmlApi.appCtrl.checkSvc.readyToCheck&&IcUiQmlApi.appCtrl.checkSvc.deviceStatus===2;
+                                enabled:(currentProgram!==null&&(IcUiQmlApi.appCtrl.checkSvc.checkState===5||IcUiQmlApi.appCtrl.checkSvc.checkState===6))&&(IcUiQmlApi.appCtrl.checkSvc.readyToCheck&&IcUiQmlApi.appCtrl.checkSvc.deviceStatus===2||IcUiQmlApi.appCtrl.checkSvc.debugMode);
                                 width:IcUiQmlApi.appCtrl.settings.isRuntimeLangEng?height*4:height*2.5;
                                 onClicked:if(currentProgram.type!==2){ staticParamsSetting.open();} else {/*dynamicParamsSetting.currentProgramChanged();console.log(currentProgram.params.brightness);*/dynamicParamsSetting.open();}
                             }

@@ -172,6 +172,8 @@ public:
 
     void readConfig();
 
+    void readProfile();
+
     void sendBinaryCommand(QByteArray ba,int dataLen);
 
 

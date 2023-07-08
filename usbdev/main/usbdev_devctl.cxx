@@ -175,7 +175,7 @@ void   DevCtl_Worker :: init( bool req_emit )
             if ( req_emit ) { emit this->workStatusChanged( DevCtl::WorkStatus_S_OK ); }
             emit updateInfo("connection succeed.");
             this->cmd_ClearCache();
-            this->cmd_ReadProfile( req_emit );
+//            this->cmd_ReadProfile( req_emit );
 //            this->cmd_ReadConfig (req_emit);                          //这个还是改成主动读取,方便调试软件设置config
         } else {
             m_wks = DevCtl::WorkStatus_E_UnExpected;
@@ -1237,7 +1237,13 @@ MoveCache *DevCtl::readMoveCache() const
 void DevCtl::readConfig()
 {
     QMetaObject::invokeMethod(
-        T_PrivPtr( m_obj )->wkrPtr(), ("cmd_ReadConfig" ),Qt::QueuedConnection );
+                T_PrivPtr( m_obj )->wkrPtr(), ("cmd_ReadConfig" ),Qt::QueuedConnection );
+}
+
+void DevCtl::readProfile()
+{
+    QMetaObject::invokeMethod(
+                T_PrivPtr( m_obj )->wkrPtr(), ("cmd_ReadProfile" ),Qt::QueuedConnection );
 }
 
 void DevCtl::sendBinaryCommand(QByteArray ba,int dataLen)

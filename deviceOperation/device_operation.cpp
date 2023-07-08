@@ -30,6 +30,7 @@ DeviceOperation::DeviceOperation()
     m_reconnectingElapsedTimer.start();
     m_reconnectTimer.setInterval(3000);
     m_waitingTime=DeviceSettings::getSingleton()->m_waitingTime;
+    m_config=DeviceData::getSingleton()->m_config;
 }
 
 
@@ -789,51 +790,49 @@ void DeviceOperation::workOnNewFrameData()
 
 void DeviceOperation::workOnNewProfile()
 {
-    if(!m_profile.isEmpty()) return;
     qDebug()<<"work on new Profile";
     m_profile=m_devCtl->profile();
     m_videoSize=m_profile.videoSize();
-    if(!m_profile.isEmpty()&&!m_config.isEmpty())
-    {
-        m_currentCastLightDA=m_config.castLightADPresetRef()+DeviceSettings::getSingleton()->m_castLightDAChanged;
-        auto date=QDate::currentDate();
-        auto lastAdjustedDate=QDate::fromString(DeviceSettings::getSingleton()->m_castLightLastAdjustedDate,"yyyy/MM/dd");
-        bool adjusted=((date.year()==lastAdjustedDate.year())&&(date.month()==lastAdjustedDate.month())&&(date.day()==lastAdjustedDate.day()));
-        if(adjusted)
-        {
-            setCastLightAdjustStatus(3);
-            dimDownCastLight();
-        }
-        else
-            adjustCastLight();
-    }
+//    if(!m_profile.isEmpty()&&!m_config.isEmpty())
+//    {
+//        m_currentCastLightDA=m_config.castLightADPresetRef()+DeviceSettings::getSingleton()->m_castLightDAChanged;
+//        auto date=QDate::currentDate();
+//        auto lastAdjustedDate=QDate::fromString(DeviceSettings::getSingleton()->m_castLightLastAdjustedDate,"yyyy/MM/dd");
+//        bool adjusted=((date.year()==lastAdjustedDate.year())&&(date.month()==lastAdjustedDate.month())&&(date.day()==lastAdjustedDate.day()));
+//        if(adjusted)
+//        {
+//            setCastLightAdjustStatus(3);
+//            dimDownCastLight();
+//        }
+//        else
+//            adjustCastLight();
+//    }
 }
 
 void DeviceOperation::workOnNewConfig()
 {
-    if(!m_config.isEmpty()) return;
     qDebug()<<"work on new config";
-    m_config=m_devCtl->config();
+    if(!DeviceSettings::getSingleton()->m_useLocalConfig) m_config=m_devCtl->config();
     m_devicePupilProcessor.m_pupilGreyLimit=m_config.pupilGreyThresholdDAPtr()[0];
     m_devicePupilProcessor.m_pupilReflectionDotWhiteLimit=m_config.pupilGreyThresholdDAPtr()[1];
     qDebug()<<m_devicePupilProcessor.m_pupilGreyLimit;
     qDebug()<<m_devicePupilProcessor.m_pupilReflectionDotWhiteLimit;
     qDebug()<<m_config.castLightADPresetRef();
 
-    if(!m_profile.isEmpty()&&!m_config.isEmpty())
+//    if(!m_profile.isEmpty()&&!m_config.isEmpty())
+//    {
+    m_currentCastLightDA=m_config.castLightADPresetRef()+DeviceSettings::getSingleton()->m_castLightDAChanged;
+    auto date=QDate::currentDate();
+    auto lastAdjustedDate=QDate::fromString(DeviceSettings::getSingleton()->m_castLightLastAdjustedDate,"yyyy/MM/dd");
+    bool adjusted=((date.year()==lastAdjustedDate.year())&&(date.month()==lastAdjustedDate.month())&&(date.day()==lastAdjustedDate.day()));
+    if(adjusted)
     {
-        m_currentCastLightDA=m_config.castLightADPresetRef()+DeviceSettings::getSingleton()->m_castLightDAChanged;
-        auto date=QDate::currentDate();
-        auto lastAdjustedDate=QDate::fromString(DeviceSettings::getSingleton()->m_castLightLastAdjustedDate,"yyyy/MM/dd");
-        bool adjusted=((date.year()==lastAdjustedDate.year())&&(date.month()==lastAdjustedDate.month())&&(date.day()==lastAdjustedDate.day()));
-        if(adjusted)
-        {
-            setCastLightAdjustStatus(3);
-            dimDownCastLight();
-        }
-        else
-            adjustCastLight();
+        setCastLightAdjustStatus(3);
+        dimDownCastLight();
     }
+    else
+        adjustCastLight();
+//    }
 }
 
 void DeviceOperation::workOnWorkStatusChanged(int status)
@@ -852,11 +851,17 @@ void DeviceOperation::workOnWorkStatusChanged(int status)
         connect(m_devCtl.data(),&UsbDev::DevCtl::newFrameData,this,&DeviceOperation::workOnNewFrameData);
         connect(m_devCtl.data(),&UsbDev::DevCtl::newProfile,this,&DeviceOperation::workOnNewProfile);
         connect(m_devCtl.data(),&UsbDev::DevCtl::newConfig,this,&DeviceOperation::workOnNewConfig);
+
+        m_devCtl->readProfile();
+        while (m_profile.isEmpty()) {QApplication::processEvents();}
+//        waitForSomeTime(500);                                          //等一下保证 config后读
         if(DeviceSettings::getSingleton()->m_useLocalConfig)
+        {
             m_config=DeviceData::getSingleton()->m_config;
+            workOnNewConfig();
+        }
         else
             m_devCtl->readConfig();
-//        waitForSomeTime(8000);                                          //目前config获取会导致阻塞 所以需要多等一下
 //        adjustCastLight();
         setDeviceStatus(2);
 //        setIsDeviceReady(true);
