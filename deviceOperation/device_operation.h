@@ -172,6 +172,7 @@ private:
 
 
     bool m_isMainTable;
+    int m_waitingTime;
 //    QVector<float> m_pupilDiameterArr;
     //视岛坐标和电机坐标
     QVector<QPair<QPointF,QPoint>> m_lastDynamicCoordAndXYMotorPos;

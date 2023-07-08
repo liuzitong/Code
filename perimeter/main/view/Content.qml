@@ -202,6 +202,7 @@ Rectangle {
                     case "check":
                         checkPage.visible=true;
                         checkPage.pageFrom=pageFrom;
+                        checkPage.atCheckingPage=true;
 //                        checkPage.rePaintCanvas();
                         if(pageFrom==="patientManagement")
                         {

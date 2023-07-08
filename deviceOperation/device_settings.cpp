@@ -55,6 +55,7 @@ DeviceSettings::DeviceSettings()
     m_castLightTargetSize=m_rootObj.value("castLightTargetSize").toInt();
     m_castLightDAChanged=m_rootObj.value("castLightDAChanged").toInt();
     m_castLightLastAdjustedDate=m_rootObj.value("castLightLastAdjustedDate").toString();
+    m_waitingTime=m_rootObj.value("waitingTime").toInt();
 
     m_beepCount=m_rootObj.value("beepCount").toInt();
     m_beepDuration=m_rootObj.value("beepDuration").toInt();

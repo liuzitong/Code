@@ -26,7 +26,8 @@ Item {id:root; width: 1366;height: 691
     property var frameProvidSvc: null;
     property var checkSvc: IcUiQmlApi.appCtrl.checkSvc;
     property string pageFrom: "";
-    onChangePage: {IcUiQmlApi.appCtrl.checkSvc.leaveCheck();}
+    property bool atCheckingPage: false;
+    onChangePage: {IcUiQmlApi.appCtrl.checkSvc.leaveCheck();atCheckingPage=false;}
 
 
     Component.onCompleted:{
@@ -34,13 +35,21 @@ Item {id:root; width: 1366;height: 691
         checkSvc.checkResultChanged.connect(currentCheckResultChanged);
         checkSvc.deviceStatusChanged.connect(function()
         {
-            if(currentCheckResult!=null&&IcUiQmlApi.appCtrl.checkSvc.checkState!==6)
+            if(atCheckingPage)
             {
-                if(currentProgram.type!==2)
-                    IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::StaticCheckResultVm",currentCheckResult);
-                else
-                    IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::DynamicCheckResultVm",currentCheckResult);
-                currentCheckResult=null;
+                if(currentCheckResult!=null&&IcUiQmlApi.appCtrl.checkSvc.checkState!==6)
+                {
+                    if(currentProgram.type!==2)
+                        IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::StaticCheckResultVm",currentCheckResult);
+                    else
+                        IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::DynamicCheckResultVm",currentCheckResult);
+                    currentCheckResult=null;
+                }
+                IcUiQmlApi.appCtrl.checkSvc.readyToCheck=false;
+                if(currentProgram!=null&&currentPatient!=null&&checkSvc.deviceStatus===2)
+                {
+                    IcUiQmlApi.appCtrl.checkSvc.prepareToCheck();
+                }
             }
         });
         IcUiQmlApi.appCtrl.checkSvc.connectDev();
