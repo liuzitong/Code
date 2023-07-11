@@ -5,6 +5,7 @@
 #include <QJsonDocument>
 #include <iostream>
 #include <QFile>
+#include <QMutex>
 
 QSharedPointer<DeviceSettings> DeviceSettings::m_singleton=nullptr;
 
@@ -89,10 +90,13 @@ DeviceSettings::DeviceSettings()
 
 QSharedPointer<DeviceSettings> DeviceSettings::getSingleton()
 {
+    static QMutex mutex;
+    mutex.lock();
     if (m_singleton==nullptr)
     {
         m_singleton.reset(new DeviceSettings());
     }
+    mutex.unlock();
     return m_singleton;
 }
 

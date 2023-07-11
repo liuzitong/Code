@@ -73,10 +73,13 @@ void DeviceOperation::reconnectDev()
 
 QSharedPointer<DeviceOperation> DeviceOperation::getSingleton()
 {
+    static QMutex mutex;
+    mutex.lock();
     if(m_singleton==nullptr)
     {
         m_singleton.reset(new DeviceOperation());
     }
+    mutex.unlock();
     return m_singleton;
 }
 
