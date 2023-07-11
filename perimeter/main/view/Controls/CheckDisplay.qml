@@ -877,9 +877,12 @@ Item{
 
                         for(i=0;i<dotList.length;i++)                               //画点
                         {
-                            if(dotList[i].isChecked&&dotList[i].isSeen)
+                            if(dotList[i].isChecked)
                             {
-                                 drawDot(dotList[i].end,"yellow");
+                                if(dotList[i].isSeen)
+                                    drawDot(dotList[i].end,"yellow");
+                                else
+                                    drawDot(dotList[i].end,"red");
                             }
                             else
                                 drawDot(dotList[i].end,"blue");
