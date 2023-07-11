@@ -27,12 +27,11 @@ public:
     int m_checkedCount,m_totalCount;   //只计算通常点数,短周期,中心点,以及周期测试不计入内.m_checkedCount=m_totalCount就测试完成.在doWork里面结束测试循环.
     int *m_checkState;
     bool m_error=false;
-    bool m_reqPause=false;
-    bool m_eyeMoveAlarm;
+//    bool m_reqPause=false;
+//    bool m_eyeMoveAlarm;
     int m_deviationCount=0;
     QString m_errorInfo;
     QSharedPointer<UtilitySvc> m_utilitySvc=UtilitySvc::getSingleton();
-    QSharedPointer<DevOps::DeviceOperation> m_deviceOperation=DevOps::DeviceOperation::getSingleton();
     static constexpr int y_offsetDiamond=-8,y_offsetBottomPoint=-12;
     virtual void Checkprocess()=0;
     virtual void initialize()=0;
@@ -42,7 +41,8 @@ public:
     void lightsOff();
 //signals:
 //    void  checkStateChanged();
-//private:
+protected:
+    QSharedPointer<DevOps::DeviceOperation> m_deviceOperation=DevOps::DeviceOperation::getSingleton();
 
 };
 
@@ -200,12 +200,31 @@ public:
     QList<QPointF> m_dynamicSelectedDots;
 };
 
+//class DeviationCheckWorker: public QObject
+//{
+//public:
+//    DeviationCheckWorker();
+//    ~DeviationCheckWorker(){};
+//    int* m_chekcState;
+//    QSharedPointer<DynamicCheck> m_dynamiceCheck;
+//    QSharedPointer<StaticCheck> m_staticCheck;
+//private:
+//    QElapsedTimer elapsedTimer;
+//    int stopCount;
+//public slots:
+//    void startChecking();
+//    void stopChecking();
+//};
+
+
 
 class CheckSvcWorker : public QObject
 {
     Q_OBJECT
 public:
     QTimer m_timer;
+//    QThread m_devationCheckThread;
+//    DeviationCheckWorker* m_devationCheckworker;
     int m_time=0;
     int* m_checkState;
     PatientVm* m_patientVm;
@@ -215,11 +234,13 @@ public:
     bool m_measurePupilDeviation=true;
     bool m_measurePupilDiameter=true;
     bool m_eyeMoveAlarm=false;
-
+    bool m_alarmAndPause=false;
+    int m_deviationCount=0;
 private:
     QSharedPointer<Check> m_check;
+    QSharedPointer<DevOps::DeviceOperation> m_deviceOperation=DevOps::DeviceOperation::getSingleton();
 public:
-    explicit CheckSvcWorker(){m_timer.setInterval(1000);connect(&m_timer,&QTimer::timeout,this,[&](){emit checkTimeChanged(m_time);m_time++;});}
+    explicit CheckSvcWorker(){m_timer.setInterval(1000);connect(&m_timer,&QTimer::timeout,this,&CheckSvcWorker::onTimeOut);}
     virtual ~CheckSvcWorker() Q_DECL_OVERRIDE {}
     void initialize();
     void setCheckState(int value)
@@ -227,6 +248,7 @@ public:
         *m_checkState=value;
         emit checkStateChanged();
     }
+    void stopDynamic();
 public slots:
     void prepareToCheck();
 
@@ -244,6 +266,8 @@ public slots:
     }
     void doWork();
 
+    void onTimeOut();
+
     void workOnMeasureDeviationChanged(bool value){m_measurePupilDeviation=value;emit measureDeviationChanged(value);}
     void workOnMeasurePupilChanged(bool value){m_measurePupilDiameter=value;}
     void workOnEyeMoveAlarmChanged(bool value){m_eyeMoveAlarm=value;emit eyeMoveAlarmChanged(value);}
@@ -257,7 +281,6 @@ signals:
     void checkTimeChanged(int secs);
     void sendErrorInfo(QString error);
     void tipChanged(QString tip);
-    void stop();
     void currentCheckingDotChanged(QPointF loc);
     void nextCheckingDotChanged(QPointF loc);
     void readyToCheck(bool isReady);
@@ -1267,23 +1290,23 @@ void StaticCheck::checkWaiting()
 //    qDebug()<<int(m_programModel->m_params.commonParams.fixationMonitor);
 //    qDebug()<<m_eyeMoveAlarm;
 
-    if(m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation>UtilitySvc::getSingleton()->m_deviationLimit&&m_eyeMoveAlarm)
-    {
-        m_deviceOperation->beep();
-        if(m_programModel->m_params.commonParams.fixationMonitor==FixationMonitor::alarmAndPause)
-        {
-            m_deviationCount++;
-            if(m_deviationCount>=UtilitySvc::getSingleton()->m_pauseCheckDeviationCount)
-            {
-                m_reqPause=true;
-                m_deviationCount=0;
-            }
-        }
-        else
-        {
-            m_reqPause=false;
-        }
-    }
+//    if(m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation>UtilitySvc::getSingleton()->m_deviationLimit&&m_eyeMoveAlarm)
+//    {
+//        m_deviceOperation->beep();
+//        if(m_programModel->m_params.commonParams.fixationMonitor==FixationMonitor::alarmAndPause)
+//        {
+//            m_deviationCount++;
+//            if(m_deviationCount>=UtilitySvc::getSingleton()->m_pauseCheckDeviationCount)
+//            {
+//                m_reqPause=true;
+//                m_deviationCount=0;
+//            }
+//        }
+//        else
+//        {
+//            m_reqPause=false;
+//        }
+//    }
 
     if(isPaused)
     {
@@ -1500,32 +1523,32 @@ QVector<QPointF> DynamicCheck::waitForAnswer()
     QElapsedTimer elapsedTimer;
     elapsedTimer.start();
     QVector<QPointF> answerLocs;
-    QtConcurrent::run([&](){
-        while (!end)
-        {
-            if(elapsedTimer.elapsed()>=1500)
-            {
-                elapsedTimer.restart();
-                if(m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation>UtilitySvc::getSingleton()->m_deviationLimit&&m_eyeMoveAlarm)
-                {
-                    m_deviceOperation->beep();
-                    if(m_programModel->m_params.fixationMonitor==FixationMonitor::alarmAndPause)
-                    {
-                        m_deviationCount++;
-                        if(m_deviationCount>=UtilitySvc::getSingleton()->m_pauseCheckDeviationCount)
-                        {
-                            m_reqPause=true;
-                            m_deviationCount=0;
-                        }
-                    }
-                    else
-                    {
-                        m_reqPause=false;
-                    }
-                }
-            }
-        }
-    });
+//    QtConcurrent::run([&](){
+//        while (!end)
+//        {
+//            if(elapsedTimer.elapsed()>=1500)
+//            {
+//                elapsedTimer.restart();
+//                if(m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation>UtilitySvc::getSingleton()->m_deviationLimit&&m_eyeMoveAlarm)
+//                {
+//                    m_deviceOperation->beep();
+//                    if(m_programModel->m_params.fixationMonitor==FixationMonitor::alarmAndPause)
+//                    {
+//                        m_deviationCount++;
+//                        if(m_deviationCount>=UtilitySvc::getSingleton()->m_pauseCheckDeviationCount)
+//                        {
+//                            m_reqPause=true;
+//                            m_deviationCount=0;
+//                        }
+//                    }
+//                    else
+//                    {
+//                        m_reqPause=false;
+//                    }
+//                }
+//            }
+//        }
+//    });
 
 
     if(m_programModel->m_params.strategy==DynamicParams::Strategy::straightLine)
@@ -1710,6 +1733,22 @@ void DynamicCheck::lightsOn()
         m_deviceOperation->setLamp(DevOps::LampId::LampId_yellowBackground,0,true);
 }
 
+//DeviationCheckWorker::DeviationCheckWorker()
+//{
+
+//}
+
+//void DeviationCheckWorker::startChecking()
+//{
+
+//}
+
+//void DeviationCheckWorker::stopChecking()
+//{
+
+//}
+
+
 void CheckSvcWorker::initialize()
 {
     std::cout<<("initialize")<<std::endl;
@@ -1728,11 +1767,12 @@ void CheckSvcWorker::initialize()
 //        connect(deviceOperation,&DevOps::DeviceOperation::pupilDiameterChanged,[&](){((DynamicCheck*)m_check.data())->m_resultModel->m_data.pupilDiameter=deviceOperation->m_pupilDiameter;emit checkResultChanged();});
 //        UtilitySvc::wait(2000);    //等几秒启动
     }
-    auto deviceOperation=DevOps::DeviceOperation::getSingleton();
+
 //
 //    m_check->m_deviceOperation->setPupilDiameter(-1.0);
-    deviceOperation->clearPupilData();
-    deviceOperation->lightUpCastLight();
+    m_deviationCount=0;
+    m_deviceOperation->clearPupilData();
+    m_deviceOperation->lightUpCastLight();
 }
 
 void CheckSvcWorker::prepareToCheck()
@@ -1756,11 +1796,12 @@ void CheckSvcWorker::prepareToCheck()
         ((StaticCheck*)m_check.data())->m_measurePupilDeviation=m_measurePupilDeviation;
         auto cursorSize=((StaticCheck*)m_check.data())->m_programModel->m_params.commonParams.cursorSize;
         auto cursorColor=((StaticCheck*)m_check.data())->m_programModel->m_params.commonParams.cursorColor;
+        m_alarmAndPause=((StaticCheck*)m_check.data())->m_programModel->m_params.commonParams.fixationMonitor==FixationMonitor::alarmAndPause;
         m_check->lightsOff();
         m_check->lightsOn();
-        m_check->m_deviceOperation->setCursorColorAndCursorSize(int(cursorColor),int(cursorSize));
+        m_deviceOperation->setCursorColorAndCursorSize(int(cursorColor),int(cursorSize));
         UtilitySvc::wait(100);
-        m_check->m_deviceOperation->waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y});
+        m_deviceOperation->waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y});
     }
     else
     {
@@ -1770,19 +1811,19 @@ void CheckSvcWorker::prepareToCheck()
         ((DynamicCheck*)m_check.data())->m_programModel=static_cast<DynamicProgramVm*>(m_programVm)->getModel();
         auto cursorSize=((DynamicCheck*)m_check.data())->m_programModel->m_params.cursorSize;
         auto cursorColor=((DynamicCheck*)m_check.data())->m_programModel->m_params.cursorColor;
+        m_alarmAndPause=((DynamicCheck*)m_check.data())->m_programModel->m_params.fixationMonitor==FixationMonitor::alarmAndPause;
         m_check->lightsOff();
         m_check->lightsOn();
-        m_check->m_deviceOperation->setCursorColorAndCursorSize(int(cursorColor),int(cursorSize));
+        m_deviceOperation->setCursorColorAndCursorSize(int(cursorColor),int(cursorSize));
         UtilitySvc::wait(100);
-        m_check->m_deviceOperation->waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y});
-        connect(this,&CheckSvcWorker::stop,[&](){m_check->m_deviceOperation->stopDynamic();});
+        m_deviceOperation->waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y});
     }
     connect(this,&CheckSvcWorker::eyeMoveAlarmChanged,[&](bool eyeMoveAlarm){
         qDebug()<<eyeMoveAlarm;
-        m_check->m_eyeMoveAlarm=eyeMoveAlarm;
+        m_eyeMoveAlarm=eyeMoveAlarm;
     });
     qDebug()<<m_eyeMoveAlarm;
-    m_check->m_eyeMoveAlarm=m_eyeMoveAlarm;
+//    m_check->m_eyeMoveAlarm=m_eyeMoveAlarm;
     m_check->initialize();
     UtilitySvc::wait(500);    //等几秒启动
     emit readyToCheck(true);
@@ -1799,6 +1840,7 @@ void CheckSvcWorker::doWork()
 {
     *m_checkState=0;
     m_time=0;
+//    QMetaObject::invokeMethod(m_devationCheckworker,"startChecking",Qt::QueuedConnection);
     while(true)
     {
         switch (*m_checkState)
@@ -1821,8 +1863,8 @@ void CheckSvcWorker::doWork()
 //            qDebug()<<("Checking");
             if(*m_checkState==3) break;
             m_check->Checkprocess();
-            qDebug()<<"m_checkReqPuase:";
-            qDebug()<<m_check->m_reqPause;
+//            qDebug()<<"m_checkReqPuase:";
+//            qDebug()<<m_check->m_reqPause;
             if(m_check->m_error)
             {
                 setCheckState(3);
@@ -1830,11 +1872,11 @@ void CheckSvcWorker::doWork()
             }
 
             if(m_check->m_checkedCount==m_check->m_totalCount) setCheckState(4);
-            if(m_check->m_reqPause)
-            {
-                setCheckState(2);
-                m_check->m_reqPause=false;
-            }
+//            if(m_check->m_reqPause)
+//            {
+//                setCheckState(2);
+//                m_check->m_reqPause=false;
+//            }
 
             emit checkedCountChanged(m_check->m_checkedCount);
             emit checkResultChanged();
@@ -1863,7 +1905,7 @@ void CheckSvcWorker::doWork()
             double pupilDiameter=0;
             if(m_measurePupilDiameter)
             {
-                pupilDiameter=m_check->m_deviceOperation->getPupilDiameter();
+                pupilDiameter=m_deviceOperation->getPupilDiameter();
             }
             if(type!=2)
             {
@@ -1885,6 +1927,37 @@ void CheckSvcWorker::doWork()
         case 5:
         case 6:return;
         };
+    }
+//    Exit:
+//    {
+//        QMetaObject::invokeMethod(m_devationCheckworker,"stopChecking",Qt::QueuedConnection);
+//    }
+}
+
+void CheckSvcWorker::onTimeOut()
+{
+    emit checkTimeChanged(m_time);m_time++;
+    if(*m_checkState>=2) return;
+    if(m_eyeMoveAlarm&&m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation>UtilitySvc::getSingleton()->m_deviationLimit)
+    {
+        m_deviceOperation->beep();
+        if(m_alarmAndPause)
+        {
+            m_deviationCount++;
+            if(m_deviationCount>UtilitySvc::getSingleton()->m_pauseCheckDeviationCount)
+            {
+                setCheckState(2);
+                m_deviationCount=0;
+            }
+        }
+    }
+}
+
+void CheckSvcWorker::stopDynamic()
+{
+    while(*m_checkState!=5)
+    {
+        m_deviceOperation->stopDynamic();UtilitySvc::wait(300);
     }
 }
 
@@ -1990,8 +2063,14 @@ void CheckSvc::resume()
 
 void CheckSvc::stop()
 {
-    setCheckState(3);
-    emit m_worker->stop();
+    if(m_checkState<=2)
+    {
+        setCheckState(3);
+    }
+    if(m_programVm->getType()==2)
+    {
+        m_worker->stopDynamic();
+    }
     qDebug()<<"stop command";
     //    QMetaObject::invokeMethod(m_worker,"stop",Qt::QueuedConnection);
 }
@@ -2136,6 +2215,7 @@ bool CheckSvc::getDebugMode()
 {
     return UtilitySvc::getSingleton()->m_debugMode;
 }
+
 
 
 

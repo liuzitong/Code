@@ -5,7 +5,7 @@
     "blindDotTestIncDB":5,
     "falseNegativeDecDB":10,
     "deviationLimit":8,
-    "pauseCheckDeviationCount":5,
+    "pauseCheckDeviationCount":3,
     "VFImultiplier":1.0,
     "checkFalseNegAndPos":true,
     "realTimeEyePosPicSize":"320*240",
