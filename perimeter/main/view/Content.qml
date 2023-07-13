@@ -16,6 +16,7 @@ Rectangle {
     property string selectionColor: "";
     property string language:IcUiQmlApi.appCtrl.settings.language
     property var currentPatient: patientPage.currentPatient;
+    signal login;
 
     MouseArea{anchors.fill: parent;hoverEnabled: true;
         onMouseXChanged: {if(checkPage.visible==true){IcUiQmlApi.appCtrl.checkSvc.castlightUp()}}
@@ -70,6 +71,7 @@ Rectangle {
                         width: parent.width;height: parent.height*0.60;
                         CusButton{
                             type:"click";isAnime: false;underImageText.text: lt+qsTr("Login");underImageText.color: "white"; fontSize: height/4;rec.visible: false;width:image.sourceSize.width;imageSrc: "qrc:/Pics/base-svg/menu_login.svg";pressImageSrc: "qrc:/Pics/base-svg/menu_login_select.svg";
+                            onClicked:login();
                         }
                         CusText
                         {

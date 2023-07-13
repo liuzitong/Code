@@ -1,0 +1,8 @@
+"Perm.LocalLogin.setup"  	--变更本地登录信息
+	数据结构：{{"UID", xxx},{"name", xxx},{"pwd", xxx}}
+	
+"Perm.LocalLogin.remove"    --删除本地登录信息
+	数据结构：{{"UID", xxx},{"name", xxx},{"pwd", xxx}}
+	
+"Perm.LocalLogin.modify"    --更新本地登录信息
+	数据结构：{{"UID", xxx},{"name", xxx},{"pwd", xxx}}

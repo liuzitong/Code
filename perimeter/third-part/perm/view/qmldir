@@ -1,0 +1,16 @@
+﻿module perm.view
+
+PermMgrView           1.0     permmgrview.qml
+UserLoginView         1.0     userloginview.qml
+UserMgrLoginView      1.0     usermgrloginview.qml
+UserBrowseView        1.0     userbrowseview.qml
+UserGrpBrowseView     1.0     usergrpbrowseview.qml
+NewUserView           1.0     newuserview.qml
+ModUserView           1.0     moduserview.qml
+NewUserGrpView        1.0     newusergrpview.qml
+ModUserGrpView        1.0     modusergrpview.qml
+UserPermListView      1.0     userpermlistview.qml
+UserGrpPermListView   1.0     usergrppermlistview.qml
+UserDiChgPwdView      1.0     userdichgpwdview.qml
+
+singleton PermSkin    1.0     permskin.qml

@@ -7,14 +7,18 @@ import perimeter.main.view.Controls 1.0
 import qxpack.indcom.ui_qml_base 1.0
 import perimeter.main.view.Controls 1.0
 import perimeter.main.view.Utils 1.0
+import perm.view 1.0
 
 
 Window {
     id: window;visible: true;width: 1366;height: 768;title: lt+qsTr("Perimeter");
     minimumWidth: 1366;minimumHeight: 768;property string currentpage: "Login";
 
-    Content{id:content;anchors.fill: parent;}
+    Content{id:content;anchors.fill: parent;visible: false;onLogin:{visible=false;permMgrView.visible=true;}}
 //    Login{id:login;visible: false;anchors.fill: parent;}
+    PermMgrView{
+        id:permMgrView; anchors.fill: parent;onLoginSucceed: {visible=false;content.visible=true;}
+    }
     property bool isEng: IcUiQmlApi.appCtrl.settings.isRuntimeLangEng;
     property string lt:"";
     Component.onCompleted: {
@@ -64,6 +68,7 @@ Window {
             IcUiQmlApi.appCtrl.databaseSvc.initDataBase();
         }
     }
+//
 
 
 }

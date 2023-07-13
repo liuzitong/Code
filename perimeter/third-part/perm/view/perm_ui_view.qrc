@@ -1,0 +1,26 @@
+<RCC>
+    <qresource prefix="/perm/view">
+        <file alias="qmldir">qmldir</file>
+        <file alias="permmgrview.qml">permmgrview.qml</file>
+        <file alias="userloginview.qml">userloginview.qml</file>
+        <file alias="usermgrloginview.qml">usermgrloginview.qml</file>
+        <file alias="userbrowseview.qml">userbrowseview.qml</file>
+        <file alias="usergrpbrowseview.qml">usergrpbrowseview.qml</file>
+        <file alias="newuserview.qml">newuserview.qml</file>
+        <file alias="moduserview.qml">moduserview.qml</file>
+        <file alias="newusergrpview.qml">newusergrpview.qml</file>
+        <file alias="modusergrpview.qml">modusergrpview.qml</file>
+        <file alias="userpermlistview.qml">userpermlistview.qml</file>
+        <file alias="usergrppermlistview.qml">usergrppermlistview.qml</file>
+        <file alias="userdichgpwdview.qml">userdichgpwdview.qml</file>
+        <file alias="permlist.qml">permlist.qml</file>
+        <file alias="grouplist.qml">grouplist.qml</file>
+        <file alias="usergrplistview.qml">usergrplistview.qml</file>
+        <file alias="grppermlist.qml">grppermlist.qml</file>
+        <file alias="permskin.qml">permskin.qml</file>
+    </qresource>
+    <qresource prefix="/images">
+        <file alias="check_box_no.svg">resource/check_box_no.svg</file>
+        <file alias="check_box_yes.svg">resource/check_box_yes.svg</file>
+    </qresource>
+</RCC>

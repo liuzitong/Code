@@ -16,6 +16,7 @@
 #include "perimeter/main/services/frame_provid_svc.h"
 #include <deviceOperation/device_operation.h>
 #include "perimeter/main/services/utility_svc.h"
+#include "perimeter/third-part/perm/perm_mod.hxx"
 namespace Perimeter {
 
 // ////////////////////////////////////////////////////////////////////////////

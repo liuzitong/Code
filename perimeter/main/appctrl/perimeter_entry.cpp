@@ -18,6 +18,10 @@
 #include "qxpack/indcom/sys/qxpack_ic_eventloopbarrier.hxx"
 #include "qxpack/indcom/sys/qxpack_ic_appdcl_priv.hxx"
 #include "qxpack/indcom/ui_qml_base/qxpack_ic_ui_qml_api.hxx"
+#include "perimeter/main/services/JRpcServerSvc.hxx"
+#include "perimeter/base/common/perimeter_guns.hxx"
+#include "perimeter/third-part/perm/local-part/resimprov/perm_improv.hxx"
+#include "perimeter/third-part/perm/perm_mod.hxx"
 
 
 
@@ -126,6 +130,7 @@ int  main ( int argc, char *argv[] )
     gPrintMemCntr("pre-stage");
     {
         QApplication app(argc, argv);
+        JRpcServerSvc jprc_svc; jprc_svc.start(GUNS_JRPC_SVC_NAME);
         Perimeter::AppCtrl *app_ctrl = new Perimeter::AppCtrl;
         app_ctrl->doInit();
 
@@ -134,6 +139,7 @@ int  main ( int argc, char *argv[] )
         // --------------------------------------------------------------------
         QSharedPointer<QObject> s_app_ctrl( app_ctrl, [](QObject*){});
         QxPack::IcUiQmlApi::setAppCtrl( s_app_ctrl );
+        FcPerm::PermMod perm_mod; perm_mod.registerTypesEx(app_ctrl);
 
 //        auto transCon=Perimeter::TranslateController::instance();
 //        transCon->loadLanguage(QLocale::Chinese);
@@ -143,6 +149,7 @@ int  main ( int argc, char *argv[] )
         QQmlApplicationEngine *eng = new QQmlApplicationEngine;
         eng->rootContext()->setContextProperty("applicationDirPath", QGuiApplication::applicationDirPath());
         eng->addImportPath(QStringLiteral("qrc:/") );
+        eng->addImageProvider( QStringLiteral("PermImProv"), new FcPerm::PermImProv( ) );
 
         eng->load(QUrl(QLatin1String("qrc:/perimeter/main/view/Application.qml")));
         qmlRegisterSingletonType(QUrl("qrc:/perimeter/main/view/Utils/CusUtils.qml"), "perimeter.main.view.Utils", 1, 0, "CusUtils");
@@ -158,7 +165,7 @@ int  main ( int argc, char *argv[] )
         ret = app.exec();
         eng->deleteLater();
 
-
+        jprc_svc.stop();
         QxPack::IcAppDclPriv::barrier( 32 );
         app_ctrl->doDeinit();
         delete app_ctrl;

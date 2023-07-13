@@ -27,6 +27,7 @@ DEFINES *= PERIMETER_CFG_STATIC
 include( $$PWD/../../base/perimeter_base.pri )
 include( $$PWD/../../main/perimeter_main.pri )
 include( $$PWD/../../third-part/qxpackic_all.pri )
+include( $$PWD/../../third-part/perm/perm.pri )
 #include( $$PWD/../../../deviceOperation-build/deviceOperation.pri )
 # ///////////////////////////////////////////////////////////////////////////
 # put the final app into /tmp for debug
@@ -47,6 +48,7 @@ INCLUDEPATH += $$PWD/../../../perimeter/third-part/
 LIBS += -L$$PWD/../../../perimeter/third-part/QxOrm/lib
 LIBS += -L$$PWD/../../../perimeter/third-part/boost/lib
 
+INCLUDEPATH *= PWD/../../../
 
 
 # 设置生成的目标名称、添加依赖库
