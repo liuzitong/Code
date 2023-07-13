@@ -16,11 +16,11 @@ else{
 SRCFILE = $$DESTDIR/$${TARGET}.dll
 CONFIG(debug,debug|release){
     PERIMETER_DIR = $$PWD/../perimeter/bin/debug/$${TARGET}.dll
-    PERIMETER_CONFIG_DIR = $$PWD/../PerimeterConfigAndTest/bin/debug/$${TARGET}.dll
+#    PERIMETER_CONFIG_DIR = $$PWD/../PerimeterConfigAndTest/bin/debug/$${TARGET}.dll
 
 }else {
     PERIMETER_DIR = $$PWD/../perimeter/bin/release/$${TARGET}.dll
-    PERIMETER_CONFIG_DIR = $$PWD/../PerimeterConfigAndTest/bin/release/$${TARGET}.dll
+#    PERIMETER_CONFIG_DIR = $$PWD/../PerimeterConfigAndTest/bin/release/$${TARGET}.dll
 }
 
 #LIB_SRC_DIR = $$DESTDIR/$${TARGET}.lib

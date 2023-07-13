@@ -52,20 +52,20 @@ LIBS += -L$$PWD/../../../perimeter/third-part/boost/lib
 # 设置生成的目标名称、添加依赖库
 CONFIG(debug, debug|release) {
     LIBS += -L$$PWD/../../../deviceOperation/bin/debug
-    LIBS += -L$$PWD/../../../perimeter/third-part/LimeReport/build/5.9.7/win32/debug/lib
+    LIBS += -L$$PWD/../../../perimeter/third-part/LimeReport/build/5.9.7/win64/debug/lib
     LIBS += -l"QxOrmd" -l"limereportd" -l"QtZintd" -l"deviceOperationd"
     CONFIG += qml_debug
-#    LIBS += -l"libboost_serialization-vc140-mt-gd-x32-1_78"
+    LIBS += -l"libboost_serialization-vc140-mt-gd-x64-1_78"
     DESTDIR=$$PWD/../../bin/debug
 } else {
     LIBS += -L$$PWD/../../../deviceOperation/bin/release
-    LIBS += -L$$PWD/../../../perimeter/third-part/LimeReport/build/5.9.7/win32/release/lib
+    LIBS += -L$$PWD/../../../perimeter/third-part/LimeReport/build/5.9.7/win64/release/lib
     LIBS += -l"QxOrm" -l"limereport" -l"QtZint" -l"deviceOperation"
 #    CONFIG -= qml_debug
 #    CONFIG -= console
     DEFINES+=QT_QML_DEBUG_NO_WARNING
 #    CONFIG -= qml_debug console
-#    LIBS += -l"libboost_serialization-vc140-mt-x32-1_78"
+    LIBS += -l"libboost_serialization-vc140-mt-x64-1_78"
     DESTDIR=$$PWD/../../bin/release
 }
 
