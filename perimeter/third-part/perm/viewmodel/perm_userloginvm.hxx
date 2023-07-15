@@ -17,6 +17,8 @@ class PERM_API UserLoginVm : public QxPack::IcViewModelBase
     Q_PROPERTY(QObject * localUser READ localUserObj CONSTANT)
     Q_PROPERTY(QJsonObject userLoginData READ userLoginData WRITE setUserLoginData NOTIFY userLoginDataChanged)
     Q_PROPERTY(bool enableOfVkb READ enableOfVkb WRITE setEnableOfVkb NOTIFY enableOfVkbChanged)
+    Q_PROPERTY(QStringList permission READ permission NOTIFY permissionChanged)
+
     Q_ENUMS(LoginType)
 public:
     enum LoginType { MAIN_LOGIN, MGR_LOGIN };
@@ -35,9 +37,13 @@ public:
     void  setEnableOfVkb( bool );
     Q_SIGNAL void enableOfVkbChanged( );
 
+    QStringList  permission() const;
+    Q_SIGNAL void permissionChanged();
+
     Q_INVOKABLE void login( );
     Q_INVOKABLE void logout( );
     Q_INVOKABLE void quitLogin();
+//    Q_INVOKABLE QObject* getPerInfo();
 
     Q_SIGNAL void showNavMainView( );
     Q_SIGNAL void showUserBrowseView( );

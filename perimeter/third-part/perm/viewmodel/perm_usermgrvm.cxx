@@ -18,6 +18,7 @@
 #include "qxpack/indcom/afw/qxpack_ic_msgbus.hxx"
 #include "qxpack/indcom/afw/qxpack_ic_confirmbus.hxx"
 
+#include <QMessageBox>
 #include <QTimer>
 
 namespace FcPerm {
@@ -248,23 +249,30 @@ void UserMgrVmPriv::checkRemove()
         }
     }
 
-    // 发送确认删除当前用户请求
-    QxPack::IcAppCtrlBase *app_ctrl = QxPack::IcAppCtrlBase::instance( GUNS_AppCtrl );
-    QxPack::IcConfirmBus *cfm_bus = app_ctrl->cfmBus(); // [HINT] just get the confirm bus
+    QMessageBox msgBox;
+    msgBox.setText(QObject::tr("Are you sure to remove the current user?"));
+    msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+    auto ret=msgBox.exec();
+    if(ret==QMessageBox::Ok) this->removeUser();
 
-    QxPack::IcConfirmBusPkg cfm_pkg;
-    cfm_pkg.setGroupName( GUNS_DefaultMethodSvcCfmGroup );
-    cfm_pkg.setMessage( QObject::tr("Whether to remove the current user?") );
 
-    cfm_bus->reqConfirm( cfm_pkg );
+//    // 发送确认删除当前用户请求
+//    QxPack::IcAppCtrlBase *app_ctrl = QxPack::IcAppCtrlBase::instance( GUNS_AppCtrl );
+//    QxPack::IcConfirmBus *cfm_bus = app_ctrl->cfmBus(); // [HINT] just get the confirm bus
 
-    if ( cfm_pkg.isGotResult()) {
-        QJsonObject jo_rsl = cfm_pkg.result();
-        if ( jo_rsl.value("result").toString().toLower() == QStringLiteral("yes")) {
-            // 确认删除
-            this->removeUser();
-        }
-    }
+//    QxPack::IcConfirmBusPkg cfm_pkg;
+//    cfm_pkg.setGroupName( GUNS_DefaultMethodSvcCfmGroup );
+//    cfm_pkg.setMessage( QObject::tr("Whether to remove the current user?") );
+
+//    cfm_bus->reqConfirm( cfm_pkg );
+
+//    if ( cfm_pkg.isGotResult()) {
+//        QJsonObject jo_rsl = cfm_pkg.result();
+//        if ( jo_rsl.value("result").toString().toLower() == QStringLiteral("yes")) {
+//            // 确认删除
+//            this->removeUser();
+//        }
+//    }
 }
 
 UserMgrVm::UserMgrVm(const QVariantList &)

@@ -9,7 +9,6 @@ import qxpack.indcom.ui_qml_base 1.0 // [HINT] this is the pre-registered module
 IcPageBase {   // this is the wrapped Popup element in ui_qml_control
     id: idUserLoginView; pageName: "UserLogin";
     implicitWidth: FcPerm.PermSkin.winRectWidth;  implicitHeight: FcPerm.PermSkin.winRectHeight;
-    signal loginSucceed;
 
     property int editItemWidth: width*0.4;
 
@@ -168,10 +167,11 @@ IcPageBase {   // this is the wrapped Popup element in ui_qml_control
 
         function turnNavMainView( )
         {
-            idUserLoginView.request( "NavMainView", {} );
-	    if(user_login_vm !== null){
-                user_login_vm.quitLogin();
-            }
+            idUserLoginView.request( "NavMainView", user_login_vm.permission);
+//            if(user_login_vm !== null)
+//            {
+//                user_login_vm.quitLogin();
+//            }
         }
 
         function turnUserDiChgPwdMgr( )
@@ -225,8 +225,8 @@ IcPageBase {   // this is the wrapped Popup element in ui_qml_control
 
             user_login_vm.userLoginData = data;
             IcUiQmlApi.postMetaCall( user_login_vm, "login" );
-            console.log("gogogog");
-            loginSucceed();
+//            console.log("gogogog");
+//            loginSucceed();
         }
 
         function onReadyTo(){

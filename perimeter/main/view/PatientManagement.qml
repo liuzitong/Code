@@ -55,8 +55,8 @@ Item{
     function createNewPatient(){
         if(currentPatient!==null) IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::PatientVm", currentPatient);
         currentPatient=null;
-        patientReviseButton.enabled=false;patientReviseButton.buttonColor="#787878"
-        patientSaveButton.enabled=true; patientSaveButton.buttonColor = "#dcdee0"
+        patientReviseButton.enabled=false;/*patientReviseButton.buttonColor="#787878"*/
+        patientSaveButton.enabled=true;/* patientSaveButton.buttonColor = "#dcdee0"*/
         newPatientId.text="";
         newChineseName.text="";
         newEnglishFirstName.text="";
@@ -273,8 +273,8 @@ Item{
 
                                                         if(currentPatient.name.indexOf(" ")>-1){ firstName =currentPatient.name.split(" ")[0]; lastName=currentPatient.name.split(" ")[1];};
                                                         newPatientId.text=currentPatient.patientId;newChineseName.text=currentPatient.name;genderSelect.selectGender(currentPatient.sex);newBirthDate.text=currentPatient.birthDate;newEnglishFirstName.text=firstName;newEnglishLastName.text=lastName
-                                                        patientSaveButton.enabled=false;patientSaveButton.buttonColor = "#787878"
-                                                        patientReviseButton.enabled=true;patientReviseButton.buttonColor="#dcdee0"
+                                                        patientSaveButton.enabled=false;/*patientSaveButton.buttonColor = "#787878"*/
+                                                        if(CommonSettings.deletePermission) patientReviseButton.enabled=true;/*patientReviseButton.buttonColor="#dcdee0"*/
                                                     }
                                                 }
                                             }
@@ -533,11 +533,13 @@ Item{
             Item{height: parent.height;width:parent.width*0.6;
                 CusButton{text:lt+qsTr("Exit");onClicked:Qt.quit()}
                 Flow{height: parent.height;spacing: height*0.8;anchors.horizontalCenter: parent.horizontalCenter
-                    CusButton{text:lt+qsTr("Recheck");
+                    CusButton{
+                        text:lt+qsTr("Recheck");
                         enabled:currentPatient!==null&&lastProgram!==null&&(IcUiQmlApi.appCtrl.checkSvc.debugMode||IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus===3&&IcUiQmlApi.appCtrl.checkSvc.deviceStatus===2);
                         onClicked:root.changePage("check",{lastProgram:lastProgram,type:"reCheck"})
                     }
-                    CusButton{id:patientReviseButton;enabled: false;text:lt+qsTr("Modify");
+                    CusButton{
+                        id:patientReviseButton;enabled: false;text:lt+qsTr("Modify");
                         onClicked:
                         {
                             var Name;
@@ -560,8 +562,9 @@ Item{
                             query.startQuery();
                         }
                     }
-                    CusButton{text:lt+qsTr("Delete");
-                        enabled: patientInfoListView.patientListModelVm.selectedCount>0;
+                    CusButton{
+                        text:lt+qsTr("Delete");
+                        enabled: CommonSettings.deletePermission&&patientInfoListView.patientListModelVm.selectedCount>0;
                         onClicked: {
                             patientInfoListView.patientListModelVm.deletePatients();
                             query.startQuery();

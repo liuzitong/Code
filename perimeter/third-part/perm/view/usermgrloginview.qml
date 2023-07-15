@@ -128,7 +128,11 @@ IcPageBase {   // this is the wrapped Popup element in ui_qml_control
         function doOnline( )
         {
             idNextBtn.clicked.connect( login );
+            console.log(user_login_vm.userLoginData);
+             console.log(user_login_vm.enableOfVkb);
             user_login_vm.showUserBrowseView.connect( turnUserBrowseView );
+            console.log(user_login_vm.userLoginData);
+             console.log(user_login_vm.enableOfVkb);
             idQuitBtn.clicked.connect( turnUserLoginView );
         }
 

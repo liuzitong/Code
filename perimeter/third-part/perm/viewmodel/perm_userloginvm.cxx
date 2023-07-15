@@ -9,6 +9,7 @@
 #include "perm/common/perm_guns.hxx"
 #include "../../base/common/perimeter_guns.hxx"
 #include "qxpack/indcom/afw/qxpack_ic_appctrlbase.hxx"
+#include <QDebug>
 //#include "main/model/main_rpcvkbd.hxx"
 
 namespace FcPerm {
@@ -32,6 +33,7 @@ public:
 
     bool  enableOfVkb( ) const;
     void  setEnableOfVkb( bool );
+    QStringList permission();
     inline QObject * localUserObj( ) { return m_localPwdMgrSvc; }
     inline QJsonObject & userLoginData( ) { return m_userLoginData; }
 
@@ -84,6 +86,11 @@ void UserLoginVmPriv::setEnableOfVkb(bool sw)
     //FcMain::RpcVkbd::globalInstance().setEnabled(sw);
 }
 
+QStringList UserLoginVmPriv::permission()
+{
+    return m_permBroker->userAndPermInfo()->actualPermList();
+}
+
 void UserLoginVmPriv::online(bool is_on)
 {
     m_permBroker->connectToServer(GUNS_JRPC_SVC_NAME);
@@ -97,6 +104,8 @@ void UserLoginVmPriv::login()
     QString pwd  = m_userLoginData.value("pwd").toString().trimmed();
     int type = m_userLoginData.value("type").toInt();
 
+
+
     if ( type == UserLoginVm::MAIN_LOGIN )
     {
         if ( name == m_localPwdMgrSvc->name() &&
@@ -109,12 +118,15 @@ void UserLoginVmPriv::login()
     if ( m_permBroker->login({{"name", name}, {"pwd", pwd}}) )
     {
         m_isLogin = true;
+        qDebug()<<m_permBroker->userAndPermInfo()->actualPermList();
         if ( type == UserLoginVm::MAIN_LOGIN )
         {
             if ( m_permBroker->userAndPermInfo()->actualPermList().contains("Perm.root")  ||
                  m_permBroker->userAndPermInfo()->actualPermList().contains("Perm.sys")   ||
                  m_permBroker->userAndPermInfo()->actualPermList().contains("Perm.admin") ||
-                 m_permBroker->userAndPermInfo()->actualPermList().contains("Perm.manage") )
+                 m_permBroker->userAndPermInfo()->actualPermList().contains("Perm.manager") ||
+                 m_permBroker->userAndPermInfo()->actualPermList().contains("Perm.chkPerm")
+                 )
             {
 //                m_app_set_svc->setQuitCode(0);
             }else{
@@ -129,7 +141,7 @@ void UserLoginVmPriv::login()
             if ( m_permBroker->userAndPermInfo()->actualPermList().contains("Perm.root")  ||
                  m_permBroker->userAndPermInfo()->actualPermList().contains("Perm.sys")   ||
                  m_permBroker->userAndPermInfo()->actualPermList().contains("Perm.admin") ||
-                 m_permBroker->userAndPermInfo()->actualPermList().contains("Perm.manage") )
+                 m_permBroker->userAndPermInfo()->actualPermList().contains("Perm.manager") )
             {
                 emit m_parent->showUserBrowseView();
             }
@@ -139,6 +151,8 @@ void UserLoginVmPriv::login()
             }
         }
     }
+//    qDebug()<<m_permBroker->userAndPermInfo()->actualPermList();
+//    qDebug()<<m_permBroker->userAndPermInfo()->authPermList();
 }
 
 void UserLoginVmPriv::logout()
@@ -182,8 +196,13 @@ bool UserLoginVm::enableOfVkb() const
 void UserLoginVm::setEnableOfVkb(bool sw)
 { T_PrivPtr( m_obj )->setEnableOfVkb(sw); }
 
+QStringList UserLoginVm::permission() const
+{
+  return T_PrivPtr( m_obj )->permission();
+}
+
 void UserLoginVm::login()
-{ T_PrivPtr( m_obj )->login(); }
+{ T_PrivPtr( m_obj )->login(); emit permissionChanged();}
 
 void UserLoginVm::logout()
 { T_PrivPtr( m_obj )->logout(); }

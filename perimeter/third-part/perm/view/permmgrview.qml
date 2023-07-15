@@ -8,7 +8,6 @@ import qxpack.indcom.ui_qml_base 1.0 // [HINT] this is the pre-registered module
 IcPageBase {   // this is the wrapped Popup element in ui_qml_control
     id: idPermMgrView; pageName: "PermMgr";
     property string viewName: "PermMgr";
-    signal loginSucceed;
 
     implicitWidth: FcPerm.PermSkin.winRectWidth;  implicitHeight: FcPerm.PermSkin.winRectHeight;
 
@@ -16,10 +15,10 @@ IcPageBase {   // this is the wrapped Popup element in ui_qml_control
     function  doPageOffline( ) { }
 
     signal reqExit(  );
-    signal reqExitAndGo( var tag );
+    signal reqExitAndGo( var arg );
 
     StackView { id: idStackView; anchors.fill: parent;
-        initialItem: UserLoginView {onLoginSucceed:{console.log("hahah");idPermMgrView.loginSucceed(); } }
+        initialItem: UserLoginView { }
     }
 
     Connections { target: idStackView.currentItem
@@ -50,7 +49,7 @@ IcPageBase {   // this is the wrapped Popup element in ui_qml_control
             else if ( req_str === "UserLoginView" )
             { idStackView.pop(idStackView.find(function(item) { return item.pageName === "UserLogin"; })); }
             else if ( req_str === "NavMainView" )
-            { idPermMgrView.reqExitAndGo( "mainview" ); }
+            {idPermMgrView.reqExitAndGo( req_arg ); }
             else if(req_str === "CloseApp"){ idPermMgrView.reqExit(); }
         }
     }

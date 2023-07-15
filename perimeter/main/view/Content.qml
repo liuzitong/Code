@@ -16,7 +16,21 @@ Rectangle {
     property string selectionColor: "";
     property string language:IcUiQmlApi.appCtrl.settings.language
     property var currentPatient: patientPage.currentPatient;
+    property var permission: null;
     signal login;
+
+    onPermissionChanged:
+    {
+        CommonSettings.deletePermission=false;
+        for(var i=0;i<permission.length;i++)
+        {
+           if(permission[i]==="Perm.patient.delete")
+           {
+               console.log("give permission");
+               CommonSettings.deletePermission=true;
+           }
+        }
+    }
 
     MouseArea{anchors.fill: parent;hoverEnabled: true;
         onMouseXChanged: {if(checkPage.visible==true){IcUiQmlApi.appCtrl.checkSvc.castlightUp()}}

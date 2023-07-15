@@ -207,6 +207,7 @@ bool PermBrokerPriv::login(const QJsonObject &jo)
     if ( !resp.isResult() )
     {
         emit m_parent->error(resp.errCode(), resp.errMsg());
+        qDebug () <<    resp.errCode() << resp.errMsg() << "aaaaaaaaaaaaaaaaaaaaaa";
         return false;
     }
 

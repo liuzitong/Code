@@ -150,7 +150,8 @@ Column {
 
             Item{height: parent.height;width:parent.width*0.20;
                 Item{anchors.fill: parent;anchors.margins:parent.height*0.15;
-                    CusButton{text:lt+qsTr("Delete"); enabled: currentCheckResult!==null;anchors.horizontalCenter: parent.horizontalCenter;
+                    CusButton{
+                        text:lt+qsTr("Delete"); enabled: CommonSettings.deletePermission&&currentCheckResult!==null;anchors.horizontalCenter: parent.horizontalCenter;
                         onClicked:analysisLobbyListVm.deleteCheckResult(currentCheckResult.id);
                     }
                 }
