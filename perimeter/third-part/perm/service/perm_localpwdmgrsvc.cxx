@@ -130,7 +130,7 @@ LocalPwdMgrSvcPriv::LocalPwdMgrSvcPriv(LocalPwdMgrSvc *pa)
 {
     m_parent = pa;
     QDir dir(QCoreApplication::applicationDirPath());
-    dir.cdUp();
+//    dir.cdUp();
     m_file_path = QString("%1/params/syseye-nw/").arg(dir.path());
     m_remember_pwd = m_last_remember_pwd = m_auto_login = false;
 

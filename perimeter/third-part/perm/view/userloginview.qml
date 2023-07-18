@@ -29,7 +29,7 @@ IcPageBase {   // this is the wrapped Popup element in ui_qml_control
     ColumnLayout { anchors.centerIn: parent; spacing: 20*FcPerm.PermSkin.winHeightScale;
 
         property int tfWidth: 478;  property int tfHeght: 38;
-        Label { Layout.preferredWidth: parent.tfWidth; Layout.preferredHeight: 80; text: qsTr("User Login"); color: "#FAFAFA"; font.pixelSize: 48;  horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter; }
+        Label { Layout.preferredWidth: parent.tfWidth; Layout.preferredHeight: 80; text: qsTr("User Login")+lt; color: "#FAFAFA"; font.pixelSize: 48;  horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter; }
 
         Item{ height: 40*FcPerm.PermSkin.winHeightScale; }
         Rectangle { Layout.preferredWidth: parent.tfWidth; Layout.preferredHeight: parent.tfHeght; border.color: "#6E6E6E"; border.width: 1; color: "#FAFAFA"; radius: 4;
@@ -40,7 +40,7 @@ IcPageBase {   // this is the wrapped Popup element in ui_qml_control
 
                 Rectangle { Layout.preferredWidth: 1; Layout.fillHeight: true; color: "#6E6E6E"; }
 
-                TextField { id: idUserNameInput; objectName: "UserInputItem.TextField"; Layout.fillWidth: true; Layout.fillHeight: true; placeholderText: qsTr("Please enter user name"); font.pixelSize: 16;  padding: 0; selectByMouse: true; selectionColor: "lightblue";
+                TextField { id: idUserNameInput; objectName: "UserInputItem.TextField"; Layout.fillWidth: true; Layout.fillHeight: true; placeholderText: qsTr("Please enter user name")+lt; font.pixelSize: 16;  padding: 0; selectByMouse: true; selectionColor: "lightblue";
                     background: Item { }
                 }
 
@@ -60,7 +60,7 @@ IcPageBase {   // this is the wrapped Popup element in ui_qml_control
 
                 Rectangle { Layout.preferredWidth: 1; Layout.fillHeight: true; color: "#6E6E6E"; }
 
-                TextField { id: idUserPwdInput; objectName: "UserInputItem.TextField"; Layout.fillWidth: true; Layout.fillHeight: true; placeholderText: qsTr("Please enter password"); font.pixelSize: 16;  padding: 0; echoMode: idPwdBtn.checked ? TextInput.Normal : TextInput.Password; selectByMouse: true; selectionColor: "lightblue";
+                TextField { id: idUserPwdInput; objectName: "UserInputItem.TextField"; Layout.fillWidth: true; Layout.fillHeight: true; placeholderText: qsTr("Please enter password")+lt; font.pixelSize: 16;  padding: 0; echoMode: idPwdBtn.checked ? TextInput.Normal : TextInput.Password; selectByMouse: true; selectionColor: "lightblue";
                     background: Item { }
                 }
 
@@ -73,16 +73,16 @@ IcPageBase {   // this is the wrapped Popup element in ui_qml_control
         Item{ height: 10*FcPerm.PermSkin.winHeightScale; }
         Item{ height: 1; }
         Item { Layout.preferredWidth: parent.tfWidth; Layout.preferredHeight: parent.tfHeght;
-            CheckBox{ id: idRememberPwd; text: qsTr("Remember the password"); contentItem:Label{ leftPadding: 35; width: contentWidth; text:idRememberPwd.text; font.pixelSize: 16; color: "#FAFAFA"; anchors.verticalCenter: parent.verticalCenter;}
+            CheckBox{ id: idRememberPwd; text: qsTr("Remember the password")+lt; contentItem:Label{ leftPadding: 35; width: contentWidth; text:idRememberPwd.text; font.pixelSize: 16; color: "#FAFAFA"; anchors.verticalCenter: parent.verticalCenter;}
                 onCheckStateChanged: { idPriv.rememberPwdTo(checked); }
             }
-            Button { id: idResetPwdBtn; anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter; text: qsTr("Reset password"); focusPolicy: Qt.NoFocus;
+            Button { id: idResetPwdBtn; anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter; text: qsTr("Reset password")+lt; focusPolicy: Qt.NoFocus;
                 background: Item { }
                 contentItem: Label { text: idResetPwdBtn.text; color: idResetPwdBtn.pressed? "#0064b6" : "#FAFAFA";  font.underline: true; font.pixelSize: 16; verticalAlignment: Text.AlignVCenter; }
             }
         }
         Item{ height: 1; }
-        Button { id: idLoginBtn; Layout.preferredWidth: parent.tfWidth; Layout.preferredHeight: parent.tfHeght; text: qsTr("Login"); focusPolicy: Qt.NoFocus;
+        Button { id: idLoginBtn; Layout.preferredWidth: parent.tfWidth; Layout.preferredHeight: parent.tfHeght; text: qsTr("Login")+lt; focusPolicy: Qt.NoFocus;
             background: Rectangle { border.color: "#6E6E6E"; border.width: 1; color: idLoginBtn.pressed? "#bdc0c6" : "#E0E0E0"; radius: 4; }
             contentItem: Label { text: idLoginBtn.text; color: idLoginBtn.pressed? "#0064b6" : "#202020"; font.pixelSize: 16;  verticalAlignment: Text.AlignVCenter; horizontalAlignment: Text.AlignHCenter; }
         }
@@ -90,7 +90,7 @@ IcPageBase {   // this is the wrapped Popup element in ui_qml_control
         Item{ height: 10*FcPerm.PermSkin.winHeightScale; }
         Item { Layout.preferredWidth: parent.tfWidth; Layout.preferredHeight: parent.tfHeght;
 
-            Button { id: idUserMgrBtn; anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter; text: qsTr("User management"); focusPolicy: Qt.NoFocus;
+            Button { id: idUserMgrBtn; anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter; text: qsTr("User management")+lt; focusPolicy: Qt.NoFocus;
                 background: Item { }
                 contentItem: Label { text: idUserMgrBtn.text; color: idUserMgrBtn.pressed? "#0064b6" : "#FAFAFA";  font.underline: true; font.pixelSize: 16; verticalAlignment: Text.AlignVCenter; }
             }
@@ -99,11 +99,11 @@ IcPageBase {   // this is the wrapped Popup element in ui_qml_control
 
     Timer { id: idTimer; interval: 1000; running: false; repeat: true
         onTriggered : {
-//            idLoginBtn.text = qsTr("Login") + "(" + idPriv.autoLoginTime + ")";
-//            if ( idPriv.autoLoginTime <= 0 )
-//            { idPriv.login(); idPriv.stopTimer(); return; }
+            idLoginBtn.text = qsTr("Login") + lt + "(" + idPriv.autoLoginTime + ")"+lt;
+            if ( idPriv.autoLoginTime <= 0 )
+            { idPriv.login(); idPriv.stopTimer(); return; }
 
-//            idPriv.autoLoginTime -= 1;
+            idPriv.autoLoginTime -= 1;
         }
     }
 
@@ -210,7 +210,7 @@ IcPageBase {   // this is the wrapped Popup element in ui_qml_control
 
         function stopTimer( )
         {
-            idTimer.stop(); idLoginBtn.text = qsTr("Login");
+            idTimer.stop(); idLoginBtn.text = qsTr("Login")+lt;
         }
 
         // ====================================================================

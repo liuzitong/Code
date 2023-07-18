@@ -87,42 +87,42 @@
         <translation>视岛</translation>
     </message>
     <message>
-        <location filename="main/view/AnalysisLobby.qml" line="153"/>
+        <location filename="main/view/AnalysisLobby.qml" line="154"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="main/view/AnalysisLobby.qml" line="166"/>
+        <location filename="main/view/AnalysisLobby.qml" line="167"/>
         <source>Single</source>
         <translation>常规分析</translation>
     </message>
     <message>
-        <location filename="main/view/AnalysisLobby.qml" line="166"/>
+        <location filename="main/view/AnalysisLobby.qml" line="167"/>
         <source>Three in one</source>
         <translation>三合一</translation>
     </message>
     <message>
-        <location filename="main/view/AnalysisLobby.qml" line="166"/>
+        <location filename="main/view/AnalysisLobby.qml" line="167"/>
         <source>Overview</source>
         <translation>总览</translation>
     </message>
     <message>
-        <location filename="main/view/AnalysisLobby.qml" line="166"/>
+        <location filename="main/view/AnalysisLobby.qml" line="167"/>
         <source>Threshold</source>
         <translation>阈值</translation>
     </message>
     <message>
-        <location filename="main/view/AnalysisLobby.qml" line="166"/>
+        <location filename="main/view/AnalysisLobby.qml" line="167"/>
         <source>Screening</source>
         <translation>筛选</translation>
     </message>
     <message>
-        <location filename="main/view/AnalysisLobby.qml" line="166"/>
+        <location filename="main/view/AnalysisLobby.qml" line="167"/>
         <source>Dynamic</source>
         <translation>动态</translation>
     </message>
     <message>
-        <location filename="main/view/AnalysisLobby.qml" line="166"/>
+        <location filename="main/view/AnalysisLobby.qml" line="167"/>
         <source>Dynamic data</source>
         <translation>动态数据</translation>
     </message>
@@ -131,7 +131,7 @@
         <translation type="vanished">动态数据</translation>
     </message>
     <message>
-        <location filename="main/view/AnalysisLobby.qml" line="168"/>
+        <location filename="main/view/AnalysisLobby.qml" line="169"/>
         <source>Analysis</source>
         <translation>分析</translation>
     </message>
@@ -139,7 +139,7 @@
 <context>
     <name>Application</name>
     <message>
-        <location filename="main/view/Application.qml" line="13"/>
+        <location filename="main/view/Application.qml" line="14"/>
         <source>Perimeter</source>
         <translation>视野仪</translation>
     </message>
@@ -147,88 +147,88 @@
 <context>
     <name>Check</name>
     <message>
-        <location filename="main/view/Check.qml" line="137"/>
+        <location filename="main/view/Check.qml" line="146"/>
         <source>Program name</source>
         <translation>程序名</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="144"/>
+        <location filename="main/view/Check.qml" line="153"/>
         <source>Cursor</source>
         <translation>光标</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="147"/>
+        <location filename="main/view/Check.qml" line="156"/>
         <source>White</source>
         <translation>白色</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="147"/>
+        <location filename="main/view/Check.qml" line="156"/>
         <source>Red</source>
         <translation>红色</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="147"/>
+        <location filename="main/view/Check.qml" line="156"/>
         <source>Blue</source>
         <translation>蓝色</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="154"/>
+        <location filename="main/view/Check.qml" line="163"/>
         <source>Strategy</source>
         <translation>策略</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="156"/>
+        <location filename="main/view/Check.qml" line="165"/>
         <source>Full threshold</source>
         <translation>全阈值</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="156"/>
+        <location filename="main/view/Check.qml" line="165"/>
         <source>Smart interactive</source>
         <translation>智能交互式</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="156"/>
+        <location filename="main/view/Check.qml" line="165"/>
         <source>One stage</source>
         <translation>二区法</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="156"/>
+        <location filename="main/view/Check.qml" line="165"/>
         <source>Fast interative</source>
         <translation>快速智能交互式</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="156"/>
+        <location filename="main/view/Check.qml" line="165"/>
         <source>Two stages</source>
         <translation>三区法</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="156"/>
+        <location filename="main/view/Check.qml" line="165"/>
         <source>Quantify defects</source>
         <translation>量化缺损</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="156"/>
-        <location filename="main/view/Check.qml" line="157"/>
+        <location filename="main/view/Check.qml" line="165"/>
+        <location filename="main/view/Check.qml" line="166"/>
         <source>Single stimulus</source>
         <translation>单刺激</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="156"/>
+        <location filename="main/view/Check.qml" line="165"/>
         <source>Fast threshold</source>
         <translation>快速阈值</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="157"/>
+        <location filename="main/view/Check.qml" line="166"/>
         <source>Standard</source>
         <translation>标准动态</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="157"/>
+        <location filename="main/view/Check.qml" line="166"/>
         <source>Blind area</source>
         <translation>盲区动态</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="157"/>
+        <location filename="main/view/Check.qml" line="166"/>
         <source>Dark area</source>
         <translation>暗区动态</translation>
     </message>
@@ -237,133 +237,133 @@
         <translation type="vanished">直线动态</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="179"/>
+        <location filename="main/view/Check.qml" line="188"/>
         <source>False positive rate</source>
         <translation>假阳性率</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="187"/>
+        <location filename="main/view/Check.qml" line="196"/>
         <source>False negative rate</source>
         <translation>假阴性率</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="198"/>
+        <location filename="main/view/Check.qml" line="207"/>
         <source>Fixation loss rate</source>
         <translation>固视丢失率</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="212"/>
+        <location filename="main/view/Check.qml" line="221"/>
         <source>Check dot count</source>
         <translation>测试点数</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="222"/>
+        <location filename="main/view/Check.qml" line="231"/>
         <source>Check timespan</source>
         <oldsource>Check time</oldsource>
         <translation>测试时间</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="264"/>
+        <location filename="main/view/Check.qml" line="273"/>
         <source>Pupil diameter</source>
         <translation>瞳孔直径</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="269"/>
+        <location filename="main/view/Check.qml" line="278"/>
         <source>Eye move alarm</source>
         <translation>眼动警报</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="274"/>
+        <location filename="main/view/Check.qml" line="283"/>
         <source>Fixation deviation</source>
         <translation>固视偏移</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="345"/>
+        <location filename="main/view/Check.qml" line="354"/>
         <source>Left eye</source>
         <translation>左眼</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="345"/>
+        <location filename="main/view/Check.qml" line="354"/>
         <source>Right eye</source>
         <translation>右眼</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="400"/>
+        <location filename="main/view/Check.qml" line="409"/>
         <source>Back</source>
         <translation>返回</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="420"/>
+        <location filename="main/view/Check.qml" line="429"/>
         <source>Select program</source>
         <translation>选择程序</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="436"/>
+        <location filename="main/view/Check.qml" line="445"/>
         <source>Params setting</source>
         <translation>参数设置</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="452"/>
+        <location filename="main/view/Check.qml" line="461"/>
         <source>Start</source>
         <translation>开始测试</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="452"/>
+        <location filename="main/view/Check.qml" line="461"/>
         <source>Resume</source>
         <translation>恢复检查</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="452"/>
+        <location filename="main/view/Check.qml" line="461"/>
         <source>Pause</source>
         <translation>暂停检查</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="495"/>
+        <location filename="main/view/Check.qml" line="504"/>
         <source>Stop</source>
         <translation>停止测试</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="509"/>
+        <location filename="main/view/Check.qml" line="518"/>
         <source>Switch eye</source>
         <translation>切换眼别</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="536"/>
+        <location filename="main/view/Check.qml" line="545"/>
         <source>Single</source>
         <translation>常规分析</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="536"/>
+        <location filename="main/view/Check.qml" line="545"/>
         <source>Three in one</source>
         <translation>三合一</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="536"/>
+        <location filename="main/view/Check.qml" line="545"/>
         <source>Overview</source>
         <translation>总览</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="536"/>
+        <location filename="main/view/Check.qml" line="545"/>
         <source>Threshold</source>
         <translation>阈值</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="536"/>
+        <location filename="main/view/Check.qml" line="545"/>
         <source>Screening</source>
         <translation>筛选</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="536"/>
+        <location filename="main/view/Check.qml" line="545"/>
         <source>Dynamic</source>
         <translation>动态</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="536"/>
+        <location filename="main/view/Check.qml" line="545"/>
         <source>Dyanmic data</source>
         <translation>动态数据</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="538"/>
+        <location filename="main/view/Check.qml" line="547"/>
         <source>Analysis</source>
         <translation>分析</translation>
     </message>
@@ -437,72 +437,72 @@
 <context>
     <name>Content</name>
     <message>
-        <location filename="main/view/Content.qml" line="39"/>
+        <location filename="main/view/Content.qml" line="54"/>
         <source>Computer automatic perimeter system</source>
         <translation>电脑自动视野仪系统</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="45"/>
+        <location filename="main/view/Content.qml" line="60"/>
         <source>Name</source>
         <translation>姓名</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="50"/>
+        <location filename="main/view/Content.qml" line="65"/>
         <source>Sex</source>
         <translation>性别</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="51"/>
+        <location filename="main/view/Content.qml" line="66"/>
         <source>Male</source>
         <translation>男性</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="51"/>
+        <location filename="main/view/Content.qml" line="66"/>
         <source>Female</source>
         <translation>女性</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="51"/>
+        <location filename="main/view/Content.qml" line="66"/>
         <source>Others</source>
         <translation>其它</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="56"/>
+        <location filename="main/view/Content.qml" line="71"/>
         <source>Age</source>
         <translation>年龄</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="72"/>
+        <location filename="main/view/Content.qml" line="87"/>
         <source>Login</source>
         <translation>登录</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="80"/>
+        <location filename="main/view/Content.qml" line="96"/>
         <source>Device is reconnecting</source>
         <translation>设备正在重新连接</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="90"/>
+        <location filename="main/view/Content.qml" line="106"/>
         <source>Patient</source>
         <translation>患者</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="92"/>
+        <location filename="main/view/Content.qml" line="108"/>
         <source>Check</source>
         <translation>检测</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="105"/>
+        <location filename="main/view/Content.qml" line="121"/>
         <source>Settings</source>
         <translation>设置</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="114"/>
+        <location filename="main/view/Content.qml" line="130"/>
         <source>Customize</source>
         <translation>自定义</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="117"/>
+        <location filename="main/view/Content.qml" line="133"/>
         <source>About</source>
         <translation>关于</translation>
     </message>
@@ -1068,37 +1068,37 @@
         <translation>关闭</translation>
     </message>
     <message>
-        <location filename="main/view/PatientManagement.qml" line="536"/>
+        <location filename="main/view/PatientManagement.qml" line="537"/>
         <source>Recheck</source>
         <translation>复查</translation>
     </message>
     <message>
-        <location filename="main/view/PatientManagement.qml" line="540"/>
+        <location filename="main/view/PatientManagement.qml" line="542"/>
         <source>Modify</source>
         <translation>修改</translation>
     </message>
     <message>
-        <location filename="main/view/PatientManagement.qml" line="563"/>
+        <location filename="main/view/PatientManagement.qml" line="566"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="main/view/PatientManagement.qml" line="570"/>
+        <location filename="main/view/PatientManagement.qml" line="573"/>
         <source>View reports</source>
         <translation>查看报告</translation>
     </message>
     <message>
-        <location filename="main/view/PatientManagement.qml" line="575"/>
+        <location filename="main/view/PatientManagement.qml" line="578"/>
         <source>Check</source>
         <translation>检测</translation>
     </message>
     <message>
-        <location filename="main/view/PatientManagement.qml" line="585"/>
+        <location filename="main/view/PatientManagement.qml" line="588"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <location filename="main/view/PatientManagement.qml" line="611"/>
+        <location filename="main/view/PatientManagement.qml" line="614"/>
         <source>New</source>
         <translation>新建</translation>
     </message>
@@ -1789,7 +1789,7 @@
 <context>
     <name>Perimeter::StaticCheck</name>
     <message>
-        <location filename="main/services/check_svc.cpp" line="754"/>
+        <location filename="main/services/check_svc.cpp" line="778"/>
         <source>Cant&apos;t locate blind dot.Turn off blindDot check.</source>
         <translation>不能定位盲点.关闭盲点检查.</translation>
     </message>
@@ -2682,6 +2682,111 @@
     </message>
 </context>
 <context>
+    <name>QObject</name>
+    <message>
+        <location filename="third-part/perm/service/perm_permbroker.cxx" line="225"/>
+        <source>Only used for third-party permission verification query users cannot login.</source>
+        <translation>仅用于第三方权限验证，查询用户无法登录。</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/service/perm_permbroker.cxx" line="572"/>
+        <source>User created successfully.</source>
+        <translation>用户创建成功。</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/service/perm_permbroker.cxx" line="613"/>
+        <source>User group created successfully.</source>
+        <translation>用户组创建成功。</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/service/perm_permbroker.cxx" line="685"/>
+        <source>User modified successfully.</source>
+        <translation>用户修改成功。</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/service/perm_permbroker.cxx" line="728"/>
+        <source>User group modified successfully.</source>
+        <translation>用户组修改成功。</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/service/perm_permbroker.cxx" line="871"/>
+        <source>user password changed successfully.</source>
+        <translation>用户密码修改成功。</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/viewmodel/perm_usergrpmgrvm.cxx" line="85"/>
+        <source>The user does not have user group browsing permissions. Please contact the administrator.</source>
+        <translation>用户不具备用户组浏览权限。请联系管理员。</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/viewmodel/perm_usergrpmgrvm.cxx" line="107"/>
+        <source>The user does not have user group creation permissions. Please contact the administrator.</source>
+        <translation>该用户不具有用户组创建权限。请联系管理员。</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/viewmodel/perm_usergrpmgrvm.cxx" line="119"/>
+        <source>The user does not have user group modification permissions. Please contact the administrator.</source>
+        <translation>该用户不具有用户组修改权限。请联系管理员。</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/viewmodel/perm_usergrpmgrvm.cxx" line="129"/>
+        <location filename="third-part/perm/viewmodel/perm_usermgrvm.cxx" line="224"/>
+        <source>Insufficient permissions to be modified.</source>
+        <translation>不具有修改权限。</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/viewmodel/perm_usergrpmgrvm.cxx" line="142"/>
+        <source>The user does not have user group remove permissions. Please contact the administrator.</source>
+        <translation>该用户不具备用户组删除权限。请联系管理员。</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/viewmodel/perm_usergrpmgrvm.cxx" line="152"/>
+        <location filename="third-part/perm/viewmodel/perm_usermgrvm.cxx" line="247"/>
+        <source>Insufficient permissions to be removed.</source>
+        <translation>不具有删除权限。</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/viewmodel/perm_usergrpmgrvm.cxx" line="162"/>
+        <source>Whether to remove the current user group?</source>
+        <translation>确定要删除当前用户组？</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/viewmodel/perm_userloginvm.cxx" line="150"/>
+        <source>No permission to perform this operation.</source>
+        <translation>没有足够的权限进行此操作。</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/viewmodel/perm_usermgrvm.cxx" line="152"/>
+        <source>The user does not have user browsing permissions. Please contact the administrator.</source>
+        <translation>该用户不具有用户浏览权限。请联系管理用。</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/viewmodel/perm_usermgrvm.cxx" line="202"/>
+        <source>The user does not have user creation permissions. Please contact the administrator.</source>
+        <translation>该用户不具有用户创建权限。请联系管理员。</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/viewmodel/perm_usermgrvm.cxx" line="214"/>
+        <source>The user does not have user modification permissions. Please contact the administrator.</source>
+        <translation>该用户不具有用户修改权限。请联系管理员。</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/viewmodel/perm_usermgrvm.cxx" line="237"/>
+        <source>The user does not have user remove permissions. Please contact the administrator.</source>
+        <translation>该用户不具备用户删除权限。请联系管理员。</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/viewmodel/perm_usermgrvm.cxx" line="253"/>
+        <source>Are you sure to remove the current user?</source>
+        <translation>你确定要删除该用户？</translation>
+    </message>
+    <message>
+        <location filename="third-part/qxpack/indcom/sys/qxpack_ic_usbstormon_win32.cxx" line="167"/>
+        <source>USB DISK</source>
+        <translation>U盘</translation>
+    </message>
+</context>
+<context>
     <name>SaveToAnotherProgram</name>
     <message>
         <location filename="main/view/SaveToAnotherProgram.qml" line="47"/>
@@ -3377,6 +3482,629 @@
         <location filename="main/view/VisionFieldIsland.qml" line="216"/>
         <source>Zoom in</source>
         <translation>放大</translation>
+    </message>
+</context>
+<context>
+    <name>grouplist</name>
+    <message>
+        <location filename="third-part/perm/view/grouplist.qml" line="31"/>
+        <source>user group</source>
+        <translation>用户组</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/grouplist.qml" line="48"/>
+        <source>OK</source>
+        <translation>确定</translation>
+    </message>
+</context>
+<context>
+    <name>grppermlist</name>
+    <message>
+        <location filename="third-part/perm/view/grppermlist.qml" line="31"/>
+        <source>user group permission</source>
+        <translation>用户管理权限</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/grppermlist.qml" line="48"/>
+        <source>OK</source>
+        <translation>确定</translation>
+    </message>
+</context>
+<context>
+    <name>modusergrpview</name>
+    <message>
+        <location filename="third-part/perm/view/modusergrpview.qml" line="21"/>
+        <source>Modify User Group</source>
+        <translation>修改用户组</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/modusergrpview.qml" line="28"/>
+        <source>user group name</source>
+        <translation>用户组名</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/modusergrpview.qml" line="30"/>
+        <source>Please enter user group name</source>
+        <translation>请输入用户组名字</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/modusergrpview.qml" line="37"/>
+        <source>memo</source>
+        <translation>备忘</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/modusergrpview.qml" line="39"/>
+        <source>Please enter memo information</source>
+        <translation>请输入备注信息</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/modusergrpview.qml" line="46"/>
+        <source>user group permission table</source>
+        <translation>用户组权限表</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/modusergrpview.qml" line="48"/>
+        <source>Edit</source>
+        <translation>编辑</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/modusergrpview.qml" line="59"/>
+        <source>Back</source>
+        <translation>返回</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/modusergrpview.qml" line="66"/>
+        <source>Save</source>
+        <translation>保存</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/modusergrpview.qml" line="71"/>
+        <source>Quit</source>
+        <translation>退出</translation>
+    </message>
+</context>
+<context>
+    <name>moduserview</name>
+    <message>
+        <location filename="third-part/perm/view/moduserview.qml" line="21"/>
+        <source>Modify User</source>
+        <translation>修改用户</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/moduserview.qml" line="28"/>
+        <source>user name</source>
+        <translation>用户名</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/moduserview.qml" line="30"/>
+        <source>Please enter user name</source>
+        <translation>请输入用户名</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/moduserview.qml" line="37"/>
+        <source>password</source>
+        <translation>密码</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/moduserview.qml" line="39"/>
+        <source>6-20 digits or letters</source>
+        <translation>6-20位数字或者字母</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/moduserview.qml" line="47"/>
+        <source>confirm password</source>
+        <translation>确认密码</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/moduserview.qml" line="49"/>
+        <source>Please enter password again</source>
+        <translation>请再次输入密码</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/moduserview.qml" line="57"/>
+        <source>memo</source>
+        <translation>备注</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/moduserview.qml" line="59"/>
+        <source>Please enter memo information</source>
+        <translation>请填入备注信息</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/moduserview.qml" line="66"/>
+        <source>user group</source>
+        <translation>用户组</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/moduserview.qml" line="68"/>
+        <location filename="third-part/perm/view/moduserview.qml" line="78"/>
+        <source>Edit</source>
+        <translation>编辑</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/moduserview.qml" line="76"/>
+        <source>user permission table</source>
+        <translation>用户权限表</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/moduserview.qml" line="89"/>
+        <source>Back</source>
+        <translation>返回</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/moduserview.qml" line="96"/>
+        <source>Save</source>
+        <translation>保存</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/moduserview.qml" line="101"/>
+        <source>Quit</source>
+        <translation>退出</translation>
+    </message>
+</context>
+<context>
+    <name>newusergrpview</name>
+    <message>
+        <location filename="third-part/perm/view/newusergrpview.qml" line="21"/>
+        <source>Create User Group</source>
+        <translation>创建用户组</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/newusergrpview.qml" line="28"/>
+        <source>user group name</source>
+        <translation>用户组名字</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/newusergrpview.qml" line="30"/>
+        <source>Please enter user group name</source>
+        <translation>请输入用户组名字</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/newusergrpview.qml" line="37"/>
+        <source>memo</source>
+        <translation>备忘</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/newusergrpview.qml" line="39"/>
+        <source>Please enter memo information</source>
+        <translation>请输入备忘信息</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/newusergrpview.qml" line="46"/>
+        <source>user group permission table</source>
+        <translation>用户组权限表</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/newusergrpview.qml" line="48"/>
+        <source>Edit</source>
+        <translation>编辑</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/newusergrpview.qml" line="59"/>
+        <source>Back</source>
+        <translation>返回</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/newusergrpview.qml" line="66"/>
+        <source>Save</source>
+        <translation>保存</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/newusergrpview.qml" line="71"/>
+        <source>Quit</source>
+        <translation>退出</translation>
+    </message>
+</context>
+<context>
+    <name>newuserview</name>
+    <message>
+        <location filename="third-part/perm/view/newuserview.qml" line="20"/>
+        <source>Create User</source>
+        <translation>创建用户</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/newuserview.qml" line="27"/>
+        <source>user name</source>
+        <translation>用户名</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/newuserview.qml" line="29"/>
+        <source>Please enter user name</source>
+        <translation>请输入用户名</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/newuserview.qml" line="36"/>
+        <source>password</source>
+        <translation>密码</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/newuserview.qml" line="38"/>
+        <source>6-20 digits or letters</source>
+        <translation>6-20 位数字或者字母</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/newuserview.qml" line="46"/>
+        <source>confirm password</source>
+        <translation>确认密码</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/newuserview.qml" line="48"/>
+        <source>Please enter password again</source>
+        <translation>请再次输入密码</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/newuserview.qml" line="56"/>
+        <source>memo</source>
+        <translation>备忘</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/newuserview.qml" line="58"/>
+        <source>Please enter memo information</source>
+        <translation>请输入备注信息</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/newuserview.qml" line="65"/>
+        <source>user group</source>
+        <translation>用户组</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/newuserview.qml" line="67"/>
+        <location filename="third-part/perm/view/newuserview.qml" line="77"/>
+        <source>Edit</source>
+        <translation>编辑</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/newuserview.qml" line="75"/>
+        <source>user permission table</source>
+        <translation>用户权限表</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/newuserview.qml" line="91"/>
+        <source>Back</source>
+        <translation>返回</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/newuserview.qml" line="98"/>
+        <source>Save</source>
+        <translation>保存</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/newuserview.qml" line="103"/>
+        <source>Quit</source>
+        <translation>退出</translation>
+    </message>
+</context>
+<context>
+    <name>permlist</name>
+    <message>
+        <location filename="third-part/perm/view/permlist.qml" line="32"/>
+        <source>user permission</source>
+        <translation>用户权限</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/permlist.qml" line="49"/>
+        <source>OK</source>
+        <translation>确定</translation>
+    </message>
+</context>
+<context>
+    <name>userbrowseview</name>
+    <message>
+        <location filename="third-part/perm/view/userbrowseview.qml" line="21"/>
+        <source>User Browse</source>
+        <translation>用户浏览</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/userbrowseview.qml" line="32"/>
+        <source>user name</source>
+        <translation>用户名</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/userbrowseview.qml" line="36"/>
+        <source>memo</source>
+        <translation>备忘</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/userbrowseview.qml" line="88"/>
+        <source>User group</source>
+        <translation>用户组</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/userbrowseview.qml" line="97"/>
+        <source>User Permission</source>
+        <translation>用户权限</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/userbrowseview.qml" line="110"/>
+        <source>Double-click the user to set automatic login.</source>
+        <translation>双击用户设为自动登录。</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/userbrowseview.qml" line="117"/>
+        <source>Back</source>
+        <translation>返回</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/userbrowseview.qml" line="122"/>
+        <source>User group browse</source>
+        <translation>用户组浏览</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/userbrowseview.qml" line="129"/>
+        <source>Create</source>
+        <translation>创建</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/userbrowseview.qml" line="135"/>
+        <source>Modify</source>
+        <translation>修改</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/userbrowseview.qml" line="140"/>
+        <source>Delete</source>
+        <translation>删除</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/userbrowseview.qml" line="145"/>
+        <source>Quit</source>
+        <translation>退出</translation>
+    </message>
+</context>
+<context>
+    <name>userdichgpwdview</name>
+    <message>
+        <location filename="third-part/perm/view/userdichgpwdview.qml" line="21"/>
+        <source>Reset password</source>
+        <translation>重设密码</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/userdichgpwdview.qml" line="30"/>
+        <source>user name</source>
+        <translation>用户名</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/userdichgpwdview.qml" line="32"/>
+        <source>Please enter user name</source>
+        <translation>请输入用户名</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/userdichgpwdview.qml" line="39"/>
+        <source>old password</source>
+        <translation>旧密码</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/userdichgpwdview.qml" line="41"/>
+        <source>Please enter old password</source>
+        <translation>请输入旧密码</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/userdichgpwdview.qml" line="48"/>
+        <source>new password</source>
+        <translation>新密码</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/userdichgpwdview.qml" line="50"/>
+        <source>6-20 digits or letters</source>
+        <translation>6-20位数字或者字母</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/userdichgpwdview.qml" line="58"/>
+        <source>confirm password</source>
+        <translation>确认密码</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/userdichgpwdview.qml" line="60"/>
+        <source>Please enter password again</source>
+        <translation>再次输入密码</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/userdichgpwdview.qml" line="72"/>
+        <source>Back</source>
+        <translation>返回</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/userdichgpwdview.qml" line="79"/>
+        <source>OK</source>
+        <translation>确定</translation>
+    </message>
+</context>
+<context>
+    <name>usergrpbrowseview</name>
+    <message>
+        <location filename="third-part/perm/view/usergrpbrowseview.qml" line="21"/>
+        <source>User Group Browse</source>
+        <translation>用户组浏览</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/usergrpbrowseview.qml" line="32"/>
+        <source>user group name</source>
+        <translation>用户组名</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/usergrpbrowseview.qml" line="36"/>
+        <source>memo</source>
+        <translation>备注</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/usergrpbrowseview.qml" line="69"/>
+        <source>User Group Permissions</source>
+        <translation>用户组权限</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/usergrpbrowseview.qml" line="84"/>
+        <source>Back</source>
+        <translation>返回</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/usergrpbrowseview.qml" line="89"/>
+        <source>User browse</source>
+        <translation>用户浏览</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/usergrpbrowseview.qml" line="96"/>
+        <source>Create</source>
+        <translation>新建</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/usergrpbrowseview.qml" line="101"/>
+        <source>Modify</source>
+        <translation>修改</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/usergrpbrowseview.qml" line="106"/>
+        <source>Delete</source>
+        <translation>删除</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/usergrpbrowseview.qml" line="111"/>
+        <source>Quit</source>
+        <translation>退出</translation>
+    </message>
+</context>
+<context>
+    <name>usergrplistview</name>
+    <message>
+        <location filename="third-part/perm/view/usergrplistview.qml" line="32"/>
+        <source>user group</source>
+        <translation>用户组</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/usergrplistview.qml" line="55"/>
+        <source>OK</source>
+        <translation>确定</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/usergrplistview.qml" line="62"/>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+</context>
+<context>
+    <name>usergrppermlistview</name>
+    <message>
+        <location filename="third-part/perm/view/usergrppermlistview.qml" line="33"/>
+        <source>user group permission table</source>
+        <translation>用户组权限表</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/usergrppermlistview.qml" line="56"/>
+        <source>OK</source>
+        <translation>确定</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/usergrppermlistview.qml" line="63"/>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+</context>
+<context>
+    <name>userloginview</name>
+    <message>
+        <location filename="third-part/perm/view/userloginview.qml" line="32"/>
+        <source>User Login</source>
+        <translation>用户登录</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/userloginview.qml" line="43"/>
+        <source>Please enter user name</source>
+        <translation>请输入用户名</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/userloginview.qml" line="63"/>
+        <source>Please enter password</source>
+        <translation>请输入密码</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/userloginview.qml" line="76"/>
+        <source>Remember the password</source>
+        <translation>记住密码</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/userloginview.qml" line="79"/>
+        <source>Reset password</source>
+        <translation>重设密码</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/userloginview.qml" line="85"/>
+        <location filename="third-part/perm/view/userloginview.qml" line="213"/>
+        <source>Login</source>
+        <translation>登录</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/userloginview.qml" line="93"/>
+        <source>User management</source>
+        <translation>用户管理</translation>
+    </message>
+</context>
+<context>
+    <name>usermgrloginview</name>
+    <message>
+        <location filename="third-part/perm/view/usermgrloginview.qml" line="21"/>
+        <source>User Management</source>
+        <translation>用户管理</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/usermgrloginview.qml" line="36"/>
+        <source>Please enter user name</source>
+        <translation>请输入用户名</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/usermgrloginview.qml" line="55"/>
+        <source>Please enter password</source>
+        <translation>请输入密码</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/usermgrloginview.qml" line="65"/>
+        <source>Please enter a username and password width administrative rights.</source>
+        <translation>请输入带有管理权限的用户名和密码。</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/usermgrloginview.qml" line="73"/>
+        <source>Quit</source>
+        <translation>退出</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/usermgrloginview.qml" line="80"/>
+        <source>Next</source>
+        <translation>继续</translation>
+    </message>
+</context>
+<context>
+    <name>userpermlistview</name>
+    <message>
+        <location filename="third-part/perm/view/userpermlistview.qml" line="31"/>
+        <source>user permission table</source>
+        <translation>用户管理权限表</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/userpermlistview.qml" line="45"/>
+        <source>permissions</source>
+        <translation>权限</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/userpermlistview.qml" line="47"/>
+        <source>inherit</source>
+        <translation>继承</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/userpermlistview.qml" line="49"/>
+        <source>enable</source>
+        <translation>激活</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/userpermlistview.qml" line="51"/>
+        <source>disable</source>
+        <translation>失效</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/userpermlistview.qml" line="95"/>
+        <source>OK</source>
+        <translation>确定</translation>
+    </message>
+    <message>
+        <location filename="third-part/perm/view/userpermlistview.qml" line="102"/>
+        <source>Cancel</source>
+        <translation>取消</translation>
     </message>
 </context>
 </TS>

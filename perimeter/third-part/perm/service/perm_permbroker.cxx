@@ -207,7 +207,6 @@ bool PermBrokerPriv::login(const QJsonObject &jo)
     if ( !resp.isResult() )
     {
         emit m_parent->error(resp.errCode(), resp.errMsg());
-        qDebug () <<    resp.errCode() << resp.errMsg() << "aaaaaaaaaaaaaaaaaaaaaa";
         return false;
     }
 
@@ -892,7 +891,7 @@ void PermBrokerPriv::starSvrProcess()
             return;
         }
         QDir dir(QCoreApplication::applicationDirPath());
-        dir.cdUp();
+//        dir.cdUp();
         QStringList arguments;
         arguments << QStringLiteral("--locSvrName") << m_svr_name
                   << QStringLiteral("--dbPath")     << QString("%1/params/syseye-nw/system.dat").arg(dir.path());
