@@ -115,7 +115,7 @@ void MainWindow::initDevCtl()
     connect(m_devCtl,&UsbDev::DevCtl::newFrameData,this,&MainWindow::refreshVideo);
     connect(m_devCtl,&UsbDev::DevCtl::newProfile,this,&MainWindow::updateProfile);
     connect(m_devCtl,&UsbDev::DevCtl::newConfig,this,&MainWindow::updateConfig);
-
+    m_devCtl->readProfile();
     ui->checkBox_IO->setChecked(m_settings.m_updateIOInfo);
     ui->checkBox_startRefreshInfo->setChecked(m_settings.m_updateRefreshIOInfo);
     ui->checkBox_RefreshIO->setChecked(m_settings.m_updateRefreshIOInfo);

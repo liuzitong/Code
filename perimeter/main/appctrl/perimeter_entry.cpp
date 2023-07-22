@@ -129,6 +129,7 @@ int  main ( int argc, char *argv[] )
     // start the application
     gPrintMemCntr("pre-stage");
     {
+        QCoreApplication::setAttribute(Qt::AA_DisableShaderDiskCache);
         QApplication app(argc, argv);
         JRpcServerSvc jprc_svc; jprc_svc.start(GUNS_JRPC_SVC_NAME);
         Perimeter::AppCtrl *app_ctrl = new Perimeter::AppCtrl;
@@ -141,9 +142,6 @@ int  main ( int argc, char *argv[] )
         QxPack::IcUiQmlApi::setAppCtrl( s_app_ctrl );
         FcPerm::PermMod perm_mod; perm_mod.registerTypesEx(app_ctrl);
 
-//        auto transCon=Perimeter::TranslateController::instance();
-//        transCon->loadLanguage(QLocale::Chinese);
-
         //  here create the main view
         // --------------------------------------------------------------------
         QQmlApplicationEngine *eng = new QQmlApplicationEngine;
@@ -155,12 +153,10 @@ int  main ( int argc, char *argv[] )
         qmlRegisterSingletonType(QUrl("qrc:/perimeter/main/view/Utils/CusUtils.qml"), "perimeter.main.view.Utils", 1, 0, "CusUtils");
 
         gPrintMemCntr("enter eventloop stage");
-//        QObject::connect(eng, &QQmlEngine::quit, QCoreApplication::instance(),  &QCoreApplication::quit);
-//        QObject::connect(eng, &QQmlEngine::quit,[](){qDebug()<<"engquit";});
+
 
         app.setWindowIcon(QIcon(":/Pics/base-svg/2logo_256_black.svg"));
         Perimeter::KeyBoardFilter* filter= new Perimeter::KeyBoardFilter();
-//        KeyBoardFilter filter;
         app.installEventFilter(filter);
         ret = app.exec();
         eng->deleteLater();
@@ -172,7 +168,6 @@ int  main ( int argc, char *argv[] )
         QxPack::IcAppDclPriv::barrier( 32 );
     }
     gPrintMemCntr("post-stage");
-
 
     return ret;
 }

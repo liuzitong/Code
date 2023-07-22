@@ -112,6 +112,7 @@ Rectangle {
                             height: parent.height;anchors.right: parent.right;spacing: height*1
 
                             CusButton{
+                                visible: false;
                                 width: parent.height*2;text: "DoStuff";
 //                                onClicked: {IcUiQmlApi.appCtrl.AnalysisSvc.showReport();}
                                 onClicked: {IcUiQmlApi.appCtrl.testClass.test();

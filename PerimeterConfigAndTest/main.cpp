@@ -83,6 +83,7 @@ int main(int argc, char *argv[])
     signal( SIGTERM, & gSigTerm_Handler );
     qInstallMessageHandler( & gMsgHandler );
     QApplication::setStyle(QStyleFactory::create("Fusion"));
+    QCoreApplication::setAttribute(Qt::AA_DisableShaderDiskCache);
 //    spdlog::info("Welcome to spdlog!");
     QApplication a(argc, argv);
     MainWindow w;
