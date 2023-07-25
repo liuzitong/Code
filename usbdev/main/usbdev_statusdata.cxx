@@ -298,7 +298,7 @@ bool     StatusData :: cameraStatus() const
 bool StatusData::eyeglassStatus() const
 { return ( m_obj != nullptr ? T_PrivPtr( m_obj )->EyeglassStatusRef() : false ); }
 
-bool StatusData::moveStutas() const
+bool StatusData::moveStatus() const
 { return ( m_obj != nullptr ? T_PrivPtr( m_obj )->moveStatusRef() : false );}
 
 qint32     StatusData :: envLightDA() const

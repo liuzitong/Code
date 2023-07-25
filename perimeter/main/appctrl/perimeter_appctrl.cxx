@@ -14,9 +14,11 @@
 #include "perimeter/main/perimeter_main.hxx"
 #include "perimeter/main/services/check_svc.h"
 #include "perimeter/main/services/frame_provid_svc.h"
+#include "perimeter/main/viewModel/deviceStatusDataVm.h"
 #include <deviceOperation/device_operation.h>
 #include "perimeter/main/services/utility_svc.h"
 #include "perimeter/third-part/perm/perm_mod.hxx"
+#include <perimeter/main/services/keyboard_filter.h>
 namespace Perimeter {
 
 // ////////////////////////////////////////////////////////////////////////////
@@ -38,6 +40,7 @@ private:
     QObject*    m_testClass;
     QObject*    m_settings;
     QObject*    m_checkSvc;
+    QObject*    m_deviceStatusData;
 //    QObject*    m_currentPatient;
 public :
     AppCtrlPriv ( AppCtrl *pa );
@@ -53,6 +56,7 @@ public :
     QObject*    getCheckSvc() const                 {return m_checkSvc;}
     QObject*    getSettings()                       {return m_settings;}
     QObject*    getUtilitySvc()                      {return FrameProvidSvc::getSingleton().data();}
+    QObject*    getDeviceStatusData()                    {return m_deviceStatusData;}
 //    QObject*    getDeviceOperation()                {return DevOps::DeviceOperation::getSingleton().data();/*return new QObject();*/}
 //    QString     getLanguage()                       {return m_language;}
 //    void        setLanguage(QString value)          {m_language=value;}
@@ -72,13 +76,12 @@ AppCtrlPriv :: AppCtrlPriv ( AppCtrl *pa )
     m_app_set_svc = AppSettingsSvc::getInstance();
     m_msg_bus_svc = MsgBusSvc::getInstance();
     m_obj_mgr_svc = ObjMgrSvc::getInstance();
-//    FrameProvidSvc::getSingleton();
-//    m_databaseSvc = static_cast<QObject*>(new databaseSvc());
+
     m_databaseSvc = perimeter_new(databaseSvc);
     m_testClass = perimeter_new(TestClass);
     m_checkSvc=perimeter_new(CheckSvc);
     m_settings=perimeter_new(Settings);
-//    m_currentPatient=perimeter_new(PatientVm);
+    m_deviceStatusData=perimeter_new(DeviceStatusDataVm);
 }
 
 // ============================================================================
@@ -90,12 +93,11 @@ AppCtrlPriv :: ~AppCtrlPriv ( )
     ObjMgrSvc::freeInstance();
     MsgBusSvc::freeInstance();
     AppSettingsSvc::freeInstance();
-//    delete m_databaseSvc;
     perimeter_delete(m_databaseSvc,databaseSvc);
     perimeter_delete(m_checkSvc,CheckSvc);
     perimeter_delete(m_testClass,TestClass);
     perimeter_delete(m_settings,Settings);
-//    perimeter_delete(m_currentPatient,PatientVm);
+    perimeter_delete(m_deviceStatusData,DeviceStatusDataVm);
 }
 
 // ============================================================================
@@ -115,6 +117,10 @@ void  AppCtrlPriv :: registerTypes()
 AppCtrl :: AppCtrl ( QObject *pa ) : QxPack::IcAppCtrlBase( pa )
 {
     m_obj = perimeter_new( AppCtrlPriv, this );
+//    DevOps::DeviceOperation::getSingleton()
+    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::newStatusData,this,&AppCtrl::deviceStatusDataChanged);
+    connect(KeyBoardFilter::getSingleton().data(),&KeyBoardFilter::showDeviceStatusChanged,this,&AppCtrl::showDeviceStatusDataChanged);
+    connect(KeyBoardFilter::getSingleton().data(),&KeyBoardFilter::showDeviceStatusChanged,[](){qDebug()<<"gogogog";});
 }
 
 // ============================================================================
@@ -159,6 +165,16 @@ QObject *AppCtrl::getFrameProvidSvc() const
 QObject *AppCtrl::getUtilitySvc() const
 {
     return UtilitySvc::getSingleton().data();
+}
+
+QObject *AppCtrl::getDeviceStatusData() const
+{
+    return T_PrivPtr( m_obj )-> getDeviceStatusData();
+}
+
+bool AppCtrl::getShowDeviceStatusData() const
+{
+    return KeyBoardFilter::showDeviceStatusData;
 }
 
 //QObject *AppCtrl::getDeviceOperation() const

@@ -31,5 +31,6 @@
         <file>StaticAnalysisReportDB.qml</file>
         <file>ProgramCustomizeCircleDot.qml</file>
         <file>ProgramCustomizeSquareDot.qml</file>
+        <file>DeviceStatus.qml</file>
     </qresource>
 </RCC>

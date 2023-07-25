@@ -14,8 +14,8 @@ Window {
     id: window;visible: true;width: 1366;height: 768;title: lt+qsTr("Perimeter");
     minimumWidth: 1366;minimumHeight: 768;
 
+    DeviceStatus{anchors.fill:parent;visible:IcUiQmlApi.appCtrl.showDeviceStatusData;z:10;}
     Content{id:content;anchors.fill: parent;visible: false;onLogin:{visible=false;permMgrView.visible=true;}}
-//    Login{id:login;visible: false;anchors.fill: parent;}
     PermMgrView{
         id:permMgrView; anchors.fill: parent;
         onReqExitAndGo: {visible=false;content.permission=arg;content.visible=true;}

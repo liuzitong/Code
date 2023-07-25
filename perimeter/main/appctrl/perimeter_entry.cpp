@@ -156,8 +156,9 @@ int  main ( int argc, char *argv[] )
 
 
         app.setWindowIcon(QIcon(":/Pics/base-svg/2logo_256_black.svg"));
-        Perimeter::KeyBoardFilter* filter= new Perimeter::KeyBoardFilter();
-        app.installEventFilter(filter);
+        auto filter= Perimeter::KeyBoardFilter::getSingleton();
+
+        app.installEventFilter(filter.data());
         ret = app.exec();
         eng->deleteLater();
 

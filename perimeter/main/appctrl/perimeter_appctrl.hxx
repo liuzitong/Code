@@ -28,6 +28,8 @@ class PERIMETER_API  AppCtrl : public QxPack::IcAppCtrlBase {
     Q_PROPERTY( QObject* settings READ getSettings)
     Q_PROPERTY( QObject* utilitySvc READ getUtilitySvc)
     Q_PROPERTY( QObject* frameProvidSvc READ getFrameProvidSvc CONSTANT)
+    Q_PROPERTY( QObject* deviceStatusData READ getDeviceStatusData NOTIFY deviceStatusDataChanged)
+    Q_PROPERTY( bool showDeviceStatusData READ getShowDeviceStatusData NOTIFY showDeviceStatusDataChanged)
 
 public:
     //! ctor
@@ -51,6 +53,8 @@ public:
     QObject*    getSettings() ;
     QObject*    getFrameProvidSvc() const;
     QObject*    getUtilitySvc() const;
+    QObject*    getDeviceStatusData() const;Q_SIGNAL void deviceStatusDataChanged();
+    bool        getShowDeviceStatusData() const;Q_SIGNAL void showDeviceStatusDataChanged();
 //    QObject*    getDeviceOperation() const;
 
 

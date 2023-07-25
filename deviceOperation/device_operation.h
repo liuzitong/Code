@@ -27,6 +27,41 @@ struct Status
 //   int DB;
 };
 
+struct StatusDataOut
+{
+    int serialNo;
+    bool answerpadStatus;
+    bool cameraStatus;
+    bool eyeglassStatus;
+    bool xMotorBusy;
+    bool yMotorBusy;
+    bool focusMotorBusy;
+    bool colorMotorBusy;
+    bool lightSpotMotorBusy;
+    bool shutterMotorBusy;
+    bool xChinMotorBusy;
+    bool yChinMotorBusy;
+    int xMotorCmdCntr;
+    int yMotorCmdCntr;
+    int focusMotorCmdCntr;
+    int colorMotorCmdCntr;
+    int lightSpotMotorCmdCntr;
+    int shutterMotorCmdCntr;
+    int xChinMotorCmdCntr;
+    int yChinMotorCmdCntr;
+    bool moveStatus;
+    int xMotorCurrPos;
+    int yMotorCurrPos;
+    int focusMotorCurrPos;
+    int colorMotorCurrPos;
+    int lightSpotMotorCurrPos;
+    int shutterMotorCurrPos;
+    int xChinMotorCurrPos;
+    int yChinMotorCurrPos;
+    int envLightDA;
+    int castLightDA;
+};
+
 
 class DEVICEOPERATIONSHARED_EXPORT DeviceOperation:public QObject
 {
@@ -141,8 +176,10 @@ public:
     UsbDev::Config m_config;
     UsbDev::Profile m_profile;
     UsbDev::StatusData m_statusData;
-    QMutex m_statusLock;                      //防止多线程冲突,放入同线程不再需要
+    StatusDataOut m_statusDataOut;
 
+
+    QMutex m_statusLock;                      //防止多线程冲突,放入同线程不再需要
     UsbDev::FrameData m_frameData;
 //    QPoint m_pupilCenterPoint;
 //    int m_pupilRadius;

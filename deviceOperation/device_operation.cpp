@@ -215,7 +215,7 @@ bool DeviceOperation::getAnswerPadStatus()
 
 bool DeviceOperation::getDynamicMoveStatus()
 {
-    return m_statusData.moveStutas();
+    return m_statusData.moveStatus();
 }
 
 QPointF DeviceOperation::getDyanmicAnswerPos()
@@ -622,6 +622,40 @@ void DeviceOperation::workOnNewStatuData()
         updateDevInfo("receive new workStatus");
     }
     m_statusData=m_devCtl->takeNextPendingStatusData();
+
+    using MotorId=UsbDev::DevCtl::MotorId;
+    m_statusDataOut.serialNo=m_statusData.serialNO();
+    m_statusDataOut.answerpadStatus=m_statusData.answerpadStatus();
+    m_statusDataOut.cameraStatus=m_statusData.cameraStatus();
+    m_statusDataOut.eyeglassStatus=m_statusData.eyeglassStatus();
+    m_statusDataOut.xMotorBusy=m_statusData.isMotorBusy(MotorId::MotorId_X);
+    m_statusDataOut.yMotorBusy=m_statusData.isMotorBusy(MotorId::MotorId_Y);
+    m_statusDataOut.focusMotorBusy=m_statusData.isMotorBusy(MotorId::MotorId_Focus);
+    m_statusDataOut.colorMotorBusy=m_statusData.isMotorBusy(MotorId::MotorId_Color);
+    m_statusDataOut.lightSpotMotorBusy=m_statusData.isMotorBusy(MotorId::MotorId_Light_Spot);
+    m_statusDataOut.shutterMotorBusy=m_statusData.isMotorBusy(MotorId::MotorId_Shutter);
+    m_statusDataOut.xChinMotorBusy=m_statusData.isMotorBusy(MotorId::MotorId_Chin_Hoz);
+    m_statusDataOut.yChinMotorBusy=m_statusData.isMotorBusy(MotorId::MotorId_Chin_Vert);
+    m_statusDataOut.xMotorCmdCntr=m_statusData.motorCmdCntr(MotorId::MotorId_X);
+    m_statusDataOut.yMotorCmdCntr=m_statusData.motorCmdCntr(MotorId::MotorId_Y);
+    m_statusDataOut.focusMotorCmdCntr=m_statusData.motorCmdCntr(MotorId::MotorId_Focus);
+    m_statusDataOut.colorMotorCmdCntr=m_statusData.motorCmdCntr(MotorId::MotorId_Color);
+    m_statusDataOut.lightSpotMotorCmdCntr=m_statusData.motorCmdCntr(MotorId::MotorId_Light_Spot);
+    m_statusDataOut.shutterMotorCmdCntr=m_statusData.motorCmdCntr(MotorId::MotorId_Shutter);
+    m_statusDataOut.xChinMotorCmdCntr=m_statusData.motorCmdCntr(MotorId::MotorId_Chin_Hoz);
+    m_statusDataOut.yChinMotorCmdCntr=m_statusData.motorCmdCntr(MotorId::MotorId_Chin_Vert);
+    m_statusDataOut.moveStatus=m_statusData.moveStatus();
+    m_statusDataOut.xMotorCurrPos=m_statusData.motorPosition(MotorId::MotorId_X);
+    m_statusDataOut.yMotorCurrPos=m_statusData.motorPosition(MotorId::MotorId_Y);
+    m_statusDataOut.focusMotorCurrPos=m_statusData.motorPosition(MotorId::MotorId_Focus);
+    m_statusDataOut.colorMotorCurrPos=m_statusData.motorPosition(MotorId::MotorId_Color);
+    m_statusDataOut.lightSpotMotorCurrPos=m_statusData.motorPosition(MotorId::MotorId_Light_Spot);
+    m_statusDataOut.shutterMotorCurrPos=m_statusData.motorPosition(MotorId::MotorId_Shutter);
+    m_statusDataOut.xChinMotorCurrPos=m_statusData.motorPosition(MotorId::MotorId_Chin_Hoz);
+    m_statusDataOut.yChinMotorCurrPos=m_statusData.motorPosition(MotorId::MotorId_Chin_Vert);
+    m_statusDataOut.envLightDA=m_statusData.envLightDA();
+    m_statusDataOut.castLightDA=m_statusData.castLightDA();
+
     auto eyeglassStatus=m_statusData.eyeglassStatus();
     if(m_isAtCheckingPage)
     {
