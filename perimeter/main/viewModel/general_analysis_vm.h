@@ -1,6 +1,7 @@
 ﻿#ifndef GENERAL_ANALYSIS_VM_H
 #define GENERAL_ANALYSIS_VM_H
 
+#include <QAbstractListModel>
 #include <QObject>
 #include <QVector>
 #include <perimeter/main/model/checkResultModel.h>
@@ -63,6 +64,76 @@ private:
     PatientModel m_patient;
 };
 
+enum OverViewRoles
+{
+    program=Qt::UserRole + 1,
+    checkDate,
+    strategy,
+    GHT,
+    OS_OD,
+    centerDotCheck,
+    md,
+    p_md,
+    psd,
+    p_psd,
+    grayPicPath,
+    threshHoldPicPath,
+    totalDeviationPicPath,
+    patternDeviationPicPath
+};
+
+struct OverViewData
+{
+    QString program;
+    QDateTime checkDate;
+    int strategy;
+    int GHT;
+    int OS_OD;
+    bool centerDotCheck;
+    float md;
+    float psd;
+    float p_md;
+    float p_psd;
+    QString grayPicPath;
+    QString threshHoldPicPath;
+    QString totalDeviationPicPath;
+    QString patternDeviationPicPath;
+};
+
+class OverViewListVm:public QAbstractListModel
+{
+    // QAbstractItemModel interface
+    Q_OBJECT
+public:
+    OverViewListVm(QList<int> ids);
+    ~OverViewListVm();
+    virtual int rowCount(const QModelIndex &parent) const override;
+    virtual QVariant data(const QModelIndex &index, int role) const override;
+    virtual QHash<int,QByteArray>  roleNames( ) const override;
+private:
+    QList<OverViewData> m_data;
+};
+
+class StaticAnalysisOverViewVm:public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(int type READ getType)
+    Q_PROPERTY(OverViewListVm* resultList READ getResultList)
+public:
+    Q_INVOKABLE explicit StaticAnalysisOverViewVm(const QVariantList & );
+    Q_INVOKABLE virtual ~StaticAnalysisOverViewVm();
+    Q_INVOKABLE void showReport(int report);
+
+    int getType(){return 3;}
+    OverViewListVm* getResultList(){return m_overViewList.data();}
+private:
+    QString m_previewFolder="./previewImage/";
+    QString m_reportFolder="./reportImage/";
+    QList<StaticCheckResultModel> m_checkResultList;
+    QList<StaticProgramModel> m_programList;
+    PatientModel m_patient;
+    QSharedPointer<OverViewListVm> m_overViewList;
+};
 
 }
 #endif // GENERAL_ANALYSIS_VM_H

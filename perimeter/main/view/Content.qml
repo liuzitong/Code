@@ -258,7 +258,6 @@ Rectangle {
                         analysisPage.pageFrom=pageFrom;
                         analysisPage.currentCheckResult=params.checkResult;
                         analysisPage.currentProgram=params.program;
-                        if(analysisPage.analysisResult!==null){analysisPage.analysisResult.destroy();}
                         analysisPage.analysisResult=params.analysisResult;
                         analysisPage.visible=true;
                         analysisPage.report=params.report;

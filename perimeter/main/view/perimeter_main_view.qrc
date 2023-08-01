@@ -32,5 +32,6 @@
         <file>ProgramCustomizeCircleDot.qml</file>
         <file>ProgramCustomizeSquareDot.qml</file>
         <file>DeviceStatus.qml</file>
+        <file>StaticAnalysisOverview.qml</file>
     </qresource>
 </RCC>

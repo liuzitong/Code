@@ -325,7 +325,6 @@ void AnalysisSvc::ThresholdAnalysis(int resultId,QVector<int>& dev,QVector<int>&
     }
     psd=sqrt(psd/(dev.length()-2));
 
-
     if(psd>4.3) p_psd=0.5;
     else if(psd>3.7) p_psd=1;
     else if(psd>3.2) p_psd=2;

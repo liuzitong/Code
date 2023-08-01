@@ -27,26 +27,34 @@ Column {
 
     onRefresh: {
 //        console.log("report type is "+report);
-        var type=currentProgram.type;
+        var type=currentProgram!=null?currentProgram.type:0;
         if(type!==2)
         {
-            content.source="StaticAnalysis.qml";
-            content.item.analysisResult=analysisResult;
-            content.item.analysisVm=analysisVm;
+            if(!(type===0&&report==2))
+            {
+                content.source="StaticAnalysis.qml";
+                content.item.analysisResult=analysisResult;
+                content.item.analysisVm=analysisVm;
+            }
+            else
+            {
+                content.source="StaticAnalysisOverview.qml";
+                content.item.analysisVm=analysisVm;
+            }
         }
         else
         {
             content.source="DynamicAnalysis.qml";
         }
 
+
+
 //        content.item.textHeight=textHeight;
         content.item.currentPatient=currentPatient;
         content.item.currentProgram=currentProgram;
         content.item.currentCheckResult=currentCheckResult;
-
         content.item.report=report;
         content.item.refresh();
-//        queryStrategy.currentIndex=report;
     }
 
 

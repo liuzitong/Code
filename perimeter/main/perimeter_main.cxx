@@ -1,4 +1,4 @@
-#ifndef PERIMETER_MAIN_CXX
+﻿#ifndef PERIMETER_MAIN_CXX
 #define PERIMETER_MAIN_CXX
 
 #include "perimeter_main.hxx"
@@ -65,6 +65,7 @@ void  Main :: registerTypes( QxPack::IcAppCtrlBase *app_base )
     obj_mgr->registerType<Perimeter::AnalysisLobbyListVm>(QStringLiteral("Perimeter::AnalysisLobbyListVm"), Q_NULLPTR);
     obj_mgr->registerType<Perimeter::ProgressAnalysisListVm>(QStringLiteral("Perimeter::ProgressAnalysisListVm"), Q_NULLPTR);
     obj_mgr->registerType<Perimeter::StaticAnalysisVm>(QStringLiteral("Perimeter::StaticAnalysisVm"), Q_NULLPTR);
+    obj_mgr->registerType<Perimeter::StaticAnalysisOverViewVm>(QStringLiteral("Perimeter::StaticAnalysisOverViewVm"), Q_NULLPTR);
     obj_mgr->registerType<Perimeter::QHeightMapSurfaceDataProxyWrapper>(QStringLiteral("Perimeter::QHeightMapSurfaceDataProxyWrapper"), Q_NULLPTR);
     obj_mgr->registerType<Perimeter::DynamicAnalysisVm>(QStringLiteral("Perimeter::DynamicAnalysisVm"), Q_NULLPTR);
     obj_mgr->registerType<Perimeter::VisionFieldIslandVm>(QStringLiteral("Perimeter::VisionFieldIslandVm"), Q_NULLPTR);

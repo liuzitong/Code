@@ -570,6 +570,91 @@ void DynamicAnalysisVm::showReport(int report)
     UtilitySvc::reportEngine->previewReport(/*LimeReport::PreviewHint::ShowAllPreviewBars*/);
 }
 
+StaticAnalysisOverViewVm::StaticAnalysisOverViewVm(const QVariantList &args)
+{
+    qDebug()<<args;
+    m_overViewList.reset(new OverViewListVm({1,2,3}));
+}
+
+StaticAnalysisOverViewVm::~StaticAnalysisOverViewVm()
+{
+
+}
+
+void StaticAnalysisOverViewVm::showReport(int report)
+{
+
+}
+
+
+OverViewListVm::OverViewListVm(QList<int> ids)
+{
+    auto dateTime = QDateTime::fromString("2013-05-16T13:24:33","yyyy-MM-ddTHH:mm:ss");
+    qDebug()<<dateTime.toString("yyyy/MM/dd");
+    m_data.append(OverViewData{"30-2",QDateTime::fromString("2013-05-16T13:24:33","yyyy-MM-ddThh:mm:ss"),1,1,0,false,2.14f,2.5f,12.0f,5.3f,"./grayPic1","./threshPic1","./totalDeviPic1","./patterDeviPic1"});
+    m_data.append(OverViewData{"30-2",QDateTime::fromString("2016-05-16T13:24:33","yyyy-MM-ddThh:mm:ss"),1,1,0,false,2.24f,2.5f,12.0f,5.3f,"./grayPic1","./threshPic1","./totalDeviPic1","./patterDeviPic1"});
+    m_data.append(OverViewData{"30-2",QDateTime::fromString("2017-05-16T13:24:33","yyyy-MM-ddThh:mm:ss"),1,1,0,false,2.34f,2.5f,12.0f,5.3f,"./grayPic1","./threshPic1","./totalDeviPic1","./patterDeviPic1"});
+    m_data.append(OverViewData{"30-2",QDateTime::fromString("2018-05-16T13:24:33","yyyy-MM-ddThh:mm:ss"),1,1,0,false,2.44f,2.5f,12.0f,5.3f,"./grayPic1","./threshPic1","./totalDeviPic1","./patterDeviPic1"});
+    m_data.append(OverViewData{"30-2",QDateTime::fromString("2019-05-16T13:24:33","yyyy-MM-ddThh:mm:ss"),1,1,0,false,2.54f,2.5f,12.0f,5.3f,"./grayPic1","./threshPic1","./totalDeviPic1","./patterDeviPic1"});
+    m_data.append(OverViewData{"30-2",QDateTime::fromString("2020-05-16T13:24:33","yyyy-MM-ddThh:mm:ss"),1,1,0,false,2.64f,2.5f,12.0f,5.3f,"./grayPic1","./threshPic1","./totalDeviPic1","./patterDeviPic1"});
+    m_data.append(OverViewData{"30-2",QDateTime::fromString("2021-05-16T13:24:33","yyyy-MM-ddThh:mm:ss"),1,1,0,false,2.74f,2.5f,12.0f,5.3f,"./grayPic1","./threshPic1","./totalDeviPic1","./patterDeviPic1"});
+}
+
+OverViewListVm::~OverViewListVm()
+{
+
+}
+
+int OverViewListVm::rowCount(const QModelIndex &parent) const
+{
+    return m_data.length();
+}
+
+QVariant OverViewListVm::data(const QModelIndex &idx, int role) const
+{
+    int index=idx.row();
+    auto data=m_data[index];
+    switch (role)
+    {
+    case (OverViewRoles::program):return data.program;
+    case (OverViewRoles::checkDate):return data.checkDate;
+    case (OverViewRoles::strategy): return data.strategy;
+    case (OverViewRoles::GHT): return data.GHT;
+    case (OverViewRoles::OS_OD): return data.OS_OD;
+    case (OverViewRoles::centerDotCheck): return data.centerDotCheck;
+    case (OverViewRoles::psd): return data.psd;
+    case (OverViewRoles::md): return data.md;
+    case (OverViewRoles::p_psd): return data.p_psd;
+    case (OverViewRoles::p_md): return data.p_md;
+    case (OverViewRoles::grayPicPath): return data.grayPicPath;
+    case (OverViewRoles::threshHoldPicPath): return data.threshHoldPicPath;
+    case (OverViewRoles::totalDeviationPicPath): return data.totalDeviationPicPath;
+    case (OverViewRoles::patternDeviationPicPath): return data.patternDeviationPicPath;
+    default:return QVariant();
+    }
+}
+
+QHash<int, QByteArray> OverViewListVm::roleNames() const
+{
+    QHash<int, QByteArray> roles;
+    roles[program] = "program";
+    roles[checkDate] = "checkDate";
+    roles[strategy] = "strategy";
+    roles[GHT] = "GHT";
+    roles[OS_OD] = "OS_OD";
+    roles[centerDotCheck]="centerDotCheck";
+    roles[md]="md";
+    roles[p_md]="p_md";
+    roles[psd]="psd";
+    roles[p_psd]="p_psd";
+    roles[grayPicPath]="grayPicPath";
+    roles[threshHoldPicPath]="threshHoldPicPath";
+    roles[totalDeviationPicPath]="totalDeviationPicPath";
+    roles[patternDeviationPicPath]="patternDeviationPicPath";
+    return roles;
+}
+
+
 
 }
 

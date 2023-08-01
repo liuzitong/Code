@@ -15,20 +15,41 @@ Column {
     property var analysisLobbyListVm: null;
     property var currentProgram: null;
     property var analysisVm: null;
+    property var analysisResult:null;
     property string pageFrom: "";
     signal changePage(var pageName,var params);
     signal refresh()
     property int fontPointSize: CommonSettings.fontPointSize;
+    property var selectedCheckResultIdList:[];
+    property var selectedCheckResultOverViewIdList:[];
 
     onRefresh: {
         if(analysisLobbyListVm!==null) IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::AnalysisLobbyListVm",analysisLobbyListVm);
-        analysisLobbyListVm=IcUiQmlApi.appCtrl.objMgr.
-        attachObj("Perimeter::AnalysisLobbyListVm", false,[currentPatient.id,((content.height-10)/4*0.9-4)]);}
+        analysisLobbyListVm=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::AnalysisLobbyListVm", false,[currentPatient.id,((content.height-10)/4*0.9-4)]);
+        selectedCheckResultIdList=[];
+        selectedCheckResultOverViewIdList=[];
+        if(currentCheckResult!==null)
+        {
+            if(currentCheckResult.type!==2)
+                 IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::StaticCheckResultVm", currentCheckResult);
+            else
+                 IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::DynamicCheckResultVm", currentCheckResult);
+            currentCheckResult=null;
+        }
+        if(currentProgram!==null)
+        {
+            if(currentProgram.type!==2)
+                IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::StaticProgramVM", currentProgram);
+            else
+                IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::DynamicProgramVM", currentProgram);
+            currentProgram=null;
+        }
+    }
 
     ListView{
         id:content;width: parent.width;height: parent.height*14/15;/*snapMode: ListView.SnapOneItem;*/spacing: -2;clip:true;model:analysisLobbyListVm;
         delegate: checkRowDelegate
-        signal cancelSelected();
+//        signal cancelSelected();
 //        signal setIndex();
         Component{id:checkRowDelegate
             Column{width: content.width;height: (content.height+6)/4;
@@ -45,16 +66,19 @@ Column {
                             spacing: height*0.15;width:parent.width*0.93;model:simpleCheckResult;
                             delegate: checkImgDelegate
                             Component{id:checkImgDelegate
-                                Item{property bool selected: false;height: Math.floor(parent.height);width: Math.floor((parent.height-4)*0.8)+4;
+                                Item{
+//                                    property bool selected: currentCheckResult.id===checkResultId;
+                                    height: Math.floor(parent.height);width: Math.floor((parent.height-4)*0.8)+4;
                                     Image {
-                                        id:image;height:parent.height-4;anchors.verticalCenter: parent.verticalCenter;anchors.horizontalCenter: parent.horizontalCenter;fillMode: Image.PreserveAspectFit
+                                        height:parent.height-4;anchors.verticalCenter: parent.verticalCenter;anchors.horizontalCenter: parent.horizontalCenter;fillMode: Image.PreserveAspectFit
                                         source:"file:///" + applicationDirPath +picName;smooth: false;cache: false;
                                     }
                                     MouseArea
                                     {
                                         anchors.fill: parent;z:1;
                                         onClicked:{
-                                            content.cancelSelected();parent.selected=true;
+//                                            content.cancelSelected();
+//                                            parent.selected=true;
                                             console.log(checkResultId);
                                             if(currentCheckResult!==null)
                                             {
@@ -80,13 +104,74 @@ Column {
                                                 currentProgram=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::StaticProgramVM", false,[currentCheckResult.program_id]);
                                             else
                                                 currentProgram=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::DynamicProgramVM", false,[currentCheckResult.program_id]);
+                                            console.log(currentCheckResult.id);
+                                            console.log(checkResultId);
                                         }
                                     }
-                                    Rectangle{anchors.fill: parent;color: "steelblue";opacity: parent.selected?1:0;z:-1;}
-                                    Component.onCompleted:
-                                    {
-                                        content.cancelSelected.connect(function(){selected=false;})
+
+                                    CusCheckBox{
+                                        height: parent.height*0.15;
+                                        width: height;
+                                        anchors.left: parent.left;
+                                        anchors.top: parent.top;
+                                        anchors.leftMargin: 2;
+                                        anchors.topMargin: 2;
+                                        z:10;
+                                        onCheckedChanged:
+                                        {
+                                            var overview=false;
+                                            if(type==0)
+                                            {
+                                                var checkResult=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::StaticCheckResultVm", false,[checkResultId]);
+                                                var program=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::StaticProgramVM", false,[checkResult.program_id]);
+                                                var report=program.report;
+                                                console.log(report);
+                                                report.forEach(function(item){if(item===2){overview=true;}});
+                                                console.log(overview);
+                                                IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::DynamicCheckResultVm", checkResult);
+                                                IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::StaticProgramVM", program);
+
+                                            }
+
+                                            if(checked)
+                                            {
+                                                selectedCheckResultIdList.push(checkResultId);
+                                                if(overview){selectedCheckResultOverViewIdList.push(checkResultId);}
+                                                console.log(selectedCheckResultIdList);
+                                                console.log(selectedCheckResultOverViewIdList);
+                                            }
+                                            else
+                                            {
+                                                for(var i=0;i<selectedCheckResultIdList.length;i++)
+                                                {
+                                                    if(selectedCheckResultIdList[i]===checkResultId)
+                                                    {
+                                                        selectedCheckResultIdList.splice(i, 1);
+                                                    }
+                                                }
+                                                if(overview)
+                                                {
+                                                    for(i=0;i<selectedCheckResultOverViewIdList.length;i++)
+                                                    {
+                                                        if(selectedCheckResultOverViewIdList[i]===checkResultId)
+                                                        {
+                                                            selectedCheckResultOverViewIdList.splice(i, 1);
+                                                        }
+                                                    }
+                                                }
+                                                console.log(selectedCheckResultIdList);
+                                                console.log(selectedCheckResultOverViewIdList);
+                                            }
+                                            selectedCheckResultIdListChanged();
+                                            selectedCheckResultOverViewIdListChanged();
+                                        }
                                     }
+
+                                    Rectangle{anchors.fill: parent;color: "steelblue";opacity:(currentCheckResult!==null&&currentCheckResult.id==checkResultId)?1:0;z:-1;}
+//                                    Component.onCompleted:
+//                                    {
+//                                        content.cancelSelected.connect(function(){selected=false;})
+//                                    }
                                 }
                             }
                         }
@@ -162,7 +247,7 @@ Column {
                     CusComboBoxButton{
                         id:queryStrategy;
                         height: parent.height;width: height*3.5;
-                        enabled: currentCheckResult!==null;
+                        enabled: currentCheckResult!==null||selectedCheckResultOverViewIdList.length!==0;
                         property var listModel:ListModel {}
                         property var reportNames: [[lt+qsTr("Single"),lt+qsTr("Three in one"),lt+qsTr("Overview"),lt+qsTr("Three in one"),lt+qsTr("Threshold")],[lt+qsTr("Screening")],[lt+qsTr("Dynamic"),lt+qsTr("Dynamic data")]]
                         comboBox.model: listModel;popDirectionDown: false;complexType: true;
@@ -180,14 +265,16 @@ Column {
                         function analysis(report)
                         {
                             var diagramWidth;
-                            switch (currentProgram.type)
+                            var type=currentProgram!=null?currentProgram.type:0;
+
+                            switch (type)
                             {
                             case 0:
                                 switch (report)
                                 {
                                 case 0:diagramWidth=root.height*14/15*0.92*0.97/3*1.25*0.8;break;
                                 case 1:diagramWidth=root.height*14/15*0.92*0.47*0.8;break;
-                                case 2:diagramWidth=root.height*14/15*0.92*0.40*0.8;break;
+                                case 2:diagramWidth=root.height*14/15*0.92*0.40*0.8;console.log("gogog");break;
                                 case 3:diagramWidth=root.height*14/15*0.92*0.5;break;                                                      //三合一
                                 case 4:diagramWidth=root.height*14/15*0.92*0.8;break;                                                      //阈值图
                                 }
@@ -198,19 +285,29 @@ Column {
                                 diagramWidth=root.height*14/15*0.92*0.8;break;
                             }
 
-
-                            var analysisResult=null;
                             if(analysisVm!=null)
                             {
-                                if(analysisVm.type!==2){ IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::StaticAnalysisVm",analysisVm);}
-                                    else{ IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::DynamicAnalysisVm",analysisVm);}
+                                if(analysisVm.type===0||analysisVm.type===1){IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::StaticAnalysisVm",analysisVm);}
+                                else if(analysisVm.type===2) {IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::DynamicAnalysisVm",analysisVm);}
+                                else if(analysisVm.type===3) {IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::StaticAnalysisOverVm",analysisVm);}
                             }
-                            if(currentProgram.type!==2)
+
+
+                            if(type!==2)
                             {
-                                analysisVm=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::StaticAnalysisVm", false,[currentCheckResult.id,diagramWidth,report]);
-                                if(report===0||report===2)//三合一不用获取结果
+                                if(type===0&&report===2)
                                 {
-                                    analysisResult=analysisVm.getResult();
+                                    console.log("oooooooooooo");
+                                    analysisVm=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::StaticAnalysisOverViewVm", false,[selectedCheckResultIdList,diagramWidth]);
+                                }
+                                else
+                                {
+                                    analysisVm=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::StaticAnalysisVm", false,[currentCheckResult.id,diagramWidth,report]);
+                                    if((type===0&report===0)||type===1)                     //三合一不用获取结果
+                                    {
+                                        if(analysisResult!==null)  {analysisResult.destroy();analysisResult=null;}
+                                        analysisResult=analysisVm.getResult();
+                                    }
                                 }
                             }
                             else
@@ -219,20 +316,29 @@ Column {
                             }
                             changePage("analysis",{pageFrom:"analysisLobby",report:report,analysisVm:analysisVm,program:currentProgram,checkResult:currentCheckResult,analysisResult:analysisResult});
                         }
-
                         Component.onCompleted: {
-                            root.currentProgramChanged.connect(function()
+                            root.currentProgramChanged.connect(getReportTypes);
+                            root.selectedCheckResultOverViewIdListChanged.connect(getReportTypes);
+                        }
+
+                        function getReportTypes(){
+                            listModel.clear();
+                            if(currentProgram!==null)
                             {
-//                                console.log(currentProgram.type);
-                                listModel.clear();
                                 var report=currentProgram.report;
-//                                console.log(report[0])
                                 report.forEach(function(item){
-//                                    console.log(item);
-                                    listModel.append({name:reportNames[currentProgram.type][item],report:item});
+                                    if(!(currentProgram.type==0&&item==2))                //排除总览
+                                    {
+                                        listModel.append({name:reportNames[currentProgram.type][item],report:item});
+                                    }
                                 })
-                                comboBox.currentIndex=0;
-                            })
+                            }
+
+                            if(selectedCheckResultOverViewIdList.length!==0)
+                            {
+                                listModel.append({name:reportNames[0][2],report:2});
+                            }
+                            comboBox.currentIndex=0;
                         }
                     }
 
