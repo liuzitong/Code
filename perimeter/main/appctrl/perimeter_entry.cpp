@@ -8,6 +8,7 @@
 #include <QSharedPointer>
 #include <QApplication>
 #include <QIcon>
+#include <QProcess>
 
 #include "perimeter/main/appctrl/perimeter_appctrl.hxx"
 #include "perimeter/base/common/perimeter_memcntr.hxx"
@@ -124,6 +125,12 @@ int  main ( int argc, char *argv[] )
     //handle the terminate signal
     signal( SIGTERM, & gSigTerm_Handler );
     qInstallMessageHandler( & gMsgHandler );
+
+
+//    QProcess p;
+//    p.execute("taskkill /im jrpcplatsvr.exe /f");
+//    p.execute("taskkill /im rpcpermd.exe /f");
+//    p.close();
 
 
     // start the application

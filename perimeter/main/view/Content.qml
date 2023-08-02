@@ -169,6 +169,8 @@ Rectangle {
                 analysisPage.visible=false;
                 visionFieldIslandPage.visible=false;
 
+                console.log(params);
+
                 console.log(pageTo);
                 console.log(pageFrom);
                 switch(pageTo)
@@ -259,10 +261,13 @@ Rectangle {
                         analysisPage.currentCheckResult=params.checkResult;
                         analysisPage.currentProgram=params.program;
                         analysisPage.analysisResult=params.analysisResult;
-                        analysisPage.visible=true;
                         analysisPage.report=params.report;
+                        console.log(params.report);
+                        analysisPage.type=params.type;
+                        console.log(params.type);
                         analysisPage.analysisVm=params.analysisVm;
                         analysisPage.refresh();
+                        analysisPage.visible=true;
                         break;
                     case "visionFieldIsland":
                         visionFieldIslandPage.pageFrom=pageFrom;

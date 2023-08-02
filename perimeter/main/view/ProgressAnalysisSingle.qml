@@ -206,8 +206,8 @@ Item
                         CusText{
                             property var ght: if(staticAnalysisResult.GHT===0){return lt+qsTr("Out of limits");} else if(staticAnalysisResult.GHT===1){return lt+qsTr("Low sensitivity");}else if(staticAnalysisResult.GHT===2){return lt+qsTr("Border of limits");}else if(staticAnalysisResult.GHT===3){return lt+qsTr("Within normal limits");}
                             width:parent.width;height:textHeight;horizontalAlignment: Text.AlignLeft;text:lt+qsTr("GHT")+": "+ ght;}
-                        CusText{width:parent.width;height:textHeight;text:lt+qsTr("MD")+": "+staticAnalysisResult.md.toFixed(2)+(staticAnalysisResult.p_md<10?" (<"+staticAnalysisResult.p_md+"%)":"") ;horizontalAlignment: Text.AlignLeft;}
-                        CusText{width:parent.width;height:textHeight;text:lt+qsTr("PSD")+": "+staticAnalysisResult.psd.toFixed(2)+(staticAnalysisResult.p_psd<10?" (<"+staticAnalysisResult.p_psd+"%)" :"");horizontalAlignment: Text.AlignLeft;}
+                        CusText{width:parent.width;height:textHeight;text:lt+qsTr("MD")+": "+staticAnalysisResult.md.toFixed(2)+(staticAnalysisResult.p_md.toFixed(2)<10?" (<"+staticAnalysisResult.p_md.toFixed(2)+"%)":"") ;horizontalAlignment: Text.AlignLeft;}
+                        CusText{width:parent.width;height:textHeight;text:lt+qsTr("PSD")+": "+staticAnalysisResult.psd.toFixed(2)+(staticAnalysisResult.p_psd.toFixed(2)<10?" (<"+staticAnalysisResult.p_psd.toFixed(2)+"%)" :"");horizontalAlignment: Text.AlignLeft;}
                         Rectangle{
                             width: parent.width;height: parent.height*0.66;border.color: "black";
                             Column{
@@ -215,8 +215,7 @@ Item
                                 CusText{width: parent.width;height: textHeight;text:"GPA";}
                                 Image {
                                     height: sourceSize.height; anchors.horizontalCenter: parent.horizontalCenter;width: sourceSize.width;
-                                    smooth: false;
-                                    cache: false;        //to refresh image
+                                    smooth: false;cache: false;        
                                     Component.onCompleted: {root.refresh.connect(function(){source="";source="file:///" + applicationDirPath + "/previewImage/single_progressPic.bmp";})}
                                 }
                                 CusText{

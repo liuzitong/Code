@@ -175,7 +175,6 @@ Item
 
                  Component.onCompleted:
                  {
-
                      //靠analysisVm的选择点变化,来触发root.realTimePicRefresh,从而刷新
                      root.refresh.connect(function(){visible=false;parent.color="white"});
                      root.realTimePicRefresh.connect(
@@ -205,7 +204,7 @@ Item
                             source: "file:///" + applicationDirPath + picSource;
                          }
                          CusText{width:CommonSettings.fontPointSize*2.5;height: CommonSettings.fontPointSize*1.6;anchors.top: parent.top; anchors.topMargin: parent.height*0.05; anchors.left: parent.left; anchors.leftMargin:parent.width*0.05;text:index+1; horizontalAlignment: Text.AlignLeft; verticalAlignment: Text.AlignTop; color: "yellow";}
-                         CusText{width:CommonSettings.fontPointSize*2.5;height: CommonSettings.fontPointSize*1.6;anchors.bottom: parent.bottom; anchors.bottomMargin: parent.height*0.05; anchors.right: parent.right; anchors.rightMargin:parent.width*0.05;text:currentCheckResult.resultData.realTimeDB[checkDisplay.clickedDotIndex][index]+"DB"; verticalAlignment: Text.AlignBottom; horizontalAlignment: Text.AlignRight;color: "yellow"; }
+                         CusText{width:CommonSettings.fontPointSize*2.5;height: CommonSettings.fontPointSize*1.6;anchors.bottom: parent.bottom; anchors.bottomMargin: parent.height*0.05; anchors.right: parent.right; anchors.rightMargin:parent.width*0.05;text:currentCheckResult.resultData.realTimeDB[selectedDotIndex][index]+"DB"; verticalAlignment: Text.AlignBottom; horizontalAlignment: Text.AlignRight;color: "yellow"; }
                      }
                  }
              }

@@ -76,8 +76,8 @@ enum OverViewRoles
     p_md,
     psd,
     p_psd,
+    dBDiagramPicPath,
     grayPicPath,
-    threshHoldPicPath,
     totalDeviationPicPath,
     patternDeviationPicPath
 };
@@ -94,8 +94,8 @@ struct OverViewData
     float psd;
     float p_md;
     float p_psd;
+    QString dBDiagramPicPath;
     QString grayPicPath;
-    QString threshHoldPicPath;
     QString totalDeviationPicPath;
     QString patternDeviationPicPath;
 };
@@ -105,13 +105,15 @@ class OverViewListVm:public QAbstractListModel
     // QAbstractItemModel interface
     Q_OBJECT
 public:
-    OverViewListVm(QList<int> ids);
+    OverViewListVm(QList<int> ids,int diagramWidth);
     ~OverViewListVm();
     virtual int rowCount(const QModelIndex &parent) const override;
     virtual QVariant data(const QModelIndex &index, int role) const override;
     virtual QHash<int,QByteArray>  roleNames( ) const override;
-private:
+    PatientModel m_patient;
     QList<OverViewData> m_data;
+    QString m_previewFolder="./previewImage/";
+    QString m_reportFolder="./reportImage/";
 };
 
 class StaticAnalysisOverViewVm:public QObject
@@ -122,15 +124,15 @@ class StaticAnalysisOverViewVm:public QObject
 public:
     Q_INVOKABLE explicit StaticAnalysisOverViewVm(const QVariantList & );
     Q_INVOKABLE virtual ~StaticAnalysisOverViewVm();
-    Q_INVOKABLE void showReport(int report);
+    Q_INVOKABLE void showReport(int report,QString diagnosis);
 
     int getType(){return 3;}
     OverViewListVm* getResultList(){return m_overViewList.data();}
 private:
-    QString m_previewFolder="./previewImage/";
+
     QString m_reportFolder="./reportImage/";
-    QList<StaticCheckResultModel> m_checkResultList;
-    QList<StaticProgramModel> m_programList;
+//    QList<StaticCheckResultModel> m_checkResultList;
+//    QList<StaticProgramModel> m_programList;
     PatientModel m_patient;
     QSharedPointer<OverViewListVm> m_overViewList;
 };

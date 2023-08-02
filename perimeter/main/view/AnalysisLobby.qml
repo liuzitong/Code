@@ -20,14 +20,15 @@ Column {
     signal changePage(var pageName,var params);
     signal refresh()
     property int fontPointSize: CommonSettings.fontPointSize;
-    property var selectedCheckResultIdList:[];
+//    property var selectedCheckResultIdList:[];
     property var selectedCheckResultOverViewIdList:[];
 
     onRefresh: {
+        selectedCheckResultOverViewIdList=[];
         if(analysisLobbyListVm!==null) IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::AnalysisLobbyListVm",analysisLobbyListVm);
         analysisLobbyListVm=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::AnalysisLobbyListVm", false,[currentPatient.id,((content.height-10)/4*0.9-4)]);
-        selectedCheckResultIdList=[];
-        selectedCheckResultOverViewIdList=[];
+//        selectedCheckResultIdList=[];
+        analysisLobbyListVmChanged();
         if(currentCheckResult!==null)
         {
             if(currentCheckResult.type!==2)
@@ -49,7 +50,7 @@ Column {
     ListView{
         id:content;width: parent.width;height: parent.height*14/15;/*snapMode: ListView.SnapOneItem;*/spacing: -2;clip:true;model:analysisLobbyListVm;
         delegate: checkRowDelegate
-//        signal cancelSelected();
+        signal cancelSelected();
 //        signal setIndex();
         Component{id:checkRowDelegate
             Column{width: content.width;height: (content.height+6)/4;
@@ -77,7 +78,8 @@ Column {
                                     {
                                         anchors.fill: parent;z:1;
                                         onClicked:{
-//                                            content.cancelSelected();
+                                            content.cancelSelected();
+                                            selectedCheckResultOverViewIdList=[];
 //                                            parent.selected=true;
                                             console.log(checkResultId);
                                             if(currentCheckResult!==null)
@@ -104,70 +106,69 @@ Column {
                                                 currentProgram=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::StaticProgramVM", false,[currentCheckResult.program_id]);
                                             else
                                                 currentProgram=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::DynamicProgramVM", false,[currentCheckResult.program_id]);
-                                            console.log(currentCheckResult.id);
-                                            console.log(checkResultId);
+//                                            console.log(currentCheckResult.id);
+//                                            console.log(checkResultId);
                                         }
                                     }
 
                                     CusCheckBox{
-                                        height: parent.height*0.15;
+                                        height: parent.height*0.25;
                                         width: height;
                                         anchors.left: parent.left;
                                         anchors.top: parent.top;
                                         anchors.leftMargin: 2;
                                         anchors.topMargin: 2;
                                         z:10;
-                                        onCheckedChanged:
+                                        visible: false;
+//                                        checked:true;
+                                        Component.onCompleted:
                                         {
-                                            var overview=false;
                                             if(type==0)
                                             {
+                                                checked=false;
                                                 var checkResult=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::StaticCheckResultVm", false,[checkResultId]);
                                                 var program=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::StaticProgramVM", false,[checkResult.program_id]);
                                                 var report=program.report;
-                                                console.log(report);
-                                                report.forEach(function(item){if(item===2){overview=true;}});
-                                                console.log(overview);
+                                                report.forEach(function(item){if(item===2){visible=true;}});
+                                                for(var i=0;i<selectedCheckResultOverViewIdList.length;i++)
+                                                {
+                                                    if(selectedCheckResultOverViewIdList[i]===checkResultId)
+                                                    {
+                                                        checked=true;
+                                                    }
+                                                }
                                                 IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::DynamicCheckResultVm", checkResult);
                                                 IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::StaticProgramVM", program);
-
+                                                content.cancelSelected.connect(function(){checked=false;});
+//                                                console.log(checked);
                                             }
+                                        }
+
+                                        onClicked:
+                                        {
 
                                             if(checked)
                                             {
-                                                selectedCheckResultIdList.push(checkResultId);
-                                                if(overview){selectedCheckResultOverViewIdList.push(checkResultId);}
-                                                console.log(selectedCheckResultIdList);
-                                                console.log(selectedCheckResultOverViewIdList);
+//
+                                                selectedCheckResultOverViewIdList.push(checkResultId);
                                             }
                                             else
                                             {
-                                                for(var i=0;i<selectedCheckResultIdList.length;i++)
+                                                for(var i=0;i<selectedCheckResultOverViewIdList.length;i++)
                                                 {
-                                                    if(selectedCheckResultIdList[i]===checkResultId)
+                                                    if(selectedCheckResultOverViewIdList[i]===checkResultId)
                                                     {
-                                                        selectedCheckResultIdList.splice(i, 1);
+                                                        selectedCheckResultOverViewIdList.splice(i, 1);
                                                     }
                                                 }
-                                                if(overview)
-                                                {
-                                                    for(i=0;i<selectedCheckResultOverViewIdList.length;i++)
-                                                    {
-                                                        if(selectedCheckResultOverViewIdList[i]===checkResultId)
-                                                        {
-                                                            selectedCheckResultOverViewIdList.splice(i, 1);
-                                                        }
-                                                    }
-                                                }
-                                                console.log(selectedCheckResultIdList);
-                                                console.log(selectedCheckResultOverViewIdList);
                                             }
-                                            selectedCheckResultIdListChanged();
+                                            console.log(selectedCheckResultOverViewIdList);
+                                            console.log(selectedCheckResultOverViewIdList.length);
                                             selectedCheckResultOverViewIdListChanged();
                                         }
                                     }
 
-                                    Rectangle{anchors.fill: parent;color: "steelblue";opacity:(currentCheckResult!==null&&currentCheckResult.id==checkResultId)?1:0;z:-1;}
+                                    Rectangle{anchors.fill: parent;color: "steelblue";opacity:(selectedCheckResultOverViewIdList.length==0&&currentCheckResult!==null&&currentCheckResult.id==checkResultId)?1:0;z:-1;}
 //                                    Component.onCompleted:
 //                                    {
 //                                        content.cancelSelected.connect(function(){selected=false;})
@@ -265,7 +266,11 @@ Column {
                         function analysis(report)
                         {
                             var diagramWidth;
-                            var type=currentProgram!=null?currentProgram.type:0;
+                            var type;
+                            if(selectedCheckResultOverViewIdList.length!==0)
+                                type=3;
+                            else
+                                type=currentProgram.type;
 
                             switch (type)
                             {
@@ -274,15 +279,15 @@ Column {
                                 {
                                 case 0:diagramWidth=root.height*14/15*0.92*0.97/3*1.25*0.8;break;
                                 case 1:diagramWidth=root.height*14/15*0.92*0.47*0.8;break;
-                                case 2:diagramWidth=root.height*14/15*0.92*0.40*0.8;console.log("gogog");break;
+//                                case 2:diagramWidth=root.height*14/15*1/3*0.85*0.9;break;
                                 case 3:diagramWidth=root.height*14/15*0.92*0.5;break;                                                      //三合一
                                 case 4:diagramWidth=root.height*14/15*0.92*0.8;break;                                                      //阈值图
                                 }
                                 break;
-                            case 1:
-                                diagramWidth=root.height*14/15*0.92*0.8;break;
-                            case 2:
-                                diagramWidth=root.height*14/15*0.92*0.8;break;
+                            case 1:diagramWidth=root.height*14/15*0.92*0.8;break;
+                            case 2:diagramWidth=root.height*14/15*0.92*0.8;break;
+                            case 3:diagramWidth=root.height*14/15*1/3*0.85*0.9;break;                   //总览
+
                             }
 
                             if(analysisVm!=null)
@@ -292,29 +297,25 @@ Column {
                                 else if(analysisVm.type===3) {IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::StaticAnalysisOverVm",analysisVm);}
                             }
 
-
-                            if(type!==2)
+                            if(type===0||type===1)
                             {
-                                if(type===0&&report===2)
+                                analysisVm=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::StaticAnalysisVm", false,[currentCheckResult.id,diagramWidth,report]);
+                                if((type===0&report===0)||type===1)                     //三合一不用获取结果
                                 {
-                                    console.log("oooooooooooo");
-                                    analysisVm=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::StaticAnalysisOverViewVm", false,[selectedCheckResultIdList,diagramWidth]);
-                                }
-                                else
-                                {
-                                    analysisVm=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::StaticAnalysisVm", false,[currentCheckResult.id,diagramWidth,report]);
-                                    if((type===0&report===0)||type===1)                     //三合一不用获取结果
-                                    {
-                                        if(analysisResult!==null)  {analysisResult.destroy();analysisResult=null;}
-                                        analysisResult=analysisVm.getResult();
-                                    }
+                                    if(analysisResult!==null)  {analysisResult.destroy();analysisResult=null;}
+                                    analysisResult=analysisVm.getResult();
                                 }
                             }
-                            else
+                            else if(type===2)
                             {
                                 analysisVm=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::DynamicAnalysisVm", false,[currentCheckResult.id,diagramWidth,report]);
                             }
-                            changePage("analysis",{pageFrom:"analysisLobby",report:report,analysisVm:analysisVm,program:currentProgram,checkResult:currentCheckResult,analysisResult:analysisResult});
+                            else
+                            {
+                                analysisVm=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::StaticAnalysisOverViewVm", false,[selectedCheckResultOverViewIdList,diagramWidth]);
+                            }
+                            console.log(type);
+                            changePage("analysis",{report:report,type:type,analysisVm:analysisVm,program:currentProgram,checkResult:currentCheckResult,analysisResult:analysisResult});
                         }
                         Component.onCompleted: {
                             root.currentProgramChanged.connect(getReportTypes);
@@ -323,7 +324,11 @@ Column {
 
                         function getReportTypes(){
                             listModel.clear();
-                            if(currentProgram!==null)
+                            if(selectedCheckResultOverViewIdList.length!==0)
+                            {
+                                listModel.append({name:reportNames[0][2],report:2});
+                            }
+                            else
                             {
                                 var report=currentProgram.report;
                                 report.forEach(function(item){
@@ -334,10 +339,6 @@ Column {
                                 })
                             }
 
-                            if(selectedCheckResultOverViewIdList.length!==0)
-                            {
-                                listModel.append({name:reportNames[0][2],report:2});
-                            }
                             comboBox.currentIndex=0;
                         }
                     }

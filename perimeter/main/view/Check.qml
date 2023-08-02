@@ -586,7 +586,7 @@ Item {id:root; width: 1366;height: 691
                                 if(currentProgram.type!==2)
                                 {
                                     analysisVm=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::StaticAnalysisVm", false,[currentCheckResult.id,diagramWidth,report]);
-                                    if(report===0||report===2)//三合一不用获取结果
+                                    if(report===0)//三合一不用获取结果
                                     {
                                         analysisResult=analysisVm.getResult();
                                     }
@@ -604,7 +604,8 @@ Item {id:root; width: 1366;height: 691
                                     listModel.clear();
                                     var report=currentProgram.report;
                                     report.forEach(function(item){
-                                        listModel.append({name:reportNames[currentProgram.type][item],report:item});
+                                        if(!(currentProgram.type==0&&item==2))
+                                            listModel.append({name:reportNames[currentProgram.type][item],report:item});
                                     })
                                     comboBox.currentIndex=0;
                                 })

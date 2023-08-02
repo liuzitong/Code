@@ -16,6 +16,7 @@ Column {
     property var analysisResult: null;
     property var analysisVm: null;
     property int report;
+    property int type;
     property string pageFrom: "";
 
 //    property int textHeight: height*0.05;
@@ -26,25 +27,22 @@ Column {
 
 
     onRefresh: {
-//        console.log("report type is "+report);
-        var type=currentProgram!=null?currentProgram.type:0;
-        if(type!==2)
+        console.log("type is "+type);
+//        var type=currentProgram!=null?currentProgram.type:0;
+        if(type===0||type===1)
         {
-            if(!(type===0&&report==2))
-            {
-                content.source="StaticAnalysis.qml";
-                content.item.analysisResult=analysisResult;
-                content.item.analysisVm=analysisVm;
-            }
-            else
-            {
-                content.source="StaticAnalysisOverview.qml";
-                content.item.analysisVm=analysisVm;
-            }
+            content.source="StaticAnalysis.qml";
+            content.item.analysisResult=analysisResult;
+            content.item.analysisVm=analysisVm;
         }
-        else
+        else if(type===2)
         {
             content.source="DynamicAnalysis.qml";
+        }
+        else if(type===3)
+        {
+            content.source="StaticAnalysisOverview.qml";
+            content.item.analysisVm=analysisVm;
         }
 
 
@@ -93,7 +91,9 @@ Column {
             Item{height: parent.height;width:parent.width*0.52;
                 Item{anchors.fill: parent;anchors.margins:parent.height*0.15;
                     Flow{height: parent.height;spacing: height*0.8;width: parent.width;anchors.horizontalCenter: parent.horizontalCenter
-                        CusButton{text:lt+qsTr("Recheck");enabled:currentProgram!==null/*&&IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus===3*/;
+                        CusButton{text:lt+qsTr("Recheck");
+                            visible: analysisVm.type!==3;
+                            enabled:currentProgram!==null&&IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus===3;
                             onClicked:{
                                 currentProgram.params=currentCheckResult.params;
                                 root.changePage("check",{currentProgram:currentProgram,type:"reCheck"});
@@ -110,7 +110,13 @@ Column {
                     {
                         height: parent.height; layoutDirection: Qt.RightToLeft;spacing: height*0.8;width: parent.width
                         anchors.horizontalCenter: parent.horizontalCenter
-                        CusButton{text:lt+qsTr("Print");onClicked:{console.log(currentCheckResult.diagnosis);analysisVm.showReport(report);}}
+                        CusButton{text:lt+qsTr("Print");onClicked:
+                            {
+                                if(analysisVm.type!==3)
+                                    analysisVm.showReport(report);
+                                else
+                                    analysisVm.showReport(report,content.item.diagnosis);
+                            }}
                     }
                 }
             }

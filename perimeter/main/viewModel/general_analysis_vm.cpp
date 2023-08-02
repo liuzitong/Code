@@ -118,7 +118,7 @@ StaticAnalysisVm::StaticAnalysisVm(const QVariantList &args)
             analysisMethodSvc->drawPE(m_peDev,m_locs,m_range,img);img.save(m_previewFolder+"TotalPE.bmp");
             if(m_md<-5)
             {
-                analysisMethodSvc->drawWords(img,{tr("Pattern Deviation not"),tr("Shown for serverely"),tr("Depressed fields. Refer"),tr("to Total Deviation")});
+                analysisMethodSvc->drawWords(img,{tr("Pattern Deviation not"),tr("Shown for serverely"),tr("Depressed fields. Refer"),tr("to Total Deviation")},1.0,true);
                 img.save(m_previewFolder+"PatternDeviation.bmp");;img.save(m_previewFolder+"PatternPE.bmp");
             }
             else
@@ -366,8 +366,8 @@ void StaticAnalysisVm::showReport(int report)
     manager->setReportVariable("VFI",QString(tr("VFI"))+": "+QString::number(qRound(m_VFI*100))+"%");
     QString GHT;switch (m_GHT){case 0:GHT=tr("Out of limits");break;case 1:GHT=tr("Low sensitivity");break;case 2:GHT=tr("Border of limits");break;case 3:GHT=tr("Within normal limits");break;}
     manager->setReportVariable("GHT",tr("GHT")+QString(": ")+GHT);
-    manager->setReportVariable("MD",tr("MD")+QString(": ")+QString::number(m_md,'f',2)+(m_p_md-5<=FLT_EPSILON?" (P<"+QString::number(m_p_md)+"%)":""));
-    manager->setReportVariable("PSD",tr("PSD")+QString(": ")+QString::number(m_psd,'f',2)+(m_p_psd-5<=FLT_EPSILON?" (P<"+QString::number(m_p_psd)+"%)":""));
+    manager->setReportVariable("MD",tr("MD")+QString(": ")+QString::number(m_md,'f',2)+(m_p_md<10-FLT_EPSILON?" (P<"+QString::number(m_p_md)+"%)":""));
+    manager->setReportVariable("PSD",tr("PSD")+QString(": ")+QString::number(m_psd,'f',2)+(m_p_psd<10-FLT_EPSILON?" (P<"+QString::number(m_p_psd)+"%)":""));
 
     if(m_type==0)
     {
@@ -546,7 +546,7 @@ void DynamicAnalysisVm::showReport(int report)
         auto data=m_checkResult.m_data.checkData;
         auto dataSource=manager->dataSource("dotinfos");
         auto model=dataSource->model();
-        model->insertRows(0,data.size());
+        model->insertRows(0,data.size()-2);
 
         for(int i=0;i<int(data.size());i++)
         {
@@ -559,8 +559,12 @@ void DynamicAnalysisVm::showReport(int report)
         }
     }
 
+    CheckResult_ptr checkResult_ptr(new CheckResult());
+    checkResult_ptr->m_id=m_checkResult.m_id;
+    qx::dao::fetch_by_id(checkResult_ptr);
+    manager->setReportVariable("DiagnosisContent",checkResult_ptr->m_diagnosis);
+
     manager->setReportVariable("FixationDeviationImagePath","./reportImage/FixationDeviation.bmp");
-    manager->setReportVariable("DiagnosisContent", m_checkResult.m_diagnosis);
     manager->setReportVariable("deviceInfo",tr("Device info")+QString(":")+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("deviceInfo").toString());
     manager->setReportVariable("version", tr("Version")+QString(":")+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("version").toString());
 
@@ -572,8 +576,15 @@ void DynamicAnalysisVm::showReport(int report)
 
 StaticAnalysisOverViewVm::StaticAnalysisOverViewVm(const QVariantList &args)
 {
-    qDebug()<<args;
-    m_overViewList.reset(new OverViewListVm({1,2,3}));
+//    auto id=args[0].toList();
+    QList<int> id;
+    for(auto& i:args[0].toList())
+    {
+        id.append(i.toInt());
+    }
+    int diagramWidth=args[1].toInt();
+    m_overViewList.reset(new OverViewListVm(id,diagramWidth));
+    m_patient=m_overViewList->m_patient;
 }
 
 StaticAnalysisOverViewVm::~StaticAnalysisOverViewVm()
@@ -581,23 +592,172 @@ StaticAnalysisOverViewVm::~StaticAnalysisOverViewVm()
 
 }
 
-void StaticAnalysisOverViewVm::showReport(int report)
+void StaticAnalysisOverViewVm::showReport(int report,QString diagnosis)
 {
+    qDebug()<<diagnosis;
+    if(UtilitySvc::reportEngine==nullptr) UtilitySvc::reportEngine=new  LimeReport::ReportEngine();
+    if(!TranslateController::isRuntimeLangEng())  UtilitySvc::reportEngine->setReportLanguage(QLocale::Chinese);
+    UtilitySvc::reportEngine->loadFromFile("./reports/OverView.lrxml");
+    auto manager=UtilitySvc::reportEngine->dataManager();
+    manager->setReportVariable("hospitalName",QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("hospitalName").toString());
+    manager->setReportVariable("name",m_patient.m_name);
+    manager->setReportVariable("birthDate",m_patient.m_birthDate.toString("yyyy/MM/dd"));
+    manager->setReportVariable("ID", m_patient.m_patientId);
+    manager->setReportVariable("age", m_patient.m_age);
+    manager->setReportVariable("sex", int(m_patient.m_sex)==0?tr("Male"):tr("Female"));
 
+    auto data=m_overViewList->m_data;
+    auto dataSource=manager->dataSource("datalist");
+    auto model=dataSource->model();
+    model->insertRows(0,data.size()-2);
+    for(int i=0;i<int(data.size());i++)
+    {
+        model->setData( model->index(i,0),QString(tr("program"))+":"+data[i].program);
+        model->setData( model->index(i,1),QString(tr("check date"))+":"+data[i].checkDate.date().toString("yyyy/MM/dd"));
+        QString strategy;switch(int(data[i].strategy)){case 0:strategy=tr("Full threshold");break;case 1:strategy=tr("Fast threshold");break;case 2:strategy=tr("Smart interactive");break;case 3:strategy=tr("Fast interactive");break;}
+        model->setData( model->index(i,2),QString(tr("strategy"))+":"+strategy);
+        QString GHT;switch (data[i].GHT){case 0:GHT=tr("Out of limits");break;case 1:GHT=tr("Low sensitivity");break;case 2:GHT=tr("Border of limits");break;case 3:GHT=tr("Within normal limits");break;}
+        model->setData( model->index(i,3),QString(tr("GHT"))+":"+GHT);
+        model->setData( model->index(i,4),QString(tr("eye kind"))+":"+(data[i].OS_OD==0?"OS":"OD"));
+        model->setData( model->index(i,5),QString(tr("center dot check"))+":"+(data[i].centerDotCheck?tr("On"):tr("Off")));
+        model->setData( model->index(i,6),tr("MD")+QString(": ")+QString::number(data[i].md,'f',2)+(data[i].p_md-10<=FLT_EPSILON?" (P<"+QString::number(data[i].p_md)+"%)":""));
+        model->setData( model->index(i,7),tr("PSD")+QString(": ")+QString::number(data[i].psd,'f',2)+(data[i].p_psd<10-FLT_EPSILON?" (P<"+QString::number(data[i].p_psd)+"%)":""));
+        model->setData( model->index(i,8),m_reportFolder+data[i].dBDiagramPicPath);
+        model->setData( model->index(i,9),m_reportFolder+data[i].grayPicPath);
+        model->setData( model->index(i,10),m_reportFolder+data[i].totalDeviationPicPath);
+        model->setData( model->index(i,11),m_reportFolder+data[i].patternDeviationPicPath);
+    }
+
+    manager->setReportVariable("DiagnosisContent", diagnosis);
+    manager->setReportVariable("deviceInfo",tr("Device info")+QString(":")+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("deviceInfo").toString());
+    manager->setReportVariable("version", tr("Version")+QString(":")+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("version").toString());
+
+    UtilitySvc::reportEngine->setShowProgressDialog(true);
+    UtilitySvc::reportEngine->setPreviewScaleType(LimeReport::ScaleType::Percents,50);
+    UtilitySvc::reportEngine->previewReport(/*LimeReport::PreviewHint::ShowAllPreviewBars*/);
 }
 
 
-OverViewListVm::OverViewListVm(QList<int> ids)
+OverViewListVm::OverViewListVm(QList<int> ids,int diagramWidth)
 {
-    auto dateTime = QDateTime::fromString("2013-05-16T13:24:33","yyyy-MM-ddTHH:mm:ss");
-    qDebug()<<dateTime.toString("yyyy/MM/dd");
-    m_data.append(OverViewData{"30-2",QDateTime::fromString("2013-05-16T13:24:33","yyyy-MM-ddThh:mm:ss"),1,1,0,false,2.14f,2.5f,12.0f,5.3f,"./grayPic1","./threshPic1","./totalDeviPic1","./patterDeviPic1"});
-    m_data.append(OverViewData{"30-2",QDateTime::fromString("2016-05-16T13:24:33","yyyy-MM-ddThh:mm:ss"),1,1,0,false,2.24f,2.5f,12.0f,5.3f,"./grayPic1","./threshPic1","./totalDeviPic1","./patterDeviPic1"});
-    m_data.append(OverViewData{"30-2",QDateTime::fromString("2017-05-16T13:24:33","yyyy-MM-ddThh:mm:ss"),1,1,0,false,2.34f,2.5f,12.0f,5.3f,"./grayPic1","./threshPic1","./totalDeviPic1","./patterDeviPic1"});
-    m_data.append(OverViewData{"30-2",QDateTime::fromString("2018-05-16T13:24:33","yyyy-MM-ddThh:mm:ss"),1,1,0,false,2.44f,2.5f,12.0f,5.3f,"./grayPic1","./threshPic1","./totalDeviPic1","./patterDeviPic1"});
-    m_data.append(OverViewData{"30-2",QDateTime::fromString("2019-05-16T13:24:33","yyyy-MM-ddThh:mm:ss"),1,1,0,false,2.54f,2.5f,12.0f,5.3f,"./grayPic1","./threshPic1","./totalDeviPic1","./patterDeviPic1"});
-    m_data.append(OverViewData{"30-2",QDateTime::fromString("2020-05-16T13:24:33","yyyy-MM-ddThh:mm:ss"),1,1,0,false,2.64f,2.5f,12.0f,5.3f,"./grayPic1","./threshPic1","./totalDeviPic1","./patterDeviPic1"});
-    m_data.append(OverViewData{"30-2",QDateTime::fromString("2021-05-16T13:24:33","yyyy-MM-ddThh:mm:ss"),1,1,0,false,2.74f,2.5f,12.0f,5.3f,"./grayPic1","./threshPic1","./totalDeviPic1","./patterDeviPic1"});
+    qDebug()<<ids;
+    qDebug()<<diagramWidth;
+    for(int i=0;i<ids.length();i++)
+    {
+        QVector<int> m_values,m_fixationValues,m_dev,m_mDev,m_peDev,m_peMDev;
+        QVector<QPointF> m_locs;
+        float m_md,m_psd,m_VFI,m_p_md,m_p_psd;
+        int m_GHT,m_innerRange,m_range,m_OS_OD;
+
+        StaticCheckResultModel m_checkResult;
+        StaticProgramModel m_program;
+
+        int resultId=ids[i];
+        int imageSize=diagramWidth;
+
+        CheckResult_ptr checkResult_ptr(new CheckResult());
+        checkResult_ptr->m_id=resultId;
+        qx::dao::fetch_by_id(checkResult_ptr);
+        Program_ptr program_ptr(new Program());
+        program_ptr->m_id=checkResult_ptr->m_program->m_id;
+        qx::dao::fetch_by_id(program_ptr);
+        m_checkResult=StaticCheckResultModel(checkResult_ptr);
+        m_program=StaticProgramModel(program_ptr);
+
+        if(i==0)
+        {
+            Patient_ptr patient_ptr(new Patient());
+            patient_ptr->m_id=checkResult_ptr->m_patient->m_id;
+            qx::dao::fetch_by_id(patient_ptr);
+            m_patient=PatientModel(patient_ptr);
+        }
+
+        m_values.resize(m_checkResult.m_data.checkData.size());
+        for(int i=0;i<int(m_checkResult.m_data.checkData.size());i++)
+        {
+            m_values[i]=m_checkResult.m_data.checkData[i];
+        }
+        m_locs.resize(m_program.m_data.dots.size());
+        for(int i=0;i<int(m_program.m_data.dots.size());i++)
+        {
+            m_locs[i]={m_program.m_data.dots[i].x,m_program.m_data.dots[i].y};
+        }
+        m_innerRange=m_program.m_params.commonParams.Range[0];
+        m_range=m_program.m_params.commonParams.Range[1];
+        m_OS_OD=m_checkResult.m_OS_OD;
+        if(m_OS_OD!=0){for(auto&i:m_locs)  i.rx()=-i.rx();}
+        m_fixationValues.resize(m_checkResult.m_data.fixationDeviation.size());
+        for(int i=0;i<int(m_checkResult.m_data.fixationDeviation.size());i++)
+        {
+            m_fixationValues[i]=m_checkResult.m_data.fixationDeviation[i];
+        }
+        QImage img=QImage({imageSize,imageSize}, QImage::Format_RGB32);
+        auto analysisMethodSvc=AnalysisSvc::getSingleton();
+        analysisMethodSvc->ThresholdAnalysis(resultId,m_dev,m_mDev,m_peDev,m_peMDev,m_md,m_psd,m_VFI,m_GHT,m_p_md,m_p_psd);
+
+        QString dBDiagramPicPath="./overView_dBDiagram"+QString::number(i)+".bmp";
+        QString grayPicPath="./overView_gray"+QString::number(i)+".bmp";
+        QString TotalPEPicPath="./overView_TotalPE"+QString::number(i)+".bmp";
+        QString PatternPEPicPath="./overView_PatternPE"+QString::number(i)+".bmp";
+
+        QString dBDiagramPicPath1=m_previewFolder+"./overView_dBDiagram"+QString::number(i)+".bmp";
+        QString grayPicPath1=m_previewFolder+"./overView_gray"+QString::number(i)+".bmp";
+        QString TotalPEPicPath1=m_previewFolder+"./overView_TotalPE"+QString::number(i)+".bmp";
+        QString PatternPEPicPath1=m_previewFolder+"./overView_PatternPE"+QString::number(i)+".bmp";
+        analysisMethodSvc->drawText(m_values,m_locs,m_range,m_OS_OD,img,DrawType::DB);img.save(dBDiagramPicPath1);
+        analysisMethodSvc->drawGray(m_values,m_locs,m_range,m_innerRange,img);img.save(grayPicPath1);
+        analysisMethodSvc->drawPE(m_peDev,m_locs,m_range,img);img.save(TotalPEPicPath1);
+        if(m_md<-5)
+        {
+            analysisMethodSvc->drawWords(img,{tr("Pattern Deviation not"),tr("Shown for serverely"),tr("Depressed fields. Refer"),tr("to Total Deviation")});
+            img.save(PatternPEPicPath1);
+        }
+        else
+            analysisMethodSvc->drawPE(m_peMDev,m_locs,m_range,img);img.save(PatternPEPicPath1);
+
+
+        QImage img2=QImage({400,400}, QImage::Format_RGB32);
+        QString dBDiagramPicPath2=m_reportFolder+"./overView_dBDiagram"+QString::number(i)+".bmp";
+        QString grayPicPath2=m_reportFolder+"./overView_gray"+QString::number(i)+".bmp";
+        QString TotalPEPicPath2=m_reportFolder+"./overView_TotalPE"+QString::number(i)+".bmp";
+        QString PatternPEPicPath2=m_reportFolder+"./overView_PatternPE"+QString::number(i)+".bmp";
+        analysisMethodSvc->drawText(m_values,m_locs,m_range,m_OS_OD,img2,DrawType::DB,1.0,true);img2.save(dBDiagramPicPath2);
+        analysisMethodSvc->drawGray(m_values,m_locs,m_range,m_innerRange,img2);img2.save(grayPicPath2);
+        analysisMethodSvc->drawPE(m_peDev,m_locs,m_range,img2);img2.save(TotalPEPicPath2);
+        if(m_md<-5)
+        {
+            analysisMethodSvc->drawWords(img2,{tr("Pattern Deviation not"),tr("Shown for serverely"),tr("Depressed fields. Refer"),tr("to Total Deviation")},1.0,true);
+            img2.save(PatternPEPicPath2);
+        }
+        else
+            analysisMethodSvc->drawPE(m_peMDev,m_locs,m_range,img2);img2.save(PatternPEPicPath2);
+
+        m_data.append(OverViewData{
+                          m_program.m_name,
+                          m_checkResult.m_time,
+                          int(m_checkResult.m_params.commonParams.strategy),
+                          m_GHT,
+                          m_checkResult.m_OS_OD,
+                          m_checkResult.m_params.commonParams.centerDotCheck,
+                          m_md,m_psd,m_p_md,m_p_psd,
+                          dBDiagramPicPath,
+                          grayPicPath,
+                          TotalPEPicPath,
+                          PatternPEPicPath});
+    }
+
+
+
+
+//    auto dateTime = QDateTime::fromString("2013-05-16T13:24:33","yyyy-MM-ddTHH:mm:ss");
+//    qDebug()<<dateTime.toString("yyyy/MM/dd");
+//    m_data.append(OverViewData{"30-2",QDateTime::fromString("2013-05-16T13:24:33","yyyy-MM-ddThh:mm:ss"),1,1,0,false,2.14f,2.5f,12.0f,5.3f,"./grayPic1","./threshPic1","./totalDeviPic1","./patterDeviPic1"});
+//    m_data.append(OverViewData{"30-2",QDateTime::fromString("2016-05-16T13:24:33","yyyy-MM-ddThh:mm:ss"),1,1,0,false,2.24f,2.5f,12.0f,5.3f,"./grayPic1","./threshPic1","./totalDeviPic1","./patterDeviPic1"});
+//    m_data.append(OverViewData{"30-2",QDateTime::fromString("2017-05-16T13:24:33","yyyy-MM-ddThh:mm:ss"),1,1,0,false,2.34f,2.5f,12.0f,5.3f,"./grayPic1","./threshPic1","./totalDeviPic1","./patterDeviPic1"});
+//    m_data.append(OverViewData{"30-2",QDateTime::fromString("2018-05-16T13:24:33","yyyy-MM-ddThh:mm:ss"),1,1,0,false,2.44f,2.5f,12.0f,5.3f,"./grayPic1","./threshPic1","./totalDeviPic1","./patterDeviPic1"});
+//    m_data.append(OverViewData{"30-2",QDateTime::fromString("2019-05-16T13:24:33","yyyy-MM-ddThh:mm:ss"),1,1,0,false,2.54f,2.5f,12.0f,5.3f,"./grayPic1","./threshPic1","./totalDeviPic1","./patterDeviPic1"});
+//    m_data.append(OverViewData{"30-2",QDateTime::fromString("2020-05-16T13:24:33","yyyy-MM-ddThh:mm:ss"),1,1,0,false,2.64f,2.5f,12.0f,5.3f,"./grayPic1","./threshPic1","./totalDeviPic1","./patterDeviPic1"});
+//    m_data.append(OverViewData{"30-2",QDateTime::fromString("2021-05-16T13:24:33","yyyy-MM-ddThh:mm:ss"),1,1,0,false,2.74f,2.5f,12.0f,5.3f,"./grayPic1","./threshPic1","./totalDeviPic1","./patterDeviPic1"});
 }
 
 OverViewListVm::~OverViewListVm()
@@ -626,10 +786,10 @@ QVariant OverViewListVm::data(const QModelIndex &idx, int role) const
     case (OverViewRoles::md): return data.md;
     case (OverViewRoles::p_psd): return data.p_psd;
     case (OverViewRoles::p_md): return data.p_md;
-    case (OverViewRoles::grayPicPath): return data.grayPicPath;
-    case (OverViewRoles::threshHoldPicPath): return data.threshHoldPicPath;
-    case (OverViewRoles::totalDeviationPicPath): return data.totalDeviationPicPath;
-    case (OverViewRoles::patternDeviationPicPath): return data.patternDeviationPicPath;
+    case (OverViewRoles::grayPicPath): return m_previewFolder+data.grayPicPath;
+    case (OverViewRoles::dBDiagramPicPath): return m_previewFolder+data.dBDiagramPicPath;
+    case (OverViewRoles::totalDeviationPicPath): return m_previewFolder+data.totalDeviationPicPath;
+    case (OverViewRoles::patternDeviationPicPath): return m_previewFolder+data.patternDeviationPicPath;
     default:return QVariant();
     }
 }
@@ -648,7 +808,7 @@ QHash<int, QByteArray> OverViewListVm::roleNames() const
     roles[psd]="psd";
     roles[p_psd]="p_psd";
     roles[grayPicPath]="grayPicPath";
-    roles[threshHoldPicPath]="threshHoldPicPath";
+    roles[dBDiagramPicPath]="dBDiagramPicPath";
     roles[totalDeviationPicPath]="totalDeviationPicPath";
     roles[patternDeviationPicPath]="patternDeviationPicPath";
     return roles;

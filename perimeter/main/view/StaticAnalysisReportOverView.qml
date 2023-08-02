@@ -49,8 +49,8 @@ Item {
                 property var ght: if(analysisResult.GHT===0){return lt+qsTr("Out of limits");} else if(analysisResult.GHT===1){return lt+qsTr("Low sensitivity");}else if(analysisResult.GHT===2){return lt+qsTr("Border of limits");}else if(analysisResult.GHT===3){return lt+qsTr("Within normal limits");}
                 width:parent.width;height:parent.height*0.12;horizontalAlignment: Text.AlignLeft;font.pointSize: height*0.40;text:lt+qsTr("GHT")+": "+ ght;}
                 Item{width:parent.width;height:parent.height*0.1;}
-                CusText{width:parent.width;height:parent.height*0.12;text:lt+qsTr("MD")+": "+analysisResult.md.toFixed(2)+(analysisResult.p_md<10?" (<"+analysisResult.p_md+"%)":"") ;horizontalAlignment: Text.AlignLeft;font.pointSize: height*0.40}
-                CusText{width:parent.width;height:parent.height*0.12;text:lt+qsTr("PSD")+": "+analysisResult.psd.toFixed(2)+(analysisResult.p_psd<10?" (<"+analysisResult.p_psd+"%)" :"");horizontalAlignment: Text.AlignLeft;font.pointSize: height*0.40}
+                CusText{width:parent.width;height:parent.height*0.12;text:lt+qsTr("MD")+": "+analysisResult.md.toFixed(2)+(analysisResult.p_md.toFixed(2)<10?" (<"+analysisResult.p_md.toFixed(2)+"%)":"") ;horizontalAlignment: Text.AlignLeft;font.pointSize: height*0.40}
+                CusText{width:parent.width;height:parent.height*0.12;text:lt+qsTr("PSD")+": "+analysisResult.psd.toFixed(2)+(analysisResult.p_psd.toFixed(2)<10?" (<"+analysisResult.p_psd.toFixed(2)+"%)" :"");horizontalAlignment: Text.AlignLeft;font.pointSize: height*0.40}
             }
 
         }

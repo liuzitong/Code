@@ -49,7 +49,8 @@ SvrProcessPriv::SvrProcessPriv(SvrProcess *pa)
 
 SvrProcessPriv::~SvrProcessPriv()
 {
-    m_process.waitForFinished( );
+//    m_process.waitForFinished( );      //不注会一直退不出去
+    m_process.kill();
 }
 
 void SvrProcessPriv::start(const QString &program, const QStringList &arguments)

@@ -24,8 +24,9 @@ public:
     }
     void stop(){
         if(m_pro_jpc.state() == QProcess::Running){
-             m_pro_jpc.terminate();
-             m_pro_jpc.waitForFinished(1000);
+//             m_pro_jpc.terminate();
+            m_pro_jpc.kill();
+//             m_pro_jpc.waitForFinished(1000);
         }
     }
 private:
