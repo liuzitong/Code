@@ -58,9 +58,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     if(logger==NULL) logger = spdlog::rotating_logger_mt("logger", "logs/perimeterConfig.txt", 1024*1024, 30);
 //    setWindowFlags(windowFlags()&~Qt::WindowMaximizeButtonHint);                    // 禁止最大化按钮
-    setWindowFlag(Qt::WindowMaximizeButtonHint,false);
-    m_width=width();m_height=height();
-    setFixedSize(m_width,m_height);                                  // 禁止拖动窗口大小
+//    setWindowFlag(Qt::WindowMaximizeButtonHint,false);
+//    m_width=width();m_height=height();
+//    setFixedSize(m_width,m_height);                                  // 禁止拖动窗口大小
+//    setBaseSize(GetSystemMetrics(SM_CXFULLSCREEN),GetSystemMetrics(SM_CYFULLSCREEN));
+//    setMaximumSize(1440,843);
 //    QSettings *configIni = new QSettings("para.ini", QSettings::IniFormat);
     VID=m_settings.m_VID;
     PID=m_settings.m_PID;
@@ -940,17 +942,17 @@ void MainWindow::on_comboBox_testFucntion_currentIndexChanged(int index)
 
 void MainWindow::on_tabWidget_currentChanged(int index)
 {
-    if(index==2||index==3)
-    {
-        int width = GetSystemMetrics(SM_CXFULLSCREEN);
-        int height = GetSystemMetrics(SM_CYFULLSCREEN);
-        setMinimumSize(0, 0);
-        setMaximumSize(width,height);
-    }
-    else{
-        showNormal();
-        setFixedSize(m_width,m_height);
-    }
+//    if(index==2||index==3)
+//    {
+//        int width = GetSystemMetrics(SM_CXFULLSCREEN);
+//        int height = GetSystemMetrics(SM_CYFULLSCREEN);
+//        setMinimumSize(0, 0);
+//        setMaximumSize(width,height);
+//    }
+//    else{
+//        showNormal();
+//        setFixedSize(m_width,m_height);
+//    }
 }
 
 void MainWindow::on_action_readLocalData_triggered()
