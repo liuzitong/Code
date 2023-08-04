@@ -595,7 +595,7 @@ Item {id:root; width: 1366;height: 691
                                 {
                                     analysisVm=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::DynamicAnalysisVm", false,[currentCheckResult.id,diagramWidth,report]);
                                 }
-                                changePage("analysis",{pageFrom:"check",report:report,analysisVm:analysisVm,program:currentProgram,checkResult:currentCheckResult,analysisResult:analysisResult});
+                                changePage("analysis",{type:currentProgram.type,report:report,analysisVm:analysisVm,program:currentProgram,checkResult:currentCheckResult,analysisResult:analysisResult});
                             }
 
                             Component.onCompleted: {

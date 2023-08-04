@@ -115,7 +115,6 @@ void MainWindow::initDevCtl()
     connect(m_devCtl,&UsbDev::DevCtl::newFrameData,this,&MainWindow::refreshVideo);
     connect(m_devCtl,&UsbDev::DevCtl::newProfile,this,&MainWindow::updateProfile);
     connect(m_devCtl,&UsbDev::DevCtl::newConfig,this,&MainWindow::updateConfig);
-    m_devCtl->readProfile();
     ui->checkBox_IO->setChecked(m_settings.m_updateIOInfo);
     ui->checkBox_startRefreshInfo->setChecked(m_settings.m_updateRefreshIOInfo);
     ui->checkBox_RefreshIO->setChecked(m_settings.m_updateRefreshIOInfo);
@@ -227,6 +226,8 @@ void MainWindow::uninitDevCtl()
     disconnect(m_devCtl,&UsbDev::DevCtl::updateInfo,this,&MainWindow::showDevInfo);
     disconnect(m_devCtl,&UsbDev::DevCtl::newStatusData,this,&MainWindow::refreshStatus);
     disconnect(m_devCtl,&UsbDev::DevCtl::newFrameData,this,&MainWindow::refreshVideo);
+    disconnect(m_devCtl,&UsbDev::DevCtl::newProfile,this,&MainWindow::updateProfile);
+    disconnect(m_devCtl,&UsbDev::DevCtl::newConfig,this,&MainWindow::updateConfig);
     ui->checkBox_IO->setChecked(Qt::CheckState::Unchecked);
     ui->checkBox_startRefreshInfo->setChecked(Qt::CheckState::Unchecked);
     ui->checkBox_RefreshIO->setChecked(Qt::CheckState::Unchecked);
@@ -453,7 +454,7 @@ void MainWindow::refreshStatus()
     ui->label_posChinVert->setText(QString::number(m_statusData.motorPosition(MotorId::MotorId_Chin_Vert)));
 
     static bool moveCommandSend=false;
-    if(m_statusData.moveStutas()==true)
+    if(m_statusData.moveStatus()==true)
     {
         moveCommandSend=true;
     }else
@@ -515,7 +516,7 @@ void MainWindow::refreshConnectionStatus(int status)
         case UsbDev::DevCtl::WorkStatus::WorkStatus_E_UnExpected:ui->label_connectionStatus->setText("连接异常");break;
         case UsbDev::DevCtl::WorkStatus::WorkStatus_S_ConnectToDev:ui->label_connectionStatus->setText("正在连接");break;
         case UsbDev::DevCtl::WorkStatus::WorkStatus_S_Disconnected:ui->label_connectionStatus->setText("连接断开");break;
-        case UsbDev::DevCtl::WorkStatus::WorkStatus_S_OK:ui->label_connectionStatus->setText("连接正常");break;
+        case UsbDev::DevCtl::WorkStatus::WorkStatus_S_OK:ui->label_connectionStatus->setText("连接正常");m_devCtl->readProfile();break;
     }
 }
 
@@ -1634,9 +1635,9 @@ void MainWindow::dynamicCastTest(CoordSpacePosInfo& dotSpaceBegin,CoordSpacePosI
 
 bool MainWindow::waitForAnswer()
 {
-    while(!m_statusData.moveStutas())
+    while(!m_statusData.moveStatus())
         QApplication::processEvents();          //等待刷新状态
-    while(m_statusData.moveStutas())
+    while(m_statusData.moveStatus())
     {
         if(m_statusData.answerpadStatus())
         {
