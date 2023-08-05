@@ -24,6 +24,7 @@
 #include "windows.h"
 #include <QDir>
 #include<QElapsedTimer>
+#include <QDateTime>
 #pragma execution_character_set("utf-8")
 
 //#define MOVERETRY 3;
@@ -398,7 +399,17 @@ void MainWindow::waitMotorStop(QVector<UsbDev::DevCtl::MotorId> motorIDs)
     {
         QCoreApplication::processEvents();
     }while(getBusy()||(mstimer.nsecsElapsed()/1000000<500)); //500ms
-//    while(getBusy()){QCoreApplication::processEvents();}
+    //    while(getBusy()){QCoreApplication::processEvents();}
+}
+
+void MainWindow::waitForSomeTime(int time)
+{
+    QElapsedTimer mstimer;
+    mstimer.restart();
+    do
+    {
+        QApplication::processEvents();
+    }while(mstimer.elapsed()<time);
 }
 
 
@@ -734,6 +745,46 @@ void MainWindow::on_pushButton_testStart_clicked()
             dynamicCastTest(dotBegin,dotEnd,spotSlot,speedLevel);
             if(waitForAnswer()) {showDevInfo("dynamic answered.");}
             break;
+        }
+        case 3:
+        {
+            m_isRunningDot=true;
+            m_runDotCount=0;
+            m_runDotLocs.clear();
+            QString info=ui->plainTextEdit_runDotLocs->toPlainText().trimmed();
+            QList<QString> infos=info.split(';');
+            for(auto&i:infos)
+            {
+                auto loc=i.split(',');
+                m_runDotLocs.append({loc[0].toInt(),loc[1].toInt()});
+            }
+            if(m_runDotLocs.length()==0) return;
+            qsrand(QDateTime::currentSecsSinceEpoch());
+            qDebug()<<m_runDotLocs;
+            while(m_isRunningDot)
+            {
+                QPair<int,int> loc;
+                if(m_runDotCount<m_runDotLocs.length())
+                {
+                    loc=m_runDotLocs[m_runDotCount];
+                    m_runDotCount++;
+                }
+                else
+                    loc=m_runDotLocs[qrand()%m_runDotLocs.length()];
+                qDebug()<<loc;
+                quint8 db=ui->spinBox_DbSetting->value();
+                quint16 durationTime=ui->spinBox_shutterOpenDuration->text().toInt();
+                quint32 shutterPos=ui->spinBox_shutterOpenPos->text().toInt();
+                float coordX=loc.first;
+                float coordY=loc.second;
+                CoordSpacePosInfo coordSpacePosInfo{coordX,coordY};
+                CoordMotorPosFocalDistInfo coordMotorPosFocalDistInfo;
+                if(!getXYMotorPosAndFocalDistFromCoord(coordSpacePosInfo,coordMotorPosFocalDistInfo)) return;
+                int focalMotorPos=getFocusMotorPosByDist(coordMotorPosFocalDistInfo.focalDist,spotSlot)+ui->lineEdit_focalMotorPosCorrection->text().toInt();
+                staticCastTest(coordMotorPosFocalDistInfo,focalMotorPos,db,sps,durationTime,shutterPos);
+                waitForSomeTime(200);
+            }
+            qDebug()<<"run dot over";
         }
     }
 }
@@ -1242,6 +1293,11 @@ void MainWindow::on_pushButton_beep_clicked()
     quint16 beepInterval=ui->spinBox_beepIntervalTime->value();
 
     m_devCtl->beep(repeatCount,beepDuration,beepInterval);
+}
+
+void MainWindow::on_pushButton_stopRunDot_clicked()
+{
+    m_isRunningDot=false;
 }
 
 void MainWindow::on_plainTextEdit_rawCommand_textChanged()

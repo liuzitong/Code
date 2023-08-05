@@ -176,6 +176,8 @@ private slots:
 
     void on_pushButton_beep_clicked();
 
+    void on_pushButton_stopRunDot_clicked();
+
 private:
     void initData();
     void initTable();
@@ -198,6 +200,7 @@ private:
     void refreshConfigUI();
     void refreshConfigDataByUI();
     void waitMotorStop(QVector<UsbDev::DevCtl::MotorId> motorIDs);
+    void waitForSomeTime(int time);
     Ui::MainWindow *ui;
     TableModel *m_colorPosTableModel;                       //颜色表
     TableModel *m_spotPosTableModel;                        //光斑表
@@ -219,6 +222,9 @@ private:
     Settings m_settings;
     quint8* pixData=NULL;
     int m_width,m_height;
+    QList<QPair<int,int>> m_runDotLocs;
+    int m_runDotCount;
+    bool m_isRunningDot;
 
     void readLocalData(QString filePath);
     void readLocalConfig(QString filePath);

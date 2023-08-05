@@ -87,6 +87,12 @@ int main(int argc, char *argv[])
 //    spdlog::info("Welcome to spdlog!");
     QApplication a(argc, argv);
     MainWindow w;
+    int width = GetSystemMetrics(SM_CXFULLSCREEN);
+    int height = GetSystemMetrics(SM_CYFULLSCREEN);
+    qDebug()<<width;
+    qDebug()<<height;
+    w.resize({qMin(1440,width),qMin(831,height)});
+//    w.setFixedHeight(400);
     w.show();
     return a.exec();
 
