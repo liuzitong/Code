@@ -35,6 +35,20 @@
 #include <windows.h>
 #endif
 
+#if defined( QT_DEBUG )
+#  if defined( Q_OS_WIN32 ) || defined( Q_OS_WIN )
+#    define TEXT_PermExe  QStringLiteral("rpcpermd.exe")
+#  else
+#    define TEXT_PermExe  QStringLiteral("rpcpermd")
+#  endif
+#else
+#  if defined( Q_OS_WIN32 ) || defined( Q_OS_WIN )
+#    define TEXT_PermExe  QStringLiteral("rpcperm.exe")
+#  else
+#    define TEXT_PermExe  QStringLiteral("rpcperm")
+#  endif
+#endif
+
 // ============================================================================
 // handle the SIGTERM
 // ============================================================================
@@ -127,10 +141,10 @@ int  main ( int argc, char *argv[] )
     qInstallMessageHandler( & gMsgHandler );
 
 
-//    QProcess p;
-//    p.execute("taskkill /im jrpcplatsvr.exe /f");
-//    p.execute("taskkill /im rpcpermd.exe /f");
-//    p.close();
+    QProcess p;
+    p.execute("taskkill /im jrpcplatsvr.exe /f");
+    p.execute("taskkill /im "+ TEXT_PermExe+" /f");
+    p.close();
 
 
     // start the application

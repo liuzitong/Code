@@ -581,8 +581,10 @@ Item{
                     onClicked:
                     {
                         root.changePage("check",{lastProgram:null,type:"check"});
+//                        console.log(currentPatient!==null);
 //                        console.log(IcUiQmlApi.appCtrl.checkSvc.deviceStatus);
 //                        console.log(IcUiQmlApi.appCtrl.checkSvc.debugMode);
+//                        console.log(IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus);
                     }
                 }
                 CusButton{id:patientSaveButton;text:lt+qsTr("Save");/*enabled: false;*/

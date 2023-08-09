@@ -1994,9 +1994,10 @@ CheckSvc::CheckSvc(QObject *parent)
 //    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::isDeviceReadyChanged,this,&CheckSvc::devReadyChanged);
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::deviceStatusChanged,this,[&]()
     {
-        if(m_checkState<=2) {setCheckState(3);}
-        qDebug()<<DevOps::DeviceOperation::getSingleton().data()->m_deviceStatus;
         emit deviceStatusChanged();
+        auto deviceStatus=DevOps::DeviceOperation::getSingleton().data()->m_deviceStatus;
+        qDebug()<<deviceStatus;
+        if(m_checkState<=2) {setCheckState(3);};
     });
 //    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::isDeviceReadyChanged,[&](){
 //        if(DevOps::DeviceOperation::getSingleton().data()->m_isDeviceReady)

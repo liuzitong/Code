@@ -56,6 +56,7 @@ void DeviceOperation::connectDev()
 void DeviceOperation::disconnectDev()
 {
     m_devCtl.reset(nullptr);
+    m_status={-1,-1};
 //    setIsDeviceReady(false);
     setDeviceStatus(0);
 }
@@ -67,6 +68,7 @@ void DeviceOperation::reconnectDev()
     m_eyeglassIntialize=false;
     qDebug()<<"reconnecting";
     m_devCtl.reset(nullptr);
+    m_status={-1,-1};
     setDeviceStatus(1);
     connectDev();
 }
@@ -125,7 +127,7 @@ void DeviceOperation::setCursorColorAndCursorSize(int color, int spot)
         waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
          //移动焦距电机电机到联动位置,一边转动颜色和光斑
         m_devCtl->move5Motors(std::array<quint8, 5>{0,0,sps[2],0,0}.data(),motorPos);
-        m_devCtl->move5Motors(std::array<quint8, 5>{0,0,0,1,1}.data(),motorPos,UsbDev::DevCtl::MoveMethod::Relative);
+//        m_devCtl->move5Motors(std::array<quint8, 5>{0,0,0,1,1}.data(),motorPos,UsbDev::DevCtl::MoveMethod::Relative);                 //取消转动颜色和光斑
         //焦距电机停止就停止,颜色和光斑
         waitForSomeTime(m_waitingTime);
         waitMotorStop({UsbDev::DevCtl::MotorId_Focus});
