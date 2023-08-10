@@ -91,9 +91,9 @@ public:
         white
     };
 
-
     DeviceOperation();
     ~DeviceOperation();
+    static QSharedPointer<DeviceOperation> getSingleton();
 //    static void Initialize();
     void moveChinUp(){if(m_deviceStatus==2) moveChin(ChinMoveDirection::Up);}
     void moveChinDown(){if(m_deviceStatus==2) moveChin(ChinMoveDirection::Down);}
@@ -102,7 +102,7 @@ public:
     void stopMovingChin(){if(m_deviceStatus==2) moveChin(ChinMoveDirection::Stop);}
     void enterCheckingPage(){m_isAtCheckingPage=true;}
     void leaveCheckingPage(){m_isAtCheckingPage=false;}
-    static QSharedPointer<DeviceOperation> getSingleton();
+
     void connectDev();
     void disconnectDev();
 //    void connectOrdisConnectDev();

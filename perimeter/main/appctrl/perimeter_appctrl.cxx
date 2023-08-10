@@ -120,7 +120,6 @@ AppCtrl :: AppCtrl ( QObject *pa ) : QxPack::IcAppCtrlBase( pa )
 //    DevOps::DeviceOperation::getSingleton()
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::newStatusData,this,&AppCtrl::deviceStatusDataChanged);
     connect(KeyBoardFilter::getSingleton().data(),&KeyBoardFilter::showDeviceStatusChanged,this,&AppCtrl::showDeviceStatusDataChanged);
-    connect(KeyBoardFilter::getSingleton().data(),&KeyBoardFilter::showDeviceStatusChanged,[](){qDebug()<<"gogogog";});
 }
 
 // ============================================================================

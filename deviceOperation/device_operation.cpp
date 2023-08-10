@@ -19,7 +19,7 @@
 #pragma execution_character_set("utf-8")
 namespace DevOps{
 
-QSharedPointer<DeviceOperation> DeviceOperation::m_singleton=nullptr;
+QSharedPointer<DeviceOperation> DeviceOperation::m_singleton=/*QSharedPointer<DeviceOperation>(new DeviceOperation())*/nullptr;
 
 DeviceOperation::DeviceOperation()
 {
@@ -37,6 +37,7 @@ DeviceOperation::DeviceOperation()
 DeviceOperation::~DeviceOperation()
 {
 //    m_connectTimer.stop();
+    qDebug()<<"********************~DeviceOperation()*************************";
 }
 
 //被checkSvcWorker 调用

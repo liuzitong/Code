@@ -785,7 +785,11 @@ void  DevCtlPriv :: ensureTimer( bool sw )
             QxPack::IcRmtObjCreator::createObjInThread (
                 m_t_tmr, []( void *)->QObject*{
                     QTimer *tmr = usbdev_new_qobj( QTimer );
+#ifdef QT_DEBUG
+                    tmr->setInterval( 1000/10 );
+#else
                     tmr->setInterval( 1000/30 );
+#endif
                     tmr->setSingleShot( false );
                     return tmr;
                 },this
@@ -797,7 +801,11 @@ void  DevCtlPriv :: ensureTimer( bool sw )
             QxPack::IcRmtObjCreator::createObjInThread (
                 m_t_tmr, []( void *)->QObject*{
                     QTimer *tmr = usbdev_new_qobj( QTimer );
-                    tmr->setInterval( 1000/100 );
+#ifdef QT_DEBUG
+                    tmr->setInterval( 1000/20 );
+#else
+                    tmr->setInterval( 1000/60 );
+#endif
                     tmr->setSingleShot( false );
                     return tmr;
                 },this
