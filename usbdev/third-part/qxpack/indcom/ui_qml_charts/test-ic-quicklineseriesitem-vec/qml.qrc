@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>mainview.qml</file>
+        <file>wavegraph.qml</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,24 @@
+[ 20200818-1552 ]
+Version: 0.2.0
+   ScMemBlock 内部实现 resize 时，重复回调了 ActID_Init
+
+[ 20200817-2057 ]
+Version: 0.2.0
+   ScMemBlock 内部实现 attach() 时，自身联接自身处理不当。
+
+[ 20200817-0914 ]
+Version: 0.2.0
+    ScVector 设计错误：size() 在初始时返回0，根据 std::vector 的特性，
+应该size() 等同于初始值，如果使用 push_back() 时，动态追加空间及成员
+
+[ 20200816-2136 ]
+Version: 0.1.0
+    ScVector/ScMatrix 的constData(), dataCow() 没有考虑内存为无效
+的状态下返回的指针
+
+[ 20200815-1355 ]
+Version: 0.1.0
+    ScVector/ScMatrix 处理类型为自定义类时，destructor 中进行废弃
+类析构时错误。如果有其他共享的对象将导致出错。
+    
+

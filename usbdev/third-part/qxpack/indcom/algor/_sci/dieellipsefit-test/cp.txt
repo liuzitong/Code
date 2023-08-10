@@ -1,0 +1,23 @@
+# //////////////////////////////////////////////////////////////
+#
+#           the ipcdatacom files
+#
+# CMCF_SRC_ROOT:  the project source directory
+# CMCF_INST_ROOT: the project install directory
+# //////////////////////////////////////////////////////////////
+
+
+# //////////////////////////////////////////////////////////////
+#
+#  below are demo-test
+#
+# //////////////////////////////////////////////////////////////
+configure_file( "${CMCF_SRC_ROOT}/x0.dat"
+     "${CMCF_OUT_ROOT}/x0.dat" COPYONLY )
+
+configure_file( "${CMCF_SRC_ROOT}/y0.dat"
+     "${CMCF_OUT_ROOT}/y0.dat" COPYONLY )
+
+
+
+

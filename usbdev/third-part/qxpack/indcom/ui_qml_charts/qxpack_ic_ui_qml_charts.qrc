@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/qxpack/indcom/ui_qml_charts">
+        <file alias="qmldir">qmldir_rls</file>
+        <file>shader/lineseries.vsh</file>
+        <file>shader/lineseries.fsh</file>     
+        <file>shader/valueaxis.vsh</file>
+        <file>shader/valueaxis.fsh</file>   
+    </qresource>
+</RCC>

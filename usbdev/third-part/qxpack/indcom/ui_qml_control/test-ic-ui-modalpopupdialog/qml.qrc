@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>tst_ic_ui_modalpopupdialog.qml</file>
+        <file>qtquickcontrols2.conf</file>
+    </qresource>
+</RCC>

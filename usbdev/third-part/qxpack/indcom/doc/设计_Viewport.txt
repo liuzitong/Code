@@ -1,0 +1,40 @@
+【 标尺的 Viewport 】
+
+设 实数值域，代表标尺的数值范围, 以浮点表示。
+   RealRange := r_max - r_min  ( 不同于整形数值需要加 1 )
+   
+设 视口域，代表观察区，以浮点表示。
+   ViewRange := v_max - v_min
+
+设 展示区，代表像素为单位的显示区域, 以整形为单位（如果以浮点则不加1）
+   DispRange := p_max - p_min + 1 （ 以浮点为单位则不加 1 ）
+
+设 标尺大刻度, 即整个标尺显示多少个大刻度
+   MajorTickCnt := N1
+   
+设 标尺小刻度，即两个大刻度之间有多少个小刻度
+   MinorTickCnt := N2
+
+以下：
+   TotalTickCnt   := ( N2 * ( N1 - 1 )) + N1
+   MajorValueStep := ( r_max - r_min ) / ( N1 - 1 )   // 大刻度步长
+   BaseTickValueStep :=  MajorValueStep / ( N2 + 1 )  // 基本刻度步长
+
+   PxDensity = ( DispRange * BaseTickValueStep / ViewRange )  // 体现每两个基本刻度之间用掉多少像素
+
+   AdjMajorTickCnt := ( MajorTickCnt * ( PxDensity / ADJ ))   
+
+   * ADJ = [1,??]  为一个可调参数，用于根据像素密度调整每两个大刻度数目
+   * 原则上 ADJ 指定后，PxDensity 越小，AdjMajorTickCnt 越小。
+
+
+   Q: 如何将大刻度对齐到 0.5, 0.25, 0.125 的边界？
+   A: 反复尝试，利用 RealRange / ( AdjMajorTickCnt - 1 ) 得到的值进行判断，
+      如果该值的小数部分能被相应的值整除则表示对齐。
+      ( frac * 10 ) % 5 == 0,  ( frac * 100 ) % 25 ) == 0, ( frac * 1000 ) % 125 ) === 0
+      如果不能整除，则根据最初 AdjMajorTickCnt 是小于或大于 MajorTickCnt 的关系进行减小或放大。
+      
+
+   
+   
+

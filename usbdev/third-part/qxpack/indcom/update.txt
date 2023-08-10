@@ -1,0 +1,342 @@
+=============================================
+20210724
+------------
+Version: 0.5.23
+   * u_qml_charts/qxpack_ic_quicklineseriesitem
+     修正由于没有添加 markDirty 标记的原因，造成有时不会重绘的问题
+
+=============================================
+20210630
+------------
+Version: 0.5.22
+   * ui_qml_control/qxpack_ic_imageitem
+   修正：textureProvider 在UI线程创建，非render线程，已变更为在 render 线程创建
+
+
+=============================================
+20210628
+------------
+Version: 0.5.21
+   * ui_qml_base/qxpack_ic_quickaryseriesdata
+     inner func: gFindBoundYdata out of the index.
+
+
+=============================================
+20210615
+------------
+Version: 0.5.20
+   * ui_qml_charts/qxpack_ic_quicklineseriesitem
+    降低 OpenGL GLSL 需求版本为 GLSL 4.0
+
+=============================================
+20210611
+------------
+Version: 0.5.19
+修正：
+   * ui_qml_charts/qxpack_ic_quicklineseriesitem
+    修正BLEND模式，以及scissor 问题（该问题导致可能grabToImage无法正常工作）
+
+=============================================
+20210610
+------------
+Version: 0.5.18
+修正：
+   * ui_qml_charts/qxpack_ic_quicklineseriesitem
+     ( 由于设置了 DepthAware 标记，导致Z序不正确)
+
+=============================================
+20210607
+------------
+Versino: 0.5.17
+修正：
+   * ui_qml_charts/qxpack_ic_quicklineseriesitem
+     
+
+=============================================
+20210531
+------------
+Version: 0.5.16
+修正：
+   * ui_qml_charts/qxpack_ic_quicklineseriesitem
+   不正常重绘的问题
+
+=============================================
+20210529
+------------
+Version: 0.5.15
+修改：
+   * ui_qml_charts/qxpack_ic_quicklineseriesitem
+   重构，利用 Shader 绘制，当前要求 OpenGL >= 4.3
+
+=============================================
+20210520
+------------
+Version: 0.5.13
+
+修改:
+   * ui_qml_base/qxpack_ic_quickaryseriesdata
+     
+   * ui_qml_charts/qxpack_ic_quicklineseriesitem
+     + 接收 qxpack_ic_quickaryseriesdata 数据
+ 
+
+=============================================
+20210320
+------------
+Version: 0.5.12
+
+修改：
+   * ui_qml_charts/qxpack_ic_quickvalueaxisitem
+     + 添加 labelVisible 属性，控制标尺标签的显示
+   * 
+
+=============================================
+20210313
+------------
+Version: 0.5.11
+
+修改：
+   * ui_qml_charts/qxpack_ic_quickparlnitem
+     添加 headRsvdPx/tailRsvdPx 控制前后像素空余
+
+=============================================
+20210311
+------------
+Version: 0.5.10
+
+修改：
+   * ui_qml_base/qxpack_ic_imagedata
+     添加属性，用于表达当前图像的尺寸
+
+=============================================
+20210302
+------------
+Version: 0.5.9
+
+修改：
+   * algor/qxpack_ic_algor_peak
+     修改算法使波峰左右低谷更精确位置
+
+=============================================
+20210121
+------------
+Version: 0.5.8
+
+修改：
+   * algor/qxpack_ic_algor_base
+     fuzzyIsNull / isNull        重构实现方式
+
+   + algor/qxpack_ic_algor_peak  用于实现一维数据波峰定位
+
+   * algor/qxpack_ic_algor_ary   
+     + xorAry / andAry / orAry / notAry  添加二进制数组操作
+     * 优化 revAryOrder 速度  
+     + rolAry           数组循环左移
+
+   + algor/qxpack_ic_algor_arycvt 
+     + boxFtrAry    均值滤波（数组）
+     + uptrndFtrAry 将数组修正为上升趋势
+
+   + algor/eigen
+     集成 Eigen 模板源码库     
+
+=============================================
+20210114
+------------
+Version: 0.5.7
+
+修改：
+   + algor/qxpack_ic_algor_byteorder  用于字序方面的函数
+   + algor/qxpack_ic_algor_rdftsg     用于实数FFT 的计算
+   * algor/qxpack_ic_algor_base
+     修正 round/round64，让其变为 std::round 整数返回型 
+
+   * ui_qml_charts/qsgnode/qxpack_ic_qsgvalueaxisnode_p
+     在范围 [-3880,10000] 下产生绘制TICKS 错误的问题
+
+
+=============================================
+20201219-20201229
+------------
+Version: 0.5.6
+
+修改：
+    * common/qxpack_ic_stratomtbl
+    已变更为线程安全版本
+
+    + algor/qxpack_ic_algor_errdev  用于错误值偏差比较的模板
+    + algor/qxpack_ic_algor_ary     和于数组相关的模板函数
+    + algor/qxpack_ic_algor_pot     Power of Two， 2 的幂次相关的模板
+    + algor/qxpack_ic_algor_shuffle 用于随机排列的算法模板
+    + algor/qxpack_ic_algor_base    提供最基本的一些模板小函数（大小，交换等）
+
+    * 修正 qxpackic_all.pri / qxpackic_all_static 中仅包含LIB
+    时没有设置 QXPACK_IC_QT5/QT6 的问题
+   
+    * 修正 ui_qml_charts/qxpack_ic_quicklineseriesitem
+      实现文件改为直接基于 QSGGeometry 进行绘制（不再在CPU上剪切与裁剪，以适应快速绘制大量数据）
+
+    * 修正 ui_qml_charts/qxpack_ic_valueaxisitem
+      实现文件改为直接基于 QSGGeometry 进行绘制（不再在CPU上剪切与裁剪，以适应快速绘制大量数据）
+
+    
+
+
+=============================================
+20201209
+------------
+Version: 0.5.5
+
+修改：
+    * sys/qxpack_ic_usbstormon_win32
+      修改指针型值 LONG 为 LONG_PTR
+    * common/qxpack_ic_geom2d
+      修改类中的模板参数名 T 改为 Tx，以避免编译错误
+    * 修改所有使用 QAtomic** 的 store() 为 storeRelease()
+
+    * 修改 *.pri 中 QXPACK_IC_QT5_ENABLED ==> QXPACK_IC_QT_ENABLED
+
+    * 修正 common/qxpack_ic_tmrqueue 的运行逻辑
+      newTmrItemNode_ts() 没有设置endTime()有可能导致退出需要等很大的时间点
+     ( 接近 无限 ）
+    
+ 
+
+=============================================
+20201114/20201127
+------------
+Version: 0.5.4
+
+修复：
+   * common/qxpack_ic_stratomtbl
+   修正stratomtbl 中使用引用的BUG
+   * common/qxpack_ic_stratomtbl::freeInstance() 没有
+    清除全局指针的问题
+
+
+=============================================
+20201112
+------------
+Version: 0.5.3
+
+修复：
+   * afw/qxpack_ic_msgbus
+   修正msgbus 中调用 rmv 时不能正确移除侦听对象的问题
+
+
+=============================================
+20201028
+------------
+Version: 0.5.0
+
+变更：
+   * common/qxpack_ic_variant
+   让其不再依赖 std::atom, 
+   + common/qxpack_ic_atomicint 
+   提供平台的原子API
+
+Version: 0.5.1
+
+再次修正 IcVariant 的问题
+
+Version: 0.5.2
+
+优化 IcVariant 的结构, 减少一次new 操作
+
+
+警告！
+    0.5.2 将导致与 0.4, 0.5.1 之前不兼容！！
+需要重新链接以防止 IcVariant 故障。
+
+
+=============================================
+20201026
+------------
+Version: 0.4.10
+
+更改：
+    + common/qxpack_ic_stratomtbl
+      字串原子表
+
+=============================================
+20201009
+------------
+Version: 0.4.8
+
+更改：
+    + common/qxpack_ic_threadpool
+    添加线程池的实现
+    * common/qxpack_ic_variant
+    修正变体变量的实现
+
+=============================================
+20200926
+------------
+Version: 0.4.7
+
+更改：
+    * ui_qml_charts/IcQuickLineSeriesItem
+    添加功能，获取点击附近的数据点。
+
+=============================================
+20200923
+------------
+Version: 0.4.6
+
+更改：
+    + ui_qml_charts/IcQuickParLnItem
+    添加用于实现并行线组的控件
+
+=============================================
+20200916
+------------
+Version: 0.4.3
+
+更改：
+   * ui_qml_charts/IcQuickValueAxisItem
+   修正不能显示负数数轴的问题
+
+
+=============================================
+20200916
+------------
+Version: 0.4.2
+
+更改：
+   * common/qxpack_ic_tmrqueue 
+     添加自动收缩定时器队列使用内存的方法
+     调整定时器队列检测定时器到期的循环内部 run_thr() doWork_thr()                        
+   * ui_qml_charts/ 下成员命名空间错误    
+   * 修正 IcArrayQueueTempPs / IcArrayQueueTemp 卸载时的问题
+
+=============================================
+20200812
+------------
+Version: 0.4.0
+
+更改：
+    -  ui_qml_control/qxpack_ic_quicklineseriesitem
+    +* ui_qml_charts/qxpack_ic_quicklineseriesitem 修正序列绘制
+    +  ui_qml_charts/qxpack_ic_quickvalueaxisitem  用于绘制坐标轴
+
+
+=============================================
+20200723
+------------
+Version: 0.3.0
+
+更改:
+    + ui_qml_base/qxpack_ic_quickxyseriesdata 用于保存序列数据
+    + ui_qml_control/qxpack_ic_quicklineseriesitem 用于绘制序列数据
+    
+
+=============================================
+20200708
+------------
+Version: 0.2.9
+
+更改：
+    1）将版本同步到 Qt5 的子版本上, ?.?.9 代表 Qt5.9
+    2) 匹配 ui_qml_control 中QML文档中的 QtQuick 版本与 Control 版本
+       导入 QtQuick 的版本 ( 2.x -> 2.9 )
+       导入 QtQuick.controls ( 2.0 -> 2.2 )

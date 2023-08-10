@@ -1,0 +1,46 @@
+【 Tcp/Local socket 的缓存区设置 】
+ Tcp read buffer size     := 512KB ( 通过 QTcpSocket::setReadBufferSize()) 
+ Tcp Opt recv buffer size := 使用操作系统默认
+ Tcp Opt send buffer size := 使用操作系统默认
+ 
+ Loc read buffer size     := 512KB ( 通过 QLocalSocket::setReadBufferSize())
+
+
+【 DataTrans ReadBuffer 接收缓存区限定 】
+
+ a) 拼接缓存区限定  
+    IcDataTransPkgReadBuff::maxCatBuffSize()
+    继承该类并重载该函数可以限定拼接缓存区最大值，默认为16MB，超过将丢包。
+
+ ** 可以在此考虑是否限定 接收包数目？即所有未被程序提取的数据包总大小？？
+    一旦接收包数目限定，新来的在 socket 缓存区的数据将不被提取？将导致拒收
+    新数据，将间接影响到发送端的 writebuffer ? (否，将导致超时）
+
+    另考虑：使用文件记录额外的数据包？（否？让上层决定？）
+
+
+【 DataTrans WriteBuffer 发送缓存区限定 】
+
+ ** 可以在此考虑是否限定 总共投递的 数据包总大小？
+    一旦限定，将影响上层发送调用，失败返回？
+    如果目标方拒收，将反复尝试？（还是定时尝试？ 否，将导致超时）
+
+    
+【 DataTransRsHdeBase 】
+
+ ** 考虑是否在此建立缓存区限制？？
+    DataTransRsHdeBase 拥有 ReadBuffer, WriteBuffer
+
+【 DataTransCli 】
+
+ ** 内含 DataTransRsHdeBase, 以及一个 QList<QByteArray> 接收列表
+    是否考虑在此建立 缓存区限制？？
+    可考虑：接收限制，超过丢数据包？或采取 文件额外记录？？
+            发送限制，在没有收到足够的 postDataSent 信号时，不发送下一数据包？
+             采取 文件额外记录？或 拒绝上层投递 ？
+
+
+
+
+
+

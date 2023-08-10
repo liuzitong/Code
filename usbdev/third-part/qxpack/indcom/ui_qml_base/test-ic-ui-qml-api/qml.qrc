@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>tst_uiapi.qml</file>
+        <file>qtquickcontrols2.conf</file>
+    </qresource>
+</RCC>

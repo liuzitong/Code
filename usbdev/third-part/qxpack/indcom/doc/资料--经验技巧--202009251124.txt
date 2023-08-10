@@ -1,0 +1,212 @@
+update: 2020/06/28 0907
+update: 2019/05/18 1158
+
+【 QObject 】
+
+  QObject 就是一个C++的类，内部附带了元信息结构指针
+
+1. 相关宏
+
+  Q_OBJECT     继承 QObject 必须要写的位于私有区的宏，用于元信息存储
+
+  Q_PROPERTY   在元信息中声明的元属性，用户可以通过元信息访问相关函数，
+               用于存取单值
+
+  Q_SIGNAL     QT5 的信号方法
+               可以直接调用，也可以用 emit 方法调用，表现形式像普通函数。
+               * 公有信号也可以被其他对象直接调用触发。
+
+  Q_SLOT       QT5 的槽函数
+               可以直接调用，也可以被信号触发调用
+
+  Q_INVOKABLE  QT5 元方法
+               由此标记的函数被存储到元信息中，可以通过 QMetaObject::invoke
+               调用
+
+2. 访问元信息
+  
+    一个继承自 QObject 的类，拥有相应的元信息，可以通过下述方法访问它的元信息：
+
+    2-1) 对象的 metaObject() 方法
+         obj->metaObject()
+
+    2-2) 类的静态信息
+         Class::staticMetaObject()
+
+
+3. 信号中的参数声明
+       
+   3-1) 引用传递
+   危险：除了连接方式以 Qt::DirectConnection 以外，其他方式都非常危险
+   QObject::connect( ... )
+
+   Q_SIGNAL void sig ( MyObj & )
+   以此声明的对象将以引用进行传递，非值复制方式
+
+   3-2) 值复制
+   Q_SIGNAL void sig ( MyObj )
+   元信息中的函数签名为  sig(MyObj)
+
+   3-3) 常量值复制
+
+   Q_SIGNAL void sig ( const MyObj & )
+   等同于值复制，元信息中的函数签名为 sig(MyObj)
+
+   3-4) C++11 lambda 函数
+    假定一个连接：      QObject::connect(senderInstance, &Sender::mySignal, this, []() {});
+    可借用如下进行断开：QObject::disconnect(senderInstance, &Sender::mySignal,this, nullptr );
+    注意 this 所有联上 &Sender::mySignal 的SLOT也都会断开
+    
+
+   
+4. 线程亲缘性 （ thread affinity）
+
+   4-1) 线程所属
+       QObject 的成员thread() 可以返回它所属的线程，此对象相关的所有事件，信号处理都是在
+   此线程中调用。
+       改变 QObject 的线程可以使用 moveToThread(), 但非常危险，因为无法确定在此对象成员中
+   有没有间接地创建了继承自QObject的实例，这些实例可能依然运行在原来的线程中。
+
+
+   4-2）访问其他线程的 QObject
+      a) 通过 Q_SIGNAL 
+      本地 QObject 提供信号，让其他线程的 QObject 连接上，本地通过发射信号来将调用事件
+      递送到目标 QObject 中
+
+      b) 通过 QMetaObject::invoke
+      其他线程 QObject 提供 Q_SLOT / Q_INVOKABLE 函数，本地线程中通过 QMetaObject::invoke 进行调用
+
+   
+   4-3) 安排一个本地队列调用
+      a) 通过 QMetaObject::invoke
+      附带 Qt::QueuedConnection 参数，调用将发送至当前线程的事件队列，在执行返回至事件循环后，
+      才会被执行。
+     
+   4-4) deleteLater
+      deleteLater 相当于使用 QMetaObject::invoke ( Qt::QueuedConnection ) 方式计划一个删除调用。
+      使用 deleteLater 的好处在于，它肯定会在没有处理信号时进行删除，避免了意外。坏处在于，对象
+      会被延迟删除，对需要立即产生效果的如设备关闭等有影响。
+
+
+5. moc 
+   元信息编译器，会对所有头文件以及实现文件进行检测，生成需要的元信息。
+
+   5-1) 实现文件中声明需要生成元信息
+   在.cxx/.cpp 中，如果写了内置的继承自 QObject 的类，需要在文件末尾使用
+  
+   #include "xxx.moc" ( xxx 即是该文件名 )，来强制moc 编译器生成元信息
+   
+6. Qt::QueuedConnection / Qt::BlockingQueuedConnection / Qt::DirectlyConnection
+   
+   6-1) qintptr/quintptr 不可在 Qt::QueuedConnect 中直接作为参数，
+   但可以在 Qt::DirectlyConnection / Qt::BlockingQueuedConnection 中使用
+
+
+
+
+【 QML 】
+   特别注意，QML 页面管理上，类似于汉诺塔形式，一层层叠加。容器的子页面严禁直接调用容器
+的任何方法信号。子页面唯一与父页面进行沟通的是：信号，或者通过C++层面的消息等。
+ 
+
+1. 界面上可以使用 xxx.signal_name.connect() 将连接到指定的函数处理。
+   函数可以是命名函数，也可以是lamda 函数。
+
+   注意 1：lamda 函数当前无法进行 disconnect()。
+   注意 2：有名函数可以适当的时候断开信号连接： xxx.signal_name.disconnect( name of function )
+ 
+
+2. 从C++ 曝露的成员可以为：
+   Q_PROPERTY / Q_INVOKABLE / Q_SLOT / Q_SIGNAL 等成员。
+
+   注意 1：Q_PROPERTY 返回 QObject* 指针时，对象的生命周期由 C++ 负责
+   注意 2：Q_INVOKABLE / Q_SLOT  返回 QObject* 指针时，对象的生命周期由 QML 负责，
+           但可以在返回之前通过 QQmlEngine::setObjectOwnerShip() 确认其生命周期由谁负责。
+
+   注意 3：QML 通过 Q_INVOKABLE / Q_SLOT 得到的 QObject* 指针，如果该对象生命周期为 JavaScriptOwnership 
+   （ 默认情况下，QML 在调用 该函数时进行了 new QObject 对象的操作，该生命周期将被设置为 JavaScriptOwnership )
+           如果为了快速释放内存，则做如下操作：
+
+            var my_obj = Cpp.makeObj();
+            ...
+            my_obj.destroy();  // JavaScript 方法的 destroy() 将主动调用 delete my_obj
+
+
+3. Java 代码动态创建与销毁QML 对象
+
+   QML界面上可以通过 Qt.createComponent()/Qt.createObject() 与 Qt.createQmlObject()。
+   详细参考手册："Dynamic QML Object Creation from JavaScript"
+
+   Qt.createComponent() 创建组件缓存时，默认在当前调用者的上下文中创建。
+   Qt.createObject() 创建组件实例时，可以传递可视化树的结点为父（只有可见父结点才可以渲染子对象）
+   Qt.createQmlObject() 支持通过字串创建QML对象（上下文可以传递并控制）
+
+   动态创建的对象可以通过 object.destroy() 方法删除，调用 destroy() 可以在该对象内部，因为 destroy() 类似于
+deleteLater(), 将在下一刷新周期进行处理。
+
+   注意 1：动态创建的对象没有 id
+   注意 2：不要删除并不是由 Qt.createObject() / Qt.createQmlObject() 创建的对象
+   * 注意 3：动态创建的对象如果设置有父结点，父结点会负责管理它的生命周期。
+   
+
+
+4. QML 页面的继承
+
+    QML页面可以像 C++ 一样继承。基页面的信号与方法 继承页面是继承的。继承页面可以改写原来基页面的
+方法。
+
+    
+
+5. QML 页面的点击事件
+
+    QT5 在处理QML页面上的 onClicked() 等点击事件，是直接调用处理函数，如果处理函数进入了事件循环或者
+尝试改变输入焦点等操作，会引发一些问题。建议将 onClicked() 事件延迟一个周期调用（在 onClicked() 中通过
+QxPack.IcUiQmlApi.postMetaCall() 推后处理）
+    
+
+
+6. C++ 与 QML 之间的数据类型对应
+
+   从 QT 助手中复制下表
+   ---------------------------------------------------------
+     Qt Types                       |  QML Types
+   ---------------------------------------------------------
+      bool                              bool
+      unsigned int,int                  int
+      double                            double
+      float,qreal                       real
+      QString                           string
+      QUrl                              url
+      QColor                            color
+      QFont                             font
+      QDate                             date
+      QPoint,QPointF                    point
+      QSize, QSizeF                     size
+      QRect,QRectF                      rect
+      QMatrix4x4                        matrix4x4
+      QQuaternion                       quaternion
+      QVector2D,QVector3D,QVector4D     vector2d,vector3d,vector4d
+      Q_ENUM()/Q_ENUMS()                enumeration
+   ---------------------------------------------------------
+
+   列表类型，下述列表在QML以 Js.Array 类型支持
+   ---------------------------------------------------------   
+      QList<int>, QList<qreal>, QList<bool>, QList<QString>/QStringList,
+      QList<QUrl>, QVector<int>, QVector<qreal>, QVector<bool>
+   ---------------------------------------------------------
+   * 列表类型尽量使用 Q_INVOKABLE 定义的函数方式取得
+
+ 
+7. C++ 与 QML 之间的 API 调用
+
+   7-1) C++ 调用 QML 定义的 function
+
+       * 使用 QMetaObject::invokeMethod( obj_ptr, "function name in QML",
+         Q_ARG( QVariant, 参数1 ), Q_ARG( QVariant, 参数2 )
+        )
+
+   7-2) QML 调用 C++ QObject 定义的 使用 Q_INVOKABLE 的API
+
+       直接使用 obj.function_name( 参数 )
+
+   

@@ -1,0 +1,14 @@
+【 如何产生一块可打印的随机数据 】
+
+方案：
+   1) 确定可打印字符，刚才满足要产生的内存块大小的数量。
+      如 A-Z, a-z, 0-9 等等
+   2）使用上述字符按顺序填充到内存块
+   3) 使用 QxPack::knuthShuffle( ) 针对内存块进行乱序
+
+   * QxPack::knuthShuffle 是实现的一种洗牌算法，据称该算法
+针对每个元素概率上机会相等
+   * #include "qxpack/indcom/algor/qxpack_ic_shuffletemp.hpp"
+
+
+

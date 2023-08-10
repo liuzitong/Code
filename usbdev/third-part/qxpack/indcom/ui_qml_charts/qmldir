@@ -1,0 +1,5 @@
+module qxpack.indcom.ui_qml_charts
+
+IcQuickLineSeriesItem 1.0  icquicklineseriesitem_dummy.qml
+IcQuickValueAxisItem  1.0  icquickvalueaxisitem_dummy.qml
+IcQuickParLnItem      1.0  icquickparlnitem_dummy.qml
