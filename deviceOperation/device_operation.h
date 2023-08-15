@@ -158,7 +158,7 @@ public:
     DevicePupilProcessor m_devicePupilProcessor;
     Status m_status={-1,-1};
     QTimer m_reconnectTimer;
-    QElapsedTimer m_workStatusElapsedTimer;
+//    QElapsedTimer m_workStatusElapsedTimer;
 //    bool m_isDeviceReady=false;
 //    bool m_reconnecting=false;
     int m_deviceStatus=0;                    // 0:初始未连接 1:断联处于重联状态 2:已连接

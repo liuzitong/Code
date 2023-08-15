@@ -23,9 +23,12 @@ QSharedPointer<DeviceOperation> DeviceOperation::m_singleton=/*QSharedPointer<De
 
 DeviceOperation::DeviceOperation()
 {
+    std::cout<<"**************************************************"<<std::endl;
+    std::cout<<"*********create deviationSingleTon****************"<<std::endl;
+    std::cout<<"**************************************************"<<std::endl;
     connect(&m_reconnectTimer,&QTimer::timeout,this,&DeviceOperation::reconnectDev);
     connect(this,&DeviceOperation::updateDevInfo,[](QString str){qDebug()<<str;});
-    m_workStatusElapsedTimer.start();
+//    m_workStatusElapsedTimer.start();
     m_autoPupilElapsedTimer.start();
     m_reconnectingElapsedTimer.start();
     m_reconnectTimer.setInterval(3000);
@@ -37,7 +40,9 @@ DeviceOperation::DeviceOperation()
 DeviceOperation::~DeviceOperation()
 {
 //    m_connectTimer.stop();
-    qDebug()<<"********************~DeviceOperation()*************************";
+    std::cout<<"**************************************************"<<std::endl;
+    std::cout<<"*********delete deviationSingleTon****************"<<std::endl;
+    std::cout<<"**************************************************"<<std::endl;
 }
 
 //被checkSvcWorker 调用
@@ -619,11 +624,11 @@ void DeviceOperation::clearPupilData()
 void DeviceOperation::workOnNewStatuData()
 {
     m_reconnectTimer.start();
-    if(m_workStatusElapsedTimer.elapsed()>=1000)
-    {
-        m_workStatusElapsedTimer.restart();
-        updateDevInfo("receive new workStatus");
-    }
+//    if(m_workStatusElapsedTimer.elapsed()>=1000)
+//    {
+//        m_workStatusElapsedTimer.restart();
+//        updateDevInfo("receive new workStatus");
+//    }
     m_statusData=m_devCtl->takeNextPendingStatusData();
 
     using MotorId=UsbDev::DevCtl::MotorId;

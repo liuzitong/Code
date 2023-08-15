@@ -66,7 +66,7 @@ public:
     PatientVm* getPatient(){return m_patientVm;}void setPatient(PatientVm* value){m_patientVm=value;}
     ProgramVm* getProgram(){return m_programVm;}void setProgram(ProgramVm* value){m_programVm=value;qDebug()<<m_programVm->getName();}
     CheckResultVm* getCheckResult(){return m_checkResultVm;}void setCheckResult(CheckResultVm* value){m_checkResultVm=value;} Q_SIGNAL void checkResultChanged();
-    int getCheckState(){return m_checkState;} void setCheckState(int value){m_checkState=value;emit checkStateChanged();}Q_SIGNAL void checkStateChanged();
+    int getCheckState(){return m_checkState;} void setCheckState(int value){static QMutex lock;lock.lock();m_checkState=value;lock.unlock();emit checkStateChanged();}Q_SIGNAL void checkStateChanged();
     int getCheckedCount(){return m_checkedCount;}void setCheckedCount(int value){m_checkedCount=value;emit checkedCountChanged();}Q_SIGNAL void checkedCountChanged();
     int getTotalCount(){return m_totalCount;}void setTotalCount(int value){m_totalCount=value;emit totalCountChanged();}Q_SIGNAL void totalCountChanged();
     int getCheckTime(){return m_checkTime;}void setCheckTime(int value){m_checkTime=value;/*qDebug()<<"checkTime:"+QString::number(m_checkTime);*/emit checkTimeChanged();}Q_SIGNAL void checkTimeChanged();

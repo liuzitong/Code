@@ -41,7 +41,7 @@ public:
     void lightsOff();
 //signals:
 //    void  checkStateChanged();
-protected:
+//protected:
     QSharedPointer<DevOps::DeviceOperation> m_deviceOperation=DevOps::DeviceOperation::getSingleton();
 
 };
@@ -1849,6 +1849,9 @@ void CheckSvcWorker::doWork()
         {
             initialize();
             m_check->resetData();
+//            qDebug()<<"***************";
+//            qDebug()<<m_check->m_deviceOperation->m_deviceStatus;
+//            qDebug()<<"***************";
 //            qDebug()<<m_check->m_totalCount;
             emit totalCountChanged(m_check->m_totalCount);
             emit checkedCountChanged(0);

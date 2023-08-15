@@ -10,7 +10,6 @@ QT += datavisualization
 CONFIG += thread
 CONFIG += c++11
 CONFIG -= app_bundle
-#CONFIG += console
 DEFINES += QT_DEPRECATED_WARNINGS QT_MESSAGELOGCONTEXT _QX_NO_PRECOMPILED_HEADER
 QMAKE_CFLAGS += /utf-8
 QMAKE_CXXFLAGS += /utf-8
@@ -56,6 +55,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L$$PWD/../../../perimeter/third-part/LimeReport/build/5.9.7/win64/debug/lib
     LIBS += -l"QxOrmd" -l"limereportd" -l"QtZintd" -l"deviceOperationd"
     CONFIG += qml_debug
+    CONFIG += console
     LIBS += -l"libboost_serialization-vc140-mt-gd-x64-1_78"
     DESTDIR=$$PWD/../../bin/debug
 } else {
