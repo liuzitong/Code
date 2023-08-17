@@ -19,6 +19,7 @@
 #include "perimeter/main/services/utility_svc.h"
 #include "perimeter/third-part/perm/perm_mod.hxx"
 #include <perimeter/main/services/keyboard_filter.h>
+
 namespace Perimeter {
 
 // ////////////////////////////////////////////////////////////////////////////

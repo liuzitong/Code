@@ -246,6 +246,7 @@ public:
     void setCheckState(int value)
     {
         *m_checkState=value;
+        std::cout<<"checkState:"<<*m_checkState<<std::endl;
         emit checkStateChanged();
     }
     void stopDynamic();
@@ -1958,7 +1959,7 @@ void CheckSvcWorker::onTimeOut()
 
 void CheckSvcWorker::stopDynamic()
 {
-    while(*m_checkState!=5)
+    while(!(*m_checkState==5||*m_checkState==6))
     {
         m_deviceOperation->stopDynamic();UtilitySvc::wait(300);
     }
@@ -1967,6 +1968,7 @@ void CheckSvcWorker::stopDynamic()
 
 CheckSvc::CheckSvc(QObject *parent)
 {
+    DevOps::DeviceOperation::createInstance();
     m_workerThread.start();
     m_worker = new CheckSvcWorker();
     m_worker->moveToThread(&m_workerThread);
@@ -2067,6 +2069,8 @@ void CheckSvc::resume()
 
 void CheckSvc::stop()
 {
+    static QMutex lock;
+    lock.lock();
     if(m_checkState<=2)
     {
         setCheckState(3);
@@ -2075,6 +2079,7 @@ void CheckSvc::stop()
     {
         m_worker->stopDynamic();
     }
+    lock.unlock();
     qDebug()<<"stop command";
     //    QMetaObject::invokeMethod(m_worker,"stop",Qt::QueuedConnection);
 }

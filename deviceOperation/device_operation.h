@@ -94,6 +94,7 @@ public:
     DeviceOperation();
     ~DeviceOperation();
     static QSharedPointer<DeviceOperation> getSingleton();
+    static void createInstance();
 //    static void Initialize();
     void moveChinUp(){if(m_deviceStatus==2) moveChin(ChinMoveDirection::Up);}
     void moveChinDown(){if(m_deviceStatus==2) moveChin(ChinMoveDirection::Down);}
@@ -128,6 +129,7 @@ public:
     void beep();
     void alarm();
     void clearPupilData();
+
 
 private:
     void moveChin(ChinMoveDirection direction);       //0左,1不动,2右;0上,1不动,2下

@@ -81,14 +81,19 @@ void DeviceOperation::reconnectDev()
 
 QSharedPointer<DeviceOperation> DeviceOperation::getSingleton()
 {
-    static QMutex mutex;
-    mutex.lock();
-    if(m_singleton==nullptr)
-    {
-        m_singleton.reset(new DeviceOperation());
-    }
-    mutex.unlock();
+//    static QMutex mutex;
+//    mutex.lock();
+//    if(m_singleton==nullptr)
+//    {
+//        m_singleton.reset(new DeviceOperation());
+//    }
+//    mutex.unlock();
     return m_singleton;
+}
+
+void DeviceOperation::createInstance()
+{
+    m_singleton.reset(new DeviceOperation());
 }
 
 void DeviceOperation::setCursorColorAndCursorSize(int color, int spot)
