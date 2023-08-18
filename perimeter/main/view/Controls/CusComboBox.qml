@@ -1,5 +1,6 @@
 ﻿import QtQuick 2.6
 import QtQuick.Controls 2.2
+import perimeter.main.view.Utils 1.0
 
 ComboBox {
     id: control
@@ -7,13 +8,14 @@ ComboBox {
     property string borderColor:"#bdc0c6"
     property string borderColorPressed:"Brown"
     property string imageSrc: "qrc:/Pics/base-svg/btn_drop_down.svg";
-    property string backgroundColor:enabled?"#dcdee0":"#c0c0c0"
+    property string backgroundColor:enabled? CommonSettings.buttonBackGroundColor: CommonSettings.buttonDisabledBackGroundColor
     font.family:"Microsoft YaHei"
     font.pointSize:height*0.30;
     height: parent.height;
     property bool complexType: false;
     property bool popDirectionDown: true;
     property string text: "";
+
 
 
     //    currentIndex: 0
@@ -23,13 +25,23 @@ ComboBox {
     delegate: ItemDelegate {
         width: control.width
         height: control.height
-        contentItem: Text {
-            text: complexType?name:modelData;
-            font: control.font
-            elide: Text.ElideRight
-            verticalAlignment: Text.AlignVCenter
-            renderType: Text.NativeRendering
-        }
+        contentItem:
+//        Item{
+            Text
+            {
+                text: complexType?name:modelData;
+                color: CommonSettings.buttonTextColor;
+                font: control.font
+                elide: Text.ElideRight
+                verticalAlignment: Text.AlignVCenter
+                renderType: Text.NativeRendering
+            }
+//            Rectangle
+//            {
+//                anchors.fill: parent;
+//                color: "red";
+//            }
+//        }
         highlighted: control.highlightedIndex == index
     }
 
@@ -49,8 +61,8 @@ ComboBox {
         leftPadding: control.height*0.5
         rightPadding: control.indicator.width + control.spacing
         text: control.text!==""?control.text:complexType?model.get(currentIndex).name:displayText;
+        color: enabled?CommonSettings.buttonTextColor:CommonSettings.buttonDisabledTextColor;
         font: control.font
-//        color: control.pressed ? "#17a81a" : "#21be2b"
         horizontalAlignment: Text.AlignLeft
         verticalAlignment: Text.AlignVCenter
         elide: Text.ElideRight
@@ -63,7 +75,7 @@ ComboBox {
         border.color: control.pressed ? "blue" : control.borderColor
         border.width: control.visualFocus ? 2 : 1
         radius: height/6
-        color:control.backgroundColor;
+        color:backgroundColor;
     }
 
     popup: Popup {
@@ -81,9 +93,10 @@ ComboBox {
         }
 
         background: Rectangle {
-            border.color: "grey"
-            radius:control.height/6
+            border.color: "grey";
+            radius:control.height/6;
         }
+
     }
 }
 

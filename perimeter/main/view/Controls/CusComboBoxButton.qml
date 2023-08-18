@@ -1,6 +1,6 @@
-import QtQuick 2.6
+﻿import QtQuick 2.6
 import QtQuick.Controls 2.2
-
+import perimeter.main.view.Utils 1.0
 Item {
     id:root;
     height:20;width: 80
@@ -9,7 +9,7 @@ Item {
     property string borderColor:"#bdc0c6"
     property string borderColorPressed:"Brown"
     property string imageSrc: "qrc:/Pics/base-svg/btn_drop_down.svg";
-    property string backgroundColor:enabled?"#dcdee0":"#a0a0a0"
+    property string backgroundColor:enabled? CommonSettings.buttonBackGroundColor: CommonSettings.buttonDisabledBackGroundColor
     property bool complexType: false;
     property bool popDirectionDown: true;
 

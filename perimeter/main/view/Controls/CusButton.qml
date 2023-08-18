@@ -1,8 +1,9 @@
 ﻿import QtQml 2.2
 import QtQuick 2.0
+import perimeter.main.view.Utils 1.0
 Item{
     id:root
-    property string buttonColor: "#dcdee0";
+    property string buttonColor: CommonSettings.buttonBackGroundColor;
     property string hoverBorderColor: "black"
     property string pressBorderColor: "#006486"
     property string commonBorderColor: "#bdc0c6"
@@ -108,6 +109,7 @@ Item{
             anchors.fill: parent
             font.family: "Microsoft YaHei"
             renderType: Text.NativeRendering
+            color: enabled?CommonSettings.buttonTextColor:CommonSettings.buttonDisabledTextColor;
         }
     }
 
@@ -115,7 +117,7 @@ Item{
         id:rec
         width:parent.width
         height:parent.height
-        color: enabled?buttonColor:"#c0c0c0"
+        color: enabled?buttonColor:CommonSettings.buttonDisabledBackGroundColor;
         radius: root.radius
         border.color: root.borderColor
         border.width: root.borderWidth
