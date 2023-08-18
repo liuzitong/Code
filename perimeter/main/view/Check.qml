@@ -455,9 +455,18 @@ Item {id:root; width: 1366;height: 691
                         Flow{
                             id:checkControl
                             height: parent.height;spacing: height*0.8;anchors.horizontalCenter: parent.horizontalCenter;
+//                            CusButton{
+//                                onClicked: {
+//                                    console.log(IcUiQmlApi.appCtrl.checkSvc.checkState);
+//                                    console.log(IcUiQmlApi.appCtrl.checkSvc.deviceStatus);
+//                                    console.log(IcUiQmlApi.appCtrl.checkSvc.readyToCheck);
+//                                    console.log(checkDisplay.dynamicSelectedDotsReady);
+//                                    console.log(currentProgram.type);
+//                                }
+//                            }
                             CusButton{
-                                enabled: (IcUiQmlApi.appCtrl.checkSvc.debugMode||(IcUiQmlApi.appCtrl.checkSvc.deviceStatus===2&&IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus===3))&&IcUiQmlApi.appCtrl.checkSvc.readyToCheck&&(currentProgram.type!==2||checkDisplay.dynamicSelectedDotsReady)&&!(checkState===3||checkState===4);
                                 property int checkState: IcUiQmlApi.appCtrl.checkSvc.checkState;
+                                enabled: (IcUiQmlApi.appCtrl.checkSvc.debugMode||(IcUiQmlApi.appCtrl.checkSvc.deviceStatus===2))&&IcUiQmlApi.appCtrl.checkSvc.readyToCheck&&(currentProgram.type!==2||checkDisplay.dynamicSelectedDotsReady)&&!(checkState===3||checkState===4);
                                 text:{if(checkState===5||checkState===6) return lt+qsTr("Start");if(checkState===2) return lt+qsTr("Resume");if(checkState===0||checkState===1) return lt+qsTr("Pause")}
                                 onClicked:{
                                     IcUiQmlApi.appCtrl.checkSvc.dynamicSelectedDots=checkDisplay.dynamicSelectedDots;     //动态输入点

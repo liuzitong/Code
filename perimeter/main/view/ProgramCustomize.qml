@@ -37,11 +37,16 @@ Item {id:root; width: 1366;height: 691; visible: true;anchors.fill:parent;
         NewProgram{
             id:newProgram;
             anchors.fill: parent;
-            onOk: {
-                currentProgram.type=type;currentProgram.strategy=strategy;
-                if(currentProgram.type!==2){currentProgram.params.commonParams.Range[1]=range;}
-                else{currentProgram.params.Range[1]=range;}
-            }
+//            onOk: {
+//                currentProgram.type=type;currentProgram.strategy=strategy;
+//                if(currentProgram.type!==2)
+//                {
+//                    currentProgram.params.commonParams.Range[1]=range;
+//                }
+//                else{
+//                    currentProgram.params.Range[1]=range;
+//                }
+//            }
         }
 
         SaveToAnotherProgram{
@@ -197,7 +202,12 @@ Item {id:root; width: 1366;height: 691; visible: true;anchors.fill:parent;
                                     strategyNames=[];
                                     switch(currentProgram.type)
                                     {
-                                        case 0:strategyNames=[{name:lt+qsTr("Full threshold"),strategy:0},{name:lt+qsTr("Fast threshold"),strategy:1},{name:lt+qsTr("Smart interactive"),strategy:2},{name:lt+qsTr("Fast interactive"),strategy:3}];break;
+                                        case 0:
+                                            if(currentProgram.category===4)
+                                                strategyNames=[{name:lt+qsTr("Full threshold"),strategy:0},{name:lt+qsTr("Fast threshold"),strategy:1}];
+                                            else
+                                                strategyNames=[{name:lt+qsTr("Full threshold"),strategy:0},{name:lt+qsTr("Fast threshold"),strategy:1},{name:lt+qsTr("Smart interactive"),strategy:2},{name:lt+qsTr("Fast interactive"),strategy:3}];
+                                            break;
                                         case 1:strategyNames=[{name:lt+qsTr("One stage"),strategy:4},{name:lt+qsTr("Two stages"),strategy:5},{name:lt+qsTr("Quantify defects"),strategy:6},{name:lt+qsTr("Single stimulation"),strategy:7}];break;
                                         default:break;
                                     }
@@ -315,24 +325,22 @@ Item {id:root; width: 1366;height: 691; visible: true;anchors.fill:parent;
                                             currentProgram=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::DynamicProgramVM", false);
                                             dynamicParamsSetting.currentProgram=currentProgram;
                                         }
-
                                         currentProgram.type=type;
                                         if(currentProgram.type!==2)
                                         {
-                                            currentProgram.params.commonParams.strategy=newProgram.strategy;
-                                            currentProgram.params.commonParams.Range[1]=newProgram.range;
                                             if(currentProgram.type===0)
                                             {
                                                 currentProgram.data.strategies=[0,1,2,3];
                                                 currentProgram.report=[4];
                                             }
-
                                             else
                                             {
-                                                currentProgram.data.strategies=[3,4,5,6];
+                                                currentProgram.data.strategies=[4,5,6,7];
                                                 currentProgram.report=[0]
-
                                             }
+                                            currentProgram.params.commonParams.strategy=newProgram.strategy;
+                                            console.log(currentProgram.params.commonParams.strategy);
+                                            currentProgram.params.commonParams.Range[1]=newProgram.range;
                                         }
                                         else{
                                             currentProgram.params.strategy=newProgram.strategy;
@@ -378,6 +386,9 @@ Item {id:root; width: 1366;height: 691; visible: true;anchors.fill:parent;
                                         if(currentProgram.type===0)
                                         {
                                             currentProgram.report=[4];
+                                            currentProgram.params.commonParams.strategy=1;
+                                            currentProgram.data.strategies=[0,1];
+
                                         }
                                         else if(currentProgram.type===1)
                                         {

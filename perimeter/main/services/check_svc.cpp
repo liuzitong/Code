@@ -1820,10 +1820,10 @@ void CheckSvcWorker::prepareToCheck()
         m_deviceOperation->waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y});
     }
     connect(this,&CheckSvcWorker::eyeMoveAlarmChanged,[&](bool eyeMoveAlarm){
-        qDebug()<<eyeMoveAlarm;
+//        qDebug()<<eyeMoveAlarm;
         m_eyeMoveAlarm=eyeMoveAlarm;
     });
-    qDebug()<<m_eyeMoveAlarm;
+//    qDebug()<<m_eyeMoveAlarm;
 //    m_check->m_eyeMoveAlarm=m_eyeMoveAlarm;
     m_check->initialize();
     UtilitySvc::wait(500);    //等几秒启动

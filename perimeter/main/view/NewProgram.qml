@@ -22,6 +22,14 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
     signal ok();
     signal cancel();
 
+    function calcStrategy()
+    {
+        type=typeComboBox.currentIndex;
+        if(type==0){strategy=stratComboBox.currentIndex;}
+        else if(type==1){strategy=stratComboBox.currentIndex+4;}
+        else if(type==2){strategy=stratComboBox.currentIndex;}
+    }
+
 
    contentItem:
    Rectangle{
@@ -71,7 +79,7 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                     height:parent.height;
                                     imageSrc: "qrc:/Pics/base-svg/btn_drop_down.svg";
                                     model: [lt+qsTr("Threshold") ,lt+qsTr("Screening"),lt+qsTr("Dynamic") ];
-                                    onCurrentIndexChanged: type=currentIndex;
+                                    onCurrentIndexChanged:{calcStrategy();}
                                 }
                             }
                             Row{width:parent.width;height: parent.height*0.12;spacing: width*0.05;
@@ -79,7 +87,7 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                 CusComboBox{
                                     id:stratComboBox
                                     property var strategies:
-                                        [[lt+qsTr("Full threshold"),lt+qsTr("Fast threshold"),lt+qsTr("Smart interactive"),lt+qsTr("Fast interactive")],
+                                        [[lt+qsTr("Full threshold"),lt+qsTr("Fast threshold")],
                                         [lt+qsTr("One stage"),lt+qsTr("Two stages"),lt+qsTr("Quantify defects"),lt+qsTr("Single stimulus")],
                                         [lt+qsTr("Standard"),lt+qsTr("Blind area"),lt+qsTr("Dark area"),lt+qsTr("Straight line")]];
                                     width: parent.width*0.7;
@@ -87,7 +95,7 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                     imageSrc: "qrc:/Pics/base-svg/btn_drop_down.svg";
 //                                    model: ListModel {ListElement { text: "阈值" } ListElement { text: "筛选" } ListElement { text: "移动" }}
                                     model:strategies[typeComboBox.currentIndex];
-                                    onCurrentIndexChanged: if(type==1){strategy=currentIndex;}else if(type==2){strategy=currentIndex+3;}else if(type==3){strategy=currentIndex+7}
+                                    onCurrentIndexChanged:{calcStrategy();}
                                 }
                             }
                             Item{
@@ -96,6 +104,8 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                 CusButton{ text:lt+qsTr("OK"); anchors.verticalCenter: parent.verticalCenter;anchors.left: parent.left;onClicked: {idPopup.close();ok()}}
                                 CusButton{ text:lt+qsTr("Cancel"); anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter;onClicked: {idPopup.close();}}
                             }
+
+
                         }
                     }
                  }

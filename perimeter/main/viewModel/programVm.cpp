@@ -29,6 +29,35 @@ StaticProgramVm::StaticProgramVm(const QVariantList &args)
         auto pp=new StaticProgramModel();
         m_data.reset(pp);
         ProgramVm::m_data=pp;
+        m_data->m_params.commonParams=
+        {
+            {0,30},
+            StaticParams::CommonParams::Strategy::fastInterative,
+            StaticParams::CommonParams::StrategyMode::ageRelated,
+            CursorColor::white,
+            CursorSize::II,
+            BackGroundColor::yellow,
+            false,
+            false,
+            200,
+            false,
+            false,
+            FixationTarget::centerPoint,
+            FixationMonitor::onlyAlarm,
+            false
+        };
+        m_data->m_params.fixedParams=
+        {
+            180,
+            800,
+            20,
+            20,
+            10,
+            10,
+            10,
+            10,
+            300,
+        };
         m_staticDataVm.reset(new StaticProgramDataVm(&m_data->m_data));
         m_staticParamsVm.reset(new StaticParamsVM(&m_data->m_params));
     }
@@ -106,7 +135,18 @@ DynamicProgramVm::DynamicProgramVm(const QVariantList &args)
     if(args.count()==0)
     {
         pp=new DynamicProgramModel;
-        pp->m_params={{0,30},dp::Strategy::standard,CursorColor::white,CursorSize::I,BackGroundColor::white,1,10,dp::DynamicMethod::_6Lines,dp::DynamicDistance::_10,FixationMonitor::onlyAlarm};
+        pp->m_params={
+            {0,90},
+            dp::Strategy::standard,
+            CursorColor::white,
+            CursorSize::II,
+            BackGroundColor::yellow,
+            7,
+            10,
+            dp::DynamicMethod::_6Lines,
+            dp::DynamicDistance::_10,
+            FixationMonitor::onlyAlarm
+        };
     }
     else
     {
