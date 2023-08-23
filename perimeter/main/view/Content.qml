@@ -128,6 +128,7 @@ Rectangle {
                                 }
                             }
                             CusButton{
+                                id:programCustomizeButton;
                                 type:"click";isAnime: false;underImageText.text: lt+qsTr("Customize");underImageText.color: "white"; fontSize: height/4;rec.visible: false;width:image.sourceSize.width;imageSrc: "qrc:/Pics/base-svg/menu_customize.svg";pressImageSrc: "qrc:/Pics/base-svg/menu_customize_select.svg";
                                 onClicked: contentPage.changePage("programCustomize",null);
                             }
@@ -159,7 +160,6 @@ Rectangle {
 
             function changePage(pageTo,pageFrom,params)
             {
-
                 patientPage.visible=false;
                 checkPage.visible=false;
                 progressAnalysisLobbyPage.visible=false;
@@ -168,7 +168,7 @@ Rectangle {
                 analysisLobbypage.visible=false;
                 analysisPage.visible=false;
                 visionFieldIslandPage.visible=false;
-
+                programCustomizeButton.enabled=false;
                 console.log(params);
 
                 console.log(pageTo);
@@ -176,6 +176,7 @@ Rectangle {
                 switch(pageTo)
                 {
                     case "patientManagement":
+                        programCustomizeButton.enabled=true;
                         patientPage.visible=true;
                         patientPage.pageFrom=pageFrom;
                         checkContentButton.image.source=checkContentButton.imageSrc;

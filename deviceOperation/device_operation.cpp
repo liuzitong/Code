@@ -31,7 +31,7 @@ DeviceOperation::DeviceOperation()
 //    m_workStatusElapsedTimer.start();
     m_autoPupilElapsedTimer.start();
     m_reconnectingElapsedTimer.start();
-    m_reconnectTimer.setInterval(3000);
+    m_reconnectTimer.setInterval(10000);                            //复位的时候会短暂收不到数据更新，时间不能太短
     m_waitingTime=DeviceSettings::getSingleton()->m_waitingTime;
     m_config=DeviceData::getSingleton()->m_config;
 }
