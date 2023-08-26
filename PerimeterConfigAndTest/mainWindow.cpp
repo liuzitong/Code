@@ -668,9 +668,6 @@ void MainWindow::on_pushButton_testStart_clicked()
     {
         case 0:
         {
-//            m_devCtl->resetMotor(UsbDev::DevCtl::MotorId_Color,sps[3]);
-//            m_devCtl->resetMotor(UsbDev::DevCtl::MotorId_Light_Spot,sps[4]);
-//            waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
             if(m_status.currentColorSlot!=colorSlot||m_status.currentLightSpotPos!=spotSlot)              //变换到改变光斑颜色位置
             {
                 int  color_Circl_Motor_Steps=m_profile.motorRange(UsbDev::DevCtl::MotorId_Color).second-m_profile.motorRange(UsbDev::DevCtl::MotorId_Color).first;
@@ -912,6 +909,8 @@ void MainWindow::on_pushButton_colorTest_clicked()
     int motorPos[5]{0};
     sps[3]=ui->spinBox_colorMotorSpeed_2->value();
     motorPos[3]=ui->spinBox_colorMotorPos_2->value();
+//    m_devCtl->resetMotor(UsbDev::DevCtl::MotorId_Color,sps[3]);
+//    waitMotorStop({UsbDev::DevCtl::MotorId_Color});
     //    QElapsedTimer mstimer;
     //    do
     //    {
@@ -931,6 +930,8 @@ void MainWindow::on_pushButton_spotTest_clicked()
     int motorPos[5]{0};
     sps[4]=ui->spinBox_spotMotorSpeed_2->value();
     motorPos[4]=ui->spinBox_spotMotorPos_2->value();
+//    m_devCtl->resetMotor(UsbDev::DevCtl::MotorId_Light_Spot,sps[4]);
+//    waitMotorStop({UsbDev::DevCtl::MotorId_Light_Spot});
     m_devCtl->move5Motors(sps,motorPos);
 }
 

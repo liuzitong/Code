@@ -66,7 +66,6 @@ PatientVm::PatientVm(const QVariantList & args)
         m_data.reset(new PatientModel());
         m_data->m_lastUpdate=QDateTime::currentDateTime();
         m_rx=new RxVm(m_data->m_rx);
-        return;
     }
     else
     {
@@ -76,14 +75,11 @@ PatientVm::PatientVm(const QVariantList & args)
         qx_query query("select * from patient where id=:id");
         query.bind(":id",id);
         QSqlError daoError = qx::dao::execute_query(query, Patient_List);
-        if(Patient_List.count()==0)
-            return;
-        else
-        {
-            patient_ptr=Patient_List.first();
-            m_data.reset(new PatientModel(patient_ptr));
-            m_rx=new RxVm(Utility::QStringToEntity<Rx>(patient_ptr->m_rx));
-        }
+        assert(Patient_List.count()>0);
+        patient_ptr=Patient_List.first();
+        m_data.reset(new PatientModel(patient_ptr));
+        m_rx=new RxVm(Utility::QStringToEntity<Rx>(patient_ptr->m_rx));
+
     }
 }
 
@@ -209,7 +205,6 @@ QSharedPointer<PatientModel> Perimeter::PatientVm::getModel()
 
 Patient_ptr PatientVm::getPatientData()
 {
-    m_data->m_rx=static_cast<RxVm*>(m_rx)->getData();
     return getModel()->ModelToDB();
 }
 

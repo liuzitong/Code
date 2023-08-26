@@ -198,8 +198,9 @@ IcPageBase {   // this is the wrapped Popup element in ui_qml_control
         {
             idKeyboardBtn.checked = Qt.binding( function() { return idPriv.user_login_vm.enableOfVkb; } );
             idUserNameInput.text = Qt.binding( function() { return idPriv.user_login_vm.localUser.name; } );
-            idUserPwdInput.text = Qt.binding( function() { return idPriv.user_login_vm.localUser.pwd; } );
             idRememberPwd.checked = Qt.binding( function() { return idPriv.user_login_vm.localUser.rememberpwd; } );
+            if(idRememberPwd.checked)
+                idUserPwdInput.text = Qt.binding( function() { return idPriv.user_login_vm.localUser.pwd; } );
             autoLoginSwt = Qt.binding( function() { return idPriv.user_login_vm.localUser.autoLogin; } );
             if ( autoLoginSwt && idUserNameInput.text.length > 0 && idUserPwdInput.text.length > 0 )
             {

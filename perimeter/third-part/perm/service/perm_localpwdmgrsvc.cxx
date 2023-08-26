@@ -161,6 +161,7 @@ LocalPwdMgrSvcPriv::~LocalPwdMgrSvcPriv()
 void LocalPwdMgrSvcPriv::setRememberpwd(bool r)
 {
     m_remember_pwd = r;
+    write();
 }
 
 void LocalPwdMgrSvcPriv::loginTo(QString name, QString pwd)

@@ -1922,7 +1922,7 @@ void CheckSvcWorker::doWork()
                 static_cast<DynamicCheckResultVm*>(m_checkResultVm)->getResultData()->setPupilDiameter(pupilDiameter);
             }
             m_checkResultVm->insert();
-            m_patientVm->update();
+//            m_patientVm->update();                            //好像没用啊,没什么会报错？
             qDebug()<<("finished");
             emit checkProcessFinished();
             setCheckState(6);
