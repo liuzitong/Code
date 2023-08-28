@@ -1753,6 +1753,7 @@ void DynamicCheck::lightsOn()
 void CheckSvcWorker::initialize()
 {
     std::cout<<("initialize")<<std::endl;
+    m_check->m_patientModel=m_patientVm->getModel();
     int type=m_programVm->getType();
 //    auto deviceOperation=m_check->m_deviceOperation.data();
     if(type!=2)
@@ -1771,6 +1772,7 @@ void CheckSvcWorker::initialize()
 
 //
 //    m_check->m_deviceOperation->setPupilDiameter(-1.0);
+    m_check->initialize();
     m_deviationCount=0;
     m_deviceOperation->clearPupilData();
     m_deviceOperation->lightUpCastLight();
@@ -1783,7 +1785,7 @@ void CheckSvcWorker::prepareToCheck()
     {
         m_check.reset(new StaticCheck());
         m_check->m_checkState=m_checkState;
-        m_check->m_patientModel=m_patientVm->getModel();
+//        m_check->m_patientModel=m_patientVm->getModel();
         ((StaticCheck*)m_check.data())->m_programModel=static_cast<StaticProgramVm*>(m_programVm)->getModel();
         connect(((StaticCheck*)m_check.data()),&StaticCheck::currentCheckingDotChanged,this,&CheckSvcWorker::currentCheckingDotChanged);
         connect(((StaticCheck*)m_check.data()),&StaticCheck::nextCheckingDotChanged,this,&CheckSvcWorker::nextCheckingDotChanged);
@@ -1808,7 +1810,7 @@ void CheckSvcWorker::prepareToCheck()
     {
         m_check.reset(new DynamicCheck());
         m_check->m_checkState=m_checkState;
-        m_check->m_patientModel=m_patientVm->getModel();
+//        m_check->m_patientModel=m_patientVm->getModel();
         ((DynamicCheck*)m_check.data())->m_programModel=static_cast<DynamicProgramVm*>(m_programVm)->getModel();
         auto cursorSize=((DynamicCheck*)m_check.data())->m_programModel->m_params.cursorSize;
         auto cursorColor=((DynamicCheck*)m_check.data())->m_programModel->m_params.cursorColor;
@@ -1825,7 +1827,6 @@ void CheckSvcWorker::prepareToCheck()
     });
 //    qDebug()<<m_eyeMoveAlarm;
 //    m_check->m_eyeMoveAlarm=m_eyeMoveAlarm;
-    m_check->initialize();
     UtilitySvc::wait(500);    //等几秒启动
     emit readyToCheck(true);
 }
@@ -2046,6 +2047,8 @@ void CheckSvc::start()
 //    {
 //        qDebug()<<QString::number(m_checkResultVm->getPatient_id());
 //    }
+//    m_patientVm->update();
+    m_worker->m_patientVm=m_patientVm;
     m_worker->m_checkResultVm=m_checkResultVm;
     if(m_programVm->getType()==2) m_worker->m_dynamicSelectedDots=m_dynamicSelectedDots;
     setCheckState(0);
@@ -2100,7 +2103,6 @@ void CheckSvc::disconnectDev()
 void CheckSvc::prepareToCheck()
 {
     std::cout<<("prepareToCheck")<<std::endl;
-    m_worker->m_patientVm=m_patientVm;
     m_worker->m_programVm=m_programVm;
     QMetaObject::invokeMethod(m_worker,"prepareToCheck",Qt::QueuedConnection);
 //    if(m_programVm->getType()!=2)

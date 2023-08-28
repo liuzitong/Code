@@ -65,14 +65,13 @@ Item {id:root; width: 1366;height: 691
         staticParamsSetting.currentProgramChanged();
         IcUiQmlApi.appCtrl.checkSvc.readyToCheck=false;
         IcUiQmlApi.appCtrl.checkSvc.program=currentProgram;
-        IcUiQmlApi.appCtrl.checkSvc.patient=currentPatient;
         if(currentProgram!==null)
         {
             console.log(currentProgram.id);
             IcUiQmlApi.appCtrl.checkSvc.prepareToCheck();
         }
-
     }
+    onCurrentPatientChanged: {IcUiQmlApi.appCtrl.checkSvc.patient=currentPatient;}
 
     onRefresh: {
         if (currentProgram==null)
@@ -493,8 +492,7 @@ Item {id:root; width: 1366;height: 691
                                         currentCheckResult.OS_OD=os_od.value;
                                         currentCheckResult.type=currentProgram.type;
                                         currentCheckResult.params=currentProgram.params;
-
-
+                                        IcUiQmlApi.appCtrl.checkSvc.patient.update();
                                         IcUiQmlApi.appCtrl.checkSvc.checkResult=currentCheckResult;
                                         IcUiQmlApi.appCtrl.checkSvc.start();
 
