@@ -47,6 +47,8 @@ public:
    //! check if it is empty
    bool     isEmpty( ) const;
 
+   void setData(const QByteArray &);
+
 //   //! to json object
 //   QJsonObject  toJsonObject( ) const;
     quint32& crcVeryficationRef();
