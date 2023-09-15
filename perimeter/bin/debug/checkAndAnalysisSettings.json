@@ -1,5 +1,6 @@
 {
     "debugMode":true,
+    "showCheckingDot":true,
     "checkCountBeforeGetBlindDotCheck":3,
     "blindDotTestDB":10,
     "blindDotTestIncDB":5,

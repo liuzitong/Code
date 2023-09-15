@@ -62,10 +62,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L$$PWD/../../../deviceOperation/bin/release
     LIBS += -L$$PWD/../../../perimeter/third-part/LimeReport/build/5.9.7/win64/release/lib
     LIBS += -l"QxOrm" -l"limereport" -l"QtZint" -l"deviceOperation"
-#    CONFIG -= qml_debug
-    CONFIG += console
     DEFINES+=QT_QML_DEBUG_NO_WARNING
-#    CONFIG -= qml_debug console
     LIBS += -l"libboost_serialization-vc140-mt-x64-1_78"
     DESTDIR=$$PWD/../../bin/release
 }

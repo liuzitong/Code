@@ -312,11 +312,8 @@ void StaticAnalysisVm::showReport(int report)
     {
         filePath="./reports/Screening.lrxml";
     }
-//    auto reportEngine = QSharedPointer<LimeReport::ReportEngine>(new LimeReport::ReportEngine());
     if(UtilitySvc::reportEngine==nullptr) UtilitySvc::reportEngine=new  LimeReport::ReportEngine();         //耗时长
-//    std::cout<<"time cost:"<<timer.elapsed()<<std::endl;
     UtilitySvc::reportEngine->loadFromFile(filePath);                                                      //耗时长
-//    std::cout<<"time cost:"<<timer.elapsed()<<std::endl;
     if(!TranslateController::isRuntimeLangEng())  UtilitySvc::reportEngine->setReportLanguage(QLocale::Chinese);
     auto manager=UtilitySvc::reportEngine->dataManager();
     manager->clearUserVariables();
@@ -420,9 +417,7 @@ void StaticAnalysisVm::showReport(int report)
     manager->setReportVariable("version", tr("Version")+QString(":")+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("version").toString());
 
     UtilitySvc::reportEngine->setPreviewScaleType(LimeReport::ScaleType::Percents,50);
-//    std::cout<<"time cost:"<<timer.elapsed()<<std::endl;
     UtilitySvc::reportEngine->previewReport(/*LimeReport::PreviewHint::ShowAllPreviewBars*/);   //耗时非常长
-//    std::cout<<"time cost:"<<timer.elapsed()<<std::endl;
 }
 
 QObject *StaticAnalysisVm::getResult()

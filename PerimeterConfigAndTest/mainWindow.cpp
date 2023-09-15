@@ -503,6 +503,13 @@ void MainWindow::refreshVideo()
 //    auto pixData=(quint8*)(m_frameData.rawData().data());
     auto pixData=reinterpret_cast<quint8*>(m_frameData.rawData().data());
     QImage image=QImage(pixData,size.width(),size.height(),QImage::Format::Format_Grayscale8);
+    image=image.convertToFormat(QImage::Format_RGBA8888);
+    QPainter painter(&image);
+    painter.setPen(QPen{Qt::red,1});
+    painter.drawLine(QPoint{0,size.height()/2},QPoint{size.width(),size.height()/2});
+    painter.drawLine(QPoint{size.width()/2,0},QPoint{size.width()/2,size.height()});
+
+
 
 //    QImage image=QImage(pixData,size.width(),size.height(),QImage::Format::Format_Grayscale8);
 //    if(m_videoCount>0)
@@ -1057,7 +1064,7 @@ void MainWindow::on_action_saveLocalData_triggered()
 
 void MainWindow::on_action_saveConfig_triggered()
 {
-    QString filePath = QFileDialog::getSaveFileName(this,"打开文件",QDir::currentPath()+R"(/data/)",tr("(*.dat)"));
+    QString filePath = QFileDialog::getSaveFileName(this,"打开文件",QDir::currentPath()+R"(/data/)",tr("(*.cfg)"));
     QFile file(filePath);
     if(file.open(QIODevice::WriteOnly))
     {
@@ -1069,7 +1076,7 @@ void MainWindow::on_action_saveConfig_triggered()
 
 void MainWindow::on_action_readConfigFromLocal_triggered()
 {
-    QString filePath=QFileDialog::getOpenFileName(this,"打开文件",QDir::currentPath()+R"(/data/)",tr("(*.dat)"));
+    QString filePath=QFileDialog::getOpenFileName(this,"打开文件",QDir::currentPath()+R"(/data/)",tr("(*.cfg)"));
     readLocalConfig(filePath);
 }
 

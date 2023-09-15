@@ -246,7 +246,6 @@ public:
     void setCheckState(int value)
     {
         *m_checkState=value;
-        std::cout<<"checkState:"<<*m_checkState<<std::endl;
         emit checkStateChanged();
     }
     void stopDynamic();
@@ -643,7 +642,9 @@ void StaticCheck::stimulate()
         m_deviceOperation->waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y,UsbDev::DevCtl::MotorId_Shutter});
         m_deviceOperation->openShutter(durationTime);
         emit currentCheckingDotChanged(debug_Loc);
+#ifdef _DEBUG
         std::cout<<"***** DB shi:"<<debug_DB<<"    "<<"zuo biao x:"<<debug_Loc.x()<<" "<<"zuobiao y:"<<debug_Loc.y()<<"    yong shi:"<<m_stimulationWaitingForAnswerElapsedTimer.elapsed()<<"   deviation:"<<m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation<<std::endl;
+#endif
 //        qDebug()<<m_resultModel->m_data.fixationDeviation;
         switch (lastCheckedDotType)
         {
@@ -675,7 +676,9 @@ void StaticCheck::stimulate()
         if(m_measurePupilDeviation)
             m_resultModel->m_data.fixationDeviation.push_back(-m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation);
         emit currentCheckingDotChanged({999,999});
+#ifdef _DEBUG
         std::cout<<"***** jiayang"<<"zuo biao x:"<<debug_Loc.x()<<" "<<"zuobiao y:"<<debug_Loc.y()<<"    yong shi:"<<m_stimulationWaitingForAnswerElapsedTimer.elapsed()<<std::endl;
+#endif
     }
 
     m_deviceOperation->m_isWaitingForStaticStimulationAnswer=true;
@@ -798,8 +801,9 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
                 int index=qMin(m_blindDotLocateIndex,UtilitySvc::getSingleton()->m_right_blindDot.size()-1);
                 blindDotLoc=UtilitySvc::getSingleton()->m_right_blindDot[index];
             }
-
+#ifdef _DEBUG
             std::cout<<"locating blindDot"<<blindDotLoc.x()<<","<<blindDotLoc.y()<<std::endl;
+#endif
             m_lastCheckeDotType.push_back(LastCheckedDotType::locateBlindDot);
             m_blindDotLocateIndex++;
             return {true,blindDotLoc,UtilitySvc::getSingleton()->m_blindDotTestDB};
@@ -811,7 +815,9 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
         {
             auto blindDB=UtilitySvc::getSingleton()->m_blindDotTestDB+UtilitySvc::getSingleton()->m_blindDotTestIncDB;
             m_checkCycleDotList.append({LastCheckedDotType::blindDotTest,m_blindDot[0],blindDB});
+#ifdef _DEBUG
             std::cout<<"check blind dot:"<<m_blindDot[0].x()<<","<<m_blindDot[0].y()<<std::endl;
+#endif
         }
     }
 
@@ -849,8 +855,6 @@ std::tuple<bool, QPointF, int> StaticCheck::getCheckCycleLocAndDB()
                 }
 
                 auto recordDot=highestDBRecords[qrand()%highestDBRecords.size()];
-//                std::cout<<"false Neg:"<<recordDot.DB<<std::endl;
-//                std::cout<<UtilitySvc::getSingleton()->m_falseNegativeDecDB<<std::endl;;
                 m_checkCycleDotList.append({LastCheckedDotType::falseNegativeTest,recordDot.loc,recordDot.DB-UtilitySvc::getSingleton()->m_falseNegativeDecDB});
             }
             else
@@ -958,7 +962,9 @@ void StaticCheck::ProcessAnswer(bool answered)
                 m_lastCheckDotRecord.pop_back();
                 m_lastCheckeDotType.pop_back();
             }
+#ifdef _DEBUG
             std::cout<<"blinddot located:"<<m_blindDot[0].x()<<","<<m_blindDot[0].y()<<std::endl;
+#endif
         }
         break;
     }
@@ -1282,7 +1288,9 @@ void StaticCheck::checkWaiting()
         QApplication::processEvents();
         if(timer.elapsed()>300)
         {
+#ifdef _QDEBUG
             std::cout<<"pausing";
+#endif
             isPaused=true;
             timer.restart();
         }
@@ -1449,8 +1457,6 @@ void DynamicCheck::resetData()
         break;
     }
     }
-
-//    m_deviceOperation->m_isChecking=true;
 }
 
 void DynamicCheck::Checkprocess()
@@ -1705,7 +1711,9 @@ void DynamicCheck::checkWaiting()
         QApplication::processEvents();
         if(timer.elapsed()>300)
         {
+#ifdef _DEBUG
             std::cout<<"pausing";
+#endif
             isPaused=true;
             timer.restart();
         }
@@ -1734,25 +1742,9 @@ void DynamicCheck::lightsOn()
         m_deviceOperation->setLamp(DevOps::LampId::LampId_yellowBackground,0,true);
 }
 
-//DeviationCheckWorker::DeviationCheckWorker()
-//{
-
-//}
-
-//void DeviationCheckWorker::startChecking()
-//{
-
-//}
-
-//void DeviationCheckWorker::stopChecking()
-//{
-
-//}
-
 
 void CheckSvcWorker::initialize()
 {
-    std::cout<<("initialize")<<std::endl;
     m_check->m_patientModel=m_patientVm->getModel();
     int type=m_programVm->getType();
 //    auto deviceOperation=m_check->m_deviceOperation.data();
@@ -2102,7 +2094,9 @@ void CheckSvc::disconnectDev()
 
 void CheckSvc::prepareToCheck()
 {
+#ifdef _DEBUG
     std::cout<<("prepareToCheck")<<std::endl;
+#endif
     m_worker->m_programVm=m_programVm;
     QMetaObject::invokeMethod(m_worker,"prepareToCheck",Qt::QueuedConnection);
 //    if(m_programVm->getType()!=2)
@@ -2225,6 +2219,11 @@ bool CheckSvc::getEnvLightAlarm()
 bool CheckSvc::getDebugMode()
 {
     return UtilitySvc::getSingleton()->m_debugMode;
+}
+
+bool CheckSvc::getShowCheckingDot()
+{
+    return UtilitySvc::getSingleton()->m_showCheckingDot;
 }
 
 

@@ -12,7 +12,9 @@ import perm.view 1.0
 
 Window {
     id: window;visible: true;width: 1366;height: 768;title: lt+qsTr("Perimeter");
-    minimumWidth: 1366;minimumHeight: 768;
+//    minimumWidth: 1366;minimumHeight: 768;
+    visibility:"Maximized"          //最大化
+    flags: Qt.Window | Qt.FramelessWindowHint           //不能隐藏任务栏 不知道为什么
 
     DeviceStatus{anchors.fill:parent;visible:IcUiQmlApi.appCtrl.showDeviceStatusData;z:10;}
     Content{id:content;anchors.fill: parent;visible: false;onLogin:{visible=false;permMgrView.visible=true;}}

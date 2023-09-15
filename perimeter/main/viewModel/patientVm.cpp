@@ -130,8 +130,6 @@ QObject *PatientVm::getLastCheckResult()
             return new DynamicCheckResultVm(checkResult_ptr);
         }
     }
-//    std::cout<<timer.elapsed()<<std::endl;
-
 }
 
 

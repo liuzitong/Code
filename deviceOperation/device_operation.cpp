@@ -23,9 +23,6 @@ QSharedPointer<DeviceOperation> DeviceOperation::m_singleton=/*QSharedPointer<De
 
 DeviceOperation::DeviceOperation()
 {
-    std::cout<<"**************************************************"<<std::endl;
-    std::cout<<"*********create deviationSingleTon****************"<<std::endl;
-    std::cout<<"**************************************************"<<std::endl;
     connect(&m_reconnectTimer,&QTimer::timeout,this,&DeviceOperation::reconnectDev);
     connect(this,&DeviceOperation::updateDevInfo,[](QString str){qDebug()<<str;});
 //    m_workStatusElapsedTimer.start();
@@ -39,10 +36,7 @@ DeviceOperation::DeviceOperation()
 
 DeviceOperation::~DeviceOperation()
 {
-//    m_connectTimer.stop();
-    std::cout<<"**************************************************"<<std::endl;
-    std::cout<<"*********delete deviationSingleTon****************"<<std::endl;
-    std::cout<<"**************************************************"<<std::endl;
+
 }
 
 //被checkSvcWorker 调用
@@ -100,7 +94,9 @@ void DeviceOperation::setCursorColorAndCursorSize(int color, int spot)
 {
     if(m_deviceStatus!=2) return;
     if(m_status.color==color&&m_status.spot==spot) return;             //变换到改变光斑颜色位置
+#ifdef _DEBUG
     std::cout<<"setCursorColorAndCursorSize"<<std::endl;
+#endif
     auto profile=m_profile;
     auto config=m_config;
     quint8 sps[5]={1,1,1,1,1};
@@ -288,7 +284,9 @@ void DeviceOperation::setDB(int DB)
 
 void DeviceOperation::moveToAdjustLight(int motorPosX,int motorPosY,int motorPosFocal)
 {
+#ifdef _DEBUG
     std::cout<<"move to adjustlight"<<std::endl;
+#endif
     int motorPos[5];
     motorPos[0]=motorPosX;
     motorPos[1]=motorPosY;
@@ -344,7 +342,9 @@ void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB,bool
 
 void DeviceOperation::adjustCastLight()
 {
+#ifdef _DEBUG
     std::cout<<"adjustCastLightStart"<<std::endl;
+#endif
     int color=DeviceSettings::getSingleton()->m_castLightTargetColor;
     int size=DeviceSettings::getSingleton()->m_castLightTargetSize;
     setCursorColorAndCursorSize(color,size);
@@ -478,7 +478,9 @@ void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSiz
 void DeviceOperation::stopDynamic()
 {
     if(m_deviceStatus!=2) return;
+#ifdef _DEBUG
     std::cout<<"stop Dynamic"<<std::endl;
+#endif
     m_devCtl->stopDyanmic();
 }
 
@@ -578,7 +580,9 @@ void DeviceOperation::lightUpCastLight()
     if(m_deviceStatus==2&&!m_castLightUp)
     {
         m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA);
+#ifdef _DEBUG
         std::cout<<"cast light Up:"<<m_currentCastLightDA<<std::endl;
+#endif
         m_castLightUp=true;
     }
 }
@@ -588,7 +592,9 @@ void DeviceOperation::dimDownCastLight()
     if(m_deviceStatus==2&&m_castLightUp)
     {
         m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA*0.3);
+#ifdef _DEBUG
         std::cout<<"cast light Down"<<m_currentCastLightDA*0.3<<std::endl;
+#endif
         m_castLightUp=false;
     }
 }
@@ -676,9 +682,11 @@ void DeviceOperation::workOnNewStatuData()
         {
             setLamp(LampId::LampId_centerInfrared,0,true);
             setLamp(LampId::LampId_eyeglassInfrared,0,eyeglassStatus);
-            std::cout<<"open eyeglassInfrared infrared:"<<eyeglassStatus<<std::endl;
             setLamp(LampId::LampId_borderInfrared,0,!eyeglassStatus);
+#ifdef _DEBUG
+            std::cout<<"open eyeglassInfrared infrared:"<<eyeglassStatus<<std::endl;
             std::cout<<"open borderInfrared infrared:"<<!eyeglassStatus<<std::endl;
+#endif
             m_eyeglassIntialize=true;
             m_eyeglassStatus=eyeglassStatus;
 
@@ -687,9 +695,11 @@ void DeviceOperation::workOnNewStatuData()
         {
             m_eyeglassStatus=eyeglassStatus;
             setLamp(LampId::LampId_eyeglassInfrared,0,eyeglassStatus);
-            std::cout<<"open eyeglassInfrared infrared:"<<eyeglassStatus<<std::endl;
             setLamp(LampId::LampId_borderInfrared,0,!eyeglassStatus);
+#ifdef _DEBUG
+            std::cout<<"open eyeglassInfrared infrared:"<<eyeglassStatus<<std::endl;
             std::cout<<"open borderInfrared infrared:"<<!eyeglassStatus<<std::endl;
+#endif
         }
 
 

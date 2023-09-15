@@ -22,6 +22,7 @@ Item{
     property int dynamicCircleRadius: 0;
     property int lastStrategy;
     property string tip;
+    property bool showCheckingDot: IcUiQmlApi.appCtrl.checkSvc.showCheckingDot;
     signal clearResult();
     onTipChanged:{console.log(tip);}
 
@@ -751,11 +752,13 @@ Item{
                                 drawDB(dBList[i],{x:0,y:0});
                         }
                     }
-                    if(nextCheckingDotLoc.x!==999)
-                        drawBigDot(nextCheckingDotLoc,"blue");
-                    if(currentCheckingDotLoc.x!==999)
-                        drawDot(currentCheckingDotLoc,"red");
-
+                    if(showCheckingDot)
+                    {
+                        if(nextCheckingDotLoc.x!==999)
+                            drawBigDot(nextCheckingDotLoc,"blue");
+                        if(currentCheckingDotLoc.x!==999)
+                            drawDot(currentCheckingDotLoc,"red");
+                    }
                 }
                 else if(currentProgram.type===1)                                // 筛选
                 {

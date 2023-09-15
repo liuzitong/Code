@@ -64,14 +64,14 @@ void GL_Image::paintGL()
 
     if(!initTextureFlag){
         // 首次显示纹理
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, imageSize_.width(), imageSize_.height(), 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, imageData_);
-//        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageSize_.width(), imageSize_.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData_);
+//        glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, imageSize_.width(), imageSize_.height(), 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, imageData_);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageSize_.width(), imageSize_.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData_);
         initTextureFlag = true;
     }
     else{
         // 动态修改纹理数据
-        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, imageSize_.width(), imageSize_.height(), GL_LUMINANCE, GL_UNSIGNED_BYTE, imageData_);
-        //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageSize_.width(), imageSize_.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData_);
+//        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, imageSize_.width(), imageSize_.height(), GL_LUMINANCE, GL_UNSIGNED_BYTE, imageData_);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageSize_.width(), imageSize_.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData_);
     }
 
     glEnable(GL_TEXTURE_2D);

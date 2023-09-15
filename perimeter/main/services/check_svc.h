@@ -35,6 +35,7 @@ class CheckSvc: public QObject
     Q_PROPERTY(bool eyeMoveAlarm READ getEyeMoveAlarm WRITE setEyeMoveAlarm NOTIFY eyeMoveAlarmChanged)
     Q_PROPERTY(bool envLightAlarm READ getEnvLightAlarm NOTIFY envLightAlarmChanged)
     Q_PROPERTY(bool debugMode READ getDebugMode)
+    Q_PROPERTY(bool showCheckingDot READ getShowCheckingDot)
 
 
 
@@ -86,6 +87,7 @@ public:
     bool getEyeMoveAlarm();void setEyeMoveAlarm(bool value);Q_SIGNAL void eyeMoveAlarmChanged(bool value);
     bool getEnvLightAlarm();Q_SIGNAL void envLightAlarmChanged();
     bool getDebugMode();
+    bool getShowCheckingDot();
 //    CheckSvcWorker* getWorker(){return m_worker;}
 
 private:

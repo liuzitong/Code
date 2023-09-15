@@ -112,6 +112,7 @@ UtilitySvc::UtilitySvc()
         m_checkZoneRatio=jo["checkZoneRatio"].toDouble();
         m_centerPointCheckedWaitingTime=jo["centerPointCheckedWaitingTime"].toInt();
         m_debugMode=jo["debugMode"].toBool();
+        m_showCheckingDot=jo["showCheckingDot"].toBool();
 
         QStringList strs=jo["realTimeEyePosPicSize"].toString().split("*");
         if(strs.size()==2)

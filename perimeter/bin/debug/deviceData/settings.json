@@ -33,7 +33,7 @@
             "Slot": 4
         }
     ],
-    "localConfigPath": "./deviceData/config.dat",
+    "localConfigPath": "./deviceData/config.cfg",
     "localDataPath": "./deviceData/data.dat",
     "motorSpeed": [
         5,
