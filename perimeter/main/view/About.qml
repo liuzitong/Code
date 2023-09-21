@@ -91,6 +91,13 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
 
                             CusText{
                                 height:parent.height*0.04;width: parent.width;
+                                text: lt+qsTr("Device ID")+": " +IcUiQmlApi.appCtrl.checkSvc.deviceID;horizontalAlignment: Text.AlignLeft;
+                                font.pointSize:fontPointSize;
+                            }
+                            Item{height:parent.height*0.06;width: parent.width; }
+
+                            CusText{
+                                height:parent.height*0.04;width: parent.width;
                                 text: lt+qsTr("Version")+": "+IcUiQmlApi.appCtrl.settings.version;
                                 horizontalAlignment: Text.AlignLeft;
                                 font.pointSize:fontPointSize;

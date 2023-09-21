@@ -27,8 +27,8 @@ static void gRegInQt ( )
 #define T_PrivPtr( o )  usbdev_objcast( ConfigPriv*, o )
 class USBDEV_HIDDEN ConfigPriv : public PImplPrivTemp<ConfigPriv > {
 private:
-    quint32                             m_crc_veryfication,
-                                        m_device_ID;
+    quint32                             m_crc_veryfication;
+    char                                m_device_ID[32];
     qint16                              m_center_fixation_lamp_DA,
                                         m_big_diamond_fixation_lamp_DA[4],
                                         m_small_diamond_fixation_lamp_DA[4],
@@ -65,7 +65,7 @@ public :
     ConfigPriv ( const ConfigPriv & );
     virtual ~ConfigPriv( ) Q_DECL_OVERRIDE;
     inline auto crcVeryficationRef( )                               -> quint32&     {return m_crc_veryfication;}
-    inline auto deviceIDRef( )                                      -> quint32&     {return m_device_ID;}
+    inline auto deviceIDRef( )                                      -> char*      {return m_device_ID;}
     inline auto centerFixationLampDARef()                           -> qint16&     {return m_center_fixation_lamp_DA;}
     inline auto bigDiamondfixationLampDAPtr()                       -> qint16*     {return m_big_diamond_fixation_lamp_DA;}
     inline auto smallDiamondFixationLampDAPtr()                     -> qint16*     {return m_small_diamond_fixation_lamp_DA;}
@@ -106,7 +106,7 @@ ConfigPriv :: ~ConfigPriv ( ) { }
 ConfigPriv :: ConfigPriv ( )
 {
     m_crc_veryfication                                            = 0xffffffff;
-    m_device_ID                                                   = 0xffffffff;
+    memset(m_device_ID,0,sizeof (m_device_ID));
     m_center_fixation_lamp_DA                                     = 0;
     memset(m_big_diamond_fixation_lamp_DA,0,sizeof (m_big_diamond_fixation_lamp_DA));
     memset(m_small_diamond_fixation_lamp_DA,0,sizeof (m_small_diamond_fixation_lamp_DA));
@@ -146,7 +146,7 @@ ConfigPriv :: ConfigPriv ( )
 ConfigPriv :: ConfigPriv ( const ConfigPriv &o )
 {
     m_crc_veryfication                                            =o.m_crc_veryfication                      ;
-    m_device_ID                                                   =o.m_device_ID                             ;
+    memcpy(m_device_ID,o.m_device_ID,sizeof (m_device_ID));
     m_center_fixation_lamp_DA                                     =o.m_center_fixation_lamp_DA               ;
     memcpy(m_big_diamond_fixation_lamp_DA,o.m_big_diamond_fixation_lamp_DA,sizeof (m_big_diamond_fixation_lamp_DA));
     memcpy(m_small_diamond_fixation_lamp_DA,o.m_small_diamond_fixation_lamp_DA,sizeof (m_small_diamond_fixation_lamp_DA));
@@ -281,7 +281,7 @@ void Config::setData(const QByteArray &ba)
 quint32&       Config :: crcVeryficationRef()
 { return T_PrivPtr( m_obj )->crcVeryficationRef(); }
 
-quint32&       Config :: deviceIDRef()
+char*       Config :: deviceIDRef()
 { return T_PrivPtr( m_obj )->deviceIDRef(); }
 
 qint16&       Config :: centerFixationLampDARef()
@@ -386,7 +386,7 @@ void *Config::dataPtr()
 
 int Config::dataLen()
 {
-    return 552;
+    return 580;
 }
 
 //void* Config::GetData()

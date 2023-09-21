@@ -52,7 +52,7 @@ public:
 //   //! to json object
 //   QJsonObject  toJsonObject( ) const;
     quint32& crcVeryficationRef();
-    quint32& deviceIDRef();
+    char* deviceIDRef();
     qint16& centerFixationLampDARef();
     qint16* bigDiamondfixationLampDAPtr();
     qint16* smallDiamondFixationLampDAPtr();

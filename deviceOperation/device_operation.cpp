@@ -27,10 +27,12 @@ DeviceOperation::DeviceOperation()
     connect(this,&DeviceOperation::updateDevInfo,[](QString str){qDebug()<<str;});
 //    m_workStatusElapsedTimer.start();
     m_autoPupilElapsedTimer.start();
-    m_reconnectingElapsedTimer.start();
+//    m_reconnectingElapsedTimer.start();
     m_reconnectTimer.setInterval(10000);                            //复位的时候会短暂收不到数据更新，时间不能太短
     m_waitingTime=DeviceSettings::getSingleton()->m_waitingTime;
     m_config=DeviceData::getSingleton()->m_config;
+//    qDebug()<<m_config.deviceIDRef();
+//    m_reconnectTimer.start();
 }
 
 
@@ -45,7 +47,7 @@ void DeviceOperation::connectDev()
     if(m_devCtl==nullptr)
     {
         updateDevInfo("connecting.");
-//        m_reconnectTimer.start();
+        m_reconnectTimer.start();
         auto deviceSettings=DeviceSettings::getSingleton();
         quint32 vid_pid=deviceSettings->m_VID.toInt(nullptr,16)<<16|deviceSettings->m_PID.toInt(nullptr,16);
         m_devCtl.reset(UsbDev::DevCtl::createInstance(vid_pid));
@@ -63,8 +65,8 @@ void DeviceOperation::disconnectDev()
 
 void DeviceOperation::reconnectDev()
 {
-    if(m_reconnectingElapsedTimer.elapsed()<=10000) return;
-    m_reconnectingElapsedTimer.restart();
+//    if(m_reconnectingElapsedTimer.elapsed()<=10000) return;
+//    m_reconnectingElapsedTimer.restart();
     m_eyeglassIntialize=false;
     qDebug()<<"reconnecting";
     m_devCtl.reset(nullptr);
@@ -129,16 +131,17 @@ void DeviceOperation::setCursorColorAndCursorSize(int color, int spot)
     int  spot_Circl_Motor_Steps=profile.motorRange(UsbDev::DevCtl::MotorId_Light_Spot).second-profile.motorRange(UsbDev::DevCtl::MotorId_Light_Spot).first;
     {
         int focalPos=config.focusPosForSpotAndColorChangeRef();
-        int motorPos[5]{0,0,focalPos,color_Circl_Motor_Steps*10,spot_Circl_Motor_Steps*10};
+//        int motorPos[5]{0,0,focalPos,color_Circl_Motor_Steps*10,spot_Circl_Motor_Steps*10};
+        int motorPos[5]{0,0,focalPos,0,0};
         waitForSomeTime(m_waitingTime);
-        waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
+        waitMotorStop({UsbDev::DevCtl::MotorId_Focus});
          //移动焦距电机电机到联动位置,一边转动颜色和光斑
         m_devCtl->move5Motors(std::array<quint8, 5>{0,0,sps[2],0,0}.data(),motorPos);
 //        m_devCtl->move5Motors(std::array<quint8, 5>{0,0,0,1,1}.data(),motorPos,UsbDev::DevCtl::MoveMethod::Relative);                 //取消转动颜色和光斑
         //焦距电机停止就停止,颜色和光斑
         waitForSomeTime(m_waitingTime);
-        waitMotorStop({UsbDev::DevCtl::MotorId_Focus});
-        m_devCtl->move5Motors(std::array<quint8, 5>{1,1,1,1,1}.data(),std::array<int, 5>{0,0,0,0,0}.data(),UsbDev::DevCtl::MoveMethod::Relative);
+//        waitMotorStop({UsbDev::DevCtl::MotorId_Focus});
+//        m_devCtl->move5Motors(std::array<quint8, 5>{1,1,1,1,1}.data(),std::array<int, 5>{0,0,0,0,0}.data(),UsbDev::DevCtl::MoveMethod::Relative);
     }
     {
         //移动光斑和颜色电机到目标位置
@@ -875,6 +878,7 @@ void DeviceOperation::workOnNewConfig()
     if(!DeviceSettings::getSingleton()->m_useLocalConfig) m_config=m_devCtl->config();
     m_devicePupilProcessor.m_pupilGreyLimit=m_config.pupilGreyThresholdDAPtr()[0];
     m_devicePupilProcessor.m_pupilReflectionDotWhiteLimit=m_config.pupilGreyThresholdDAPtr()[1];
+    emit newDeviceID(QString(m_config.deviceIDRef()));
     qDebug()<<m_devicePupilProcessor.m_pupilGreyLimit;
     qDebug()<<m_devicePupilProcessor.m_pupilReflectionDotWhiteLimit;
     qDebug()<<m_config.castLightADPresetRef();

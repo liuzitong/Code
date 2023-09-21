@@ -298,7 +298,7 @@ void MainWindow::initConfigUI()
 void MainWindow::refreshConfigUI()
 {
     ui->spinBox_shutterOpenPos->setValue(m_config.shutterOpenPosRef());
-    ui->lineEdit_deviceSerialNo->setText(QString::number(m_config.deviceIDRef()));
+    ui->lineEdit_deviceSerialNo->setText(QString(m_config.deviceIDRef()));
     ui->lineEdit_centralLightDA->setText(QString::number(m_config.centerFixationLampDARef()));
     ui->lineEdit_bigDiamond1DA->setText(QString::number(m_config.bigDiamondfixationLampDAPtr()[0]));
     ui->lineEdit_bigDiamond2DA->setText(QString::number(m_config.bigDiamondfixationLampDAPtr()[1]));
@@ -338,11 +338,11 @@ void MainWindow::refreshConfigUI()
 void MainWindow::refreshConfigDataByUI()
 {
     bool ok;
-    m_config.deviceIDRef()=ui->lineEdit_deviceSerialNo->text().toInt(&ok);                              //if(!ok) return;
-    qDebug()<<m_config.centerFixationLampDARef();
-    qDebug()<<ui->lineEdit_centralLightDA->text();
+//    m_config.deviceIDRef()=ui->lineEdit_deviceSerialNo->text();                              //if(!ok) return;
+    memset(m_config.deviceIDRef(),0,32);
+    auto ID=ui->lineEdit_deviceSerialNo->text().trimmed().toStdString();
+    memcpy(m_config.deviceIDRef(),ID.data(),ID.length());
     m_config.centerFixationLampDARef()=ui->lineEdit_centralLightDA->text().toInt(&ok);                  //if(!ok) return;
-    qDebug()<<m_config.centerFixationLampDARef();
     m_config.bigDiamondfixationLampDAPtr()[0]=ui->lineEdit_bigDiamond1DA->text().toShort(&ok);            //if(!ok) return;
     m_config.bigDiamondfixationLampDAPtr()[1]=ui->lineEdit_bigDiamond2DA->text().toShort(&ok);            //if(!ok) return;
     m_config.bigDiamondfixationLampDAPtr()[2]=ui->lineEdit_bigDiamond3DA->text().toShort(&ok);            //if(!ok) return;
@@ -682,32 +682,35 @@ void MainWindow::on_pushButton_testStart_clicked()
 
                 {
                     int focalPos=m_config.focusPosForSpotAndColorChangeRef();
-                    int motorPos[5]{0,0,focalPos,m_statusData.motorPosition(MotorId::MotorId_Color)+color_Circl_Motor_Steps*10,m_statusData.motorPosition(MotorId::MotorId_Light_Spot)+spot_Circl_Motor_Steps*10};
-                    waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
-                    m_devCtl->move5Motors(std::array<quint8, 5>{0,0,sps[2],1,1}.data(),motorPos);
+                    int motorPos[5]{0,0,focalPos,0,0};
                     waitMotorStop({UsbDev::DevCtl::MotorId_Focus});
-                    m_devCtl->move5Motors(std::array<quint8, 5>{1,1,1,1,1}.data(),std::array<int, 5>{0,0,0,0,0}.data(),UsbDev::DevCtl::MoveMethod::Relative);//焦距到位立刻停止
+                    m_devCtl->move5Motors(std::array<quint8, 5>{0,0,sps[2],0,0}.data(),motorPos);
+//                    waitMotorStop({UsbDev::DevCtl::MotorId_Focus});
+//                    m_devCtl->move5Motors(std::array<quint8, 5>{1,1,1,1,1}.data(),std::array<int, 5>{0,0,0,0,0}.data(),UsbDev::DevCtl::MoveMethod::Relative);//焦距到位立刻停止
                 }
                 showDevInfo("调整颜色和光斑.");
+                waitForSomeTime(300);
                 {
                     int motorPos[5]{0,0,0,ui->spinBox_colorMotorPos_2->value(),ui->spinBox_spotMotorPos_2->value()}; //单个电机绝对位置不可行
                     quint8 speed[5]{0,0,0,sps[3],sps[4]};
                     waitMotorStop({UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Focus});
                     m_devCtl->move5Motors(speed,motorPos);
                 }
-
+                waitForSomeTime(300);
                 {
                     int  motorPos[5]{0,0,0,color_Circl_Motor_Steps,spot_Circl_Motor_Steps};
                     quint8 speed[5]{0,0,0,sps[3],sps[4]};
                     waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});          //转一圈拖动光斑和颜色
                     m_devCtl->move5Motors(speed,motorPos,UsbDev::DevCtl::Relative);
                 }
+                waitForSomeTime(300);
                 {
                     int motorPos[5]={0,0,0,-1000,-1000};
                     quint8 speed[5]{0,0,0,sps[3],sps[4]};
                     waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
                     m_devCtl->move5Motors(speed,motorPos,UsbDev::DevCtl::Relative);    //防止干扰误差
                 }
+                waitForSomeTime(300);
                 {
                     int motorPos[5]={0, 0, 10000, 0 ,0};
                     quint8 speed[5]{0,0,sps[2],0,0};

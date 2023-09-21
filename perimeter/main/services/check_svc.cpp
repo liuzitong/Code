@@ -2011,9 +2011,8 @@ CheckSvc::CheckSvc(QObject *parent)
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::castLightAdjustStatusChanged,this,&CheckSvc::castLightAdjustStatusChanged);
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::pupilDiameterChanged,this,&CheckSvc::pupilDiameterChanged);
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::envLightAlarmChanged,this,&CheckSvc::envLightAlarmChanged);
-    connect(this,&CheckSvc::envLightAlarmChanged,[&](){
-        qDebug()<<getEnvLightAlarm();
-    });
+    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::newDeviceID,this,&CheckSvc::setDeviceID);
+    connect(this,&CheckSvc::envLightAlarmChanged,[&](){qDebug()<<getEnvLightAlarm();});
 //    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::isDeviceReadyChanged,[&](){if(m_checkState<=2){m_checkState=3;}});
     connect(&m_castLightDimdownTimer,&QTimer::timeout,[&]()
     {

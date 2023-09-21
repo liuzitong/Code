@@ -146,6 +146,7 @@ signals:
     void newFrameData(QByteArray ba);
     void newProfile();
     void newConfig();
+    void newDeviceID(QString id);
     void updateDevInfo(QString info);
 
 public:
