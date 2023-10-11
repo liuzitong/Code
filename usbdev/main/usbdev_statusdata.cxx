@@ -63,8 +63,8 @@ private:
                             m_hoz_chin_motor,
                             m_vert_chin_motor;
     int                     m_sn_no,
-                            m_env_light_DA,
-                            m_cast_light_DA;
+                            m_env_light_sensor_DA,
+                            m_cast_light_sensor_DA;
     bool                    m_cache_normal_flag,
                             m_cache_move_flag,
                             m_answerpad_status,
@@ -82,8 +82,8 @@ public :
     inline auto  CameraStatusRef()              -> bool& { return m_camera_status; }
     inline auto  EyeglassStatusRef()            -> bool& { return m_eyeglass_status; }
     inline auto  AnswerPadStatusRef()           -> bool& { return m_answerpad_status; }
-    inline auto  envLightDARef()                -> int&  { return m_env_light_DA; }
-    inline auto  castLightDARef()               -> int&  { return m_cast_light_DA; }
+    inline auto  envLightSensorDARef()                -> int&  { return m_env_light_sensor_DA; }
+    inline auto  castLightSensorDARef()               -> int&  { return m_cast_light_sensor_DA; }
     inline auto  moveStatusRef()                -> bool& { return m_move_status;}
     inline auto  xMotorRef()                    -> StatusData_MotorItem& { return m_x_motor; }
     inline auto  yMotorRef()                    -> StatusData_MotorItem& { return m_y_motor; }
@@ -100,7 +100,7 @@ public :
 // ============================================================================
 StatusDataPriv :: StatusDataPriv ( )
 {
-    m_sn_no=m_env_light_DA=m_cast_light_DA = 0;
+    m_sn_no=m_env_light_sensor_DA=m_cast_light_sensor_DA = 0;
     m_cache_normal_flag=m_cache_move_flag=m_answerpad_status=m_camera_status=m_eyeglass_status=false;
 }
 
@@ -215,8 +215,8 @@ StatusData :: StatusData ( const QByteArray &ba )
     priv->shutterMotorRef().positionRef()=gReadData_Le_I32(&buff[44]);
     priv->hozChinMotorRef().positionRef()=gReadData_Le_I32(&buff[48]);
     priv->vertChinMotorRef().positionRef()=gReadData_Le_I32(&buff[52]);
-    priv->envLightDARef()=gReadData_Le_I32(&buff[56]);
-    priv->castLightDARef()=gReadData_Le_I32(&buff[60]);
+    priv->envLightSensorDARef()=gReadData_Le_I32(&buff[56]);
+    priv->castLightSensorDARef()=gReadData_Le_I32(&buff[60]);
 
     m_obj = d;
 }
@@ -301,11 +301,11 @@ bool StatusData::eyeglassStatus() const
 bool StatusData::moveStatus() const
 { return ( m_obj != nullptr ? T_PrivPtr( m_obj )->moveStatusRef() : false );}
 
-qint32     StatusData :: envLightDA() const
-{ return ( m_obj != nullptr ? T_PrivPtr( m_obj )->envLightDARef() : false ); }
+qint32     StatusData :: envLightSensorDA() const
+{ return ( m_obj != nullptr ? T_PrivPtr( m_obj )->envLightSensorDARef() : false ); }
 
-qint32     StatusData :: castLightDA() const
-{ return ( m_obj != nullptr ? T_PrivPtr( m_obj )->castLightDARef() : false ); }
+qint32     StatusData :: castLightSensorDA() const
+{ return ( m_obj != nullptr ? T_PrivPtr( m_obj )->castLightSensorDARef() : false ); }
 
 }
 

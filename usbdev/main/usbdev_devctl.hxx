@@ -27,8 +27,6 @@ class MoveCache;
 class USBDEV_API  DevCtl : public QObject {
     Q_OBJECT
 public:
-    static void hello(){qDebug()<<"hello from dev";}
-
 
     //! enumeric
     enum WorkStatus {

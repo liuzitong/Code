@@ -49,12 +49,11 @@ DeviceSettings::DeviceSettings()
     m_pixelDistFromPupilCenterToMiddleReflectionDot=m_rootObj.value("pixelDistFromPupilCenterToMiddleReflectionDot").toInt();
     m_pupilDiameterPixelToMillimeterConstant=m_rootObj.value("pupilDiameterPixelToMillimeterConstant").toDouble();
     m_pupilDeviationPixelToNumberConstant=m_rootObj.value("pupilDeviationPixelToNumberConstant").toDouble();
-    m_castLightDADifference=m_rootObj.value("castLightDADifference").toInt();
-    m_castLightTagetDA=m_rootObj.value("castLightTargetDA").toInt();
+    m_castLightDA=m_rootObj.value("castLightDA").toInt();
     m_castLightDAChangeStep=m_rootObj.value("castLightDAChangeStep").toInt();
     m_castLightTargetColor=m_rootObj.value("castLightTargetColor").toInt();
     m_castLightTargetSize=m_rootObj.value("castLightTargetSize").toInt();
-    m_castLightDAChanged=m_rootObj.value("castLightDAChanged").toInt();
+    m_castLightDADifferenceTolerance=m_rootObj.value("castLightDADifferenceTolerance").toInt();
     m_castLightLastAdjustedDate=m_rootObj.value("castLightLastAdjustedDate").toString();
     m_waitingTime=m_rootObj.value("waitingTime").toInt();
 
@@ -102,7 +101,7 @@ QSharedPointer<DeviceSettings> DeviceSettings::getSingleton()
 
 void DeviceSettings::saveSettings()
 {
-    m_rootObj["castLightDAChanged"]=m_castLightDAChanged;
+    m_rootObj["castLightDA"]=m_castLightDA;
     m_rootObj["castLightLastAdjustedDate"]=m_castLightLastAdjustedDate;
     QJsonDocument jsonDoc(m_rootObj);
     auto data=jsonDoc.toJson();

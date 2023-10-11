@@ -3,8 +3,8 @@
 #include "UsbViewer/UsbViewerQt.h"
 #include <QDebug>
 #include <QSettings>
-#include <spdlog/spdlog.h>
-#include <spdlog/sinks/rotating_file_sink.h>
+//#include <spdlog/spdlog.h>
+//#include <spdlog/sinks/rotating_file_sink.h>
 #include <usbdev/main/usbdev_statusdata.hxx>
 #include <QImage>
 #include <QPainter>
@@ -36,7 +36,7 @@
     obj->blockSignals(false);               \
 }                                           \
 
-static std::shared_ptr<spdlog::logger> logger=NULL;
+//static std::shared_ptr<spdlog::logger> logger=NULL;
 static QString buffToQStr(const char* buff,size_t length)
 {
     QString str;
@@ -57,7 +57,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    if(logger==NULL) logger = spdlog::rotating_logger_mt("logger", "logs/perimeterConfig.txt", 1024*1024, 30);
+//    if(logger==NULL) logger = spdlog::rotating_logger_mt("logger", "logs/perimeterConfig.txt", 1024*1024, 30);
 //    setWindowFlags(windowFlags()&~Qt::WindowMaximizeButtonHint);                    // 禁止最大化按钮
 //    setWindowFlag(Qt::WindowMaximizeButtonHint,false);
 //    m_width=width();m_height=height();
@@ -326,7 +326,10 @@ void MainWindow::refreshConfigUI()
     ui->lineEdit_secondaryCenterX->setText(QString::number(m_config.secondaryTableCenterXRef()));
     ui->lineEdit_secondaryCenterY->setText(QString::number(m_config.secondaryTableCenterYRef()));
     ui->lineEdit_focalMotorPosCorrection->setText(QString::number(m_config.focalMotorPosCorrectionRef()));
-    ui->lineEdit_castLightDA->setText(QString::number(m_config.castLightADPresetRef()));
+
+//    ui->lineEdit_castLight->setText(QString::number(m_config.castLightADPresetRef()));
+    ui->lineEdit_castLightCorrectionDB->setText(QString::number(m_config.DBForLightCorrectionRef()));
+    ui->lineEdit_castLightCorrenctionSensorDA->setText(QString::number(m_config.castLightSensorDAForLightCorrectionRef()));
     ui->lineEdit_lightCorrectionFocus->setText(QString::number(m_config.focalLengthMotorPosForLightCorrectionRef()));
     ui->lineEdit_lightCorrectionX->setText(QString::number(m_config.xMotorPosForLightCorrectionRef()));
     ui->lineEdit_lightCorrectionY->setText(QString::number(m_config.yMotorPosForLightCorrectionRef()));
@@ -369,7 +372,8 @@ void MainWindow::refreshConfigDataByUI()
     m_config.secondaryTableCenterXRef()=ui->lineEdit_secondaryCenterX->text().toInt(&ok);
     m_config.secondaryTableCenterYRef()=ui->lineEdit_secondaryCenterY->text().toInt(&ok);
     m_config.focalMotorPosCorrectionRef()=ui->lineEdit_focalMotorPosCorrection->text().toInt(&ok);
-    m_config.castLightADPresetRef()=ui->lineEdit_castLightDA->text().toInt(&ok);
+    m_config.DBForLightCorrectionRef()=ui->lineEdit_castLightCorrectionDB->text().toInt(&ok);
+    m_config.castLightSensorDAForLightCorrectionRef()=ui->lineEdit_castLightCorrenctionSensorDA->text().toInt(&ok);
     m_config.focalLengthMotorPosForLightCorrectionRef()=ui->lineEdit_lightCorrectionFocus->text().toInt(&ok);
     m_config.xMotorPosForLightCorrectionRef()=ui->lineEdit_lightCorrectionX->text().toInt(&ok);
     m_config.yMotorPosForLightCorrectionRef()=ui->lineEdit_lightCorrectionY->text().toInt(&ok);
@@ -422,7 +426,7 @@ MainWindow::~MainWindow()
 void MainWindow::refreshStatus()
 {
     using MotorId=UsbDev::DevCtl::MotorId;
-    spdlog::info("refreshStatus");
+//    spdlog::info("refreshStatus");
     m_statusData=m_devCtl->takeNextPendingStatusData();
 
     static bool firstStatus=true;
@@ -443,8 +447,8 @@ void MainWindow::refreshStatus()
     ui->label_stateChinHoz->setText(m_statusData.isMotorBusy(MotorId::MotorId_Chin_Hoz)?"忙":"闲");
     ui->label_stateChinVert->setText(m_statusData.isMotorBusy(MotorId::MotorId_Chin_Vert)?"忙":"闲");
 
-    ui->label_castLightDA->setText(QString::number(m_statusData.castLightDA()));
-    ui->label_environmentDA->setText(QString::number(m_statusData.envLightDA()));
+    ui->label_castLightDA->setText(QString::number(m_statusData.castLightSensorDA()));
+    ui->label_environmentDA->setText(QString::number(m_statusData.envLightSensorDA()));
 
     ui->label_cameraStatus->setText(m_statusData.cameraStatus()?"开启":"关闭");
     QString cacheStr;
@@ -1126,6 +1130,8 @@ void MainWindow::on_action_updateConfigToLower_triggered()
 void MainWindow::on_action_downloadConfig_triggered()
 {
     m_devCtl->readConfig();
+    initConfigUI();
+    refreshConfigUI();
 }
 
 void MainWindow::on_spinBox_centerLightAndOtherDA_valueChanged(int arg1)
@@ -1137,10 +1143,9 @@ void MainWindow::on_spinBox_centerLightAndOtherDA_valueChanged(int arg1)
         {
         case 0:ui->lineEdit_centralLightDA->setText(QString::number(arg1));break;
         case 1:ui->lineEdit_yellowBackGroundLampDa->setText(QString::number(arg1));break;
-        case 2:ui->lineEdit_centerInfraredLampDA->setText(QString::number(arg1));break;break;
-        case 3:ui->lineEdit_borderLampDA->setText(QString::number(arg1));break;break;
-        case 4:ui->lineEdit_eyeGlassLampDa->setText(QString::number(arg1));break;break;
-        case 5:ui->lineEdit_castLightDA->setText(QString::number(arg1));break;break;
+        case 2:ui->lineEdit_centerInfraredLampDA->setText(QString::number(arg1));break;
+        case 3:ui->lineEdit_borderLampDA->setText(QString::number(arg1));break;
+        case 4:ui->lineEdit_eyeGlassLampDa->setText(QString::number(arg1));break;
         }
     }
 }
@@ -1188,15 +1193,15 @@ void MainWindow::on_comboBox_lightSelect_1_currentIndexChanged(int index)
     int value;
     switch (index)
     {
-    case 0:value=m_config.centerFixationLampDARef();break;
-    case 1:value=m_config.yellowBackgroundLampDARef();break;
-    case 2:value=m_config.centerInfraredLampDARef();break;
-    case 3:value=m_config.borderInfraredLampDARef();break;
-    case 4:value=m_config.eyeglassFrameLampDARef();break;
-    case 5:value=m_config.castLightADPresetRef();break;
+    case 0:ui->checkBox_centerLightAndOtherDASync->setEnabled(true);value=m_config.centerFixationLampDARef();ui->spinBox_centerLightAndOtherDA->setValue(value);break;
+    case 1:ui->checkBox_centerLightAndOtherDASync->setEnabled(true);value=m_config.yellowBackgroundLampDARef();ui->spinBox_centerLightAndOtherDA->setValue(value);break;
+    case 2:ui->checkBox_centerLightAndOtherDASync->setEnabled(true);value=m_config.centerInfraredLampDARef();ui->spinBox_centerLightAndOtherDA->setValue(value);break;
+    case 3:ui->checkBox_centerLightAndOtherDASync->setEnabled(true);value=m_config.borderInfraredLampDARef();ui->spinBox_centerLightAndOtherDA->setValue(value);break;
+    case 4:ui->checkBox_centerLightAndOtherDASync->setEnabled(true);value=m_config.eyeglassFrameLampDARef();ui->spinBox_centerLightAndOtherDA->setValue(value);break;
+    case 5:ui->checkBox_centerLightAndOtherDASync->setEnabled(false);ui->checkBox_centerLightAndOtherDASync->setChecked(false);;break;
     }
-    ui->spinBox_centerLightAndOtherDA->setValue(value);
-    refreshConfigUI();
+
+//    refreshConfigUI();
 
 }
 

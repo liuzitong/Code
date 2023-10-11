@@ -89,7 +89,7 @@ public:
     bool getEnvLightAlarm();Q_SIGNAL void envLightAlarmChanged();
     bool getDebugMode();
     bool getShowCheckingDot();
-    QString getDeviceID(){return m_deviceID;}void setDeviceID(QString id){m_deviceID=id;emit deviceIDChanged();qDebug()<<":sssssssssss"<<m_deviceID;};Q_SIGNAL void deviceIDChanged();
+    QString getDeviceID(){return m_deviceID;}void setDeviceID(QString id){m_deviceID=id;emit deviceIDChanged();};Q_SIGNAL void deviceIDChanged();
 //    CheckSvcWorker* getWorker(){return m_worker;}
 
 private:

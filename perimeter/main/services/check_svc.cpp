@@ -264,6 +264,11 @@ public slots:
 //        DevOps::DeviceOperation::getSingleton()->m_connectDev=false;
         DevOps::DeviceOperation::getSingleton()->disconnectDev();    //连接设备
     }
+
+    void lightsOff(){m_check->lightsOff();}
+
+    void lightsOn(){if(m_check!=nullptr) m_check->lightsOn();}
+
     void doWork();
 
     void onTimeOut();
@@ -2139,6 +2144,7 @@ void CheckSvc::enterCheck()
     qDebug()<<"trunOnVideo";
     DevOps::DeviceOperation::getSingleton()->enterCheckingPage();
 //    DevOps::DeviceOperation::getSingleton()->lightUpCastLight();
+    QMetaObject::invokeMethod(m_worker,"lightsOn",Qt::QueuedConnection);
     m_atCheckingPage=true;
 }
 
@@ -2147,6 +2153,7 @@ void CheckSvc::leaveCheck()
     qDebug()<<"trunOffVideo";
     DevOps::DeviceOperation::getSingleton()->leaveCheckingPage();
     DevOps::DeviceOperation::getSingleton()->dimDownCastLight();
+    QMetaObject::invokeMethod(m_worker,"lightsOff",Qt::QueuedConnection);
     m_atCheckingPage=false;
 }
 

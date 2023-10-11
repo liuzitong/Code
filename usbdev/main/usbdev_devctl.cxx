@@ -20,14 +20,14 @@
 #include "qxpack/indcom/sys/qxpack_ic_rmtobjcreator_priv.hxx"
 #include "qxpack/indcom/common/qxpack_ic_queuetemp.hpp"
 #include "qxpack/indcom/sys/qxpack_ic_rmtobjsigblocker_priv.hxx"
-#include <spdlog/spdlog.h>
-#include <spdlog/sinks/rotating_file_sink.h>
+//#include <spdlog/spdlog.h>
+//#include <spdlog/sinks/rotating_file_sink.h>
 #include <memory>
 #pragma execution_character_set("utf-8")
 
 namespace UsbDev {
 
-static std::shared_ptr<spdlog::logger> logger=NULL;
+//static std::shared_ptr<spdlog::logger> logger=NULL;
 
 // ////////////////////////////////////////////////////////////////////////////
 // helper function
@@ -1361,12 +1361,12 @@ auto     DevCtl :: writeUsbEEPROM( const char *buff_ptr, int size, int eeprom_ad
 // ============================================================================
 UsbDev::DevCtl* DevCtl :: createInstance( quint32 vid_pid, quint32 cfg_id )
 {
-    if(logger==NULL)
-    {
-        logger = spdlog::rotating_logger_mt("logger", "logs/UsbDev_logger.txt", 1024*1024*30, 30);
-        spdlog::flush_on(spdlog::level::info);
-    }
-    logger->info("create instance.");
+//    if(logger==NULL)
+//    {
+//        logger = spdlog::rotating_logger_mt("logger", "logs/UsbDev_logger.txt", 1024*1024*30, 30);
+//        spdlog::flush_on(spdlog::level::info);
+//    }
+//    logger->info("create instance.");
     return usbdev_new_qobj( UsbDev::DevCtl, vid_pid, cfg_id );
 }
 
@@ -1375,12 +1375,12 @@ UsbDev::DevCtl* DevCtl :: createInstance( quint32 vid_pid, quint32 cfg_id )
 // ============================================================================
 UsbDev::DevCtl*   DevCtl :: createInstanceSync( quint32 vid_pid, quint32 cfg_id )
 {
-    if(logger==NULL)
-    {
-        logger = spdlog::rotating_logger_mt("logger", "logs/UsbDev_logger.txt", 1024*1024*30, 30);
-        spdlog::flush_on(spdlog::level::info);
-    }
-    logger->info("createInstanceSync.");
+//    if(logger==NULL)
+//    {
+//        logger = spdlog::rotating_logger_mt("logger", "logs/UsbDev_logger.txt", 1024*1024*30, 30);
+//        spdlog::flush_on(spdlog::level::info);
+//    }
+//    logger->info("createInstanceSync.");
     return usbdev_new_qobj( UsbDev::DevCtl, vid_pid, cfg_id, true ); }
 }
 

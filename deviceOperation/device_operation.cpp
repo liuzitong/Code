@@ -30,6 +30,7 @@ DeviceOperation::DeviceOperation()
 //    m_reconnectingElapsedTimer.start();
     m_reconnectTimer.setInterval(10000);                            //复位的时候会短暂收不到数据更新，时间不能太短
     m_waitingTime=DeviceSettings::getSingleton()->m_waitingTime;
+    m_currentCastLightDA=DeviceSettings::getSingleton()->m_castLightDA;
     m_config=DeviceData::getSingleton()->m_config;
 //    qDebug()<<m_config.deviceIDRef();
 //    m_reconnectTimer.start();
@@ -99,6 +100,9 @@ void DeviceOperation::setCursorColorAndCursorSize(int color, int spot)
 #ifdef _DEBUG
     std::cout<<"setCursorColorAndCursorSize"<<std::endl;
 #endif
+    resetMotors({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
+    waitForSomeTime(m_waitingTime);
+    waitMotorStop({{UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot}});
     auto profile=m_profile;
     auto config=m_config;
     quint8 sps[5]={1,1,1,1,1};
@@ -290,12 +294,17 @@ void DeviceOperation::moveToAdjustLight(int motorPosX,int motorPosY,int motorPos
 #ifdef _DEBUG
     std::cout<<"move to adjustlight"<<std::endl;
 #endif
+    int DB=m_config.DBForLightCorrectionRef();
     int motorPos[5];
     motorPos[0]=motorPosX;
     motorPos[1]=motorPosY;
     motorPos[2]=motorPosFocal;
-    motorPos[3]=m_config.DbPosMappingPtr()[0][0];
-    motorPos[4]=m_config.DbPosMappingPtr()[0][1];
+//    motorPos[3]=m_config.DbPosMappingPtr()[DB][0];
+//    motorPos[4]=m_config.DbPosMappingPtr()[DB][1];
+    motorPos[3]=m_config.DbPosMappingPtr()[DB][0];
+    motorPos[4]=m_config.DbPosMappingPtr()[DB][1];
+    qDebug()<<motorPos[3];
+    qDebug()<<motorPos[4];
 
     bool isMotorMove[5]{true,true,true,true,true};
     waitMotorStop({UsbDev::DevCtl::MotorId_Color,
@@ -364,6 +373,7 @@ void DeviceOperation::adjustCastLight()
                    });
     waitForSomeTime(m_waitingTime);
     openShutter(65535);
+    qDebug()<<m_currentCastLightDA;
     m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA);
     waitForSomeTime(m_waitingTime);
     m_castLightAdjustStatus=2;
@@ -675,8 +685,8 @@ void DeviceOperation::workOnNewStatuData()
     m_statusDataOut.shutterMotorCurrPos=m_statusData.motorPosition(MotorId::MotorId_Shutter);
     m_statusDataOut.xChinMotorCurrPos=m_statusData.motorPosition(MotorId::MotorId_Chin_Hoz);
     m_statusDataOut.yChinMotorCurrPos=m_statusData.motorPosition(MotorId::MotorId_Chin_Vert);
-    m_statusDataOut.envLightDA=m_statusData.envLightDA();
-    m_statusDataOut.castLightDA=m_statusData.castLightDA();
+    m_statusDataOut.envLightDA=m_statusData.envLightSensorDA();
+    m_statusDataOut.castLightDA=m_statusData.castLightSensorDA();
 
     auto eyeglassStatus=m_statusData.eyeglassStatus();
     if(m_isAtCheckingPage)
@@ -715,7 +725,7 @@ void DeviceOperation::workOnNewStatuData()
         {
             envLightAlarmDA=m_config.environmentAlarmLightDAPtr()[1];
         }
-        setEnvLightAlarm(m_statusData.envLightDA()>envLightAlarmDA);
+        setEnvLightAlarm(m_statusData.envLightSensorDA()>envLightAlarmDA);
     }
     else if(m_eyeglassIntialize)        //关红外
     {
@@ -748,15 +758,15 @@ void DeviceOperation::workOnNewStatuData()
     if(m_castLightAdjustStatus==2&&m_castLightAdjustElapsedTimer.elapsed()>=500&&m_deviceStatus==2)
     {
         updateDevInfo("keep adjust castLightDa");
-        int tagetDA=DeviceSettings::getSingleton()->m_castLightTagetDA;
-        int DADiff=DeviceSettings::getSingleton()->m_castLightDADifference;
+        int DADiffTolerance=DeviceSettings::getSingleton()->m_castLightDADifferenceTolerance;
         int step=DeviceSettings::getSingleton()->m_castLightDAChangeStep;
-        int currentDA=m_statusData.castLightDA();
+        int currentcastLightSensorDA=m_statusData.castLightSensorDA();
+        int targetcastLightSensorDA=m_config.castLightSensorDAForLightCorrectionRef();
         updateDevInfo("castlight Da:"+QString::number(m_currentCastLightDA));
-        updateDevInfo("current da:"+QString::number(currentDA));
-        if(qAbs(tagetDA-currentDA)>DADiff)
+        updateDevInfo("current da:"+QString::number(currentcastLightSensorDA));
+        if(qAbs(targetcastLightSensorDA-currentcastLightSensorDA)>DADiffTolerance)
         {
-            if(tagetDA>currentDA)
+            if(targetcastLightSensorDA>currentcastLightSensorDA)
             {
                 m_currentCastLightDA+=step;
             }
@@ -776,7 +786,7 @@ void DeviceOperation::workOnNewStatuData()
             m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA*0.3);
 
             DeviceSettings::getSingleton()->m_castLightLastAdjustedDate=QDate::currentDate().toString("yyyy/MM/dd");
-            DeviceSettings::getSingleton()->m_castLightDAChanged=m_currentCastLightDA-m_config.castLightADPresetRef();
+            DeviceSettings::getSingleton()->m_castLightDA=m_currentCastLightDA;
             DeviceSettings::getSingleton()->saveSettings();
         }
     }
@@ -879,13 +889,8 @@ void DeviceOperation::workOnNewConfig()
     m_devicePupilProcessor.m_pupilGreyLimit=m_config.pupilGreyThresholdDAPtr()[0];
     m_devicePupilProcessor.m_pupilReflectionDotWhiteLimit=m_config.pupilGreyThresholdDAPtr()[1];
     emit newDeviceID(QString(m_config.deviceIDRef()));
-    qDebug()<<m_devicePupilProcessor.m_pupilGreyLimit;
-    qDebug()<<m_devicePupilProcessor.m_pupilReflectionDotWhiteLimit;
-    qDebug()<<m_config.castLightADPresetRef();
-
 //    if(!m_profile.isEmpty()&&!m_config.isEmpty())
 //    {
-    m_currentCastLightDA=m_config.castLightADPresetRef()+DeviceSettings::getSingleton()->m_castLightDAChanged;
     auto date=QDate::currentDate();
     auto lastAdjustedDate=QDate::fromString(DeviceSettings::getSingleton()->m_castLightLastAdjustedDate,"yyyy/MM/dd");
     bool adjusted=((date.year()==lastAdjustedDate.year())&&(date.month()==lastAdjustedDate.month())&&(date.day()==lastAdjustedDate.day()));

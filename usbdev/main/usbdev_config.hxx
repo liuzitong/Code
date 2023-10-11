@@ -72,7 +72,8 @@ public:
     qint32& secondaryTableCenterXRef();
     qint32& secondaryTableCenterYRef();
     qint32& focalMotorPosCorrectionRef();
-    qint32& castLightADPresetRef();
+    qint32& DBForLightCorrectionRef();
+    qint32& castLightSensorDAForLightCorrectionRef();
     qint32& focalLengthMotorPosForLightCorrectionRef();
     qint32& xMotorPosForLightCorrectionRef();
     qint32& yMotorPosForLightCorrectionRef();

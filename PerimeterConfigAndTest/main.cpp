@@ -1,9 +1,9 @@
 ﻿#include "mainWindow.h"
 #include <QtWidgets/QApplication>
-#include <spdlog/spdlog.h>
-#include "spdlog/sinks/basic_file_sink.h"
-#include <spdlog/sinks/rotating_file_sink.h>
-#include <spdlog/common.h>
+//#include <spdlog/spdlog.h>
+//#include "spdlog/sinks/basic_file_sink.h"
+//#include <spdlog/sinks/rotating_file_sink.h>
+//#include <spdlog/common.h>
 #include <QDebug>
 #include <settings.h>
 #include <QSharedPointer>

@@ -20,12 +20,11 @@ public:
     QJsonObject m_rootObj;
     bool m_useLocalConfig;
     int m_pupilAutoAlignPixelTolerance;
-    int m_castLightDADifference;
-    int m_castLightTagetDA;
+    int m_castLightDADifferenceTolerance;
+    int m_castLightDA;
     int m_castLightDAChangeStep;
     int m_castLightTargetColor;
     int m_castLightTargetSize;
-    int m_castLightDAChanged;
     QString m_castLightLastAdjustedDate;
     int m_beepCount;
     int m_beepInterval;

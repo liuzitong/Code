@@ -31,7 +31,7 @@ ModalPopupDialog/* Rectangle*/{   // this is the wrapped Popup element in ui_qml
         Rectangle
         {
         // [HINT] Popup element need implicitWidth & implicitHeight to calc. the right position
-            id: menu; width:isEng?idPopup.width*0.5:idPopup.width*0.4; height: idPopup.height*0.98;color: "#dcdee0";radius: 5;/*width:480; height:480;*/
+            id: menu; width:isEng?idPopup.width*0.6:idPopup.width*0.5; height: idPopup.height*0.98;color: "#dcdee0";radius: 5;/*width:480; height:480;*/
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
             border.color: "#7C7C7C";

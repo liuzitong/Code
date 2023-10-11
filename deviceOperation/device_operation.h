@@ -194,7 +194,6 @@ public:
     bool m_staticStimulationAnswer;
     int m_castLightAdjustStatus=0;    //0:未标准,1:调整光斑和位置,2:矫正的光强,3:校准完成
     int m_currentCastLightDA;
-    int m_castLightTargetDA;
     bool m_castLightUp=false;
     QByteArray m_frameRawData;
     QMutex m_frameRawDataLock;
@@ -213,6 +212,7 @@ private:
 
     bool m_isMainTable;
     int m_waitingTime;
+//    QPair<int,int> m_lastColorAndSpotPos;
 //    QVector<float> m_pupilDiameterArr;
     //视岛坐标和电机坐标
     QVector<QPair<QPointF,QPoint>> m_lastDynamicCoordAndXYMotorPos;

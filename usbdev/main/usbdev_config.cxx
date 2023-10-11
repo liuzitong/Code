@@ -48,7 +48,8 @@ private:
                                         m_secondary_table_center_x_correction,
                                         m_secondary_table_center_y_correction,
                                         m_focal_motor_pos_correction,
-                                        m_maximun_projection_light_AD_preset,
+                                        m_DB_for_light_correction,
+                                        m_cast_light_sensor_DA_for_light_correction,
                                         m_x_motor_Pos_for_light_correction,
                                         m_y_motor_Pos_for_light_correction,
                                         m_focal_motor_pos_for_light_correction,
@@ -85,7 +86,8 @@ public :
     inline auto secondaryTableCenterXCorrectionRef()                -> qint32&      {return m_secondary_table_center_x_correction;}
     inline auto secondaryTableCenterYCorrectionRef()                -> qint32&      {return m_secondary_table_center_y_correction;}
     inline auto focalPosCorrectionRef()                             -> qint32&      {return m_focal_motor_pos_correction;}
-    inline auto maximunProjectionLightADPresetRef()                 -> qint32&      {return m_maximun_projection_light_AD_preset;}
+    inline auto DBForLightCorrectionRef()                           -> qint32&      {return m_DB_for_light_correction;}
+    inline auto castLightSensorDAForLightCorrectionRef()             -> qint32&      {return m_cast_light_sensor_DA_for_light_correction;}
     inline auto xMotorPosForLightCorrectionRef()                    -> qint32&      {return m_x_motor_Pos_for_light_correction;}
     inline auto yMotorPosForLightCorrectionRef()                    -> qint32&      {return m_y_motor_Pos_for_light_correction;}
     inline auto focalLengthMotorPosForLightCorrectionRef()          -> qint32&      {return m_focal_motor_pos_for_light_correction;}
@@ -126,7 +128,8 @@ ConfigPriv :: ConfigPriv ( )
     m_secondary_table_center_x_correction                         = 0;
     m_secondary_table_center_y_correction                         = 0;
     m_focal_motor_pos_correction                                  = 0;
-    m_maximun_projection_light_AD_preset                          = 0;
+    m_DB_for_light_correction                          = 0;
+    m_cast_light_sensor_DA_for_light_correction          = 0;
     m_x_motor_Pos_for_light_correction                          = 0;
     m_y_motor_Pos_for_light_correction                          = 0;
     m_focal_motor_pos_for_light_correction               = 0;
@@ -166,10 +169,11 @@ ConfigPriv :: ConfigPriv ( const ConfigPriv &o )
     m_secondary_table_center_x_correction                         =o.m_secondary_table_center_x_correction   ;
     m_secondary_table_center_y_correction                         =o.m_secondary_table_center_y_correction   ;
     m_focal_motor_pos_correction                                  =o.m_focal_motor_pos_correction;
-    m_maximun_projection_light_AD_preset                          =o.m_maximun_projection_light_AD_preset    ;
-    m_x_motor_Pos_for_light_correction                          =o.m_x_motor_Pos_for_light_correction    ;
-    m_y_motor_Pos_for_light_correction                          =o.m_y_motor_Pos_for_light_correction    ;
-    m_focal_motor_pos_for_light_correction               =o.m_focal_motor_pos_for_light_correction;
+    m_DB_for_light_correction                                     =o.m_DB_for_light_correction    ;
+    m_cast_light_sensor_DA_for_light_correction                     =o.m_cast_light_sensor_DA_for_light_correction    ;
+    m_x_motor_Pos_for_light_correction                            =o.m_x_motor_Pos_for_light_correction    ;
+    m_y_motor_Pos_for_light_correction                            =o.m_y_motor_Pos_for_light_correction    ;
+    m_focal_motor_pos_for_light_correction                        =o.m_focal_motor_pos_for_light_correction;
 //    m_x_motor_Pos_for_diamond_center_test                       =o.m_x_motor_Pos_for_diamond_center_test ;
 //    m_y_motor_Pos_for_diamond_center_test                       =o.m_y_motor_Pos_for_diamond_center_test ;
 //    memcpy(m_focal_motor_Pos_for_diamond_center_test,o.m_focal_motor_Pos_for_diamond_center_test,sizeof (m_focal_motor_Pos_for_diamond_center_test));
@@ -341,8 +345,11 @@ qint32&       Config :: secondaryTableCenterYRef()
 qint32 &Config::focalMotorPosCorrectionRef()
 {  return T_PrivPtr( m_obj )->focalPosCorrectionRef();}
 
-qint32&       Config :: castLightADPresetRef()
-{ return T_PrivPtr( m_obj )->maximunProjectionLightADPresetRef(); }
+qint32&       Config :: DBForLightCorrectionRef()
+{ return T_PrivPtr( m_obj )->DBForLightCorrectionRef(); }
+
+qint32&       Config :: castLightSensorDAForLightCorrectionRef()
+{ return T_PrivPtr( m_obj )->castLightSensorDAForLightCorrectionRef(); }
 
 qint32&       Config :: focalLengthMotorPosForLightCorrectionRef()
 { return T_PrivPtr( m_obj )->focalLengthMotorPosForLightCorrectionRef(); }
@@ -386,7 +393,7 @@ void *Config::dataPtr()
 
 int Config::dataLen()
 {
-    return 580;
+    return 584;
 }
 
 //void* Config::GetData()

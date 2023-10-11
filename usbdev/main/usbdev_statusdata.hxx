@@ -56,8 +56,8 @@ public:
    bool cameraStatus() const;
    bool eyeglassStatus() const;
    bool moveStatus() const;
-   qint32 envLightDA() const;
-   qint32 castLightDA() const;
+   qint32 envLightSensorDA() const;
+   qint32 castLightSensorDA() const;
 private:
     void *m_obj;
 };
