@@ -28,7 +28,7 @@ DeviceOperation::DeviceOperation()
 //    m_workStatusElapsedTimer.start();
     m_autoPupilElapsedTimer.start();
 //    m_reconnectingElapsedTimer.start();
-    m_reconnectTimer.setInterval(10000);                            //复位的时候会短暂收不到数据更新，时间不能太短
+    m_reconnectTimer.setInterval(1000);                            //复位的时候会短暂收不到数据更新，时间不能太短
     m_waitingTime=DeviceSettings::getSingleton()->m_waitingTime;
     m_currentCastLightDA=DeviceSettings::getSingleton()->m_castLightDA;
     m_config=DeviceData::getSingleton()->m_config;
@@ -48,7 +48,9 @@ void DeviceOperation::connectDev()
     if(m_devCtl==nullptr)
     {
         updateDevInfo("connecting.");
+#ifndef _DEBUG
         m_reconnectTimer.start();
+#endif
         auto deviceSettings=DeviceSettings::getSingleton();
         quint32 vid_pid=deviceSettings->m_VID.toInt(nullptr,16)<<16|deviceSettings->m_PID.toInt(nullptr,16);
         m_devCtl.reset(UsbDev::DevCtl::createInstance(vid_pid));
@@ -647,7 +649,9 @@ void DeviceOperation::clearPupilData()
 
 void DeviceOperation::workOnNewStatuData()
 {
+#ifndef _DEBUG
     m_reconnectTimer.start();
+#endif
 //    if(m_workStatusElapsedTimer.elapsed()>=1000)
 //    {
 //        m_workStatusElapsedTimer.restart();

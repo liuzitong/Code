@@ -4,7 +4,7 @@
     "beepCount": 3,
     "beepDuration": 200,
     "beepInterval": 200,
-    "castLightDA": 2470,
+    "castLightDA": 3130,
     "castLightDAChangeStep": 10,
     "castLightDADifferenceTolerance": 1000,
     "castLightLastAdjustedDate": "2023/10/11",

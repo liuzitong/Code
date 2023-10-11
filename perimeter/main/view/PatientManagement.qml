@@ -19,6 +19,7 @@ Item{
     property int pageSize: 10;
     property int fontPointSize: CommonSettings.fontPointSize;
     property string pageFrom: "";
+    property bool creatingNewPatient:false;
     signal queryStarted;
     signal changePage(var pageName,var params);
     width: 1440
@@ -63,6 +64,14 @@ Item{
         newEnglishLastName.text="";
         genderSelect.selectGender(0);
         newBirthDate.text="";
+        rx1_r.text="";
+        rx2_r.text="";
+        rx3_r.text="";
+        visual_r.text="";
+        rx1_l.text="";
+        rx2_l.text="";
+        rx3_l.text="";
+        visual_l.text="";
     }
 
     Item{id:content;width: parent.width;height: parent.height*14/15;anchors.top: parent.top;
@@ -236,7 +245,7 @@ Item{
 //                                                    }
 
                                                 }
-                                                Rectangle{width: parent.width*2.5/10+1;height: parent.height;color: "white"; border.color: backGroundBorderColor;CusText{anchors.fill: parent;font.pointSize: fontPointSize;text:model.patientId+" "+model.Id}}
+                                                Rectangle{width: parent.width*2.5/10+1;height: parent.height;color: "white"; border.color: backGroundBorderColor;CusText{anchors.fill: parent;font.pointSize: fontPointSize;text:model.patientId/*+" "+model.Id*/}}
                                                 Rectangle{width: parent.width*2.5/10+1;height: parent.height;color: "white"; border.color: backGroundBorderColor;CusText{anchors.fill: parent;font.pointSize: fontPointSize;text:model.name/*+" "+model.Id+" "+model.lastUpdate*/}}
                                                 Rectangle{width: parent.width*1/10+1;height: parent.height;color: "white"; border.color: backGroundBorderColor;CusText{anchors.fill: parent;font.pointSize: fontPointSize;text:patientInfoListView.sex[model.sex]}}
                                                 Rectangle{width: parent.width*2/10+1;height: parent.height;color: "white"; border.color: backGroundBorderColor;CusText{anchors.fill: parent;font.pointSize: fontPointSize;text:model.birthDate}}
@@ -473,10 +482,22 @@ Item{
                                    CusText{text:lt+qsTr("Right eye"); horizontalAlignment: Text.AlignRight;width:parent.width*0.15;font.pointSize: fontPointSize;}
                                    Row{
                                        height:parent.height;spacing:(width-8*height)/3;width:newPatient.width*0.7
-                                       LineEdit{ id:rx1_r;width: 2*height;horizontalAlignment: Text.AlignHCenter;text:currentPatient==null?"":currentPatient.rx.rx1_r.toFixed(2);textInput.validator: DoubleValidator{bottom:0.0;notation: DoubleValidator.StandardNotation;decimals: 2}}
-                                       LineEdit{ id:rx2_r;width: 2*height;horizontalAlignment: Text.AlignHCenter;text:currentPatient==null?"":currentPatient.rx.rx2_r.toFixed(2);textInput.validator: DoubleValidator{bottom:0.0;notation: DoubleValidator.StandardNotation;decimals: 2}}
-                                       LineEdit{ id:rx3_r;width: 2*height;horizontalAlignment: Text.AlignHCenter;text:currentPatient==null?"":currentPatient.rx.rx3_r.toFixed(2);textInput.validator: DoubleValidator{bottom:0.0;notation: DoubleValidator.StandardNotation;decimals: 2}}
-                                       LineEdit{ id:visual_r;width: 2*height;horizontalAlignment: Text.AlignHCenter;text:currentPatient==null?"":currentPatient.rx.visual_r.toFixed(2);textInput.validator: DoubleValidator{bottom:0.0;notation: DoubleValidator.StandardNotation;decimals: 2}}
+                                       LineEdit{ id:rx1_r;width: 2*height;horizontalAlignment: Text.AlignHCenter;/*text:currentPatient==null?"":currentPatient.rx.rx1_r.toFixed(2);*/textInput.validator: DoubleValidator{bottom:0.0;notation: DoubleValidator.StandardNotation;decimals: 2}}
+                                       LineEdit{ id:rx2_r;width: 2*height;horizontalAlignment: Text.AlignHCenter;/*text:currentPatient==null?"":currentPatient.rx.rx2_r.toFixed(2);*/textInput.validator: DoubleValidator{bottom:0.0;notation: DoubleValidator.StandardNotation;decimals: 2}}
+                                       LineEdit{ id:rx3_r;width: 2*height;horizontalAlignment: Text.AlignHCenter;/*text:currentPatient==null?"":currentPatient.rx.rx3_r.toFixed(2);*/textInput.validator: DoubleValidator{bottom:0.0;notation: DoubleValidator.StandardNotation;decimals: 2}}
+                                       LineEdit{ id:visual_r;width: 2*height;horizontalAlignment: Text.AlignHCenter;/*text:currentPatient==null?"":currentPatient.rx.visual_r.toFixed(2);*/textInput.validator: DoubleValidator{bottom:0.0;notation: DoubleValidator.StandardNotation;decimals: 2}}
+                                       Component.onCompleted:
+                                       {
+                                           currentPatientChanged.connect(function(){
+                                           if(currentPatient!==null&&!creatingNewPatient)
+                                           {
+                                               rx1_r.text=currentPatient.rx.rx1_r.toFixed(2);
+                                               rx2_r.text=currentPatient.rx.rx2_r.toFixed(2);
+                                               rx3_r.text=currentPatient.rx.rx3_r.toFixed(2);
+                                               visual_r.text=currentPatient.rx.visual_r.toFixed(2);
+                                           }
+                                           });
+                                       }
                                    }
                                }
                                Row{
@@ -484,10 +505,22 @@ Item{
                                    CusText{text:lt+qsTr("Left eye"); horizontalAlignment: Text.AlignRight;width:parent.width*0.15;font.pointSize: fontPointSize;}
                                    Row{
                                        height:parent.height;spacing:(width-8*height)/3;width:newPatient.width*0.7
-                                       LineEdit{ id:rx1_l;width: 2*height;horizontalAlignment: Text.AlignHCenter;text:currentPatient==null?"":currentPatient.rx.rx1_l.toFixed(2);textInput.validator: DoubleValidator{bottom:0.0;notation: DoubleValidator.StandardNotation;decimals: 2}}
-                                       LineEdit{ id:rx2_l;width: 2*height;horizontalAlignment: Text.AlignHCenter;text:currentPatient==null?"":currentPatient.rx.rx2_l.toFixed(2);textInput.validator: DoubleValidator{bottom:0.0;notation: DoubleValidator.StandardNotation;decimals: 2}}
-                                       LineEdit{ id:rx3_l;width: 2*height;horizontalAlignment: Text.AlignHCenter;text:currentPatient==null?"":currentPatient.rx.rx3_l.toFixed(2);textInput.validator: DoubleValidator{bottom:0.0;notation: DoubleValidator.StandardNotation;decimals: 2}}
-                                       LineEdit{ id:visual_l;width: 2*height;horizontalAlignment: Text.AlignHCenter;text:currentPatient==null?"":currentPatient.rx.visual_l.toFixed(2);textInput.validator: DoubleValidator{bottom:0.0;notation: DoubleValidator.StandardNotation;decimals: 2}}
+                                       LineEdit{ id:rx1_l;width: 2*height;horizontalAlignment: Text.AlignHCenter;/*text:currentPatient==null?"":currentPatient.rx.rx1_l.toFixed(2);*/textInput.validator: DoubleValidator{bottom:0.0;notation: DoubleValidator.StandardNotation;decimals: 2}}
+                                       LineEdit{ id:rx2_l;width: 2*height;horizontalAlignment: Text.AlignHCenter;/*text:currentPatient==null?"":currentPatient.rx.rx2_l.toFixed(2);*/textInput.validator: DoubleValidator{bottom:0.0;notation: DoubleValidator.StandardNotation;decimals: 2}}
+                                       LineEdit{ id:rx3_l;width: 2*height;horizontalAlignment: Text.AlignHCenter;/*text:currentPatient==null?"":currentPatient.rx.rx3_l.toFixed(2);*/textInput.validator: DoubleValidator{bottom:0.0;notation: DoubleValidator.StandardNotation;decimals: 2}}
+                                       LineEdit{ id:visual_l;width: 2*height;horizontalAlignment: Text.AlignHCenter;/*text:currentPatient==null?"":currentPatient.rx.visual_l.toFixed(2);*/textInput.validator: DoubleValidator{bottom:0.0;notation: DoubleValidator.StandardNotation;decimals: 2}}
+                                       Component.onCompleted:
+                                       {
+                                           currentPatientChanged.connect(function(){
+                                               if(currentPatient!==null&&!creatingNewPatient)
+                                               {
+                                                   rx1_l.text=currentPatient.rx.rx1_l.toFixed(2);
+                                                   rx2_l.text=currentPatient.rx.rx2_l.toFixed(2);
+                                                   rx3_l.text=currentPatient.rx.rx3_l.toFixed(2);
+                                                   visual_l.text=currentPatient.rx.visual_l.toFixed(2);
+                                               }
+                                           });
+                                       }
                                    }
                                }
                                Row{
@@ -515,8 +548,8 @@ Item{
 
                                            onClicked:
                                            {
-                                               currentPatient.rx.rx1_r=getRx1(rx1_r.text,rx2_r.text,newPatientage.text).toFixed(2);
-                                               currentPatient.rx.rx1_l=getRx1(rx1_l.text,rx2_l.text,newPatientage.text).toFixed(2);
+                                               rx1_r.text=getRx1(rx1_r.text,rx2_r.text,newPatientage.text).toFixed(2);
+                                               rx1_l.text=getRx1(rx1_l.text,rx2_l.text,newPatientage.text).toFixed(2);
                                            }
                                        }
                                    }
@@ -589,6 +622,7 @@ Item{
                 }
                 CusButton{id:patientSaveButton;text:lt+qsTr("Save");/*enabled: false;*/
                     onClicked:{
+                        creatingNewPatient=true;
                         var name="";
                         if(!doubleName){ name=newChineseName.text; }
                         else {name = newEnglishFirstName.text+" "+newEnglishLastName.text;}
@@ -598,7 +632,10 @@ Item{
                         currentPatient.name=name;
                         currentPatient.sex=genderSelect.gender;
                         currentPatient.birthDate=newBirthDate.text;
+                        console.log("*****************************");
+                        console.log(parseFloat(rx1_l.text));
                         currentPatient.rx.rx1_l=parseFloat(rx1_l.text);
+                        console.log(currentPatient.rx.rx1_l);
                         currentPatient.rx.rx2_l=parseFloat(rx2_l.text);
                         currentPatient.rx.rx3_l=parseFloat(rx3_l.text);
                         currentPatient.rx.visual_l=parseFloat(visual_l.text);
@@ -610,6 +647,7 @@ Item{
                         console.log(currentPatient.id);
                         root.currentPatientChanged();
                         query.startQuery();
+                        creatingNewPatient=false;
                     }
                 }
                 CusButton{
