@@ -21,7 +21,7 @@ IcPageBase {   // this is the wrapped Popup element in ui_qml_control
     }
 
     Item { width: 96; height: 96; anchors.right: parent.right;
-        Button { id: idCloseBtn; anchors.centerIn: parent; width: 36; height: 36; focusPolicy: Qt.NoFocus; opacity: pressed? 0.7 : 1.0;
+        Button { visible:false;id: idCloseBtn; anchors.centerIn: parent; width: 36; height: 36; focusPolicy: Qt.NoFocus; opacity: pressed? 0.7 : 1.0;
             background: Image { source: "image://PermImProv/default/close"; }
         }
     }

@@ -286,7 +286,7 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                         width: parent.width; height:parent.parent.rowHeight;
                                         CusText{text:lt+qsTr("Stimulus time"); anchors.left: parent.left; anchors.leftMargin: 0;width: parent.width*0.45;horizontalAlignment: Text.AlignLeft;font.pointSize:fontPointSize;}
                                         NumberLineEdit{
-                                            width: parent.width*0.5; anchors.right: parent.right;step:50;max:5000;min:0;
+                                            width: parent.width*0.5; anchors.right: parent.right;step:50;max:500000;min:0;
                                             Component.onCompleted: {idPopup.ok.connect(function(){currentProgram.params.fixedParams.stimulationTime=value;});idPopup.currentProgramChanged.connect(function(){value=currentProgram.params.fixedParams.stimulationTime;});}
                                         }
                                     }
@@ -294,7 +294,7 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                         width: parent.width; height:parent.parent.rowHeight;
                                         CusText{text:lt+qsTr("Inteval time"); anchors.left: parent.left; anchors.leftMargin: 0;width: parent.width*0.45;horizontalAlignment: Text.AlignLeft;font.pointSize:fontPointSize;}
                                         NumberLineEdit{
-                                            width: parent.width*0.5; anchors.right: parent.right;step:50;max:5000;min:0;
+                                            width: parent.width*0.5; anchors.right: parent.right;step:50;max:500000;min:0;
                                             Component.onCompleted: {idPopup.ok.connect(function(){currentProgram.params.fixedParams.intervalTime=value;});idPopup.currentProgramChanged.connect(function(){value=currentProgram.params.fixedParams.intervalTime;});}
                                         }
                                     }

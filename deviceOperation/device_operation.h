@@ -165,7 +165,7 @@ public:
 //    bool m_isDeviceReady=false;
 //    bool m_reconnecting=false;
     int m_deviceStatus=0;                    // 0:初始未连接 1:断联处于重联状态 2:已连接
-    bool m_autoAlignPupil=true;
+    bool m_autoAlignPupil=false;
     bool m_eyeglassStatus;
     bool m_eyeglassIntialize=false;
 //    bool m_isChecking=false;

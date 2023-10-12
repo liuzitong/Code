@@ -10,6 +10,10 @@ Item{
     property int clickedDotIndex: -1;
     property point currentCheckingDotLoc: IcUiQmlApi.appCtrl.checkSvc.currentCheckingDotLoc;
     property point nextCheckingDotLoc: IcUiQmlApi.appCtrl.checkSvc.nextCheckingDotLoc;
+    property point currentCheckedDotLocTemp;
+    property point previousCheckedDotLoc;
+    property int currentCheckingDB: IcUiQmlApi.appCtrl.checkSvc.currentCheckingDB;
+    property int currentCheckingDotAnswerStatus: IcUiQmlApi.appCtrl.checkSvc.currentCheckingDotAnswerStatus;    //0:等待应答   1：未应答  2：应答
     property alias testOver:displayCanvas.testOver;
     property int os_od: 0;
     property var dynamicSelectedDots:[];
@@ -26,15 +30,25 @@ Item{
     signal clearResult();
     onTipChanged:{console.log(tip);}
 
+
     onCurrentCheckResultChanged:
     {
         displayCanvas.requestPaint();
 //        console.log(currentCheckingDotLoc);
     }
+    Component.onCompleted:
+    {
+        IcUiQmlApi.appCtrl.checkSvc.currentCheckingDotLocChanged.connect(function()
+        {
+            previousCheckedDotLoc=currentCheckedDotLocTemp;currentCheckedDotLocTemp=currentCheckingDotLoc;console.log(previousCheckedDotLoc);displayCanvas.requestPaint();
+        });
+    }
 
-    onCurrentCheckingDotLocChanged: {displayCanvas.requestPaint();console.log(currentCheckingDotLoc);}
-    onNextCheckingDotLocChanged: {displayCanvas.requestPaint();console.log(nextCheckingDotLoc);}
+//    onCurrentCheckingDotLocChanged: {previousCheckedDotLoc=currentCheckedDotLocTemp;currentCheckedDotLocTemp=currentCheckingDotLoc;console.log(previousCheckedDotLoc);displayCanvas.requestPaint();}
+    onNextCheckingDotLocChanged: {displayCanvas.requestPaint();}
     onDynamicSelectedDotsReadyChanged:{setTip();}
+    onCurrentCheckingDBChanged: {displayCanvas.requestPaint();}
+    onCurrentCheckingDotAnswerStatusChanged: {console.log("************************");console.log(currentCheckingDotAnswerStatus);}
 
     function setTip()
     {
@@ -372,6 +386,24 @@ Item{
             ctx.fillStyle = color;
             ctx.fill();
         }
+
+        function drawRightWrongDot(dot,color)
+        {
+            var orthCoord;
+            var pixDot=dotToPixCoord(dot);
+            var dotRadius=diameter/180*2;
+            var ctx = getContext("2d");
+            ctx.lineWidth = 0;
+            ctx.strokeStyle = "black";
+            ctx.beginPath();
+            ctx.arc(pixDot.x, pixDot.y+diameter/180*6, dotRadius, 0, Math.PI*2);
+            ctx.stroke();
+            ctx.closePath();
+            ctx.fillStyle = color;
+            ctx.fill();
+        }
+
+
 
         function drawBigDot(dot,color)
         {
@@ -749,7 +781,7 @@ Item{
                             else if(dBList[i]>51)
                                 drawText(">51",dotToPixCoord({x:0,y:0}).x,dotToPixCoord({x:0,y:0}).y)
                             else  if(dBList[i])
-                                drawDB(dBList[i],{x:0,y:0});
+                                drawDB(dBList[i],{x:0,y:0});                
                         }
                     }
                     if(showCheckingDot)
@@ -757,7 +789,19 @@ Item{
                         if(nextCheckingDotLoc.x!==999)
                             drawBigDot(nextCheckingDotLoc,"blue");
                         if(currentCheckingDotLoc.x!==999)
-                            drawDot(currentCheckingDotLoc,"red");
+                        {
+                            var pixDot=dotToPixCoord(currentCheckingDotLoc);
+                            drawText(currentCheckingDB,pixDot.x,pixDot.y-fontSize*1.3);
+                            drawDot(currentCheckingDotLoc,"yellow");
+                        }
+                        if(previousCheckedDotLoc.x!==999&&currentCheckedDotLocTemp.x!==999)
+                        {
+//                            pixDot=dotToPixCoord(previousCheckedDotLoc);
+                            if(currentCheckingDotAnswerStatus===2)
+                                drawRightWrongDot(previousCheckedDotLoc,"green");
+                            else if(currentCheckingDotAnswerStatus===1)
+                                drawRightWrongDot(previousCheckedDotLoc,"red");
+                        }
                     }
                 }
                 else if(currentProgram.type===1)                                // 筛选
@@ -802,11 +846,25 @@ Item{
                             }
                         }
                     }
-                    if(nextCheckingDotLoc.x!==999)
-                        drawBigDot(nextCheckingDotLoc,"blue");
-                    if(currentCheckingDotLoc.x!==999)
-                        drawDot(currentCheckingDotLoc,"red");
-
+                    if(showCheckingDot)
+                    {
+                        if(nextCheckingDotLoc.x!==999)
+                            drawBigDot(nextCheckingDotLoc,"blue");
+                        if(currentCheckingDotLoc.x!==999)
+                        {
+                            pixDot=dotToPixCoord(currentCheckingDotLoc);
+                            drawText(currentCheckingDB,pixDot.x,pixDot.y-fontSize*1.3);
+                            drawDot(currentCheckingDotLoc,"yellow");
+                        }
+                        if(previousCheckedDotLoc.x!==999&&currentCheckedDotLocTemp.x!==999)
+                        {
+                            pixDot=dotToPixCoord(previousCheckedDotLoc);
+                            if(currentCheckingDotAnswerStatus===2)
+                                drawRightWrongDot({x:pixDot.x,y:pixDot.y+diameter/180*6},"green");
+                            else if(currentCheckingDotAnswerStatus===1)
+                                drawRightWrongDot({x:pixDot.x,y:pixDot.y+diameter/180*6},"red");
+                        }
+                    }
                 }
                 else                                                        //动态
                 {

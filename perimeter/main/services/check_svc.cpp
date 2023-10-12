@@ -112,6 +112,8 @@ public:
 signals:
     void currentCheckingDotChanged(QPointF loc);
     void nextCheckingDotChanged(QPointF loc);
+    void currentCheckingDBChanged(int DB);
+    void currentCheckingDotAnswerStatus(int status); //0:等待应答   1：未应答  2：应答
     void checkResultChanged();
 
 private:
@@ -288,6 +290,8 @@ signals:
     void tipChanged(QString tip);
     void currentCheckingDotChanged(QPointF loc);
     void nextCheckingDotChanged(QPointF loc);
+    void currentCheckingDBChanged(int DB);
+    void currentCheckingDotAnswerStatus(int status); //0:等待应答   1：未应答  2：应答
     void readyToCheck(bool isReady);
     void measureDeviationChanged(bool value);
     void eyeMoveAlarmChanged(bool value);
@@ -416,20 +420,23 @@ void StaticCheck::resetData()
 void StaticCheck::Checkprocess()
 {
 //    std::cout<<"getReadyToStimulate..........."<<std::endl;
+    bool checkingDot=false;
     m_alreadyChecked=false;
     auto checkCycleLocAndDB=getCheckCycleLocAndDB();                //存储LastdotType为各种检查
     if(m_error==true) return;                                       //找不到盲点 退出检查
     if(std::get<0>(checkCycleLocAndDB))
     {
         m_lastCheckDotRecord.push_back(nullptr);
-        getReadyToStimulate(std::get<1>(checkCycleLocAndDB),std::get<2>(checkCycleLocAndDB));
         emit nextCheckingDotChanged(std::get<1>(checkCycleLocAndDB));
+        getReadyToStimulate(std::get<1>(checkCycleLocAndDB),std::get<2>(checkCycleLocAndDB));
     }
     else
     {
         m_lastCheckDotRecord.push_back(&getCheckDotRecordRef());   //存储lastDotType为commondot 并且存储指针
         emit nextCheckingDotChanged(m_lastCheckDotRecord.last()->loc);
+        checkingDot=true;
         getReadyToStimulate(m_lastCheckDotRecord.last()->loc,m_lastCheckDotRecord.last()->StimulationDBs.last());
+
     }
 
 //    std::cout<<"waitAndProcessAnswer..........."<<std::endl;
@@ -438,17 +445,22 @@ void StaticCheck::Checkprocess()
         m_stimulated=false;
         waitAndProcessAnswer();                             //取出commonDot 并且取出指针,处理的时候可能发现下一个是已经检查出结果的点,这个时候就选择不刺激置m_alreadyChecked为true
         emit checkResultChanged();
+        if(checkingDot)
+            getReadyToStimulate(m_lastCheckDotRecord.last()->loc,m_lastCheckDotRecord.last()->StimulationDBs.last());
+        m_lastCheckDotRecord.removeFirst();
+        m_lastCheckeDotType.removeFirst();
     }
 //    std::cout<<"checkWaiting..........."<<std::endl;
     checkWaiting();
-
 //    std::cout<<"stimulate..........."<<std::endl;
     if(m_checkedCount<m_totalCount&&!m_alreadyChecked)                         //如果测试完毕或者是已经得到结果的点就不刺激了
     {
+
         stimulate();
         m_stimulationCount++;
         m_stimulated=true;
     }
+
 }
 
 void StaticCheck::finished()
@@ -590,15 +602,24 @@ StaticCheck::DotRecord &StaticCheck::getCheckDotRecordRef()
             for(auto&i:seletedZoneCheckedRecords)
             {
 //                qDebug()<<"got  checked";
+                bool nearBlindDot=false;
+                for(auto& bindDot:m_blindDot)
+                {
+                    if(sqrt(pow((i.loc.x()-bindDot.x()),2)+pow((i.loc.y()-bindDot.y()),2))<3)
+                    {
+                        nearBlindDot=true;break;
+                    }
+                }
+                if(nearBlindDot) continue;
                 auto dist=sqrt(pow((i.loc.x()-selectedDot.loc.x()),2)+pow((i.loc.y()-selectedDot.loc.y()),2));
-                if(dist<nearestDist)                                        //发现更小的距离,之前的值清空
+                if(dist<(nearestDist-1))                                        //发现更小的距离,之前的值清空
                 {
                     DBsAroundSelectedDot.clear();
                     int DB=qMin(qMax(i.DB,0),51);
                     DBsAroundSelectedDot.append(DB);
                     nearestDist=dist;
                 }
-                else if(dist==nearestDist)                                  //相同加进去
+                else if(qAbs(dist-nearestDist)<=1)                                  //相同加进去
                 {
                     int DB=qMin(qMax(i.DB,0),51);
                     DBsAroundSelectedDot.append(DB);
@@ -606,7 +627,7 @@ StaticCheck::DotRecord &StaticCheck::getCheckDotRecordRef()
             }
             int sum=0;                                                      //求出平均值
             for(auto&i:DBsAroundSelectedDot){sum+=i;}
-            int stimulationDB=qRound(double(sum)/DBsAroundSelectedDot.length());
+            int stimulationDB=qRound(double(sum)/DBsAroundSelectedDot.length())-1;
             m_dotRecords[selectedDot.index].StimulationDBs.append(stimulationDB);
         }
 //        qDebug()<<"getCheckDotRecordRef loc inside:"<<m_dotRecords[selectedDot.index].loc<<"DB leng"<<QString::number(m_dotRecords[selectedDot.index].StimulationDBs.count())<<"upper:"<<QString::number(m_dotRecords[selectedDot.index].upperBound)<<"lower:"<<QString::number(m_dotRecords[selectedDot.index].lowerBound);
@@ -647,6 +668,7 @@ void StaticCheck::stimulate()
         m_deviceOperation->waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y,UsbDev::DevCtl::MotorId_Shutter});
         m_deviceOperation->openShutter(durationTime);
         emit currentCheckingDotChanged(debug_Loc);
+        emit currentCheckingDBChanged(debug_DB);
 #ifdef _DEBUG
         std::cout<<"***** DB shi:"<<debug_DB<<"    "<<"zuo biao x:"<<debug_Loc.x()<<" "<<"zuobiao y:"<<debug_Loc.y()<<"    yong shi:"<<m_stimulationWaitingForAnswerElapsedTimer.elapsed()<<"   deviation:"<<m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation<<std::endl;
 #endif
@@ -662,7 +684,7 @@ void StaticCheck::stimulate()
                 m_resultModel->m_data.fixationDeviation.push_back(m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation);
 
             uint dotIndex=m_lastCheckDotRecord[0]->index;
-            qDebug()<<m_resultModel->m_data.realTimeDB.size();
+//            qDebug()<<m_resultModel->m_data.realTimeDB.size();
             m_resultModel->m_data.realTimeDB[dotIndex]=m_lastCheckDotRecord[0]->StimulationDBs.toStdVector(); //在check初始化的时候扩充了大小.
             if(dotIndex<m_programModel->m_data.dots.size()||dotIndex==2*m_programModel->m_data.dots.size())
             {
@@ -948,8 +970,10 @@ bool StaticCheck::waitForAnswer()
 
 void StaticCheck::ProcessAnswer(bool answered)
 {
-    auto lastCheckedDot=m_lastCheckDotRecord.takeFirst();
-    auto lastCheckedDotType=m_lastCheckeDotType.takeFirst();
+//    auto lastCheckedDot=m_lastCheckDotRecord.takeFirst();
+//    auto lastCheckedDotType=m_lastCheckeDotType.takeFirst();
+    auto lastCheckedDot=m_lastCheckDotRecord.first();
+    auto lastCheckedDotType=m_lastCheckeDotType.first();
     switch (lastCheckedDotType)
     {
     case LastCheckedDotType::locateBlindDot:
@@ -1256,12 +1280,13 @@ void StaticCheck::ProcessAnswer(bool answered)
 
 void StaticCheck::waitAndProcessAnswer()
 {
+//    emit currentCheckingDotAnswerStatus(0);
     bool answerResult;
     if(m_deviceOperation->m_deviceStatus==2)
          answerResult=waitForAnswer();
     else if(m_deviceOperation->m_deviceStatus==0)
     {
-        qDebug()<<"into kebordd!!!!!!!!!!!!*******************************";
+//        qDebug()<<"into kebordd!!!!!!!!!!!!*******************************";
         if(KeyBoardFilter::needRefresh)
         {
             while(!KeyBoardFilter::freshed)
@@ -1278,6 +1303,8 @@ void StaticCheck::waitAndProcessAnswer()
             UtilitySvc::wait(300);
         }
     }
+
+    emit currentCheckingDotAnswerStatus(answerResult?2:1);
 //    qDebug()<<answerResult;
     ProcessAnswer(answerResult);
 }
@@ -1786,6 +1813,9 @@ void CheckSvcWorker::prepareToCheck()
         ((StaticCheck*)m_check.data())->m_programModel=static_cast<StaticProgramVm*>(m_programVm)->getModel();
         connect(((StaticCheck*)m_check.data()),&StaticCheck::currentCheckingDotChanged,this,&CheckSvcWorker::currentCheckingDotChanged);
         connect(((StaticCheck*)m_check.data()),&StaticCheck::nextCheckingDotChanged,this,&CheckSvcWorker::nextCheckingDotChanged);
+        connect(((StaticCheck*)m_check.data()),&StaticCheck::currentCheckingDBChanged,this,&CheckSvcWorker::currentCheckingDBChanged);
+        connect(((StaticCheck*)m_check.data()),&StaticCheck::currentCheckingDotAnswerStatus,this,&CheckSvcWorker::currentCheckingDotAnswerStatus);
+        connect(((StaticCheck*)m_check.data()),&StaticCheck::currentCheckingDotAnswerStatus,[](){qDebug()<<"static answer status";});
         connect(this,&CheckSvcWorker::measureDeviationChanged,m_check.data(),[&](bool value)
         {
             ((StaticCheck*)m_check.data())->m_measurePupilDeviation=value;
@@ -1986,6 +2016,8 @@ CheckSvc::CheckSvc(QObject *parent)
     connect(this,&CheckSvc::eyeMoveAlarmChanged,m_worker,&CheckSvcWorker::workOnEyeMoveAlarmChanged);
     connect(m_worker,&CheckSvcWorker::currentCheckingDotChanged,[&](QPointF value){m_currentCheckingDotLoc=value;emit currentCheckingDotLocChanged();});
     connect(m_worker,&CheckSvcWorker::nextCheckingDotChanged,[&](QPointF value){m_nextCheckingDotLoc=value;emit nextCheckingDotLocChanged();});
+    connect(m_worker,&CheckSvcWorker::currentCheckingDBChanged,[&](int DB){m_currentCheckingDB=DB;emit currentCheckingDBChanged();});
+    connect(m_worker,&CheckSvcWorker::currentCheckingDotAnswerStatus,[&](int status){m_currentCheckingDotAnswerStatus=status;emit currentCheckingDotAnswerStatusChanged();qDebug()<<"checsvc answer status";});
     connect(m_worker,&CheckSvcWorker::tipChanged,this,&CheckSvc::setTips);
     connect(m_worker,&CheckSvcWorker::sendErrorInfo,this, [](QString errorInfo)
     {

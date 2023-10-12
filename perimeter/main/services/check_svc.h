@@ -28,6 +28,8 @@ class CheckSvc: public QObject
     Q_PROPERTY(QVariantList dynamicSelectedDots WRITE setInputDots)
     Q_PROPERTY(QPointF nextCheckingDotLoc READ getNextCheckingDotLoc NOTIFY nextCheckingDotLocChanged)
     Q_PROPERTY(QPointF currentCheckingDotLoc READ getCurrentCheckingDotLoc NOTIFY currentCheckingDotLocChanged)
+    Q_PROPERTY(int currentCheckingDB READ getCurrentCheckingDB NOTIFY currentCheckingDBChanged)
+    Q_PROPERTY(int currentCheckingDotAnswerStatus READ getCurrentCheckingDotAnswerStatus NOTIFY currentCheckingDotAnswerStatusChanged)
     Q_PROPERTY(bool readyToCheck READ getReadyToCheck WRITE setReadyToCheck NOTIFY readyToCheckChanged)
     Q_PROPERTY(QString tips READ getTips WRITE setTips NOTIFY tipsChanged)
     Q_PROPERTY(bool measurePupil READ getMeasurePupil WRITE setMeasurePupil NOTIFY measurePupilChanged)
@@ -81,6 +83,9 @@ public:
     void setInputDots(QVariantList value);
     QPointF getCurrentCheckingDotLoc(){return m_currentCheckingDotLoc;}Q_SIGNAL void currentCheckingDotLocChanged();
     QPointF getNextCheckingDotLoc(){return m_nextCheckingDotLoc;}Q_SIGNAL void nextCheckingDotLocChanged();
+    int getCurrentCheckingDB(){return m_currentCheckingDB;}Q_SIGNAL void currentCheckingDBChanged();
+    int getCurrentCheckingDotAnswerStatus(){return m_currentCheckingDotAnswerStatus;}Q_SIGNAL void currentCheckingDotAnswerStatusChanged();
+//    int getCurrentCheckingDot(){return m_currentChecking}
     bool getReadyToCheck(){return m_readyToCheck;}void setReadyToCheck(bool value){m_readyToCheck=value;emit readyToCheckChanged();} Q_SIGNAL void readyToCheckChanged();
     QString getTips(){return m_tips;}void setTips(QString value){m_tips=value;emit tipsChanged();}Q_SIGNAL void tipsChanged();
     bool getMeasurePupil();void setMeasurePupil(bool value);Q_SIGNAL void measurePupilChanged(bool value);
@@ -102,6 +107,8 @@ private:
     int m_checkTime=0;
     QPointF m_currentCheckingDotLoc={999,999};
     QPointF m_nextCheckingDotLoc={999,999};
+    int m_currentCheckingDB;
+    int m_currentCheckingDotAnswerStatus;
     bool m_readyToCheck=false;
     bool m_atCheckingPage=false;
 //    bool m_measurePupilDiameter;
