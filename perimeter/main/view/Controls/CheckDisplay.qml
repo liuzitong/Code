@@ -858,11 +858,11 @@ Item{
                         }
                         if(previousCheckedDotLoc.x!==999&&currentCheckedDotLocTemp.x!==999)
                         {
-                            pixDot=dotToPixCoord(previousCheckedDotLoc);
+//                            pixDot=dotToPixCoord(previousCheckedDotLoc);
                             if(currentCheckingDotAnswerStatus===2)
-                                drawRightWrongDot({x:pixDot.x,y:pixDot.y+diameter/180*6},"green");
+                                drawRightWrongDot(previousCheckedDotLoc,"green");
                             else if(currentCheckingDotAnswerStatus===1)
-                                drawRightWrongDot({x:pixDot.x,y:pixDot.y+diameter/180*6},"red");
+                                drawRightWrongDot(previousCheckedDotLoc,"red");
                         }
                     }
                 }

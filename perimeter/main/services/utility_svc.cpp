@@ -183,14 +183,14 @@ int UtilitySvc::getIndex(const QPointF &dot, const QVector<QPoint> &pointLoc, in
     for(int i=0;i<pointLoc.length();i++)
     {
         int dist;
-        if(OS_OD==0)
-        {
+//        if(OS_OD==0)
+//        {
             dist=pow(pointLoc[i].x()-dot.x(),2)+pow(pointLoc[i].y()-dot.y(),2);
-        }
-        else
-        {
-            dist=pow(pointLoc[i].x()-(-dot.x()),2)+pow(pointLoc[i].y()-dot.y(),2);
-        }
+//        }
+//        else
+//        {
+//            dist=pow(pointLoc[i].x()-(-dot.x()),2)+pow(pointLoc[i].y()-dot.y(),2);
+//        }
         if(dist<FLT_EPSILON)
         {index=i;break;}
         else if(dist<distMin){distMin=dist;index=i;}

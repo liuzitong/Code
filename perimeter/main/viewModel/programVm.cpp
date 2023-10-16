@@ -32,11 +32,11 @@ StaticProgramVm::StaticProgramVm(const QVariantList &args)
         m_data->m_params.commonParams=
         {
             {0,30},
-            StaticParams::CommonParams::Strategy::fastInterative,
+            StaticParams::CommonParams::Strategy::fullThreshold,
             StaticParams::CommonParams::StrategyMode::ageRelated,
             CursorColor::white,
-            CursorSize::II,
-            BackGroundColor::yellow,
+            CursorSize::III,
+            BackGroundColor::white,
             false,
             false,
             200,
@@ -49,14 +49,14 @@ StaticProgramVm::StaticProgramVm(const QVariantList &args)
         m_data->m_params.fixedParams=
         {
             180,
-            800,
+            1000,
             20,
             20,
             10,
             10,
             10,
             10,
-            300,
+            500,
         };
         m_staticDataVm.reset(new StaticProgramDataVm(&m_data->m_data));
         m_staticParamsVm.reset(new StaticParamsVM(&m_data->m_params));

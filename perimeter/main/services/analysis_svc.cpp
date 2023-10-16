@@ -221,6 +221,7 @@ void AnalysisSvc::ThresholdAnalysis(int resultId,QVector<int>& dev,QVector<int>&
     else if(testAge<=65){age_correction=3;}
     else {age_correction=4;}
 
+    qDebug()<<checkResult.m_OS_OD;
     for(int i=0;i<int(dotList.size());i++)
     {
         auto dot=dotList[i];

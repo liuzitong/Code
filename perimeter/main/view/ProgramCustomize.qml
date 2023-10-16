@@ -330,7 +330,7 @@ Item {id:root; width: 1366;height: 691; visible: true;anchors.fill:parent;
                                         {
                                             if(currentProgram.type===0)
                                             {
-                                                currentProgram.data.strategies=[0,1,2,3];
+                                                currentProgram.data.strategies=[0,1];
                                                 currentProgram.report=[4];
                                             }
                                             else
