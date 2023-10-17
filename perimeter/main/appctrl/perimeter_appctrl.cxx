@@ -19,6 +19,11 @@
 #include "perimeter/main/services/utility_svc.h"
 #include "perimeter/third-part/perm/perm_mod.hxx"
 #include <perimeter/main/services/keyboard_filter.h>
+#if defined( WIN32 )
+#include <windows.h>
+#endif
+#include <QWindow>
+#include <QScreen>
 
 namespace Perimeter {
 
@@ -65,7 +70,9 @@ public :
 //    void        setDoubleName(bool value)           {m_doubleName=value;}
 
 //    QObject*    getCurrentPatient()                 {return m_currentPatient;}
-//    void        setCurrentPatient(QObject *value)   {m_currentPatient=value;}
+    //    void        setCurrentPatient(QObject *value)   {m_currentPatient=value;}
+public slots:
+    void adjustWindowSize(QObject *win_obj);
 };
 
 // ============================================================================
@@ -85,6 +92,48 @@ AppCtrlPriv :: AppCtrlPriv ( AppCtrl *pa )
     m_deviceStatusData=perimeter_new(DeviceStatusDataVm);
 }
 
+void AppCtrl::adjustWindowSize(QObject *win_obj)
+{
+#if defined( WIN32 )
+    QWindow *win = qobject_cast< QWindow *>( win_obj );
+    if ( win == Q_NULLPTR ) { return; }
+    QScreen* screen = win->screen();
+    QSize  scr_size = screen->size();
+#if 0
+    RECT w_rect;
+    ::GetWindowRect( ( HWND )( win->winId()), & w_rect );
+    int  pos_x = ( scr_size.width()  - ( w_rect.right - w_rect.left )) / 2;
+    int  pos_y = ( scr_size.height() - ( w_rect.bottom - w_rect.top )) / 2;
+
+    win->setPosition( pos_x, pos_y );
+#else
+    QRect w_size = win->geometry();
+    int  pos_x = ( scr_size.width()  - ( w_size.width()  - 2 )) / 2;
+    int  pos_y = ( scr_size.height() - ( w_size.height() - 2 )) / 2;
+
+    win->setGeometry( pos_x, pos_y, w_size.width() - 2, w_size.height() - 2 );
+
+    HWND previousFocusWnd = Q_NULLPTR; HWND wHa = ( HWND )( win->winId());
+    previousFocusWnd = GetForegroundWindow();
+    if(previousFocusWnd != wHa){
+        AttachThreadInput( GetWindowThreadProcessId( previousFocusWnd, Q_NULLPTR ), GetCurrentThreadId(), TRUE );
+        AttachThreadInput( GetWindowThreadProcessId( previousFocusWnd, Q_NULLPTR ), GetWindowThreadProcessId( wHa, Q_NULLPTR ), TRUE );
+        SendMessage( wHa, WM_SETFOCUS, 0, 0 );
+        SetForegroundWindow( wHa );
+        AttachThreadInput( GetWindowThreadProcessId( previousFocusWnd, Q_NULLPTR ), GetWindowThreadProcessId( wHa, Q_NULLPTR ), FALSE );
+        AttachThreadInput( GetWindowThreadProcessId( previousFocusWnd, Q_NULLPTR ), GetCurrentThreadId(), FALSE );
+    }
+
+    //    // 2--Always front main window。这段代码打开会导致系统菜单栏显示在界面上方
+    //    WId hwnd = win->winId();
+    //    ::SetWindowPos( ( HWND ) hwnd,  HWND_NOTOPMOST,
+    //                    pos_x, pos_y, 0, 0,
+    //                    SWP_NOSIZE | SWP_NOSENDCHANGING | SWP_NOACTIVATE
+    //                    );
+    //    ::SetForegroundWindow( ( HWND ) hwnd );
+#endif
+#endif
+}
 // ============================================================================
 // dtor
 // ============================================================================

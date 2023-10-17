@@ -508,6 +508,12 @@ void MainWindow::refreshVideo()
     auto pixData=reinterpret_cast<quint8*>(m_frameData.rawData().data());
     QImage image=QImage(pixData,size.width(),size.height(),QImage::Format::Format_Grayscale8);
     image=image.convertToFormat(QImage::Format_RGBA8888);
+    if(m_takePhoto)
+    {
+        auto filePath=QString("./savePics/")+QDateTime::currentDateTime().toString("yyyy_MM_dd_hh_MM_ss")+".bmp";
+        image.save(filePath);
+    }
+    m_takePhoto=false;
     QPainter painter(&image);
     painter.setPen(QPen{Qt::red,1});
     painter.drawLine(QPoint{0,size.height()/2},QPoint{size.width(),size.height()/2});
@@ -1322,6 +1328,11 @@ void MainWindow::on_pushButton_beep_clicked()
 void MainWindow::on_pushButton_stopRunDot_clicked()
 {
     m_isRunningDot=false;
+}
+
+void MainWindow::on_pushButton_takePhoto_clicked()
+{
+    m_takePhoto=true;
 }
 
 void MainWindow::on_plainTextEdit_rawCommand_textChanged()

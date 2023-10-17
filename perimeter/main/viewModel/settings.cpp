@@ -23,6 +23,7 @@ Settings::Settings()
         m_defaultProgramId=jo["defaultProgramId"].toInt();
         m_defaultProgramType=jo["defaultProgramType"].toInt();
         m_programUnlockPwd=jo["programUnlockPwd"].toString();
+        m_virtualKeyBoard=jo["virtualKeyBoard"].toBool();
         changeLang();
         jsonFile.close();
     }
@@ -39,7 +40,8 @@ void Settings::save()
         {"deviceInfo",m_deviceInfo},
         {"defaultProgramId",m_defaultProgramId},
         {"defaultProgramType",m_defaultProgramType},
-        {"programUnlockPwd",m_programUnlockPwd}
+        {"programUnlockPwd",m_programUnlockPwd},
+        {"virtualKeyBoard",m_virtualKeyBoard}
     };
     QJsonDocument jsonDoc;
     jsonDoc.setObject(jo);

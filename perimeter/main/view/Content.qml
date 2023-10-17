@@ -63,7 +63,7 @@ Rectangle {
                                 Flow{
                                     height: parent.height;
                                     CusText{text:lt+qsTr("Sex")+":  "; horizontalAlignment: Text.AlignRight;color:"white";width: 2*height;font.pointSize: height*0.4;}
-                                    CusText{id:sex;text:{switch (currentPatient.sex){ case 0:return qsTr("Male");case 1:return qsTr("Female");case 2:return qsTr("Others");};}
+                                    CusText{id:sex;text:{switch (currentPatient.sex){ case 0:return lt+qsTr("Male");case 1:return lt+qsTr("Female");case 2:return lt+qsTr("Others");};}
                                             horizontalAlignment: Text.AlignLeft;color:"white";font.pointSize: height*0.4;width: height*1;}
                                 }
                                 Flow{

@@ -53,7 +53,8 @@ INCLUDEPATH *= PWD/../../../
 CONFIG(debug, debug|release) {
     LIBS += -L$$PWD/../../../deviceOperation/bin/debug
     LIBS += -L$$PWD/../../../perimeter/third-part/LimeReport/build/5.9.7/win64/debug/lib
-    LIBS += -l"QxOrmd" -l"limereportd" -l"QtZintd" -l"deviceOperationd"
+    LIBS += -L$$PWD/../../../ipckbd/build/lib
+    LIBS += -l"QxOrmd" -l"limereportd" -l"QtZintd" -l"deviceOperationd" -l"ipckbdclid"
     CONFIG += qml_debug
     CONFIG += console
     LIBS += -l"libboost_serialization-vc140-mt-gd-x64-1_78"
@@ -61,7 +62,8 @@ CONFIG(debug, debug|release) {
 } else {
     LIBS += -L$$PWD/../../../deviceOperation/bin/release
     LIBS += -L$$PWD/../../../perimeter/third-part/LimeReport/build/5.9.7/win64/release/lib
-    LIBS += -l"QxOrm" -l"limereport" -l"QtZint" -l"deviceOperation"
+    LIBS += -L$$PWD/../../../ipckbd/build/lib
+    LIBS += -l"QxOrm" -l"limereport" -l"QtZint" -l"deviceOperation" -l"ipckbdcli"
     DEFINES+=QT_QML_DEBUG_NO_WARNING
     LIBS += -l"libboost_serialization-vc140-mt-x64-1_78"
     DESTDIR=$$PWD/../../bin/release

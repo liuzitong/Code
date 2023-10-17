@@ -581,16 +581,24 @@ Item{
                             currentPatient.patientId=newPatientId.text;
                             currentPatient.name=Name;
                             currentPatient.sex=genderSelect.gender;
-                            console.log(newBirthDate.text);
                             currentPatient.birthDate=newBirthDate.text;
-                            currentPatient.rx.rx1_l=parseFloat(rx1_l.text);
-                            currentPatient.rx.rx2_l=parseFloat(rx2_l.text);
-                            currentPatient.rx.rx3_l=parseFloat(rx3_l.text);
-                            currentPatient.rx.visual_l=parseFloat(visual_l.text);
-                            currentPatient.rx.rx1_r=parseFloat(rx1_r.text);
-                            currentPatient.rx.rx2_r=parseFloat(rx2_r.text);
-                            currentPatient.rx.rx3_r=parseFloat(rx3_r.text);
-                            currentPatient.rx.visual_r=parseFloat(visual_r.text);
+
+                            if(parseFloat(rx1_l.text).toString()!=="NaN")
+                                currentPatient.rx.rx1_l=parseFloat(rx1_l.text);
+                            if(parseFloat(rx2_l.text).toString()!=="NaN")
+                                currentPatient.rx.rx2_l=parseFloat(rx2_l.text);
+                            if(parseFloat(rx3_l.text).toString()!=="NaN")
+                                currentPatient.rx.rx3_l=parseFloat(rx3_l.text);
+                            if(parseFloat(visual_l.text).toString()!=="NaN")
+                                currentPatient.rx.visual_l=parseFloat(visual_l.text);
+                            if(parseFloat(rx1_r.text).toString()!=="NaN")
+                                currentPatient.rx.rx1_r=parseFloat(rx1_r.text);
+                            if(parseFloat(rx2_r.text).toString()!=="NaN")
+                                currentPatient.rx.rx2_r=parseFloat(rx2_r.text);
+                            if(parseFloat(rx3_r.text).toString()!=="NaN")
+                                currentPatient.rx.rx3_r=parseFloat(rx3_r.text);
+                            if(parseFloat(visual_r.text).toString()!=="NaN")
+                                currentPatient.rx.visual_r=parseFloat(visual_r.text);
                             currentPatient.update();
                             query.startQuery();
                         }
@@ -632,17 +640,22 @@ Item{
                         currentPatient.name=name;
                         currentPatient.sex=genderSelect.gender;
                         currentPatient.birthDate=newBirthDate.text;
-                        console.log("*****************************");
-                        console.log(parseFloat(rx1_l.text));
-                        currentPatient.rx.rx1_l=parseFloat(rx1_l.text);
-                        console.log(currentPatient.rx.rx1_l);
-                        currentPatient.rx.rx2_l=parseFloat(rx2_l.text);
-                        currentPatient.rx.rx3_l=parseFloat(rx3_l.text);
-                        currentPatient.rx.visual_l=parseFloat(visual_l.text);
-                        currentPatient.rx.rx1_r=parseFloat(rx1_r.text);
-                        currentPatient.rx.rx2_r=parseFloat(rx2_r.text);
-                        currentPatient.rx.rx3_r=parseFloat(rx3_r.text);
-                        currentPatient.rx.visual_r=parseFloat(visual_r.text);
+                        if(parseFloat(rx1_l.text).toString()!=="NaN")
+                            currentPatient.rx.rx1_l=parseFloat(rx1_l.text);
+                        if(parseFloat(rx2_l.text).toString()!=="NaN")
+                            currentPatient.rx.rx2_l=parseFloat(rx2_l.text);
+                        if(parseFloat(rx3_l.text).toString()!=="NaN")
+                            currentPatient.rx.rx3_l=parseFloat(rx3_l.text);
+                        if(parseFloat(visual_l.text).toString()!=="NaN")
+                            currentPatient.rx.visual_l=parseFloat(visual_l.text);
+                        if(parseFloat(rx1_r.text).toString()!=="NaN")
+                            currentPatient.rx.rx1_r=parseFloat(rx1_r.text);
+                        if(parseFloat(rx2_r.text).toString()!=="NaN")
+                            currentPatient.rx.rx2_r=parseFloat(rx2_r.text);
+                        if(parseFloat(rx3_r.text).toString()!=="NaN")
+                            currentPatient.rx.rx3_r=parseFloat(rx3_r.text);
+                        if(parseFloat(visual_r.text).toString()!=="NaN")
+                            currentPatient.rx.visual_r=parseFloat(visual_r.text);
                         currentPatient.insert();
                         console.log(currentPatient.id);
                         root.currentPatientChanged();

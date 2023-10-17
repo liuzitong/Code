@@ -178,6 +178,8 @@ private slots:
 
     void on_pushButton_stopRunDot_clicked();
 
+    void on_pushButton_takePhoto_clicked();
+
 private:
     void initData();
     void initTable();
@@ -225,6 +227,7 @@ private:
     QList<QPair<int,int>> m_runDotLocs;
     int m_runDotCount;
     bool m_isRunningDot;
+    bool m_takePhoto=false;
 
     void readLocalData(QString filePath);
     void readLocalConfig(QString filePath);

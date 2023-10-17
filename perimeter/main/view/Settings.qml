@@ -84,9 +84,13 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
 
                             Flow{
                                 height: rowHeight;width: parent.width*0.7; anchors.horizontalCenter: parent.horizontalCenter;spacing: width*0.1
-//                                CusText{text:"First name and last name separated";width: parent.width*0.3;font.pointSize: fontPointSize;}
-//                                CusCheckBox{id:doubleName;checked:IcUiQmlApi.appCtrl.settings.doubleName;}
+                                CusText{text:lt+qsTr("Use VirtualKeyboard")+":"; horizontalAlignment: Text.AlignRight;width: parent.width*0.3;font.pointSize: fontPointSize;}
+                                Switch {
+                                    id: idEnableVkbd; width:parent.width*0.60; height:rowHeight;checked:IcUiQmlApi.appCtrl.settings.virtualKeyBoard;
+                                    onCheckedChanged: gVkbd.enabled = idEnableVkbd.checked;
+                                }
                             }
+
                         }
                         Item{
                             height: rowHeight; anchors.bottom: parent.bottom; anchors.bottomMargin: 0; anchors.horizontalCenter: parent.horizontalCenter; width: parent.width*0.6;
@@ -101,8 +105,7 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                     if(languageSelection.currentIndex==0) IcUiQmlApi.appCtrl.settings.language="Default";
                                     if(languageSelection.currentIndex==1) IcUiQmlApi.appCtrl.settings.language="Chinese";
                                     if(languageSelection.currentIndex==2) IcUiQmlApi.appCtrl.settings.language="English";
-//                                    console.log(doubleName.checked);
-//                                    IcUiQmlApi.appCtrl.settings.doubleName=doubleName.checked;
+                                    IcUiQmlApi.appCtrl.settings.virtualKeyBoard=idEnableVkbd.checked;
                                     IcUiQmlApi.appCtrl.settings.hospitalName=hospitalName.text;
                                     IcUiQmlApi.appCtrl.settings.save();
                                     idPopup.close();

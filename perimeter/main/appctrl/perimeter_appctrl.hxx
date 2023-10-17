@@ -60,7 +60,9 @@ public:
 
 //    Q_INVOKABLE void Quit();
 //    QObject*    getCurrentPatient();    void setCurrentPatient(QObject* value);     Q_SIGNAL void  currentPatientChanged(QObject* value);
-//    Q_SIGNAL void  changePage(QString value);
+    //    Q_SIGNAL void  changePage(QString value);
+public slots:
+    void adjustWindowSize(QObject *win_obj);
 protected:
     // override the name
     virtual QString   instanceName() const Q_DECL_OVERRIDE;

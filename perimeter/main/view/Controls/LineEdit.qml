@@ -5,12 +5,14 @@ import perimeter.main.view.Utils 1.0
 Item{
     id:root
     property int radius:height/6;
+    property string lang: "en_GB";
     property alias text:textInput.text;
     property alias verticalAlignment: textInput.verticalAlignment;
     property alias horizontalAlignment: textInput.horizontalAlignment;
     property alias readOnly: textInput.readOnly;
     property alias backgroundColor: recbackground.color;
     property alias textInput: textInput;
+
     width: parent.width;
     height:parent.height;
     clip: true
@@ -20,6 +22,8 @@ Item{
         id:recbackground;border.width: 1;radius: root.radius;color:root.enabled?readOnly? "#e4e6e8":"white" :"#e0e0e0";border.color: "#bdc0c6"
         TextInput{
             id:textInput;
+            objectName: "UserInputItem.TextField";
+            property string vkbdLangCountry : root.lang;
             anchors.fill: parent;
             anchors.leftMargin:horizontalAlignment==Text.AlignHCenter?0:10;
             text:"";

@@ -10,12 +10,19 @@ import perimeter.main.view.Utils 1.0
 import perm.view 1.0
 
 
-Window {
-    id: window;visible: true;width: 1366;height: 724;title: lt+qsTr("Perimeter");
+ApplicationWindow {
+    id: window;visible: true;width: 1360;height: 762;title: lt+qsTr("Perimeter");
 //    minimumWidth: 1366;minimumHeight: 768;
-    visibility:"Maximized"          //最大化
-    flags: Qt.Window /*| Qt.FramelessWindowHint          */ //不能隐藏任务栏 不知道为什么
+//    visibility:"Maximized"          //最大化
 
+//    flags: Qt.Window| Qt.FramelessWindowHint           //不能隐藏任务栏 不知道为什么
+    flags:Qt.Window|Qt.CustomizeWindowHint|Qt.MSWindowsFixedSizeDialogHint
+
+//    TextField { width:100; height:80; anchors.horizontalCenter: parent.horizontalCenter; anchors.verticalCenter: parent.verticalCenter; objectName: "UserInputItem.TextField"; placeholderText: "show me the money";
+//        //property string  vkbdLangCountry : "en_GB";
+//        property string vkbdLangCountry : "zh_CN";
+
+//    }
     DeviceStatus{anchors.fill:parent;visible:IcUiQmlApi.appCtrl.showDeviceStatusData;z:10;}
     Content{id:content;anchors.fill: parent;visible: false;onLogin:{visible=false;permMgrView.visible=true;}}
     PermMgrView{
@@ -25,6 +32,13 @@ Window {
     }
     property bool isEng: IcUiQmlApi.appCtrl.settings.isRuntimeLangEng;
     property string lt:"";
+    onVisibleChanged:
+    {
+        if(window===null) return;
+        if(window.visible) {IcUiQmlApi.appCtrl.adjustWindowsSzie(window)}
+    }
+
+
     Component.onCompleted: {
         IcUiQmlApi.appCtrl.settings.langTriggerChanged.connect(function(){ltChanged();});
         idPriv.init();

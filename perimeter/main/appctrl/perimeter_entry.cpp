@@ -23,6 +23,8 @@
 #include "perimeter/base/common/perimeter_guns.hxx"
 #include "perimeter/third-part/perm/local-part/resimprov/perm_improv.hxx"
 #include "perimeter/third-part/perm/perm_mod.hxx"
+#include "../ipckbd/build/include/common/ipcclientevtmon.hxx"
+#include "../ipckbd/build/include/common/regcommonitem_api.hxx"
 
 
 
@@ -162,11 +164,15 @@ int  main ( int argc, char *argv[] )
         QSharedPointer<QObject> s_app_ctrl( app_ctrl, [](QObject*){});
         QxPack::IcUiQmlApi::setAppCtrl( s_app_ctrl );
         FcPerm::PermMod perm_mod; perm_mod.registerTypesEx(app_ctrl);
+        IpcKbd::regCommonItem();
+        IpcKbd::IpcClientEvtMon  *cli_mon = new IpcKbd::IpcClientEvtMon( "CE_IPC_KBD", & app );
+        app.installEventFilter( cli_mon );
 
         //  here create the main view
         // --------------------------------------------------------------------
         QQmlApplicationEngine *eng = new QQmlApplicationEngine;
         eng->rootContext()->setContextProperty("applicationDirPath", QGuiApplication::applicationDirPath());
+        eng->rootContext()->setContextProperty( QStringLiteral("gVkbd"), qobject_cast< QObject* >( cli_mon ));
         eng->addImportPath(QStringLiteral("qrc:/") );
         eng->addImageProvider( QStringLiteral("PermImProv"), new FcPerm::PermImProv( ) );
 
