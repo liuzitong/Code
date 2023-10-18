@@ -427,7 +427,6 @@ Item{
                                         onClicked: {genderSelect.selectGender(2)}
                                     }
                                     function selectGender(id)
-
                                     {
                                         manButton.borderColor=manButton.commonBorderColor;
                                         womanButton.borderColor=womanButton.commonBorderColor;
@@ -439,6 +438,7 @@ Item{
                                             case 2:genderSelect.gender=2; otherButton.borderColor=otherButton.pressBorderColor;break;
                                         }
                                     }
+                                    Component.onCompleted: {genderSelect.selectGender(0);}
                                 }
                             }
                             Row{
@@ -563,9 +563,15 @@ Item{
     }
     Rectangle{id:bottomRibbon;width: parent.width;height: parent.height*1/15;color: "#333e44";anchors.bottom: parent.bottom
         Row{anchors.fill: parent;anchors.margins:parent.height*0.15;
-            Item{height: parent.height;width:parent.width*0.6;
-                CusButton{text:lt+qsTr("Exit");onClicked:Qt.quit()}
-                Flow{height: parent.height;spacing: height*0.8;anchors.horizontalCenter: parent.horizontalCenter
+            CusButton{text:lt+qsTr("Exit");onClicked:Qt.quit();}
+            Item{height: parent.height;width: parent.width*0.08}
+            Item
+            {
+                width: parent.width*0.32
+                height: parent.height;
+                Flow{
+                    anchors.fill: parent;
+                    layoutDirection: Qt.LeftToRight;spacing: height*0.8;anchors.horizontalCenter: parent.horizontalCenter
                     CusButton{
                         text:lt+qsTr("Recheck");
                         enabled:currentPatient!==null&&lastProgram!==null&&(IcUiQmlApi.appCtrl.checkSvc.debugMode||IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus===3&&IcUiQmlApi.appCtrl.checkSvc.deviceStatus===2);
@@ -577,7 +583,7 @@ Item{
                         {
                             var Name;
                             if(!doubleName) Name=newChineseName.text;else {Name=newEnglishFirstName.text+" "+newEnglishLastName.text;}
-//                            IcUiQmlApi.appCtrl.databaseSvc.updatePatient(IcUiQmlApi.appCtrl.currentPatient.id,newPatientId.text,Name,genderSelect.gender,newBirthDate.text);
+    //                            IcUiQmlApi.appCtrl.databaseSvc.updatePatient(IcUiQmlApi.appCtrl.currentPatient.id,newPatientId.text,Name,genderSelect.gender,newBirthDate.text);
                             currentPatient.patientId=newPatientId.text;
                             currentPatient.name=Name;
                             currentPatient.sex=genderSelect.gender;
@@ -613,61 +619,106 @@ Item{
                     }
                     CusButton{text:lt+qsTr("View reports");enabled:currentPatient!==null&&lastProgram!==null;onClicked: {root.changePage("analysisLobby",{});}}
                 }
+
             }
-            Flow{height:parent.height; layoutDirection: Qt.RightToLeft;width:parent.width*0.4;spacing: height*0.8;
-                CusButton{
-                    text:lt+qsTr("Check");
-//                    enabled: true;
-                    enabled:currentPatient!==null&&(IcUiQmlApi.appCtrl.checkSvc.debugMode||(IcUiQmlApi.appCtrl.checkSvc.deviceStatus===2&&IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus===3));
-                    onClicked:
-                    {
-                        root.changePage("check",{lastProgram:null,type:"check"});
-//                        console.log(currentPatient!==null);
-//                        console.log(IcUiQmlApi.appCtrl.checkSvc.deviceStatus);
-//                        console.log(IcUiQmlApi.appCtrl.checkSvc.debugMode);
-//                        console.log(IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus);
+
+            CusText
+            {
+                id:headsUp;color: "red";
+                width: parent.width*0.31;height:parent.height;
+            }
+
+            Item{
+                height:parent.height;width:parent.width*0.23;
+                Flow{anchors.fill: parent; layoutDirection: Qt.RightToLeft;spacing: height*0.8;
+                    CusButton{
+                        text:lt+qsTr("Check");
+    //                    enabled: true;
+                        enabled:currentPatient!==null&&(IcUiQmlApi.appCtrl.checkSvc.debugMode||(IcUiQmlApi.appCtrl.checkSvc.deviceStatus===2&&IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus===3));
+                        onClicked:
+                        {
+                            root.changePage("check",{lastProgram:null,type:"check"});
+    //                        console.log(currentPatient!==null);
+    //                        console.log(IcUiQmlApi.appCtrl.checkSvc.deviceStatus);
+    //                        console.log(IcUiQmlApi.appCtrl.checkSvc.debugMode);
+    //                        console.log(IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus);
+                        }
+                    }
+                    CusButton{id:patientSaveButton;text:lt+qsTr("Save");/*enabled: false;*/
+                        onClicked:{
+                            creatingNewPatient=true;
+                            headsUp.text="";
+                            var name="";
+                            if(!doubleName){
+                                name=newChineseName.text;
+                            }
+                            else {
+                                name = newEnglishFirstName.text+" "+newEnglishLastName.text;
+                            }
+                            console.log(newPatientId.text);
+                            console.log(name);
+                            console.log(newBirthDate.text);
+                            if(newPatientId.text.trim()==="")
+                                headsUp.text+="Patient ID";
+                            if(name.trim()==="")
+                            {
+                                if(headsUp.text!=="")
+                                    headsUp.text+=",name";
+                                else
+                                    headsUp.text+="Patient name";
+                            }
+                            if(newBirthDate.text.trim()==="")
+                            {
+                                if(headsUp.text!=="")
+                                    headsUp.text+=",birth date";
+                                else
+                                    headsUp.text+="Patient birth date";
+                            }
+                            console.log(headsUp.text.trim());
+                            if(headsUp.text.trim()!=="")
+                            {
+                                headsUp.text+=qsTr(" can't be blank.")
+                                creatingNewPatient=false;
+                                return;
+                            }
+
+                            if(currentPatient!==null) IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::PatientVm", currentPatient);
+                            currentPatient=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::PatientVm", false,[]);
+                            currentPatient.patientId=newPatientId.text.trim();
+                            currentPatient.name=name.trim();
+                            currentPatient.sex=genderSelect.gender;
+                            currentPatient.birthDate=newBirthDate.text.trim();
+                            if(parseFloat(rx1_l.text).toString()!=="NaN")
+                                currentPatient.rx.rx1_l=parseFloat(rx1_l.text);
+                            if(parseFloat(rx2_l.text).toString()!=="NaN")
+                                currentPatient.rx.rx2_l=parseFloat(rx2_l.text);
+                            if(parseFloat(rx3_l.text).toString()!=="NaN")
+                                currentPatient.rx.rx3_l=parseFloat(rx3_l.text);
+                            if(parseFloat(visual_l.text).toString()!=="NaN")
+                                currentPatient.rx.visual_l=parseFloat(visual_l.text);
+                            if(parseFloat(rx1_r.text).toString()!=="NaN")
+                                currentPatient.rx.rx1_r=parseFloat(rx1_r.text);
+                            if(parseFloat(rx2_r.text).toString()!=="NaN")
+                                currentPatient.rx.rx2_r=parseFloat(rx2_r.text);
+                            if(parseFloat(rx3_r.text).toString()!=="NaN")
+                                currentPatient.rx.rx3_r=parseFloat(rx3_r.text);
+                            if(parseFloat(visual_r.text).toString()!=="NaN")
+                                currentPatient.rx.visual_r=parseFloat(visual_r.text);
+                            currentPatient.insert();
+                            console.log(currentPatient.id);
+                            root.currentPatientChanged();
+                            query.startQuery();
+                            creatingNewPatient=false;
+                        }
+                    }
+                    CusButton{
+                        id:newPatientButton;text:lt+qsTr("New");
+                        onClicked: root.createNewPatient()
                     }
                 }
-                CusButton{id:patientSaveButton;text:lt+qsTr("Save");/*enabled: false;*/
-                    onClicked:{
-                        creatingNewPatient=true;
-                        var name="";
-                        if(!doubleName){ name=newChineseName.text; }
-                        else {name = newEnglishFirstName.text+" "+newEnglishLastName.text;}
-                        if(currentPatient!==null) IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::PatientVm", currentPatient);
-                        currentPatient=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::PatientVm", false,[]);
-                        currentPatient.patientId=newPatientId.text;
-                        currentPatient.name=name;
-                        currentPatient.sex=genderSelect.gender;
-                        currentPatient.birthDate=newBirthDate.text;
-                        if(parseFloat(rx1_l.text).toString()!=="NaN")
-                            currentPatient.rx.rx1_l=parseFloat(rx1_l.text);
-                        if(parseFloat(rx2_l.text).toString()!=="NaN")
-                            currentPatient.rx.rx2_l=parseFloat(rx2_l.text);
-                        if(parseFloat(rx3_l.text).toString()!=="NaN")
-                            currentPatient.rx.rx3_l=parseFloat(rx3_l.text);
-                        if(parseFloat(visual_l.text).toString()!=="NaN")
-                            currentPatient.rx.visual_l=parseFloat(visual_l.text);
-                        if(parseFloat(rx1_r.text).toString()!=="NaN")
-                            currentPatient.rx.rx1_r=parseFloat(rx1_r.text);
-                        if(parseFloat(rx2_r.text).toString()!=="NaN")
-                            currentPatient.rx.rx2_r=parseFloat(rx2_r.text);
-                        if(parseFloat(rx3_r.text).toString()!=="NaN")
-                            currentPatient.rx.rx3_r=parseFloat(rx3_r.text);
-                        if(parseFloat(visual_r.text).toString()!=="NaN")
-                            currentPatient.rx.visual_r=parseFloat(visual_r.text);
-                        currentPatient.insert();
-                        console.log(currentPatient.id);
-                        root.currentPatientChanged();
-                        query.startQuery();
-                        creatingNewPatient=false;
-                    }
-                }
-                CusButton{
-                    id:newPatientButton;text:lt+qsTr("New");
-                    onClicked: root.createNewPatient()
-                }
+
             }
+
         }
     }
 }

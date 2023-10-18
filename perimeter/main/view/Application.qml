@@ -35,7 +35,7 @@ ApplicationWindow {
     onVisibleChanged:
     {
         if(window===null) return;
-        if(window.visible) {IcUiQmlApi.appCtrl.adjustWindowsSzie(window)}
+//        if(window.visible) {IcUiQmlApi.appCtrl.adjustWindowSize(window)}
     }
 
 
