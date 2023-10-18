@@ -9,7 +9,7 @@ class DeviceDataProcesser
 {
 public:
     DeviceDataProcesser()=default;
-    static int getFocusMotorPosByDist(int focalDist,int spotSlot);
+    static int getFocusMotorPosByDist(int focalDist, int spotSlot, int focalMotorPosCorrection);
     static CoordMotorPosFocalDistInfo getXYMotorPosAndFocalDistFromCoord(const QPointF loc,bool isMainDotInfoTable);
 //    static QVector<QPoint> caculatePupilDeviation(const QByteArray ba,int width,int height,bool& valid);
 //    static float caculatePupilDiameter(QPoint topLeft,QPoint bottomRight);

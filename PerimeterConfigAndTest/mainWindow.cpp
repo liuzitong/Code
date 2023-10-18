@@ -281,7 +281,7 @@ int MainWindow::getFocusMotorPosByDist(int focalDist,int spotSlot)
     int indexDist= floor(focalDist/10)-8;
     int pos1=map(indexDist,spotSlot-1);
     int pos2=map(indexDist+1,spotSlot-1);
-    int focalMotorPos=pos1+(pos2-pos1)*(focalDist%10)/10;
+    int focalMotorPos=pos1+(pos2-pos1)*(focalDist%10)/10+m_config.focalMotorPosCorrectionRef();
     return focalMotorPos;
 }
 
