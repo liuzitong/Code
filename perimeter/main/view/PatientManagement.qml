@@ -14,6 +14,7 @@ Item{
     property string backGroundColor:"#dcdee0"
     property string backGroundBorderColor:"#bdc0c6"
     property var currentPatient:null;
+    property var modifyPatient: null;
     property var lastProgram:null;
 //    property var lastCheckResult: null;
     property int pageSize: 10;
@@ -53,27 +54,6 @@ Item{
     }
 
 
-    function createNewPatient(){
-        if(currentPatient!==null) IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::PatientVm", currentPatient);
-        currentPatient=null;
-        patientReviseButton.enabled=false;/*patientReviseButton.buttonColor="#787878"*/
-        patientSaveButton.enabled=true;/* patientSaveButton.buttonColor = "#dcdee0"*/
-        newPatientId.text="";
-        newChineseName.text="";
-        newEnglishFirstName.text="";
-        newEnglishLastName.text="";
-        genderSelect.selectGender(0);
-        newBirthDate.text="";
-        rx1_r.text="";
-        rx2_r.text="";
-        rx3_r.text="";
-        visual_r.text="";
-        rx1_l.text="";
-        rx2_l.text="";
-        rx3_l.text="";
-        visual_l.text="";
-    }
-
     Item{id:content;width: parent.width;height: parent.height*14/15;anchors.top: parent.top;
         property int layoutGroupMargin: 0.03*height
         CusCalendar{id: calendar;width: parent.width;height: parent.height;}
@@ -100,8 +80,9 @@ Item{
                         }
                         Row{
                             id:query; width: parent.width; height:patientInfo.rowHight;spacing: height*0.5
+                            CusButton{id:queryAllPatients;text:lt+qsTr("Show all");onClicked: {patientInfoListView.patientListModelVm.getPatientListByTimeSpan("","");queryStarted();}}
                             CusComboBox{
-                                id:queryStrategy;height: parent.height;width: parent.height*5;
+                                id:queryStrategy;height: parent.height;width: parent.height*4.5;
                                 borderColor: backGroundBorderColor;font.family:"Microsoft YaHei";
                                 imageSrc: "qrc:/Pics/base-svg/btn_drop_down.svg";
 //                                model: ListModel {ListElement { name: lt+qsTr("Query by time") } ListElement { name: lt+qsTr("Patient ID") } ListElement { name: lt+qsTr("Name") }ListElement { name: lt+qsTr("Sex") }ListElement { name: lt+qsTr("Birth date") }}
@@ -123,10 +104,10 @@ Item{
                             LineEdit{id:patientID;radius:height/6;width: height*4}
                             LineEdit{id:chineseName;radius:height/6;width: height*4;onEnterPressed:{query.startQuery();}}
                             Flow{
-                                id:englishNameGroup;height: parent.height;spacing: height*0.4;
-                                CusText{text:lt+qsTr("First name")+":";width:height*2.5;font.pointSize: fontPointSize;}
+                                id:englishNameGroup;height: parent.height;spacing: height*0.3;
+                                CusText{text:lt+qsTr("First name")+":";width:height*2.0;font.pointSize: fontPointSize;}
                                 LineEdit{id:firstName;radius:height/6;width: height*4}
-                                CusText{text:lt+qsTr("Last name")+":";width:height*2.5;font.pointSize: fontPointSize;}
+                                CusText{text:lt+qsTr("Last name")+":";width:height*2.0;font.pointSize: fontPointSize;}
                                 LineEdit{id:lastName;radius:height/6;width: height*4}
                             }
                             CusComboBox{
@@ -148,7 +129,6 @@ Item{
 
                             function startQuery()
                             {
-//                                console.log(patientID.text);
                                 switch (queryStrategy.currentIndex)
                                 {
                                 case 0:patientInfoListView.patientListModelVm.getPatientListByTimeSpan(dateFrom.text,dateTo.text);break;
@@ -204,12 +184,41 @@ Item{
                                     Component{
                                         id:patientInfoDelegate
                                         Item{
+                                            id:patientRowItem
                                             width: patientInfoListView.width;height: (patientInfoCol.height-patientInfo.rowHight)/pageSize+1;
                                             MouseArea{
-                                                anchors.fill: parent;
+                                                width: parent.width*0.8;anchors.left: parent.left;anchors.leftMargin: parent.width*0.1;height: parent.height;
+                                                onClicked:
+                                                {
+                                                    var firstName ="";var lastName="";
+                                                    if(currentPatient!==null) IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::PatientVm", currentPatient);
+                                                    currentPatient=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::PatientVm", false,[model.Id]);
+                                                    if(lastProgram!==null)
+                                                    {
+                                                        if(lastProgram.type!==2)
+                                                        {IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::StaticProgramVM", lastProgram);}
+                                                        else{IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::DynamicProgramVM", lastProgram);}
+                                                    }
+                                                    var lastCheckResult=currentPatient.getLastCheckResult();
+                                                    if(lastCheckResult!==null)
+                                                    {
+                                                        if(lastCheckResult.type!==2)
+                                                            lastProgram=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::StaticProgramVM", false,[lastCheckResult.program_id]);
+                                                        else
+                                                            lastProgram=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::DynamicProgramVM", false,[lastCheckResult.program_id]);
+
+                                                        lastProgram.params=lastCheckResult.params;
+                                                        if(lastCheckResult.type!==2)
+                                                            IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::StaticCheckResultVm", lastCheckResult);
+                                                        else
+                                                            IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::DynamicCheckResultVm", lastCheckResult);
+                                                        lastCheckResult=null;
+                                                    }
+                                                }
                                             }
                                             Row{
                                                 id:patientInfoRow;anchors.fill: parent;spacing: -1;
+
 //                                                property alias isAllSelected: header.isAllSelected;
 //                                                onIsAllSelectedChanged: isSelected=isAllSelected;
                                                 CusButton{
@@ -217,7 +226,7 @@ Item{
                                                     width: parent.width*1/10;height: parent.height;buttonColor: "white"; borderColor: backGroundBorderColor;radius:0;isAnime:false;imageSrc:"qrc:/Pics/base-svg/btn_select_normal.svg"
                                                     property bool isSelected:model.isSelected;
 //                                                    property bool isAllSelected: header.isAllSelected;
-                                                    enabled: currentPatient==null||(currentPatient.id!=model.Id);
+//                                                    enabled: currentPatient==null||(currentPatient.id!=model.Id);
                                                     onClicked:isSelected=!isSelected;
                                                     onIsSelectedChanged:
                                                     {
@@ -245,45 +254,42 @@ Item{
 //                                                    }
 
                                                 }
-                                                Rectangle{width: parent.width*2.5/10+1;height: parent.height;color: "white"; border.color: backGroundBorderColor;CusText{anchors.fill: parent;font.pointSize: fontPointSize;text:model.patientId/*+" "+model.Id*/}}
-                                                Rectangle{width: parent.width*2.5/10+1;height: parent.height;color: "white"; border.color: backGroundBorderColor;CusText{anchors.fill: parent;font.pointSize: fontPointSize;text:model.name/*+" "+model.Id+" "+model.lastUpdate*/}}
-                                                Rectangle{width: parent.width*1/10+1;height: parent.height;color: "white"; border.color: backGroundBorderColor;CusText{anchors.fill: parent;font.pointSize: fontPointSize;text:patientInfoListView.sex[model.sex]}}
-                                                Rectangle{width: parent.width*2/10+1;height: parent.height;color: "white"; border.color: backGroundBorderColor;CusText{anchors.fill: parent;font.pointSize: fontPointSize;text:model.birthDate}}
-                                                CusButton
+                                                Rectangle{width: parent.width*2.5/10+1;height: parent.height;color: currentPatient==null?"white":currentPatient.id==model.Id?"cyan":"white"; border.color: backGroundBorderColor;CusText{anchors.fill: parent;font.pointSize: fontPointSize;text:model.patientId/*+" "+model.Id*/}}
+                                                Rectangle{width: parent.width*2.5/10+1;height: parent.height;color: currentPatient==null?"white":currentPatient.id==model.Id?"cyan":"white"; border.color: backGroundBorderColor;CusText{anchors.fill: parent;font.pointSize: fontPointSize;text:model.name/*+" "+model.Id+" "+model.lastUpdate*/}}
+                                                Rectangle{width: parent.width*1/10+1;height: parent.height;color: currentPatient==null?"white":currentPatient.id==model.Id?"cyan":"white"; border.color: backGroundBorderColor;CusText{anchors.fill: parent;font.pointSize: fontPointSize;text:patientInfoListView.sex[model.sex]}}
+                                                Rectangle{width: parent.width*2/10+1;height: parent.height;color: currentPatient==null?"white":currentPatient.id==model.Id?"cyan":"white"; border.color: backGroundBorderColor;CusText{anchors.fill: parent;font.pointSize: fontPointSize;text:model.birthDate}}
+                                                Rectangle
                                                 {
-                                                    enabled: !selectedPatient.isSelected;
-                                                    width: parent.width*1/10;height: parent.height;buttonColor: "white"; radius:0;imageSrc:"qrc:/Pics/base-svg/btn_analysis_enter.svg"
-                                                    onClicked:
-                                                    {
-                                                        var firstName ="";var lastName="";
-                                                        if(currentPatient!==null) IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::PatientVm", currentPatient);
-                                                        currentPatient=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::PatientVm", false,[model.Id]);
-                                                        if(lastProgram!==null)
+                                                    width: parent.width*1/10;height: parent.height;color: modifyPatient==null?"white":modifyPatient.id==model.Id?"cyan":"white";border.color: backGroundBorderColor;
+                                                    Image {
+                                                        source: "qrc:/Pics/base-svg/btn_analysis_enter.svg";
+                                                        height: parent.height*0.6
+                                                        anchors.horizontalCenter: parent.horizontalCenter
+                                                        anchors.verticalCenter: parent.verticalCenter;
+                                                        width: sourceSize.width*(height/sourceSize.height);
+                                                    }
+                                                    MouseArea{
+                                                        anchors.fill: parent;
+                                                        onClicked:
                                                         {
-                                                            if(lastProgram.type!==2)
-                                                            {IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::StaticProgramVM", lastProgram);}
-                                                            else{IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::DynamicProgramVM", lastProgram);}
+                                                            var firstName ="";var lastName="";
+                                                            if(modifyPatient!==null) IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::PatientVm", modifyPatient);
+                                                            modifyPatient=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::PatientVm", false,[model.Id]);
+                                                            if(modifyPatient.name.indexOf(" ")>-1){ firstName =modifyPatient.name.split(" ")[0]; lastName=modifyPatient.name.split(" ")[1];};
+                                                            newPatientId.text=modifyPatient.patientId;newChineseName.text=modifyPatient.name;
+                                                            genderSelect.selectGender(modifyPatient.sex);newBirthDate.text=modifyPatient.birthDate;
+                                                            newEnglishFirstName.text=firstName;newEnglishLastName.text=lastName
+                                                            patientSaveButton.enabled=false;
+                                                            rx1_r.text=modifyPatient.rx.rx1_r.toFixed(2);
+                                                            rx2_r.text=modifyPatient.rx.rx2_r.toFixed(2);
+                                                            rx3_r.text=modifyPatient.rx.rx3_r.toFixed(2);
+                                                            visual_r.text=modifyPatient.rx.visual_r.toFixed(2);
+                                                            rx1_l.text=modifyPatient.rx.rx1_l.toFixed(2);
+                                                            rx2_l.text=modifyPatient.rx.rx2_l.toFixed(2);
+                                                            rx3_l.text=modifyPatient.rx.rx3_l.toFixed(2);
+                                                            visual_l.text=modifyPatient.rx.visual_l.toFixed(2);
+                                                            if(CommonSettings.deletePermission) patientReviseButton.enabled=true;
                                                         }
-                                                        var lastCheckResult=currentPatient.getLastCheckResult();
-                                                        if(lastCheckResult!==null)
-                                                        {
-                                                            if(lastCheckResult.type!==2)
-                                                                lastProgram=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::StaticProgramVM", false,[lastCheckResult.program_id]);
-                                                            else
-                                                                lastProgram=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::DynamicProgramVM", false,[lastCheckResult.program_id]);
-
-                                                            lastProgram.params=lastCheckResult.params;
-                                                            if(lastCheckResult.type!==2)
-                                                                IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::StaticCheckResultVm", lastCheckResult);
-                                                            else
-                                                                IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::DynamicCheckResultVm", lastCheckResult);
-                                                            lastCheckResult=null;
-                                                        }
-
-                                                        if(currentPatient.name.indexOf(" ")>-1){ firstName =currentPatient.name.split(" ")[0]; lastName=currentPatient.name.split(" ")[1];};
-                                                        newPatientId.text=currentPatient.patientId;newChineseName.text=currentPatient.name;genderSelect.selectGender(currentPatient.sex);newBirthDate.text=currentPatient.birthDate;newEnglishFirstName.text=firstName;newEnglishLastName.text=lastName
-                                                        patientSaveButton.enabled=false;/*patientSaveButton.buttonColor = "#787878"*/
-                                                        if(CommonSettings.deletePermission) patientReviseButton.enabled=true;/*patientReviseButton.buttonColor="#dcdee0"*/
                                                     }
                                                 }
                                             }
@@ -486,18 +492,18 @@ Item{
                                        LineEdit{ id:rx2_r;width: 2*height;horizontalAlignment: Text.AlignHCenter;/*text:currentPatient==null?"":currentPatient.rx.rx2_r.toFixed(2);*/textInput.validator: DoubleValidator{bottom:0.0;notation: DoubleValidator.StandardNotation;decimals: 2}}
                                        LineEdit{ id:rx3_r;width: 2*height;horizontalAlignment: Text.AlignHCenter;/*text:currentPatient==null?"":currentPatient.rx.rx3_r.toFixed(2);*/textInput.validator: DoubleValidator{bottom:0.0;notation: DoubleValidator.StandardNotation;decimals: 2}}
                                        LineEdit{ id:visual_r;width: 2*height;horizontalAlignment: Text.AlignHCenter;/*text:currentPatient==null?"":currentPatient.rx.visual_r.toFixed(2);*/textInput.validator: DoubleValidator{bottom:0.0;notation: DoubleValidator.StandardNotation;decimals: 2}}
-                                       Component.onCompleted:
-                                       {
-                                           currentPatientChanged.connect(function(){
-                                           if(currentPatient!==null&&!creatingNewPatient)
-                                           {
-                                               rx1_r.text=currentPatient.rx.rx1_r.toFixed(2);
-                                               rx2_r.text=currentPatient.rx.rx2_r.toFixed(2);
-                                               rx3_r.text=currentPatient.rx.rx3_r.toFixed(2);
-                                               visual_r.text=currentPatient.rx.visual_r.toFixed(2);
-                                           }
-                                           });
-                                       }
+//                                       Component.onCompleted:
+//                                       {
+//                                           currentPatientChanged.connect(function(){
+//                                           if(currentPatient!==null&&!creatingNewPatient)
+//                                           {
+//                                               rx1_r.text=currentPatient.rx.rx1_r.toFixed(2);
+//                                               rx2_r.text=currentPatient.rx.rx2_r.toFixed(2);
+//                                               rx3_r.text=currentPatient.rx.rx3_r.toFixed(2);
+//                                               visual_r.text=currentPatient.rx.visual_r.toFixed(2);
+//                                           }
+//                                           });
+//                                       }
                                    }
                                }
                                Row{
@@ -509,18 +515,18 @@ Item{
                                        LineEdit{ id:rx2_l;width: 2*height;horizontalAlignment: Text.AlignHCenter;/*text:currentPatient==null?"":currentPatient.rx.rx2_l.toFixed(2);*/textInput.validator: DoubleValidator{bottom:0.0;notation: DoubleValidator.StandardNotation;decimals: 2}}
                                        LineEdit{ id:rx3_l;width: 2*height;horizontalAlignment: Text.AlignHCenter;/*text:currentPatient==null?"":currentPatient.rx.rx3_l.toFixed(2);*/textInput.validator: DoubleValidator{bottom:0.0;notation: DoubleValidator.StandardNotation;decimals: 2}}
                                        LineEdit{ id:visual_l;width: 2*height;horizontalAlignment: Text.AlignHCenter;/*text:currentPatient==null?"":currentPatient.rx.visual_l.toFixed(2);*/textInput.validator: DoubleValidator{bottom:0.0;notation: DoubleValidator.StandardNotation;decimals: 2}}
-                                       Component.onCompleted:
-                                       {
-                                           currentPatientChanged.connect(function(){
-                                               if(currentPatient!==null&&!creatingNewPatient)
-                                               {
-                                                   rx1_l.text=currentPatient.rx.rx1_l.toFixed(2);
-                                                   rx2_l.text=currentPatient.rx.rx2_l.toFixed(2);
-                                                   rx3_l.text=currentPatient.rx.rx3_l.toFixed(2);
-                                                   visual_l.text=currentPatient.rx.visual_l.toFixed(2);
-                                               }
-                                           });
-                                       }
+//                                       Component.onCompleted:
+//                                       {
+//                                           currentPatientChanged.connect(function(){
+//                                               if(currentPatient!==null&&!creatingNewPatient)
+//                                               {
+//                                                   rx1_l.text=currentPatient.rx.rx1_l.toFixed(2);
+//                                                   rx2_l.text=currentPatient.rx.rx2_l.toFixed(2);
+//                                                   rx3_l.text=currentPatient.rx.rx3_l.toFixed(2);
+//                                                   visual_l.text=currentPatient.rx.visual_l.toFixed(2);
+//                                               }
+//                                           });
+//                                       }
                                    }
                                }
                                Row{
@@ -583,29 +589,28 @@ Item{
                         {
                             var Name;
                             if(!doubleName) Name=newChineseName.text;else {Name=newEnglishFirstName.text+" "+newEnglishLastName.text;}
-    //                            IcUiQmlApi.appCtrl.databaseSvc.updatePatient(IcUiQmlApi.appCtrl.currentPatient.id,newPatientId.text,Name,genderSelect.gender,newBirthDate.text);
-                            currentPatient.patientId=newPatientId.text;
-                            currentPatient.name=Name;
-                            currentPatient.sex=genderSelect.gender;
-                            currentPatient.birthDate=newBirthDate.text;
+                            modifyPatient.patientId=newPatientId.text;
+                            modifyPatient.name=Name;
+                            modifyPatient.sex=genderSelect.gender;
+                            modifyPatient.birthDate=newBirthDate.text;
 
                             if(parseFloat(rx1_l.text).toString()!=="NaN")
-                                currentPatient.rx.rx1_l=parseFloat(rx1_l.text);
+                                modifyPatient.rx.rx1_l=parseFloat(rx1_l.text);
                             if(parseFloat(rx2_l.text).toString()!=="NaN")
-                                currentPatient.rx.rx2_l=parseFloat(rx2_l.text);
+                                modifyPatient.rx.rx2_l=parseFloat(rx2_l.text);
                             if(parseFloat(rx3_l.text).toString()!=="NaN")
-                                currentPatient.rx.rx3_l=parseFloat(rx3_l.text);
+                                modifyPatient.rx.rx3_l=parseFloat(rx3_l.text);
                             if(parseFloat(visual_l.text).toString()!=="NaN")
-                                currentPatient.rx.visual_l=parseFloat(visual_l.text);
+                                modifyPatient.rx.visual_l=parseFloat(visual_l.text);
                             if(parseFloat(rx1_r.text).toString()!=="NaN")
-                                currentPatient.rx.rx1_r=parseFloat(rx1_r.text);
+                                modifyPatient.rx.rx1_r=parseFloat(rx1_r.text);
                             if(parseFloat(rx2_r.text).toString()!=="NaN")
-                                currentPatient.rx.rx2_r=parseFloat(rx2_r.text);
+                                modifyPatient.rx.rx2_r=parseFloat(rx2_r.text);
                             if(parseFloat(rx3_r.text).toString()!=="NaN")
-                                currentPatient.rx.rx3_r=parseFloat(rx3_r.text);
+                                modifyPatient.rx.rx3_r=parseFloat(rx3_r.text);
                             if(parseFloat(visual_r.text).toString()!=="NaN")
-                                currentPatient.rx.visual_r=parseFloat(visual_r.text);
-                            currentPatient.update();
+                                modifyPatient.rx.visual_r=parseFloat(visual_r.text);
+                            modifyPatient.update();
                             query.startQuery();
                         }
                     }
@@ -613,7 +618,12 @@ Item{
                         text:lt+qsTr("Delete");
                         enabled: CommonSettings.deletePermission&&patientInfoListView.patientListModelVm.selectedCount>0;
                         onClicked: {
+                            if(currentPatient!==null) IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::PatientVm", currentPatient);
+                            if(modifyPatient!==null) IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::PatientVm", currentPatient);
+                            currentPatient=null;
+                            modifyPatient=null;
                             patientInfoListView.patientListModelVm.deletePatients();
+                            newPatientButton.clicked()
                             query.startQuery();
                         }
                     }
@@ -659,25 +669,25 @@ Item{
                             console.log(name);
                             console.log(newBirthDate.text);
                             if(newPatientId.text.trim()==="")
-                                headsUp.text+="Patient ID";
+                                headsUp.text+=qsTr("Patient ID");
                             if(name.trim()==="")
                             {
                                 if(headsUp.text!=="")
-                                    headsUp.text+=",name";
+                                    headsUp.text+=","+qsTr("name");
                                 else
-                                    headsUp.text+="Patient name";
+                                    headsUp.text+=qsTr("Patient name");
                             }
                             if(newBirthDate.text.trim()==="")
                             {
                                 if(headsUp.text!=="")
-                                    headsUp.text+=",birth date";
+                                    headsUp.text+=","+qsTr("birth date");
                                 else
-                                    headsUp.text+="Patient birth date";
+                                    headsUp.text+=qsTr("Patient birth date");
                             }
                             console.log(headsUp.text.trim());
                             if(headsUp.text.trim()!=="")
                             {
-                                headsUp.text+=qsTr(" can't be blank.")
+                                headsUp.text+=" "+qsTr("can't be blank")+".";
                                 creatingNewPatient=false;
                                 return;
                             }
@@ -713,7 +723,29 @@ Item{
                     }
                     CusButton{
                         id:newPatientButton;text:lt+qsTr("New");
-                        onClicked: root.createNewPatient()
+                        onClicked:
+                        {
+                            if(currentPatient!==null) IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::PatientVm", currentPatient);
+                            if(modifyPatient!==null) IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::PatientVm", currentPatient);
+                            currentPatient=null;
+                            modifyPatient=null;
+                            patientReviseButton.enabled=false;/*patientReviseButton.buttonColor="#787878"*/
+                            patientSaveButton.enabled=true;/* patientSaveButton.buttonColor = "#dcdee0"*/
+                            newPatientId.text="";
+                            newChineseName.text="";
+                            newEnglishFirstName.text="";
+                            newEnglishLastName.text="";
+                            genderSelect.selectGender(0);
+                            newBirthDate.text="";
+                            rx1_r.text="";
+                            rx2_r.text="";
+                            rx3_r.text="";
+                            visual_r.text="";
+                            rx1_l.text="";
+                            rx2_l.text="";
+                            rx3_l.text="";
+                            visual_l.text="";
+                        }
                     }
                 }
 

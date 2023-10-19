@@ -31,11 +31,14 @@ Item{
     signal released()
     signal entered()
     signal exited()
+
+
 //    onEnabledChanged: {
 //        enabled?buttonColor="#dcdee0":buttonColor="#989898";
 //    }
 
     MouseArea{
+        id:mouseArea;
         property string tempColor;
         anchors.fill: parent
         hoverEnabled: root.hoverEnabled
