@@ -4,10 +4,10 @@
     "beepCount": 3,
     "beepDuration": 200,
     "beepInterval": 200,
-    "castLightDA": 3130,
+    "castLightDA": 3150,
     "castLightDAChangeStep": 10,
     "castLightDADifferenceTolerance": 1000,
-    "castLightLastAdjustedDate": "2023/10/18",
+    "castLightLastAdjustedDate": "2023/10/20",
     "castLightTargetColor": 0,
     "castLightTargetSize": 5,
     "colorToSlot": [

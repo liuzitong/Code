@@ -33,6 +33,21 @@ Item {id:root; width: 1366;height: 691
     Component.onCompleted:{
         frameProvidSvc=IcUiQmlApi.appCtrl.frameProvidSvc;
         checkSvc.checkResultChanged.connect(currentCheckResultChanged);
+        checkSvc.castLightAdjustStatusChanged.connect(function()
+        {
+            if(checkSvc.castLightAdjustStatus===3)
+            {
+                if (currentProgram==null)
+                {
+                    var program_id=IcUiQmlApi.appCtrl.settings.defaultProgramId;
+                    var program_type=IcUiQmlApi.appCtrl.settings.defaultProgramType;
+                    if(program_type!==2)
+                        currentProgram=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::StaticProgramVM", false,[program_id]);
+                    else
+                        currentProgram=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::DynamicProgramVM", false,[program_id]);
+                }
+            }
+        });
         checkSvc.deviceStatusChanged.connect(function()
         {
             if(atCheckingPage)
@@ -46,7 +61,7 @@ Item {id:root; width: 1366;height: 691
                     currentCheckResult=null;
                 }
                 IcUiQmlApi.appCtrl.checkSvc.readyToCheck=false;
-                if(currentProgram!=null&&currentPatient!=null&&checkSvc.deviceStatus===2)
+                if(currentProgram!=null&&currentPatient!=null&&checkSvc.deviceStatus===2&&checkSvc.castLightAdjustStatus===3)
                 {
                     IcUiQmlApi.appCtrl.checkSvc.prepareToCheck();
                 }

@@ -40,14 +40,18 @@
 #if defined( QT_DEBUG )
 #  if defined( Q_OS_WIN32 ) || defined( Q_OS_WIN )
 #    define TEXT_PermExe  QStringLiteral("rpcpermd.exe")
+#    define TEXT_KbdExe  QStringLiteral("ipckbdsrvd.exe")
 #  else
 #    define TEXT_PermExe  QStringLiteral("rpcpermd")
+#    define TEXT_KbdExe  QStringLiteral("ipckbdsrvd")
 #  endif
 #else
 #  if defined( Q_OS_WIN32 ) || defined( Q_OS_WIN )
 #    define TEXT_PermExe  QStringLiteral("rpcperm.exe")
+#    define TEXT_KbdExe  QStringLiteral("ipckbdsrv.exe")
 #  else
 #    define TEXT_PermExe  QStringLiteral("rpcperm")
+#    define TEXT_KbdExe  QStringLiteral("ipckbdsrv")
 #  endif
 #endif
 
@@ -145,6 +149,7 @@ int  main ( int argc, char *argv[] )
 
     QProcess p;
     p.execute("taskkill /im jrpcplatsvr.exe /f");
+    p.execute("taskkill /im "+ TEXT_KbdExe+" /f");
     p.execute("taskkill /im "+ TEXT_PermExe+" /f");
     p.close();
 
