@@ -113,6 +113,8 @@ UtilitySvc::UtilitySvc()
         m_centerPointCheckedWaitingTime=jo["centerPointCheckedWaitingTime"].toInt();
         m_debugMode=jo["debugMode"].toBool();
         m_showCheckingDot=jo["showCheckingDot"].toBool();
+        m_beginningCheckDBDec=jo["beginningCheckDBDec"].toInt();
+        m_beginningCheckDBCount=jo["beginningCheckDBCount"].toInt();
 
         QStringList strs=jo["realTimeEyePosPicSize"].toString().split("*");
         if(strs.size()==2)

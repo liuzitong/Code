@@ -11,6 +11,8 @@
     "checkFalseNegAndPos":true,
     "realTimeEyePosPicSize":"320*240",
     "checkZoneRatio":1.4,
+    "beginningCheckDBDec":4,
+    "beginningCheckDBCount":4,
     "boundaryOne":
     {
         "center":{"x":-25,"y":0},

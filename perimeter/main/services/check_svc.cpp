@@ -433,6 +433,13 @@ void StaticCheck::Checkprocess()
     else
     {
         m_lastCheckDotRecord.push_back(&getCheckDotRecordRef());   //存储lastDotType为commondot 并且存储指针
+        if(m_stimulationCount<=UtilitySvc::getSingleton()->m_beginningCheckDBCount)                                   //调高最高时测的几次的DB。
+        {
+            if(m_lastCheckDotRecord.last()->StimulationDBs.count()==1)
+            {
+                m_lastCheckDotRecord.last()->StimulationDBs[0]=qMax( m_lastCheckDotRecord.last()->StimulationDBs[0]-UtilitySvc::getSingleton()->m_beginningCheckDBDec,0);
+            }
+        }
         emit nextCheckingDotChanged(m_lastCheckDotRecord.last()->loc);
         checkingDot=true;
         getReadyToStimulate(m_lastCheckDotRecord.last()->loc,m_lastCheckDotRecord.last()->StimulationDBs.last());
