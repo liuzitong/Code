@@ -41,31 +41,31 @@ INCLUDEPATH += $$PWD/../../../perimeter/third-part/QxOrm/include
 INCLUDEPATH += $$PWD/../../../perimeter/third-part/LimeReport/include
 INCLUDEPATH += $$PWD/../../../perimeter/third-part/LimeReport/limereport/base
 INCLUDEPATH += $$PWD/../../../perimeter/third-part/
-
+INCLUDEPATH *= PWD/../../../
 
 LIBS += -L$$PWD/../../../perimeter/third-part/QxOrm/lib
 LIBS += -L$$PWD/../../../perimeter/third-part/boost/lib
+LIBS += -L$$PWD/../../../ipckbd/build/lib
 
-INCLUDEPATH *= PWD/../../../
 
 
 # 设置生成的目标名称、添加依赖库
 CONFIG(debug, debug|release) {
     LIBS += -L$$PWD/../../../deviceOperation/bin/debug
     LIBS += -L$$PWD/../../../perimeter/third-part/LimeReport/build/5.9.7/win64/debug/lib
-    LIBS += -L$$PWD/../../../ipckbd/build/lib
-    LIBS += -l"QxOrmd" -l"limereportd" -l"QtZintd" -l"deviceOperationd" -l"ipckbdclid"
+
+    LIBS += -l"QxOrmd" -l"limereportd" -l"QtZintd" -l"deviceOperationd" -l"ipckbdclid" -l"libboost_serialization-vc140-mt-gd-x64-1_78"
+
     CONFIG += qml_debug
     CONFIG += console
-    LIBS += -l"libboost_serialization-vc140-mt-gd-x64-1_78"
     DESTDIR=$$PWD/../../bin/debug
 } else {
     LIBS += -L$$PWD/../../../deviceOperation/bin/release
     LIBS += -L$$PWD/../../../perimeter/third-part/LimeReport/build/5.9.7/win64/release/lib
-    LIBS += -L$$PWD/../../../ipckbd/build/lib
-    LIBS += -l"QxOrm" -l"limereport" -l"QtZint" -l"deviceOperation" -l"ipckbdcli"
+
+    LIBS += -l"QxOrm" -l"limereport" -l"QtZint" -l"deviceOperation" -l"ipckbdcli" -l"libboost_serialization-vc140-mt-x64-1_78"
+
     DEFINES+=QT_QML_DEBUG_NO_WARNING
-    LIBS += -l"libboost_serialization-vc140-mt-x64-1_78"
     DESTDIR=$$PWD/../../bin/release
 }
 

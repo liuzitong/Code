@@ -3,6 +3,7 @@
 #include <usbdev/main/usbdev_devctl.hxx>
 #include <device_operation.h>
 #include <device_settings.h>
+
 namespace DevOps{
 
 //QSharedPointer<DeviceDataProcesser> DeviceDataProcesser::m_singleton=nullptr;

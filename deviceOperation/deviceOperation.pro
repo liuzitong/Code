@@ -1,15 +1,22 @@
 include( $$PWD/deviceOperation.pri )
 include( $$PWD/../usbdev-build/usbdev/usbdev.pri )
-#include( $$PWD/defines.pri )
+
 QT       += core
 QT *= gui
 QT += widgets
+
+
+INCLUDEPATH += $$PWD/../opencv/build/include
+LIBS += -L$$PWD/../opencv/build/x64/vc16/lib
+
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
     DESTDIR =$$PWD/bin/debug
+    LIBS += -l"opencv_world481d"
 }
 else{
     DESTDIR =$$PWD/bin/release
+    LIBS += -l"opencv_world481"
 }
 
 

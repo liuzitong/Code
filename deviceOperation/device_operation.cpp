@@ -804,7 +804,8 @@ void DeviceOperation::workOnNewFrameData()
     m_frameRawData=m_frameData.rawData();
     m_frameRawDataLock.unlock();
     auto data=m_frameData.rawData();
-    m_devicePupilProcessor.processData((uchar*)data.data(),m_videoSize.width(),m_videoSize.height());
+//    m_devicePupilProcessor.processData((uchar*)data.data(),m_videoSize.width(),m_videoSize.height());
+    m_devicePupilProcessor.find_point((uchar*)data.data(),m_videoSize.width(),m_videoSize.height());
     QImage img((uchar*)data.data(),m_videoSize.width(),m_videoSize.height(),QImage::Format_Grayscale8);
     img=img.convertToFormat(QImage::Format_ARGB32);
     if(m_devicePupilProcessor.m_pupilResValid)

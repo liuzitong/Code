@@ -2,189 +2,115 @@
 #include <iostream>
 #include <QDebug>
 #include <QtMath>
+#include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
+#include <QVector>
+#include <QPoint>
+#include <QImage>
+#include <QDebug>
+
 namespace DevOps{
+void DevicePupilProcessor::find_point(uchar* data, int width, int height)
+{
+    QImage image(data,width,height,QImage::Format_Grayscale8);
+    QVector<QPoint>  point_vec;    //0:瞳孔中心点  1,2,3:三个反光点
+    int  center_radius;
+    m_pupilResValid=false;
+
+    QVector<QPoint> result;
+    cv::Mat gray_image = cv::Mat(image.height(), image.width(), CV_8UC1, image.bits(), image.bytesPerLine());
+    std::vector<cv::Vec3f> circles;
+    cv::HoughCircles(gray_image, circles, cv::HOUGH_GRADIENT, 1, 100, 60, 30, 15, 50);
+
+    QPoint pupil_center;
+    int pupil_radius = 0;
+
+    for (auto circle : circles) {
+        pupil_center = QPoint(cvRound(circle[0]), cvRound(circle[1]));
+        pupil_radius = cvRound(circle[2]);
+        break;
+    }
+
+    center_radius = pupil_radius;
+
+    result.append(pupil_center);
+
+    if (pupil_radius > pupil_center.x() || pupil_radius > pupil_center.y()) {
+        return;
+    }
+
+    cv::Rect pupil_roi_rect(pupil_center.x() - pupil_radius, pupil_center.y() - pupil_radius, pupil_radius * 2, pupil_radius * 2);
+
+    cv::Mat pupil_roi = gray_image(pupil_roi_rect);
+    double pupil_max_val = 0;
+    double image_mean_val = cv::mean(gray_image).val[0];
+
+    cv::minMaxLoc(pupil_roi, nullptr, &pupil_max_val);
+
+    double pupil_threshold = (pupil_max_val + image_mean_val) / 2;
+
+    cv::Mat threshold_image;
+
+    cv::threshold(gray_image, threshold_image, pupil_threshold, 255, cv::THRESH_BINARY_INV);
+
+    if (threshold_image.empty()) {
+        return;
+    }
+
+    std::vector<cv::Mat> contours;
+    cv::findContours(threshold_image, contours, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
+
+    contours = std::vector<cv::Mat>(contours.begin() + 1, contours.end());
+
+    if (contours.empty()) {
+        return;
+    }
+
+    for (auto cnt : contours) {
+        auto rect = cv::boundingRect(cnt);
+        QPoint point(rect.x + int(rect.width / 2), rect.y + int(rect.height / 2));
+        result.append(point);
+    }
+
+    point_vec = std::move(result);
+
+
+    m_pupilDeviation=13;
+    m_pupilResValid=(point_vec.count()>0);
+    if(m_pupilResValid)
+    {
+        m_pupilCenterPoint=point_vec[0];
+        m_pupilDiameterPix=center_radius*2;
+
+        auto pupilDiameter=m_pupilDiameterPix*DeviceSettings::getSingleton()->m_pupilDiameterPixelToMillimeterConstant*320/width;
+        if(m_pupilDiameterArr.length()>=20) m_pupilDiameterArr.pop_front();
+        m_pupilDiameterArr.push_back(pupilDiameter);
+        {
+            float sum=0;
+            for(auto&i:m_pupilDiameterArr) sum+=i;
+            m_pupilDiameter=sum/m_pupilDiameterArr.size();
+//            std::cout<<m_pupilDiameter<<std::endl;
+        }
+
+//        auto vcReflectionDot=caculateReflectingDot(data,width,height);
+        m_reflectionResValid=(point_vec.length()==4);
+
+
+        qDebug()<<"******************************";
+        qDebug()<<m_reflectionResValid;
+        qDebug()<<"******************************";
+        if(m_reflectionResValid)
+        {
+//            std::cout<<"find reflectionDot."<<std::endl;
+            m_reflectionDot={point_vec[1],point_vec[2],point_vec[3]};
+            m_pupilDeviation=caculateFixationDeviation(m_pupilCenterPoint,m_reflectionDot);
+        }
+    }
+}
+
 DevicePupilProcessor::DevicePupilProcessor()
 {
 
-}
-
-void DevicePupilProcessor::processData(QByteArray data)
-{
-    int px,py,pdx,pdy,pwx,pwy;
-    double vx,vy,vdx,vdy,vwx,vwy;
-    auto res=findPupil(data);
-    QVector<double> avg;
-    if(!res.isEmpty())
-    {
-        px=res[0];py=res[1];pdx=res[2];pdy=res[3];pwx=res[4];pwy=res[5];
-        m_pupilData.push_back(res);
-        m_pupilDeviation=qAbs(getEyeMove(px,py,pdx,pdy,pwx,pwy));
-    }
-    if(!res.isEmpty()&&pdx>=10&&pdx<=71)
-    {
-        if(m_pupilData.length()>10) m_pupilData.pop_front();
-        for(int i=0;i<6;i++)
-        {
-            int sum=0;
-            for(int j=0;j<m_pupilData.length();j++)
-            {
-                sum+=m_pupilData[j][i];
-            }
-            avg.push_back(double(sum)/m_pupilData.length());
-        }
-        vx=avg[0];vy=avg[1];vdx=avg[2];vdy=avg[3];vwx=avg[4];vwy=avg[5];
-        m_pupilDiameter=vdx*DeviceSettings::getSingleton()->m_pupilDiameterPixelToMillimeterConstant;
-    }
-}
-
-QVector<int> DevicePupilProcessor::findPupil(QByteArray data)
-{
-    int px,py,pdx,pdy,pwx,pwy;
-    auto pupilGreyLimit=DeviceSettings::getSingleton()->m_pupilGreyLimit;
-    auto dataPupil=DataToBlackAndWhite(data,pupilGreyLimit);
-    QVector<int> pupilFindRes;
-    for(int w=50;w<270;w++)
-    {
-        for(int h=50;h<190;h++)
-        {
-            auto val=dataPupil.at(h*320+w);
-            if(val==0)
-            {
-                auto res=findPupilAtXY(dataPupil,w,h);
-                if(!res.isEmpty())
-                {
-                    pupilFindRes=res;
-                    break;
-                }
-            }
-        }
-        if(!pupilFindRes.isEmpty()) break;
-    }
-    if(pupilFindRes.isEmpty()){return {};}
-
-    px=pupilFindRes[0];py=pupilFindRes[1];pdx=pupilFindRes[2];pdy=pupilFindRes[3];
-    int x1=(px+py+pdx)/2;
-    int y1=py+50;
-    auto dataWhiteDot=DataToBlackAndWhite(data,250);
-    QVector<int> res1;
-    QVector<int> res2;
-    for(int y=py+10;y<=y1;y++)
-    {
-        for(int x=px-30;x<270;)
-        {
-            res1=findWhiteDot(dataWhiteDot,x,y,x1,y1);
-            if(!res1.isEmpty())
-            {
-                int x0=res1[0];
-                int y0=res1[1];
-                x=x0+1;
-                res2=findWhiteDot(dataWhiteDot,x0+20,y0-2,x0+40,y0+2);
-                if(!res2.isEmpty())
-                {
-
-                    x1=res2[0];
-                    y1=res2[1];
-                    pwx=(x0+x1)/2;
-                    pwy=(y0+y1)/2;
-                    return {px,py,pdx,pdy,pwx,pwy};
-                }
-            }
-            else
-            {
-                return {};
-            }
-        }
-    }
-    return {};
-}
-
-QByteArray DevicePupilProcessor::DataToBlackAndWhite(QByteArray data, int value)
-{
-    uchar* data_ptr=(uchar*)data.data();
-    for(int i=0;i<data.length();i++)
-    {
-        if(data_ptr[i]>value)
-            data_ptr[i]=255;
-        else
-            data_ptr[i]=0;
-    }
-    return data;
-}
-
-double DevicePupilProcessor::getEyeMove(double x, double y, double dx, double dy, double wx, double wy)
-{
-    return 0.0;
-}
-
-QVector<int> DevicePupilProcessor::findPupilAtXY(QByteArray data, int x, int y)
-{
-    auto y1=findWhiteY(data,x,y,1);
-    if(y1-y>15||y==-1) return {};
-    if(!isWhiteYLine(data,x-1,(y+y1)/2-10)) return {};
-    auto x1=findWhiteYLine(data,x,(y+y1)/10);
-    if(x1==-1) return{};
-    int n;
-    for(int i=0;i<10;i++)
-        for(int j=0;j<10;j++)
-            if((uchar)data[(y+j)*320+x+i]==0)
-                n++;
-    if(n<70) return {};
-    if(!pupilFeature(data,x,y,x1,y1)) return {};
-
-    int px=x;
-    int pdx=x1-x;
-    int py=(y+y1-pdx)/2;
-    int pdy=pdx;
-    return {px,py,pdx,pdy};
-
-}
-
-int DevicePupilProcessor::findWhiteY(QByteArray data, int x, int y,int step)
-{
-    for(int i=0;i<40;i++)
-    {
-        if((uchar)data[y*320+x]==255)
-        {
-            return y;
-        }
-        else y+=step;
-    }
-    return -1;
-}
-
-int DevicePupilProcessor::findWhiteYLine(QByteArray data,int x,int y)
-{
-    for(int i=0;i<40;i++)
-    {
-        if(isWhiteYLine(data,x+i,y))
-        {
-            if(i<10) return -1;
-            if(i>=10) return x+i;
-        }
-    }
-    return -1;
-}
-
-QVector<int> DevicePupilProcessor::findWhiteDot(QByteArray data, int x, int y, int x1, int y1)
-{
-    return {};
-}
-
-
-bool DevicePupilProcessor::isWhiteYLine(QByteArray data, int x, int y)
-{
-    int n=0;
-    for(int i=0;i<20;i++)
-    {
-        if((uchar)data[(y+i)*320+x]==0) n++;
-    }
-    if(n<=2) return true;
-    else return false;
-}
-
-bool DevicePupilProcessor::pupilFeature(QByteArray data, int x, int y, int x1, int y1)
-{
-    return false;
 }
 
 void DevicePupilProcessor::processData(uchar* data, int width, int height)
@@ -216,7 +142,7 @@ void DevicePupilProcessor::processData(uchar* data, int width, int height)
         {
 //            std::cout<<"find reflectionDot."<<std::endl;
             m_reflectionDot={vcReflectionDot[0].toPoint(),vcReflectionDot[1].toPoint(),vcReflectionDot[2].toPoint()};
-            m_pupilDeviation=caculateFixationDeviation(vcPupil,vcReflectionDot);
+            m_pupilDeviation=caculateFixationDeviation(m_pupilCenterPoint,vcReflectionDot);
         }
     }
 }
@@ -444,11 +370,11 @@ float DevicePupilProcessor::caculatePupilDiameter(QPointF topLeft,QPointF bottom
     return pixelDiameter;
 }
 
-int DevicePupilProcessor::caculateFixationDeviation(QVector<QPointF> pupil, QVector<QPointF> reflectionDot)
+int DevicePupilProcessor::caculateFixationDeviation(QPointF pupil, QVector<QPointF> reflectionDot)
 {
     auto middleDot=reflectionDot[1];
-    double distX=pupil[0].x()-middleDot.x();
-    double distY=pupil[0].y()-(middleDot.y()-DeviceSettings::getSingleton()->m_pixelDistFromPupilCenterToMiddleReflectionDot);
+    double distX=pupil.x()-middleDot.x();
+    double distY=pupil.y()-(middleDot.y()-DeviceSettings::getSingleton()->m_pixelDistFromPupilCenterToMiddleReflectionDot);
     auto deviation=qRound(sqrt(distX*distX+distY*distY)*DeviceSettings::getSingleton()->m_pupilDeviationPixelToNumberConstant);
     return deviation;
 }
