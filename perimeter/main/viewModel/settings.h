@@ -19,7 +19,7 @@ class Settings :public QObject
     Q_PROPERTY(int defaultProgramType READ defaultProgramType WRITE setDefaultProgramType)
 //    Q_PROPERTY(QString trigger READ getTrigger NOTIFY triggerChanged)
     Q_PROPERTY(QString langTrigger READ langTrigger /*WRITE setLangTrigger*/ NOTIFY langTriggerChanged)
-    Q_PROPERTY(bool virtualKeyBoard READ getVirtualKeyBoard WRITE setVirtualKeyBoard)
+    Q_PROPERTY(bool virtualKeyBoard READ getVirtualKeyBoard WRITE setVirtualKeyBoard NOTIFY virtualKeyBoardChanged)
 //    Q_PROPERTY(QVariantList boundaries READ getBoundaries)
 
 
@@ -36,7 +36,7 @@ public:
     int defaultProgramId(){return m_defaultProgramId;}void setDefaultProgramId(int value){m_defaultProgramId=value;}
     int defaultProgramType(){return m_defaultProgramType;}void setDefaultProgramType(int value){m_defaultProgramType=value;}
     QString langTrigger(){return "";}Q_SIGNAL void langTriggerChanged();
-    bool getVirtualKeyBoard(){return m_virtualKeyBoard;}void setVirtualKeyBoard(bool value){m_virtualKeyBoard=value;}
+    bool getVirtualKeyBoard(){return m_virtualKeyBoard;}void setVirtualKeyBoard(bool value){m_virtualKeyBoard=value;emit virtualKeyBoardChanged();}Q_SIGNAL void virtualKeyBoardChanged();
 //    QVariantList getBoundaries(){return m_boundaries;}
 
     //    QString getTrigger(){return "";} Q_SIGNAL void triggerChanged();

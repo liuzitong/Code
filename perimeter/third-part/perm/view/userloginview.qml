@@ -21,7 +21,7 @@ IcPageBase {   // this is the wrapped Popup element in ui_qml_control
     }
 
     Item { width: 96; height: 96; anchors.right: parent.right;
-        Button { visible:false;id: idCloseBtn; anchors.centerIn: parent; width: 36; height: 36; focusPolicy: Qt.NoFocus; opacity: pressed? 0.7 : 1.0;
+        Button { id: idCloseBtn; anchors.centerIn: parent; width: 36; height: 36; focusPolicy: Qt.NoFocus; opacity: pressed? 0.7 : 1.0;
             background: Image { source: "image://PermImProv/default/close"; }
         }
     }
@@ -46,7 +46,12 @@ IcPageBase {   // this is the wrapped Popup element in ui_qml_control
 
                 Button { id: idKeyboardBtn; Layout.preferredWidth: 38; Layout.preferredHeight: 38; checkable: true; focusPolicy: Qt.NoFocus;
                     background: Image { width: 22; height: 22; anchors.centerIn: parent; source: idKeyboardBtn.checked ? "image://PermImProv/default/keyboard" : "image://PermImProv/default/keyboardClose"; }
-                    onToggled: { idPriv.user_login_vm.enableOfVkb = checked; }
+                    onToggled: { gVkbd.enabled = checked; }
+                    Component.onCompleted:
+                    {
+                        checked=IcUiQmlApi.appCtrl.settings.virtualKeyBoard;
+                        IcUiQmlApi.appCtrl.settings.virtualKeyBoardChanged.connect(function(){checked=IcUiQmlApi.appCtrl.settings.virtualKeyBoard;});
+                    }
                 }
             }
         }
@@ -226,8 +231,8 @@ IcPageBase {   // this is the wrapped Popup element in ui_qml_control
 
             user_login_vm.userLoginData = data;
             IcUiQmlApi.postMetaCall( user_login_vm, "login" );
-//            console.log("gogogog");
-//            loginSucceed();
+            IcUiQmlApi.appCtrl.settings.virtualKeyBoard=gVkbd.enabled;
+
         }
 
         function onReadyTo(){

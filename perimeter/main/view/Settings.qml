@@ -87,7 +87,9 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                 CusText{text:lt+qsTr("Use VirtualKeyboard")+":"; horizontalAlignment: Text.AlignRight;width: parent.width*0.3;font.pointSize: fontPointSize;}
                                 Switch {
                                     id: idEnableVkbd; width:parent.width*0.60; height:rowHeight;checked:IcUiQmlApi.appCtrl.settings.virtualKeyBoard;
-                                    onCheckedChanged: gVkbd.enabled = idEnableVkbd.checked;
+                                    Component.onCompleted: {
+                                        gVkbd.enabled=IcUiQmlApi.appCtrl.settings.virtualKeyBoard;
+                                    }
                                 }
                             }
 
@@ -106,6 +108,7 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                     if(languageSelection.currentIndex==1) IcUiQmlApi.appCtrl.settings.language="Chinese";
                                     if(languageSelection.currentIndex==2) IcUiQmlApi.appCtrl.settings.language="English";
                                     IcUiQmlApi.appCtrl.settings.virtualKeyBoard=idEnableVkbd.checked;
+                                    gVkbd.enabled=idEnableVkbd.checked;
                                     IcUiQmlApi.appCtrl.settings.hospitalName=hospitalName.text;
                                     IcUiQmlApi.appCtrl.settings.save();
                                     idPopup.close();
