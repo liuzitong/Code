@@ -35,7 +35,6 @@ DeviceSettings::DeviceSettings()
 
     m_PID = m_rootObj.value("PID").toString();
     m_VID = m_rootObj.value("VID").toString();
-    m_useLocalConfig=m_rootObj.value("useLocalConfig").toBool();
 
     m_pupilAutoAlignPixelTolerance=m_rootObj.value("pupilAutoAlignPixelTolerance").toInt();
     m_pupilAutoAlignStep=m_rootObj.value("pupilAutoAlignStep").toInt();

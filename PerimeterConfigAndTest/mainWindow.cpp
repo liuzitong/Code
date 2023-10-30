@@ -377,8 +377,9 @@ void MainWindow::refreshConfigDataByUI()
     m_config.focalLengthMotorPosForLightCorrectionRef()=ui->lineEdit_lightCorrectionFocus->text().toInt(&ok);
     m_config.xMotorPosForLightCorrectionRef()=ui->lineEdit_lightCorrectionX->text().toInt(&ok);
     m_config.yMotorPosForLightCorrectionRef()=ui->lineEdit_lightCorrectionY->text().toInt(&ok);
-    qDebug()<<m_config.centerFixationLampDARef();
-
+    quint32 crc=calcCrc((quint8*)m_config.dataPtr()+4, m_config.dataLen());
+    m_config.crcVeryficationRef()=crc;
+    qDebug()<<QString("文件校验码:")+QString::number(m_config.crcVeryficationRef());
 }
 
 
@@ -576,6 +577,18 @@ void MainWindow::updateConfig()
 {
     showDevInfo("Config Got.");
     memcpy(m_config.dataPtr(),m_devCtl->config().dataPtr(),UsbDev::Config::dataLen());
+    showDevInfo(QString("文件校验码:")+QString::number(m_config.crcVeryficationRef()));
+    quint32 crc=calcCrc((quint8*)m_config.dataPtr()+4, m_config.dataLen());
+    showDevInfo(QString("计算校验码:")+QString::number(crc));
+    if(crc==m_config.crcVeryficationRef())
+    {
+        showDevInfo(QString("校验码一致。"));
+    }
+    else
+    {
+        showDevInfo(QString("校验码不一致。"));
+    }
+    initConfigUI();
     refreshConfigUI();
 }
 
@@ -1120,9 +1133,42 @@ void MainWindow::readLocalConfig(QString filePath)
         }
         file.flush();
         file.close();
+        showDevInfo(QString("文件校验码:")+QString::number(m_config.crcVeryficationRef()));
+        quint32 crc=calcCrc((quint8*)m_config.dataPtr()+4, m_config.dataLen());
+        showDevInfo(QString("计算校验码:")+QString::number(crc));
+        if(crc==m_config.crcVeryficationRef())
+        {
+            showDevInfo(QString("校验码一致。"));
+        }
+        else
+        {
+            showDevInfo(QString("校验码不一致。"));
+        }
+        initConfigUI();
+        refreshConfigUI();
     }
-    initConfigUI();
-    refreshConfigUI();
+}
+
+quint16 MainWindow::calcCrc(quint8 *p_data, int data_len)
+{
+    int32_t i;
+    uint16_t crc_value = 0xFFFF; /* 定义一个16位无符号类型的变量，并初始化为0xFFFF */
+
+    while(data_len--)
+    {
+        /* 数据包中的字节与CRC变量中的低字节进行异或运算，结果存回CRC变量 */
+        crc_value ^= *p_data++;
+        for (i = 0; i < 8; i++) {
+            if (crc_value & 0x0001) {
+                /* 如果最低位为1：将CRC变量与固定值0xA001进行异或运算 */
+                crc_value = (crc_value >> 1) ^ 0xA001;
+            } else {
+                /* 如果最低位为0：重复第3步(配合计算流程来阅读代码) */
+                crc_value >>= 1;
+            }
+        }
+    }
+    return crc_value;
 }
 
 void MainWindow::on_action_updateConfigToLower_triggered()
@@ -1136,8 +1182,7 @@ void MainWindow::on_action_updateConfigToLower_triggered()
 void MainWindow::on_action_downloadConfig_triggered()
 {
     m_devCtl->readConfig();
-    initConfigUI();
-    refreshConfigUI();
+
 }
 
 void MainWindow::on_spinBox_centerLightAndOtherDA_valueChanged(int arg1)

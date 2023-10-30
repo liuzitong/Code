@@ -7,7 +7,7 @@
     "castLightDA": 3150,
     "castLightDAChangeStep": 10,
     "castLightDADifferenceTolerance": 1000,
-    "castLightLastAdjustedDate": "2023/10/25",
+    "castLightLastAdjustedDate": "2023/10/30",
     "castLightTargetColor": 0,
     "castLightTargetSize": 5,
     "colorToSlot": [
@@ -78,6 +78,5 @@
             "spotSize": 0
         }
     ],
-    "useLocalConfig": false,
     "waitingTime": 200
 }

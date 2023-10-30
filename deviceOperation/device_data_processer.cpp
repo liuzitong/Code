@@ -97,6 +97,30 @@ CoordMotorPosFocalDistInfo DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoo
     return coordSpacePosInfo;
 }
 
+quint16 DeviceDataProcesser::calcCrc(quint8 *p_data, int data_len)
+{
+    int32_t i;
+    uint16_t crc_value = 0xFFFF; /* 定义一个16位无符号类型的变量，并初始化为0xFFFF */
+
+    while(data_len--)
+    {
+        /* 数据包中的字节与CRC变量中的低字节进行异或运算，结果存回CRC变量 */
+        crc_value ^= *p_data++;
+        for (i = 0; i < 8; i++) {
+            if (crc_value & 0x0001) {
+                /* 如果最低位为1：将CRC变量与固定值0xA001进行异或运算 */
+                crc_value = (crc_value >> 1) ^ 0xA001;
+            } else {
+                /* 如果最低位为0：重复第3步(配合计算流程来阅读代码) */
+                crc_value >>= 1;
+            }
+        }
+    }
+
+    return crc_value;
+
+}
+
 
 
 //QSharedPointer<DeviceDataProcesser> DeviceDataProcesser::getSingleton()

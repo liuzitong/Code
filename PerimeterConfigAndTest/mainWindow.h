@@ -231,6 +231,7 @@ private:
 
     void readLocalData(QString filePath);
     void readLocalConfig(QString filePath);
+    quint16 calcCrc(quint8 *p_data, int data_len);
 
 //    QTimer* m_videoTimer=NULL;
 //    int m_videoCount=0;

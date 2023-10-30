@@ -31,7 +31,7 @@ DeviceOperation::DeviceOperation()
     m_reconnectTimer.setInterval(1000);                            //复位的时候会短暂收不到数据更新，时间不能太短
     m_waitingTime=DeviceSettings::getSingleton()->m_waitingTime;
     m_currentCastLightDA=DeviceSettings::getSingleton()->m_castLightDA;
-    m_config=DeviceData::getSingleton()->m_config;
+
 //    qDebug()<<m_config.deviceIDRef();
 //    m_reconnectTimer.start();
 }
@@ -890,7 +890,17 @@ void DeviceOperation::workOnNewProfile()
 void DeviceOperation::workOnNewConfig()
 {
     qDebug()<<"work on new config";
-    if(!DeviceSettings::getSingleton()->m_useLocalConfig) m_config=m_devCtl->config();
+    UsbDev::Config config=m_devCtl->config();
+    quint32 crc=DeviceDataProcesser::calcCrc((quint8*)config.dataPtr()+4, config.dataLen());
+    if(crc==config.crcVeryficationRef())
+    {
+        m_config=config;
+    }
+    else
+    {
+        m_config=DeviceData::getSingleton()->m_config;
+    }
+
     m_devicePupilProcessor.m_pupilGreyLimit=m_config.pupilGreyThresholdDAPtr()[0];
     m_devicePupilProcessor.m_pupilReflectionDotWhiteLimit=m_config.pupilGreyThresholdDAPtr()[1];
     emit newDeviceID(QString(m_config.deviceIDRef()));
@@ -929,13 +939,8 @@ void DeviceOperation::workOnWorkStatusChanged(int status)
         m_devCtl->readProfile();
         while (m_profile.isEmpty()) {QApplication::processEvents();}
 //        waitForSomeTime(500);                                          //等一下保证 config后读
-        if(DeviceSettings::getSingleton()->m_useLocalConfig)
-        {
-            m_config=DeviceData::getSingleton()->m_config;
-            workOnNewConfig();
-        }
-        else
-            m_devCtl->readConfig();
+
+        m_devCtl->readConfig();
 //        adjustCastLight();
         setDeviceStatus(2);
 //        setIsDeviceReady(true);

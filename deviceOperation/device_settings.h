@@ -18,7 +18,6 @@ public:
 
     QString m_VID,m_PID;
     QJsonObject m_rootObj;
-    bool m_useLocalConfig;
     int m_pupilAutoAlignPixelTolerance;
     int m_castLightDADifferenceTolerance;
     int m_castLightDA;
