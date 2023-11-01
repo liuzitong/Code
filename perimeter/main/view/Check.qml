@@ -293,7 +293,7 @@ Item {id:root; width: 1366;height: 691
                                                 Image {source: "qrc:/Pics/capture-svg/btn_alarm.svg";height:parent.height*0.6; anchors.verticalCenter: parent.verticalCenter;width: height; }
                                             }
                                             Row{width:parent.width;height: parent.height*0.75/3;spacing: width*0.05;
-                                                CusCheckBox{id:deviationCheckBox;checked:true;onCheckedChanged:checkSvc.measureDeviation=checked;}
+                                                CusCheckBox{id:deviationCheckBox;checked:false;onCheckedChanged:checkSvc.measureDeviation=checked;}
                                                 CusText{text:lt+qsTr("Fixation deviation"); horizontalAlignment: Text.AlignLeft;width: parent.width*0.25;font.pointSize: fontPointSize; }
                                                 Component.onCompleted: {root.currentProgramChanged.connect(function(){if(currentProgram.type===2){deviationCheckBox.checked=false;deviationCheckBox.enabled=false;}else {deviationCheckBox.enabled=true;deviationCheckBox.checked=false;}});}
                                             }

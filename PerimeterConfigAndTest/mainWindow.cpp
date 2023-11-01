@@ -377,7 +377,7 @@ void MainWindow::refreshConfigDataByUI()
     m_config.focalLengthMotorPosForLightCorrectionRef()=ui->lineEdit_lightCorrectionFocus->text().toInt(&ok);
     m_config.xMotorPosForLightCorrectionRef()=ui->lineEdit_lightCorrectionX->text().toInt(&ok);
     m_config.yMotorPosForLightCorrectionRef()=ui->lineEdit_lightCorrectionY->text().toInt(&ok);
-    quint32 crc=calcCrc((quint8*)m_config.dataPtr()+4, m_config.dataLen());
+    quint32 crc=calcCrc((quint8*)m_config.dataPtr()+4, m_config.dataLen()-4);
     m_config.crcVeryficationRef()=crc;
     qDebug()<<QString("文件校验码:")+QString::number(m_config.crcVeryficationRef());
 }
@@ -578,7 +578,7 @@ void MainWindow::updateConfig()
     showDevInfo("Config Got.");
     memcpy(m_config.dataPtr(),m_devCtl->config().dataPtr(),UsbDev::Config::dataLen());
     showDevInfo(QString("文件校验码:")+QString::number(m_config.crcVeryficationRef()));
-    quint32 crc=calcCrc((quint8*)m_config.dataPtr()+4, m_config.dataLen());
+    quint32 crc=calcCrc((quint8*)m_config.dataPtr()+4, m_config.dataLen()-4);
     showDevInfo(QString("计算校验码:")+QString::number(crc));
     if(crc==m_config.crcVeryficationRef())
     {
@@ -1134,7 +1134,7 @@ void MainWindow::readLocalConfig(QString filePath)
         file.flush();
         file.close();
         showDevInfo(QString("文件校验码:")+QString::number(m_config.crcVeryficationRef()));
-        quint32 crc=calcCrc((quint8*)m_config.dataPtr()+4, m_config.dataLen());
+        quint32 crc=calcCrc((quint8*)m_config.dataPtr()+4, m_config.dataLen()-4);
         showDevInfo(QString("计算校验码:")+QString::number(crc));
         if(crc==m_config.crcVeryficationRef())
         {

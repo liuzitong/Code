@@ -26,7 +26,7 @@ DeviceData::DeviceData()
     qDebug()<<configPath;
     QString dataPath=settings->localDataPath;
     qDebug()<<dataPath;
-    if(!readLocalConfig(configPath)) qDebug()<<"read config error!";
+    if(!readLocalConfig(configPath)) qDebug()<<"no local config!";
     if(!readLocalData(dataPath)) qDebug()<<"read local data error!";
 //    qDebug()<<m_config.shutterOpenPosRef();
 //    qDebug()<<m_config.DbPosMappingPtr()[0][0];
@@ -59,8 +59,11 @@ bool DeviceData::readLocalConfig(QString filePath)
         }
         file.flush();
         file.close();
+        return true;
     }
-    return true;
+    else
+        return false;
+
 }
 
 bool DeviceData::readLocalData(QString filePath)

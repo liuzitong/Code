@@ -28,7 +28,7 @@ DeviceOperation::DeviceOperation()
 //    m_workStatusElapsedTimer.start();
     m_autoPupilElapsedTimer.start();
 //    m_reconnectingElapsedTimer.start();
-    m_reconnectTimer.setInterval(1000);                            //复位的时候会短暂收不到数据更新，时间不能太短
+    m_reconnectTimer.setInterval(5000);                            //复位的时候会短暂收不到数据更新，时间不能太短
     m_waitingTime=DeviceSettings::getSingleton()->m_waitingTime;
     m_currentCastLightDA=DeviceSettings::getSingleton()->m_castLightDA;
 
@@ -804,8 +804,8 @@ void DeviceOperation::workOnNewFrameData()
     m_frameRawData=m_frameData.rawData();
     m_frameRawDataLock.unlock();
     auto data=m_frameData.rawData();
-//    m_devicePupilProcessor.processData((uchar*)data.data(),m_videoSize.width(),m_videoSize.height());
-    m_devicePupilProcessor.find_point((uchar*)data.data(),m_videoSize.width(),m_videoSize.height());
+    m_devicePupilProcessor.processData((uchar*)data.data(),m_videoSize.width(),m_videoSize.height());
+//    m_devicePupilProcessor.find_point((uchar*)data.data(),m_videoSize.width(),m_videoSize.height());
     QImage img((uchar*)data.data(),m_videoSize.width(),m_videoSize.height(),QImage::Format_Grayscale8);
     img=img.convertToFormat(QImage::Format_ARGB32);
     if(m_devicePupilProcessor.m_pupilResValid)
@@ -871,34 +871,33 @@ void DeviceOperation::workOnNewProfile()
     qDebug()<<"work on new Profile";
     m_profile=m_devCtl->profile();
     m_videoSize=m_profile.videoSize();
-//    if(!m_profile.isEmpty()&&!m_config.isEmpty())
-//    {
-//        m_currentCastLightDA=m_config.castLightADPresetRef()+DeviceSettings::getSingleton()->m_castLightDAChanged;
-//        auto date=QDate::currentDate();
-//        auto lastAdjustedDate=QDate::fromString(DeviceSettings::getSingleton()->m_castLightLastAdjustedDate,"yyyy/MM/dd");
-//        bool adjusted=((date.year()==lastAdjustedDate.year())&&(date.month()==lastAdjustedDate.month())&&(date.day()==lastAdjustedDate.day()));
-//        if(adjusted)
-//        {
-//            setCastLightAdjustStatus(3);
-//            dimDownCastLight();
-//        }
-//        else
-//            adjustCastLight();
-//    }
 }
 
 void DeviceOperation::workOnNewConfig()
 {
     qDebug()<<"work on new config";
     UsbDev::Config config=m_devCtl->config();
-    quint32 crc=DeviceDataProcesser::calcCrc((quint8*)config.dataPtr()+4, config.dataLen());
-    if(crc==config.crcVeryficationRef())
+    quint32 crc=DeviceDataProcesser::calcCrc((quint8*)config.dataPtr()+4, config.dataLen()-4);
+    if(DeviceData::getSingleton()->m_config.isEmpty())
     {
+        QString filePath = R"(./deviceData/config.cfg)";
+        QFile file(filePath);
+        if(file.open(QIODevice::WriteOnly))
+        {
+            file.write((char*)config.dataPtr(),config.dataLen());
+        }
         m_config=config;
     }
     else
     {
-        m_config=DeviceData::getSingleton()->m_config;
+        if(crc==config.crcVeryficationRef())
+        {
+            m_config=config;
+        }
+        else
+        {
+            m_config=DeviceData::getSingleton()->m_config;
+        }
     }
 
     m_devicePupilProcessor.m_pupilGreyLimit=m_config.pupilGreyThresholdDAPtr()[0];

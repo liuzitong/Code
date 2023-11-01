@@ -238,6 +238,7 @@ public:
     bool m_eyeMoveAlarm=false;
     bool m_alarmAndPause=false;
     int m_deviationCount=0;
+    bool m_atCheckingPage=false;
 private:
     QSharedPointer<Check> m_check;
     QSharedPointer<DevOps::DeviceOperation> m_deviceOperation=DevOps::DeviceOperation::getSingleton();
@@ -1835,7 +1836,10 @@ void CheckSvcWorker::prepareToCheck()
         auto cursorColor=((StaticCheck*)m_check.data())->m_programModel->m_params.commonParams.cursorColor;
         m_alarmAndPause=((StaticCheck*)m_check.data())->m_programModel->m_params.commonParams.fixationMonitor==FixationMonitor::alarmAndPause;
         m_check->lightsOff();
-        m_check->lightsOn();
+        if(m_atCheckingPage)
+        {
+            m_check->lightsOn();
+        }
         m_deviceOperation->setCursorColorAndCursorSize(int(cursorColor),int(cursorSize));
         UtilitySvc::wait(100);
         m_deviceOperation->waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y});
@@ -2183,8 +2187,9 @@ void CheckSvc::enterCheck()
     qDebug()<<"trunOnVideo";
     DevOps::DeviceOperation::getSingleton()->enterCheckingPage();
 //    DevOps::DeviceOperation::getSingleton()->lightUpCastLight();
-    QMetaObject::invokeMethod(m_worker,"lightsOn",Qt::QueuedConnection);
+    m_worker->m_atCheckingPage=true;
     m_atCheckingPage=true;
+    QMetaObject::invokeMethod(m_worker,"lightsOn",Qt::QueuedConnection);
 }
 
 void CheckSvc::leaveCheck()
@@ -2192,8 +2197,8 @@ void CheckSvc::leaveCheck()
     qDebug()<<"trunOffVideo";
     DevOps::DeviceOperation::getSingleton()->leaveCheckingPage();
     DevOps::DeviceOperation::getSingleton()->dimDownCastLight();
-    QMetaObject::invokeMethod(m_worker,"lightsOff",Qt::QueuedConnection);
     m_atCheckingPage=false;
+    QMetaObject::invokeMethod(m_worker,"lightsOff",Qt::QueuedConnection);
 }
 
 void CheckSvc::castlightUp()
