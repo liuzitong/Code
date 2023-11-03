@@ -67,9 +67,14 @@ MainWindow::MainWindow(QWidget *parent) :
 //    QSettings *configIni = new QSettings("para.ini", QSettings::IniFormat);
     VID=m_settings.m_VID;
     PID=m_settings.m_PID;
-    m_timer=new QTimer();
-    connect(m_timer,&QTimer::timeout,[&](){
+    m_reconnTimer=new QTimer();
+    m_takingPhotoTimer=new QTimer();
+
+    connect(m_reconnTimer,&QTimer::timeout,[&](){
         ui->label_connectionStatus->setText("连接断开");
+    });
+    connect(m_takingPhotoTimer,&QTimer::timeout,[&](){
+        m_takePhoto=true;
     });
     init();
 
@@ -223,7 +228,7 @@ void MainWindow::initTable()
 
 void MainWindow::uninitDevCtl()
 {
-    m_timer->stop();
+    m_reconnTimer->stop();
     ui->label_connectionStatus->setText("未连接");
     disconnect(m_devCtl,&UsbDev::DevCtl::workStatusChanged,this,&MainWindow::refreshConnectionStatus);
     disconnect(m_devCtl,&UsbDev::DevCtl::updateInfo,this,&MainWindow::showDevInfo);
@@ -437,7 +442,7 @@ void MainWindow::refreshStatus()
         m_devCtl->setFrontVideo(false);
     }
     firstStatus=false;
-    m_timer->start(1000);
+    m_reconnTimer->start(1000);
     ui->label_connectionStatus->setText("保持连接");
     ui->label_stateX->setText(m_statusData.isMotorBusy(MotorId::MotorId_X)?"忙":"闲");
     ui->label_stateY->setText(m_statusData.isMotorBusy(MotorId::MotorId_Y)?"忙":"闲");
@@ -511,7 +516,7 @@ void MainWindow::refreshVideo()
     image=image.convertToFormat(QImage::Format_RGBA8888);
     if(m_takePhoto)
     {
-        auto filePath=QString("./savePics/")+QDateTime::currentDateTime().toString("yyyy_MM_dd_hh_MM_ss")+".bmp";
+        auto filePath=QString("./savePics/")+QDateTime::currentDateTime().toString("yyyy_MM_dd_hh_MM_ss_zzz")+".bmp";
         image.save(filePath);
     }
     m_takePhoto=false;
@@ -1377,7 +1382,32 @@ void MainWindow::on_pushButton_stopRunDot_clicked()
 
 void MainWindow::on_pushButton_takePhoto_clicked()
 {
-    m_takePhoto=true;
+    int inteval=ui->spinBox_takingPhotoInteval->text().toInt();
+    if(inteval==0)
+    {
+        m_takePhoto=true;
+    }
+    else
+    {
+        m_keepTakingPhoto=!m_keepTakingPhoto;
+        m_keepTakingPhoto?ui->pushButton_takePhoto->setText("停止"):ui->pushButton_takePhoto->setText("开始");
+        if(m_keepTakingPhoto)
+        {
+            m_takePhoto=true;
+            m_takingPhotoTimer->setInterval(inteval);
+            m_takingPhotoTimer->start();
+            ui->spinBox_takingPhotoInteval->setEnabled(false);
+        }
+        else
+        {
+            m_takingPhotoTimer->stop();
+            ui->spinBox_takingPhotoInteval->setEnabled(true);
+        }
+    }
+
+
+
+
 }
 
 void MainWindow::on_plainTextEdit_rawCommand_textChanged()

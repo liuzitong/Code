@@ -2674,8 +2674,33 @@
                     </item>
                     <item>
                      <widget class="QPushButton" name="pushButton_takePhoto">
+                      <property name="maximumSize">
+                       <size>
+                        <width>40</width>
+                        <height>16777215</height>
+                       </size>
+                      </property>
                       <property name="text">
                        <string>拍照</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QSpinBox" name="spinBox_takingPhotoInteval">
+                      <property name="maximumSize">
+                       <size>
+                        <width>40</width>
+                        <height>16777215</height>
+                       </size>
+                      </property>
+                      <property name="maximum">
+                       <number>10000000</number>
+                      </property>
+                      <property name="singleStep">
+                       <number>10</number>
+                      </property>
+                      <property name="value">
+                       <number>30</number>
                       </property>
                      </widget>
                     </item>

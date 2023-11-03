@@ -220,7 +220,8 @@ private:
     UsbDev::StatusData m_statusData;
     UsbDev::FrameData m_frameData;
     UsbDev::Profile m_profile;
-    QTimer* m_timer=NULL;
+    QTimer* m_reconnTimer=NULL;
+    QTimer* m_takingPhotoTimer=NULL;
     Settings m_settings;
     quint8* pixData=NULL;
     int m_width,m_height;
@@ -228,6 +229,7 @@ private:
     int m_runDotCount;
     bool m_isRunningDot;
     bool m_takePhoto=false;
+    bool m_keepTakingPhoto=false;
 
     void readLocalData(QString filePath);
     void readLocalConfig(QString filePath);
