@@ -130,6 +130,8 @@ private slots:
 
     void on_spinBox_coordY_valueChanged(int arg1){fillXYMotorAndFocalInfoByXYCoord();};
 
+    void on_lineEdit_focalMotorPosCorrection_textChanged(const QString &arg1){fillXYMotorAndFocalInfoByXYCoord();};
+
     void on_radioButton_mainTable_clicked(){fillXYMotorAndFocalInfoByXYCoord();};
 
     void on_radioButton_secondaryTable_clicked(){fillXYMotorAndFocalInfoByXYCoord();};
@@ -179,6 +181,8 @@ private slots:
     void on_pushButton_stopRunDot_clicked();
 
     void on_pushButton_takePhoto_clicked();
+
+
 
 private:
     void initData();

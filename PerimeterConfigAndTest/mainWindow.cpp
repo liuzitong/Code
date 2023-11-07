@@ -761,8 +761,7 @@ void MainWindow::on_pushButton_testStart_clicked()
             CoordSpacePosInfo coordSpacePosInfo{coordX,coordY};
             CoordMotorPosFocalDistInfo coordMotorPosFocalDistInfo;
             if(!getXYMotorPosAndFocalDistFromCoord(coordSpacePosInfo,coordMotorPosFocalDistInfo)) return;
-//            coordMotorPosFocalDistInfo.focalDist=ui->spinBox_focalDist->value();
-            int focalMotorPos=getFocusMotorPosByDist(coordMotorPosFocalDistInfo.focalDist,spotSlot)+ui->lineEdit_focalMotorPosCorrection->text().toInt();
+            int focalMotorPos=ui->spinBox_focalMotorPos_2->text().toInt();
             staticCastTest(coordMotorPosFocalDistInfo,focalMotorPos,db,sps,durationTime,shutterPos);
             break;
         }
@@ -1404,10 +1403,6 @@ void MainWindow::on_pushButton_takePhoto_clicked()
             ui->spinBox_takingPhotoInteval->setEnabled(true);
         }
     }
-
-
-
-
 }
 
 void MainWindow::on_plainTextEdit_rawCommand_textChanged()
@@ -1588,7 +1583,7 @@ void MainWindow::fillXYMotorAndFocalInfoByXYCoord()
     coordSpacePosInfo.coordY=ui->spinBox_coordY->value();
     CoordMotorPosFocalDistInfo coordMotorPosFocalDistInfo;
     getXYMotorPosAndFocalDistFromCoord(coordSpacePosInfo,coordMotorPosFocalDistInfo);
-    int focalMotorPos=getFocusMotorPosByDist(coordMotorPosFocalDistInfo.focalDist,ui->spinBox_spotSlot->value());
+    int focalMotorPos=getFocusMotorPosByDist(coordMotorPosFocalDistInfo.focalDist,ui->spinBox_spotSlot->value())+ui->lineEdit_focalMotorPosCorrection->text().toInt();
     ui->spinBox_XMotorPos_2->setValue(coordMotorPosFocalDistInfo.motorX);
     ui->spinBox_YMotorPos_2->setValue(coordMotorPosFocalDistInfo.motorY);
     ui->spinBox_focalDist->setValue(coordMotorPosFocalDistInfo.focalDist);
@@ -1689,6 +1684,7 @@ void MainWindow::staticCastTest( CoordMotorPosFocalDistInfo& coordMotorPosFocalD
         motorPos[3]=m_config.DbPosMappingPtr()[db][0];
         motorPos[4]=m_config.DbPosMappingPtr()[db][1];
 
+
 //        motorPos[2]=getFocusMotorPosByDist(coordMotorPosFocalDistInfo.focalDist,spotSlot);
         waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot,UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y});
         m_devCtl->move5Motors(sps,motorPos);
@@ -1720,7 +1716,7 @@ void MainWindow::dynamicCastTest(CoordSpacePosInfo& dotSpaceBegin,CoordSpacePosI
     CoordSpacePosInfo coordSpacePosInfoTemp=dotSpaceBegin;
     CoordMotorPosFocalDistInfo coordMotorPosFocalDistInfoTemp;
     getXYMotorPosAndFocalDistFromCoord(dotSpaceBegin,coordMotorPosFocalDistInfoTemp);
-    auto focalMotorPos=getFocusMotorPosByDist(coordMotorPosFocalDistInfoTemp.focalDist,spotSlot);
+    auto focalMotorPos=getFocusMotorPosByDist(coordMotorPosFocalDistInfoTemp.focalDist,spotSlot)+ui->lineEdit_focalMotorPosCorrection->text().toInt();
     int motorPos[5];
     motorPos[0]=coordMotorPosFocalDistInfoTemp.motorX;
     motorPos[1]=coordMotorPosFocalDistInfoTemp.motorY;
@@ -1764,7 +1760,7 @@ void MainWindow::dynamicCastTest(CoordSpacePosInfo& dotSpaceBegin,CoordSpacePosI
         getXYMotorPosAndFocalDistFromCoord(coordSpacePosInfoTemp,coordMotorPosFocalDistInfoTemp);
         dotArr[i*3+0]=coordMotorPosFocalDistInfoTemp.motorX;
         dotArr[i*3+1]=coordMotorPosFocalDistInfoTemp.motorY;
-        dotArr[i*3+2]=getFocusMotorPosByDist(coordMotorPosFocalDistInfoTemp.focalDist,spotSlot);
+        dotArr[i*3+2]=getFocusMotorPosByDist(coordMotorPosFocalDistInfoTemp.focalDist,spotSlot)+ui->lineEdit_focalMotorPosCorrection->text().toInt();
         showDevInfo((QString("第%1个点,X坐标:%2,Y坐标:%3,X电机坐标%4,Y电机坐标%5,焦距电机坐标%6.")
                    .arg(QString::number(i)).arg(QString::number(coordSpacePosInfoTemp.coordX)).arg(QString::number(coordSpacePosInfoTemp.coordY)).arg(QString::number( dotArr[i*3+0])).
                     arg(QString::number( dotArr[i*3+1])).arg(QString::number( dotArr[i*3+2]))));
