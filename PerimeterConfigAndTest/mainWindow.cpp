@@ -977,7 +977,7 @@ void MainWindow::on_pushButton_dbTest_clicked()
 {
     quint8 sps[5]{0};
     int motorPos[5]{0};
-    sps[3]=ui->spinBox_focalMotorSpeed_2->value();
+    sps[3]=ui->spinBox_colorMotorSpeed_2->value();
     motorPos[3]=ui->spinBox_DbColorPos->value();
     sps[4]=ui->spinBox_spotMotorSpeed_2->value();
     motorPos[4]=ui->spinBox_DbSpotPos->value();

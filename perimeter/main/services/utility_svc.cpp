@@ -104,6 +104,7 @@ UtilitySvc::UtilitySvc()
         m_checkCountBeforeGetBlindDotCheck=jo["checkCountBeforeGetBlindDotCheck"].toInt();
         m_blindDotTestDB=jo["blindDotTestDB"].toInt();
         m_blindDotTestIncDB=jo["blindDotTestIncDB"].toInt();
+        m_nearBlindDotCheckDB=jo["nearBlindDotCheckDB"].toInt();
         m_falseNegativeDecDB=jo["falseNegativeDecDB"].toInt();
         m_deviationLimit=jo["deviationLimit"].toInt();
         m_pauseCheckDeviationCount=jo["pauseCheckDeviationCount"].toInt();

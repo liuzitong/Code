@@ -396,6 +396,16 @@ void StaticCheck::resetData()
                 stimulationDBs={m_utilitySvc->getExpectedDB(m_value_30d,{dot.x,dot.y},m_resultModel->m_OS_OD)+DBChanged};
             }
 
+            bool nearBlindDot=false;
+            for(auto& bindDot:m_blindDot)
+            {
+                if(sqrt(pow((dot.x-bindDot.x()),2)+pow((dot.y-bindDot.y()),2))<3)                   //在盲点周围的另外设置初始值
+                {
+                    nearBlindDot=true;break;
+                }
+            }
+            if(nearBlindDot) stimulationDBs={m_utilitySvc->m_nearBlindDotCheckDB};
+
             m_dotRecords.push_back(DotRecord{i,QPointF{dot.x,dot.y},stimulationDBs,-initialNumber,isBaseDot,false,-initialNumber,initialNumber});
         }
 
@@ -613,7 +623,7 @@ StaticCheck::DotRecord &StaticCheck::getCheckDotRecordRef()
                 bool nearBlindDot=false;
                 for(auto& bindDot:m_blindDot)
                 {
-                    if(sqrt(pow((i.loc.x()-bindDot.x()),2)+pow((i.loc.y()-bindDot.y()),2))<3)
+                    if(sqrt(pow((i.loc.x()-bindDot.x()),2)+pow((i.loc.y()-bindDot.y()),2))<3)                   //排除盲点
                     {
                         nearBlindDot=true;break;
                     }
@@ -635,7 +645,7 @@ StaticCheck::DotRecord &StaticCheck::getCheckDotRecordRef()
             }
             int sum=0;                                                      //求出平均值
             for(auto&i:DBsAroundSelectedDot){sum+=i;}
-            int stimulationDB=qRound(double(sum)/DBsAroundSelectedDot.length())-1;
+            int stimulationDB=qMax(qRound(double(sum)/DBsAroundSelectedDot.length())-1,0);
             m_dotRecords[selectedDot.index].StimulationDBs.append(stimulationDB);
         }
 //        qDebug()<<"getCheckDotRecordRef loc inside:"<<m_dotRecords[selectedDot.index].loc<<"DB leng"<<QString::number(m_dotRecords[selectedDot.index].StimulationDBs.count())<<"upper:"<<QString::number(m_dotRecords[selectedDot.index].upperBound)<<"lower:"<<QString::number(m_dotRecords[selectedDot.index].lowerBound);

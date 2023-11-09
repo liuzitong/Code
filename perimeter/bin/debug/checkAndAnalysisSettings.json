@@ -1,15 +1,16 @@
 {
-    "debugMode":true,
+    "debugMode":false,
     "showCheckingDot":true,
     "checkCountBeforeGetBlindDotCheck":3,
     "blindDotTestDB":10,
     "blindDotTestIncDB":5,
+    "nearBlindDotCheckDB":0,
     "falseNegativeDecDB":10,
     "deviationLimit":8,
     "pauseCheckDeviationCount":3,
-    "VFImultiplier":1.0,
+    "VFImultiplier":1.13,
     "checkFalseNegAndPos":true,
-    "realTimeEyePosPicSize":"320*240",
+    "realTimeEyePosPicSize":"240*180",
     "checkZoneRatio":1.4,
     "beginningCheckDBDec":4,
     "beginningCheckDBCount":4,
@@ -18,6 +19,7 @@
         "center":{"x":-25,"y":0},
         "radius":55
     },
+    
     "boundaryTwo":
     {
         "center":{"x":25,"y":0},

@@ -56,6 +56,7 @@ public:
     int m_checkCountBeforeGetBlindDotCheck;
     int m_blindDotTestDB;
     int m_blindDotTestIncDB;
+    int m_nearBlindDotCheckDB;
     int m_falseNegativeDecDB;
     bool m_checkFalseNegAndPos;
     double m_VFImultiplier;
