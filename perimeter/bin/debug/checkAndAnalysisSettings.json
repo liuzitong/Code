@@ -1,10 +1,10 @@
 {
-    "debugMode":false,
+    "debugMode":true,
     "showCheckingDot":true,
     "checkCountBeforeGetBlindDotCheck":3,
     "blindDotTestDB":10,
     "blindDotTestIncDB":5,
-    "nearBlindDotCheckDB":0,
+    "nearBlindDotCheckDB":15,
     "falseNegativeDecDB":10,
     "deviationLimit":8,
     "pauseCheckDeviationCount":3,

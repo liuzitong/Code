@@ -286,7 +286,7 @@ int MainWindow::getFocusMotorPosByDist(int focalDist,int spotSlot)
     int indexDist= floor(focalDist/10)-8;
     int pos1=map(indexDist,spotSlot-1);
     int pos2=map(indexDist+1,spotSlot-1);
-    int focalMotorPos=pos1+(pos2-pos1)*(focalDist%10)/10+m_config.focalMotorPosCorrectionRef();
+    int focalMotorPos=pos1+(pos2-pos1)*(focalDist%10)/10+ui->lineEdit_focalMotorPosCorrection->text().toInt();
     return focalMotorPos;
 }
 
@@ -1583,7 +1583,7 @@ void MainWindow::fillXYMotorAndFocalInfoByXYCoord()
     coordSpacePosInfo.coordY=ui->spinBox_coordY->value();
     CoordMotorPosFocalDistInfo coordMotorPosFocalDistInfo;
     getXYMotorPosAndFocalDistFromCoord(coordSpacePosInfo,coordMotorPosFocalDistInfo);
-    int focalMotorPos=getFocusMotorPosByDist(coordMotorPosFocalDistInfo.focalDist,ui->spinBox_spotSlot->value())+ui->lineEdit_focalMotorPosCorrection->text().toInt();
+    int focalMotorPos=getFocusMotorPosByDist(coordMotorPosFocalDistInfo.focalDist,ui->spinBox_spotSlot->value());
     ui->spinBox_XMotorPos_2->setValue(coordMotorPosFocalDistInfo.motorX);
     ui->spinBox_YMotorPos_2->setValue(coordMotorPosFocalDistInfo.motorY);
     ui->spinBox_focalDist->setValue(coordMotorPosFocalDistInfo.focalDist);

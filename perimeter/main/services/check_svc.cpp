@@ -395,20 +395,20 @@ void StaticCheck::resetData()
             {
                 stimulationDBs={m_utilitySvc->getExpectedDB(m_value_30d,{dot.x,dot.y},m_resultModel->m_OS_OD)+DBChanged};
             }
-
-            bool nearBlindDot=false;
-            for(auto& bindDot:m_blindDot)
+            if(m_programModel->m_type==Type::ThreshHold&&(!m_programModel->m_params.commonParams.blindDotTest))             //阈值状态下又不测试盲点的盲点附近初始值
             {
-                if(sqrt(pow((dot.x-bindDot.x()),2)+pow((dot.y-bindDot.y()),2))<3)                   //在盲点周围的另外设置初始值
+
+                QPointF blindDot;
+                m_resultModel->m_OS_OD==0?blindDot={-15,-3}:blindDot={15,-3};
+                if(sqrt(pow(dot.x-blindDot.x(),2)+pow((dot.y-blindDot.y()),2))<=3.5)
                 {
-                    nearBlindDot=true;break;
+                    stimulationDBs={UtilitySvc::getSingleton()->m_nearBlindDotCheckDB};
                 }
+
             }
-            if(nearBlindDot) stimulationDBs={m_utilitySvc->m_nearBlindDotCheckDB};
 
             m_dotRecords.push_back(DotRecord{i,QPointF{dot.x,dot.y},stimulationDBs,-initialNumber,isBaseDot,false,-initialNumber,initialNumber});
         }
-
         m_centerDotRecord=DotRecord{m_totalCount*2,QPointF{0,0},{m_utilitySvc->getExpectedDB(m_value_30d,{0,0},m_resultModel->m_OS_OD)+DBChanged},-initialNumber,false,false,-initialNumber,initialNumber};
     }
     else                            //单刺激
@@ -1008,6 +1008,25 @@ void StaticCheck::ProcessAnswer(bool answered)
                 m_deviceOperation->move5Motors(std::array<bool,5>{false,false,false,false,false}.data(),std::array<int,5>{0,0,0,0,0}.data());       //盲点已经确定就没必要跑点了,早点停止可以立即跑下一个点
                 m_lastCheckDotRecord.pop_back();
                 m_lastCheckeDotType.pop_back();
+            }
+
+            for(auto& dot:m_dotRecords)
+            {
+                if(m_programModel->m_type==Type::ThreshHold)
+                {
+                    if(sqrt(pow(dot.loc.x()-m_blindDot[0].x(),2)+pow((dot.loc.y()-m_blindDot[0].y()),2))<=3.5)                   //在盲点周围的另外设置初始值
+                    {
+                        if(dot.StimulationDBs.isEmpty())
+                            dot.StimulationDBs={UtilitySvc::getSingleton()->m_nearBlindDotCheckDB};
+                        else
+                        {
+                            if(dot.StimulationDBs.last()>UtilitySvc::getSingleton()->m_nearBlindDotCheckDB)
+                            {
+                                dot.StimulationDBs.last()=UtilitySvc::getSingleton()->m_nearBlindDotCheckDB;
+                            }
+                        }
+                    }
+                }
             }
 #ifdef _DEBUG
             std::cout<<"blinddot located:"<<m_blindDot[0].x()<<","<<m_blindDot[0].y()<<std::endl;
