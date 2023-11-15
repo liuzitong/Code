@@ -89,12 +89,32 @@ Rectangle {
                         }
                         CusText
                         {
+                            property string deviceStatus: IcUiQmlApi.appCtrl.checkSvc.deviceStatus===1?(qsTr("Device is reconnecting.")+lt):"";
+                            property string castLightStatus: IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus!==3?(qsTr("Device is adjusting light.")+lt):"" ;
+                            property string checkStatus:
+                            {
+                                if(checkPage.visible)
+                                {
+                                    if(IcUiQmlApi.appCtrl.checkSvc.checkState===0) return qsTr("Start");
+                                    if(IcUiQmlApi.appCtrl.checkSvc.checkState===1) return qsTr("Checking");
+                                    if(IcUiQmlApi.appCtrl.checkSvc.checkState===2) return qsTr("Pausing");
+                                    if(IcUiQmlApi.appCtrl.checkSvc.checkState===3) return qsTr("Stoping");
+                                    if(IcUiQmlApi.appCtrl.checkSvc.checkState===4) return qsTr("Finishing");
+                                    if(IcUiQmlApi.appCtrl.checkSvc.checkState===5) return qsTr("Stopped");
+                                    if(IcUiQmlApi.appCtrl.checkSvc.checkState===6) return qsTr("Finished");
+                                }
+                                else
+                                {
+                                    return "";
+                                }
+                            }
                             width: parent.width*0.2;
                             height: parent.height;
                             anchors.left: parent.left;
                             anchors.leftMargin: parent.width*0.07;
-                            text:IcUiQmlApi.appCtrl.checkSvc.deviceStatus===1?(qsTr("Device is reconnecting")+lt):"";
-                            color: "Red";
+                            text:deviceStatus!=""?deviceStatus:castLightStatus!=""?castLightStatus:checkStatus;
+                            horizontalAlignment: Text.AlignLeft
+                            color:deviceStatus!=""?"Red":castLightStatus!=""?"Yellow":"White";
                         }
 
                         Flow{
