@@ -759,17 +759,20 @@ void DeviceOperation::workOnNewStatuData()
 
     }
 
-    if(m_castLightAdjustStatus==2&&m_castLightAdjustElapsedTimer.elapsed()>=500&&m_deviceStatus==2)
+    if(m_castLightAdjustStatus==2&&m_castLightAdjustElapsedTimer.elapsed()>=DeviceSettings::getSingleton()->m_castLightDAChangeInteval&&m_deviceStatus==2)
     {
         updateDevInfo("keep adjust castLightDa");
         int DADiffTolerance=DeviceSettings::getSingleton()->m_castLightDADifferenceTolerance;
-        int step=DeviceSettings::getSingleton()->m_castLightDAChangeStep;
         int currentcastLightSensorDA=m_statusData.castLightSensorDA();
         int targetcastLightSensorDA=m_config.castLightSensorDAForLightCorrectionRef();
         updateDevInfo("castlight Da:"+QString::number(m_currentCastLightDA));
         updateDevInfo("current da:"+QString::number(currentcastLightSensorDA));
-        if(qAbs(targetcastLightSensorDA-currentcastLightSensorDA)>DADiffTolerance)
+        int DADiff=qAbs(targetcastLightSensorDA-currentcastLightSensorDA);
+        if(DADiff>DADiffTolerance)
         {
+            int minStep=DeviceSettings::getSingleton()->m_castLightDAChangeMinStep;
+            int maxStep=qRound(DADiff*DeviceSettings::getSingleton()->m_castLightDAChangeRate);
+            int step=qMax(minStep,maxStep);
             if(targetcastLightSensorDA>currentcastLightSensorDA)
             {
                 m_currentCastLightDA+=step;

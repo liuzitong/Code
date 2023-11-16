@@ -21,7 +21,9 @@ public:
     int m_pupilAutoAlignPixelTolerance;
     int m_castLightDADifferenceTolerance;
     int m_castLightDA;
-    int m_castLightDAChangeStep;
+    double m_castLightDAChangeRate;
+    int m_castLightDAChangeInteval;
+    int m_castLightDAChangeMinStep;
     int m_castLightTargetColor;
     int m_castLightTargetSize;
     QString m_castLightLastAdjustedDate;
