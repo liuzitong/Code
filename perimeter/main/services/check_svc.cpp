@@ -25,7 +25,7 @@ public:
     ~Check()=default;
     QSharedPointer<PatientModel> m_patientModel;
     int m_checkedCount,m_totalCount;   //只计算通常点数,短周期,中心点,以及周期测试不计入内.m_checkedCount=m_totalCount就测试完成.在doWork里面结束测试循环.
-    int *m_checkState;
+    QAtomicInt* m_checkState;
     bool m_error=false;
 //    bool m_reqPause=false;
 //    bool m_eyeMoveAlarm;
@@ -228,7 +228,7 @@ public:
 //    QThread m_devationCheckThread;
 //    DeviationCheckWorker* m_devationCheckworker;
     int m_time=0;
-    int* m_checkState;
+    QAtomicInt* m_checkState;
     PatientVm* m_patientVm;
     ProgramVm* m_programVm;
     CheckResultVm* m_checkResultVm;
@@ -970,7 +970,7 @@ bool StaticCheck::waitForAnswer()
     bool answer=false;
     while((m_stimulationWaitingForAnswerElapsedTimer.elapsed()<waitTime)&&(!answer))   //应答时间内
     {
-        if(m_deviceOperation->m_deviceStatus!=2) return false;
+        if(m_deviceOperation->m_deviceStatus!=2||*m_checkState==3) return false;
         if(m_deviceOperation->m_staticStimulationAnswer)
         {
 
@@ -1353,7 +1353,7 @@ void StaticCheck::checkWaiting()
     timer.start();
     while(m_deviceOperation->getAnswerPadStatus())
     {
-        if(m_deviceOperation->m_deviceStatus!=2) return;
+        if(m_deviceOperation->m_deviceStatus!=2||*m_checkState==3) return;
         QApplication::processEvents();
         if(timer.elapsed()>300)
         {
@@ -1912,6 +1912,7 @@ void CheckSvcWorker::doWork()
 //    QMetaObject::invokeMethod(m_devationCheckworker,"startChecking",Qt::QueuedConnection);
     while(true)
     {
+//        checkStateLock.lock();
         switch (*m_checkState)
         {
         case 0:                                             //start
@@ -1926,14 +1927,18 @@ void CheckSvcWorker::doWork()
             emit checkedCountChanged(0);
             emit checkResultChanged();
             m_timer.start();
+            checkStateLock.lock();
             if(*m_checkState==0)                              //防止其它主线程选择退出,之后被覆盖
                 setCheckState(1);
+            checkStateLock.unlock();
             break;
         }
         case 1:                                             //check
         {
-//            qDebug()<<("Checking");
+            qDebug()<<("Checking");
+            checkStateLock.lock();
             if(*m_checkState==3) break;
+            checkStateLock.unlock();
             m_check->Checkprocess();
 //            qDebug()<<"m_checkReqPuase:";
 //            qDebug()<<m_check->m_reqPause;
@@ -1953,6 +1958,7 @@ void CheckSvcWorker::doWork()
             emit checkedCountChanged(m_check->m_checkedCount);
             emit checkResultChanged();
             QApplication::processEvents();
+            qDebug()<<("Checking over.");
             break;
         }
         case 2:                                             //pause
@@ -1966,7 +1972,9 @@ void CheckSvcWorker::doWork()
 //            qDebug()<<("stopped");
             m_timer.stop();
             m_check->finished();
+            checkStateLock.lock();
             setCheckState(5);
+            checkStateLock.unlock();
             break;
         }
         case 4:                                             //finish
@@ -1993,17 +2001,17 @@ void CheckSvcWorker::doWork()
 //            m_patientVm->update();                            //好像没用啊,没什么会报错？
             qDebug()<<("finished");
             emit checkProcessFinished();
+            checkStateLock.lock();
             setCheckState(6);
+            checkStateLock.unlock();
             break;
         }
         case 5:
-        case 6:return;
+        case 6:break;
         };
+//        checkStateLock.lock();
+        if(*m_checkState==5||*m_checkState==6) return;
     }
-//    Exit:
-//    {
-//        QMetaObject::invokeMethod(m_devationCheckworker,"stopChecking",Qt::QueuedConnection);
-//    }
 }
 
 void CheckSvcWorker::onTimeOut()
