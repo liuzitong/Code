@@ -133,11 +133,11 @@ Item{
                                 {
                                 case 0:patientInfoListView.patientListModelVm.getPatientListByTimeSpan(dateFrom.text,dateTo.text);break;
                                 case 1:
-                                    patientInfoListView.patientListModelVm.getPatientListByPatientId(patientID.text);break;
+                                    patientInfoListView.patientListModelVm.getPatientListByPatientId(patientID.text.replace(/^\s*|\s*$/g,""));break;
                                 case 2:
                                     console.log(chineseName.text);
-                                    if(!doubleName) patientInfoListView.patientListModelVm.getPatientListByName(chineseName.text,dateFrom.text,dateTo.text);
-                                    else  patientInfoListView.patientListModelVm.getPatientListByName(firstName.text+" "+lastName.text,dateFrom.text,dateTo.text);
+                                    if(!doubleName) patientInfoListView.patientListModelVm.getPatientListByName(chineseName.text.replace(/^\s*|\s*$/g,""),dateFrom.text,dateTo.text);
+                                    else  patientInfoListView.patientListModelVm.getPatientListByName(firstName.text.replace(/^\s*|\s*$/g,"")+" "+lastName.text.replace(/^\s*|\s*$/g,""),dateFrom.text,dateTo.text);
                                     break;
                                 case 3:patientInfoListView.patientListModelVm.getPatientListBySex(sex.currentIndex,dateFrom.text,dateTo.text);break;
                                 case 4:patientInfoListView.patientListModelVm.getPatientListByBirthDate(birthDate.text);

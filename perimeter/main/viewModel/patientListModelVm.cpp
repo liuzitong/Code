@@ -223,8 +223,11 @@ void PatientListModelVm::getPatientListByName(QString name, QDate from, QDate to
 {
     if(from.toString()=="") from.setDate(1900,1,1);
     if(to.toString()=="") to=QDate::currentDate().addDays(1);
-    qx_query query("select * from patient where name=:name and lastUpdate>=:from and lastUpdate<=:to ORDER BY lastUpdate DESC");
-    query.bind(":name",name);query.bind(":from",from.toString("yyyy-MM-dd"));query.bind(":to",to.toString("yyyy-MM-dd"));
+    QString str="select * from patient where name like '%"+name+"%' and lastUpdate>=:from and lastUpdate<=:to ORDER BY lastUpdate DESC";
+    qx_query query(str);
+//    qx_query query("select * from patient where name like '%:name%' and lastUpdate>=:from and lastUpdate<=:to ORDER BY lastUpdate DESC");
+//    query.bind(":name",name);
+    query.bind(":from",from.toString("yyyy-MM-dd"));query.bind(":to",to.toString("yyyy-MM-dd"));
     Patient_List Patient_List;
     QSqlError daoError = qx::dao::execute_query(query, Patient_List);
     setPatientList(Patient_List);
