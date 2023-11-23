@@ -10,6 +10,7 @@
     "castLightDAChangeRate": 0.04,
     "castLightDADifferenceTolerance": 10,
     "castLightLastAdjustedDate": "2023/11/21",
+    "skipAdjustCastLight": false,
     "castLightTargetColor": 0,
     "castLightTargetSize": 4,
     "colorToSlot": [

@@ -27,6 +27,7 @@ public:
     int m_castLightTargetColor;
     int m_castLightTargetSize;
     QString m_castLightLastAdjustedDate;
+    bool m_skipAdjustCastLight;
     int m_beepCount;
     int m_beepInterval;
     int m_beepDuration;

@@ -911,7 +911,8 @@ void DeviceOperation::workOnNewConfig()
     auto date=QDate::currentDate();
     auto lastAdjustedDate=QDate::fromString(DeviceSettings::getSingleton()->m_castLightLastAdjustedDate,"yyyy/MM/dd");
     bool adjusted=((date.year()==lastAdjustedDate.year())&&(date.month()==lastAdjustedDate.month())&&(date.day()==lastAdjustedDate.day()));
-    if(adjusted)
+    bool skipAdjustCastLight=DeviceSettings::getSingleton()->m_skipAdjustCastLight;
+    if(adjusted||skipAdjustCastLight)
     {
         setCastLightAdjustStatus(3);
         dimDownCastLight();
