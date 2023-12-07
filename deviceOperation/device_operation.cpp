@@ -31,6 +31,7 @@ DeviceOperation::DeviceOperation()
     m_reconnectTimer.setInterval(5000);                            //复位的时候会短暂收不到数据更新，时间不能太短
     m_waitingTime=DeviceSettings::getSingleton()->m_waitingTime;
     m_currentCastLightDA=DeviceSettings::getSingleton()->m_castLightDA;
+    m_config=DeviceData::getSingleton()->m_config;
 
 //    qDebug()<<m_config.deviceIDRef();
 //    m_reconnectTimer.start();
@@ -896,10 +897,6 @@ void DeviceOperation::workOnNewConfig()
         if(crc==config.crcVeryficationRef())
         {
             m_config=config;
-        }
-        else
-        {
-            m_config=DeviceData::getSingleton()->m_config;
         }
     }
 
