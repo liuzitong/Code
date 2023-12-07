@@ -329,6 +329,8 @@ void StaticCheck::resetData()
     constexpr int initialNumber=999;
     qsrand(QTime::currentTime().msec());
     m_checkedCount=0;
+    m_error=false;
+    m_errorInfo="";
     m_autoAdaptTime=0;
     m_blindDotLocateIndex=0;
     m_stimulationCount=0;
@@ -1453,6 +1455,8 @@ void DynamicCheck::resetData()
     m_resultModel->m_program_id=m_programModel->m_id;
     m_records.clear();
     m_checkedCount=0;
+    m_error=false;
+    m_errorInfo="";
     auto& os_od=m_resultModel->m_OS_OD;
     auto& params=m_programModel->m_params;
     switch(params.strategy)
