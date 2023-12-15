@@ -126,7 +126,7 @@ void MainWindow::initDevCtl()
     ui->checkBox_IO->setChecked(m_settings.m_updateIOInfo);
     ui->checkBox_startRefreshInfo->setChecked(m_settings.m_updateRefreshIOInfo);
     ui->checkBox_RefreshIO->setChecked(m_settings.m_updateRefreshIOInfo);
-
+    m_devCtl->readConfig();
 }
 
 

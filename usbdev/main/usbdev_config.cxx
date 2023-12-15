@@ -72,7 +72,7 @@ public :
     inline auto smallDiamondFixationLampDAPtr()                     -> qint16*     {return m_small_diamond_fixation_lamp_DA;}
     inline auto yellowBackgroundLampDARef()                         -> qint16&     {return m_yellow_background_lamp_DA;}
     inline auto whiteBackgroundLampDAPtr()                          -> qint16*     {return m_white_background_lamp_DA;}
-    inline auto centerInfraredLampDARef()                           -> qint16&     {return m_center_fixation_lamp_DA;}
+    inline auto centerInfraredLampDARef()                           -> qint16&     {return m_center_infrared_lamp_DA;}
     inline auto borderInfraredLampDARef()                           -> qint16&     {return m_border_infrared_lamp_DA;}
     inline auto eyeglassFrameLampDARef()                            -> qint16&     {return m_eyeglass_frame_lamp_DA;}
     inline auto environmentAlarmLightDAPtr()                        -> qint16*     {return m_environment_light_alarm_DA;}
