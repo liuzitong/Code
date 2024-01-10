@@ -8,7 +8,7 @@ class DevicePupilProcessor
 {
 public:
     DevicePupilProcessor();
-    void find_point(uchar* data, int width, int height);
+    // void find_point(uchar* data, int width, int height);
     void processData(uchar* data,int width,int height);
     QVector<QPointF> caculatePupil(uchar* ba,int width,int height);
     QVector<QPointF> caculateReflectingDot(uchar* ba,int width,int height);

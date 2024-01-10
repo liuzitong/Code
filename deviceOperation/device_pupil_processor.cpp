@@ -2,111 +2,111 @@
 #include <iostream>
 #include <QDebug>
 #include <QtMath>
-#include <opencv2/core.hpp>
-#include <opencv2/imgproc.hpp>
+// #include <opencv2/core.hpp>
+// #include <opencv2/imgproc.hpp>
 #include <QVector>
 #include <QPoint>
 #include <QImage>
 #include <QDebug>
 
 namespace DevOps{
-void DevicePupilProcessor::find_point(uchar* data, int width, int height)
-{
-    QImage image(data,width,height,QImage::Format_Grayscale8);
-    QVector<QPoint>  point_vec;    //0:瞳孔中心点  1,2,3:三个反光点
-    int  center_radius;
-    m_pupilResValid=false;
+// void DevicePupilProcessor::find_point(uchar* data, int width, int height)
+// {
+//     QImage image(data,width,height,QImage::Format_Grayscale8);
+//     QVector<QPoint>  point_vec;    //0:瞳孔中心点  1,2,3:三个反光点
+//     int  center_radius;
+//     m_pupilResValid=false;
 
-    QVector<QPoint> result;
-    cv::Mat gray_image = cv::Mat(image.height(), image.width(), CV_8UC1, image.bits(), image.bytesPerLine());
-    std::vector<cv::Vec3f> circles;
-    cv::HoughCircles(gray_image, circles, cv::HOUGH_GRADIENT, 1, 100, 60, 30, 15, 50);
+//     QVector<QPoint> result;
+//     cv::Mat gray_image = cv::Mat(image.height(), image.width(), CV_8UC1, image.bits(), image.bytesPerLine());
+//     std::vector<cv::Vec3f> circles;
+//     cv::HoughCircles(gray_image, circles, cv::HOUGH_GRADIENT, 1, 100, 60, 30, 15, 50);
 
-    QPoint pupil_center;
-    int pupil_radius = 0;
+//     QPoint pupil_center;
+//     int pupil_radius = 0;
 
-    for (auto circle : circles) {
-        pupil_center = QPoint(cvRound(circle[0]), cvRound(circle[1]));
-        pupil_radius = cvRound(circle[2]);
-        break;
-    }
+//     for (auto circle : circles) {
+//         pupil_center = QPoint(cvRound(circle[0]), cvRound(circle[1]));
+//         pupil_radius = cvRound(circle[2]);
+//         break;
+//     }
 
-    center_radius = pupil_radius;
+//     center_radius = pupil_radius;
 
-    result.append(pupil_center);
+//     result.append(pupil_center);
 
-    if (pupil_radius > pupil_center.x() || pupil_radius > pupil_center.y()) {
-        return;
-    }
+//     if (pupil_radius > pupil_center.x() || pupil_radius > pupil_center.y()) {
+//         return;
+//     }
 
-    cv::Rect pupil_roi_rect(pupil_center.x() - pupil_radius, pupil_center.y() - pupil_radius, pupil_radius * 2, pupil_radius * 2);
+//     cv::Rect pupil_roi_rect(pupil_center.x() - pupil_radius, pupil_center.y() - pupil_radius, pupil_radius * 2, pupil_radius * 2);
 
-    cv::Mat pupil_roi = gray_image(pupil_roi_rect);
-    double pupil_max_val = 0;
-    double image_mean_val = cv::mean(gray_image).val[0];
+//     cv::Mat pupil_roi = gray_image(pupil_roi_rect);
+//     double pupil_max_val = 0;
+//     double image_mean_val = cv::mean(gray_image).val[0];
 
-    cv::minMaxLoc(pupil_roi, nullptr, &pupil_max_val);
+//     cv::minMaxLoc(pupil_roi, nullptr, &pupil_max_val);
 
-    double pupil_threshold = (pupil_max_val + image_mean_val) / 2;
+//     double pupil_threshold = (pupil_max_val + image_mean_val) / 2;
 
-    cv::Mat threshold_image;
+//     cv::Mat threshold_image;
 
-    cv::threshold(gray_image, threshold_image, pupil_threshold, 255, cv::THRESH_BINARY_INV);
+//     cv::threshold(gray_image, threshold_image, pupil_threshold, 255, cv::THRESH_BINARY_INV);
 
-    if (threshold_image.empty()) {
-        return;
-    }
+//     if (threshold_image.empty()) {
+//         return;
+//     }
 
-    std::vector<cv::Mat> contours;
-    cv::findContours(threshold_image, contours, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
+//     std::vector<cv::Mat> contours;
+//     cv::findContours(threshold_image, contours, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
 
-    contours = std::vector<cv::Mat>(contours.begin() + 1, contours.end());
+//     contours = std::vector<cv::Mat>(contours.begin() + 1, contours.end());
 
-    if (contours.empty()) {
-        return;
-    }
+//     if (contours.empty()) {
+//         return;
+//     }
 
-    for (auto cnt : contours) {
-        auto rect = cv::boundingRect(cnt);
-        QPoint point(rect.x + int(rect.width / 2), rect.y + int(rect.height / 2));
-        result.append(point);
-    }
+//     for (auto cnt : contours) {
+//         auto rect = cv::boundingRect(cnt);
+//         QPoint point(rect.x + int(rect.width / 2), rect.y + int(rect.height / 2));
+//         result.append(point);
+//     }
 
-    point_vec = std::move(result);
-
-
-    m_pupilDeviation=13;
-    m_pupilResValid=(point_vec.count()>0);
-    if(m_pupilResValid)
-    {
-        m_pupilCenterPoint=point_vec[0];
-        m_pupilDiameterPix=center_radius*2;
-
-        auto pupilDiameter=m_pupilDiameterPix*DeviceSettings::getSingleton()->m_pupilDiameterPixelToMillimeterConstant*320/width;
-        if(m_pupilDiameterArr.length()>=20) m_pupilDiameterArr.pop_front();
-        m_pupilDiameterArr.push_back(pupilDiameter);
-        {
-            float sum=0;
-            for(auto&i:m_pupilDiameterArr) sum+=i;
-            m_pupilDiameter=sum/m_pupilDiameterArr.size();
-//            std::cout<<m_pupilDiameter<<std::endl;
-        }
-
-//        auto vcReflectionDot=caculateReflectingDot(data,width,height);
-        m_reflectionResValid=(point_vec.length()==4);
+//     point_vec = std::move(result);
 
 
-        qDebug()<<"******************************";
-        qDebug()<<m_reflectionResValid;
-        qDebug()<<"******************************";
-        if(m_reflectionResValid)
-        {
-//            std::cout<<"find reflectionDot."<<std::endl;
-            m_reflectionDot={point_vec[1],point_vec[2],point_vec[3]};
-            m_pupilDeviation=caculateFixationDeviation(m_pupilCenterPoint,m_reflectionDot);
-        }
-    }
-}
+//     m_pupilDeviation=13;
+//     m_pupilResValid=(point_vec.count()>0);
+//     if(m_pupilResValid)
+//     {
+//         m_pupilCenterPoint=point_vec[0];
+//         m_pupilDiameterPix=center_radius*2;
+
+//         auto pupilDiameter=m_pupilDiameterPix*DeviceSettings::getSingleton()->m_pupilDiameterPixelToMillimeterConstant*320/width;
+//         if(m_pupilDiameterArr.length()>=20) m_pupilDiameterArr.pop_front();
+//         m_pupilDiameterArr.push_back(pupilDiameter);
+//         {
+//             float sum=0;
+//             for(auto&i:m_pupilDiameterArr) sum+=i;
+//             m_pupilDiameter=sum/m_pupilDiameterArr.size();
+// //            std::cout<<m_pupilDiameter<<std::endl;
+//         }
+
+// //        auto vcReflectionDot=caculateReflectingDot(data,width,height);
+//         m_reflectionResValid=(point_vec.length()==4);
+
+
+//         qDebug()<<"******************************";
+//         qDebug()<<m_reflectionResValid;
+//         qDebug()<<"******************************";
+//         if(m_reflectionResValid)
+//         {
+// //            std::cout<<"find reflectionDot."<<std::endl;
+//             m_reflectionDot={point_vec[1],point_vec[2],point_vec[3]};
+//             m_pupilDeviation=caculateFixationDeviation(m_pupilCenterPoint,m_reflectionDot);
+//         }
+//     }
+// }
 
 DevicePupilProcessor::DevicePupilProcessor()
 {
