@@ -84,6 +84,7 @@ private:
     int m_falsePosCyc,m_falseNegCyc,m_fiaxationViewLossCyc;  //随机错开值
     QVector<QPointF> m_blindDot;
     int m_blindDotLocateIndex=0;
+    int m_beginningCheckDBCount=0;
     int m_stimulationCount=0;                   //刺激次数到了测试盲点位置
     bool m_stimulated;
     QVector<DotRecord*> m_lastCheckDotRecord;
@@ -333,6 +334,7 @@ void StaticCheck::resetData()
     m_errorInfo="";
     m_autoAdaptTime=0;
     m_blindDotLocateIndex=0;
+    m_beginningCheckDBCount=0;
     m_stimulationCount=0;
     m_deviationCount=0;
     m_stimulated=false;
@@ -446,11 +448,12 @@ void StaticCheck::Checkprocess()
     else
     {
         m_lastCheckDotRecord.push_back(&getCheckDotRecordRef());   //存储lastDotType为commondot 并且存储指针
-        if(m_stimulationCount<=UtilitySvc::getSingleton()->m_beginningCheckDBCount)                                   //调高最高时测的几次的DB。
+        if(m_beginningCheckDBCount<UtilitySvc::getSingleton()->m_beginningCheckDBCount)                                   //调高最高时测的几次的DB。
         {
             if(m_lastCheckDotRecord.last()->StimulationDBs.count()==1)
             {
                 m_lastCheckDotRecord.last()->StimulationDBs[0]=qMax( m_lastCheckDotRecord.last()->StimulationDBs[0]-UtilitySvc::getSingleton()->m_beginningCheckDBDec,0);
+                m_beginningCheckDBCount++;
             }
         }
         emit nextCheckingDotChanged(m_lastCheckDotRecord.last()->loc);
