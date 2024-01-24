@@ -94,7 +94,7 @@ Item
                         }
                     }
 
-                    Item{ id: item2;width:parent.width;height: parent.height*0.12; anchors.left: parent.left;
+                    Item{ id: item2;width:parent.width;height: parent.height*0.12; anchors.left: parent.left;visible: false;
                         FixationDeviation{ anchors.bottom: parent.bottom; dots:if(currentCheckResult!==null) currentCheckResult.resultData.fixationDeviation; }
                     }
                 }

@@ -123,7 +123,7 @@ Rectangle {
         Row{
             width: parent.width;height: parent.height*0.30;spacing: parent.width*0.03;
             Column{
-                width: height;height: parent.parent.height*0.32;spacing: textHeight*0.5;
+                width: parent.width*0.18;height: parent.parent.height*0.32;spacing: textHeight*0.5;
                 Repeater{
                     property var slopeType: [lt+qsTr("Slope insignificant"),lt+qsTr("Slope significant")];
                     model: [

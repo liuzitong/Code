@@ -460,11 +460,11 @@ DynamicAnalysisVm::DynamicAnalysisVm(const QVariantList &args)
     }
     qDebug()<<m_values;
     m_range=m_program.m_params.Range[1];
-    m_fixationValues.resize(m_checkResult.m_data.fixationDeviation.size());
-    for(int i=0;i<int(m_checkResult.m_data.fixationDeviation.size());i++)
-    {
-        m_fixationValues[i]=m_checkResult.m_data.fixationDeviation[i];
-    }
+//    m_fixationValues.resize(m_checkResult.m_data.fixationDeviation.size());
+//    for(int i=0;i<int(m_checkResult.m_data.fixationDeviation.size());i++)
+//    {
+//        m_fixationValues[i]=m_checkResult.m_data.fixationDeviation[i];
+//    }
 
     QImage img=QImage({imageSize,imageSize}, QImage::Format_RGB32);
     analysisMethodSvc->drawDynamic(m_values,m_dotNames,m_range,img);img.save(m_previewFolder+"Dynamic.bmp");
@@ -559,7 +559,7 @@ void DynamicAnalysisVm::showReport(int report)
     qx::dao::fetch_by_id(checkResult_ptr);
     manager->setReportVariable("DiagnosisContent",checkResult_ptr->m_diagnosis);
 
-    manager->setReportVariable("FixationDeviationImagePath","./reportImage/FixationDeviation.bmp");
+//    manager->setReportVariable("FixationDeviationImagePath","./reportImage/FixationDeviation.bmp");
     manager->setReportVariable("deviceInfo",tr("Device info")+QString(":")+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("deviceInfo").toString());
     manager->setReportVariable("version", tr("Version")+QString(":")+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("version").toString());
 
@@ -739,6 +739,7 @@ OverViewListVm::OverViewListVm(QList<int> ids,int diagramWidth)
                           grayPicPath,
                           TotalPEPicPath,
                           PatternPEPicPath});
+        std::sort(m_data.begin(),m_data.end(),[](OverViewData a,OverViewData b){return a.checkDate<b.checkDate;});
     }
 
 

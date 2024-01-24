@@ -99,7 +99,7 @@ QObject *ProgressAnalysisListVm::getProgressBaseLinePreview(int imageSize)
         months.push_back(month);
     }
 
-    img=QImage({(endYear-startYear)*24+120,300}, QImage::Format_RGB32);
+    img=QImage({(endYear-startYear)*48+120,300}, QImage::Format_RGB32);
     analysisSvc->drawBaseLine(mdList,startYear,endYear,months,img);img.save(m_previewFolder+"baseLine.bmp");
     analysisSvc->BaseLineAnalysis(mdList,months,avgMd,progressSpeedBase,progressSpeedDeviation,slopeType);
     return new BaseLineResult(avgMd,progressSpeedBase,progressSpeedDeviation,slopeType);

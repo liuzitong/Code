@@ -1388,7 +1388,7 @@ void AnalysisSvc::drawBaseLine(QVector<float> mds,int startYear,int endYear,QVec
     int yearScale=startYear;
     for(int i=0;i<=endYear-startYear;i++)
     {
-        const QRect rectangle = QRect(60*scale+24*scale*i-fontPixSize*1.6*0.5, fontPixSize*0.2,fontPixSize*1.2, fontPixSize*0.8);
+        const QRect rectangle = QRect(60*scale+48*scale*i-fontPixSize*1.6*0.5, fontPixSize*0.2,fontPixSize*1.2, fontPixSize*0.8);
         painter.drawText(rectangle,Qt::AlignCenter|Qt::AlignVCenter,QString::number(yearScale%100));
         yearScale++;
     }

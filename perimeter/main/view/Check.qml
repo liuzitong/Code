@@ -276,8 +276,8 @@ Item {id:root; width: 1366;height: 691
                                     CusButton {id:autoButton;width: parent.width*0.35;height: parent.height*0.28;buttonColor: backGroundColor; text:checkSvc.autoAlignPupil?"Auto":"Manual";borderColor: "black";anchors.horizontalCenter: parent.horizontalCenter; anchors.verticalCenter: parent.verticalCenter;onClicked: {checkSvc.autoAlignPupil=!checkSvc.autoAlignPupil;}}
                                     CusButton {id:upButton;rec.visible: false;anchors.left: parent.Top;height: image.sourceSize.height*root.height/691;imageHightScale:1.0;width: image.sourceSize.width*root.width/1366;anchors.horizontalCenter: parent.horizontalCenter;imageSrc: "qrc:/Pics/capture-svg/arrow_1up.svg";onPressed:{imageHightScale=1.1;checkSvc.moveChinUp();}onReleased:{imageHightScale=1.0;checkSvc.stopMovingChin();}}
                                     CusButton {id:downButton;rec.visible: false;anchors.bottom: parent.bottom; height: image.sourceSize.height*root.height/691;imageHightScale:1.0;width: image.sourceSize.width*root.width/1366;anchors.horizontalCenter: parent.horizontalCenter;imageSrc: "qrc:/Pics/capture-svg/arrow_2down.svg";onPressed:{imageHightScale=1.1;checkSvc.moveChinDown();}onReleased:{imageHightScale=1.0;checkSvc.stopMovingChin();}}
-                                    CusButton {id:leftButton;rec.visible: false; anchors.right: autoButton.left; anchors.verticalCenter: parent.verticalCenter; imageHightScale:1.0;height: image.sourceSize.height*root.height/691; anchors.rightMargin:(controlPanel.height-autoButton.height-upButton.height*2)/2;width: image.sourceSize.width*root.width/1366;imageSrc: "qrc:/Pics/capture-svg/arrow_3left.svg";onPressed:{imageHightScale=1.1;checkSvc.moveChinLeft();}onReleased:{imageHightScale=1.0;checkSvc.stopMovingChin();}}
-                                    CusButton {id:rightButton;rec.visible: false;anchors.left: autoButton.right;anchors.verticalCenter: parent.verticalCenter;imageHightScale:1.0;height: image.sourceSize.height*root.height/691; anchors.leftMargin:(controlPanel.height-autoButton.height-upButton.height*2)/2;width: image.sourceSize.width*root.width/1366; imageSrc: "qrc:/Pics/capture-svg/arrow_4right.svg";onPressed:{imageHightScale=1.1;checkSvc.moveChinRight();}onReleased:{imageHightScale=1.0;checkSvc.stopMovingChin();}}
+                                    CusButton {id:leftButton;rec.visible: false; anchors.right: autoButton.left; anchors.verticalCenter: parent.verticalCenter; imageHightScale:1.0;height: image.sourceSize.height*root.height/691; anchors.rightMargin:(controlPanel.height-autoButton.height-upButton.height*2)/2;width: image.sourceSize.width*root.width/1366;imageSrc: "qrc:/Pics/capture-svg/arrow_3left.svg";onPressed:{imageHightScale=1.1;checkSvc.moveChinRight();}onReleased:{imageHightScale=1.0;checkSvc.stopMovingChin();}}
+                                    CusButton {id:rightButton;rec.visible: false;anchors.left: autoButton.right;anchors.verticalCenter: parent.verticalCenter;imageHightScale:1.0;height: image.sourceSize.height*root.height/691; anchors.leftMargin:(controlPanel.height-autoButton.height-upButton.height*2)/2;width: image.sourceSize.width*root.width/1366; imageSrc: "qrc:/Pics/capture-svg/arrow_4right.svg";onPressed:{imageHightScale=1.1;checkSvc.moveChinLeft();}onReleased:{imageHightScale=1.0;checkSvc.stopMovingChin();}}
                                 }
                                 Rectangle{id:eyeOptionsGroup; width: parent.width*0.83;height: parent.height*0.25;anchors.horizontalCenter: parent.horizontalCenter; border.color: backGroundBorderColor;color: backGroundColor; radius: width*0.03;
                                     Item{ anchors.fill: parent;anchors.margins: parent.height*0.1;
@@ -292,17 +292,17 @@ Item {id:root; width: 1366;height: 691
                                                 CusText{text:lt+qsTr("Eye move alarm"); horizontalAlignment: Text.AlignLeft;width: parent.width*0.50;font.pointSize: fontPointSize;}
                                                 Image {source: "qrc:/Pics/capture-svg/btn_alarm.svg";height:parent.height*0.6; anchors.verticalCenter: parent.verticalCenter;width: height; }
                                             }
-                                            Row{width:parent.width;height: parent.height*0.75/3;spacing: width*0.05;
-                                                CusCheckBox{id:deviationCheckBox;checked:false;onCheckedChanged:checkSvc.measureDeviation=checked;}
+                                            Row{width:parent.width;height: parent.height*0.75/3;spacing: width*0.05;enabled:currentProgram.type!==2
+                                                CusCheckBox{id:deviationCheckBox;checked:false;onCheckedChanged:checkSvc.measureDeviation=checked; }
                                                 CusText{text:lt+qsTr("Fixation deviation"); horizontalAlignment: Text.AlignLeft;width: parent.width*0.25;font.pointSize: fontPointSize; }
-                                                Component.onCompleted: {root.currentProgramChanged.connect(function(){if(currentProgram.type===2){deviationCheckBox.checked=false;deviationCheckBox.enabled=false;}else {deviationCheckBox.enabled=true;deviationCheckBox.checked=false;}});}
+//                                                Component.onCompleted: {root.currentProgramChanged.connect(function(){if(currentProgram.type===2){deviationCheckBox.checked=false;deviationCheckBox.enabled=false;}else {deviationCheckBox.enabled=true;deviationCheckBox.checked=false;}});}
                                             }
                                         }
                                     }
                                 }
                                 Item{
                                     width: parent.width*0.83;height: parent.height*0.08;anchors.horizontalCenter: parent.horizontalCenter;
-                                    FixationDeviation{ visible:deviationCheckBox.checked;anchors.horizontalCenter: parent.horizontalCenter;dots:if(currentCheckResult!==null) currentCheckResult.resultData.fixationDeviation;}
+                                    FixationDeviation{ visible:currentProgram.type!==2;anchors.horizontalCenter: parent.horizontalCenter;dots:if(currentCheckResult!==null) currentCheckResult.resultData.fixationDeviation;}
                                 }
                             }
                         }

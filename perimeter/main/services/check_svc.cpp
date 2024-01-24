@@ -233,8 +233,8 @@ public:
     ProgramVm* m_programVm;
     CheckResultVm* m_checkResultVm;
     QList<QPointF> m_dynamicSelectedDots;
-    bool m_measurePupilDeviation=true;
     bool m_measurePupilDiameter=true;
+    bool m_measurePupilDeviation=false;
     bool m_eyeMoveAlarm=false;
     bool m_alarmAndPause=false;
     int m_deviationCount=0;
@@ -1824,6 +1824,7 @@ void CheckSvcWorker::initialize()
     if(type!=2)
     {
         ((StaticCheck*)m_check.data())->m_resultModel=static_cast<StaticCheckResultVm*>(m_checkResultVm)->getModel();
+//        ((StaticCheck*)m_check.data())->m_measurePupilDeviation=m_measurePupilDeviation;
 //        connect(deviceOperation,&DevOps::DeviceOperation::pupilDiameterChanged,[&](){((StaticCheck*)m_check.data())->m_resultModel->m_data.pupilDiameter=deviceOperation->m_pupilDiameter;emit checkResultChanged();});
     }
 
@@ -1860,8 +1861,8 @@ void CheckSvcWorker::prepareToCheck()
         connect(this,&CheckSvcWorker::measureDeviationChanged,m_check.data(),[&](bool value)
         {
             ((StaticCheck*)m_check.data())->m_measurePupilDeviation=value;
-            if(((StaticCheck*)m_check.data())->m_resultModel!=nullptr)
-                ((StaticCheck*)m_check.data())->m_resultModel->m_data.fixationDeviation.clear();
+//            if(((StaticCheck*)m_check.data())->m_resultModel!=nullptr)
+//                ((StaticCheck*)m_check.data())->m_resultModel->m_data.fixationDeviation.clear();
             emit checkResultChanged();
         });
         ((StaticCheck*)m_check.data())->m_measurePupilDeviation=m_measurePupilDeviation;
