@@ -180,7 +180,7 @@ int UtilitySvc::getIndex(const QPointF &dot, const QVector<QPointF> &pointLoc)
     return index;
 }
 
-int UtilitySvc::getIndex(const QPointF &dot, const QVector<QPoint> &pointLoc, int OS_OD)
+int UtilitySvc::getIndex(const QPointF &dot, const QVector<QPoint> &pointLoc/*, int OS_OD*/)
 {
     int index=-1;
     int distMin=INT_MAX;
@@ -204,25 +204,25 @@ int UtilitySvc::getIndex(const QPointF &dot, const QVector<QPoint> &pointLoc, in
 }
 
 
-int UtilitySvc::getIndex(const QPointF &dot, const QVector<QPointF> &pointLoc, int OS_OD)
-{
-    int index=-1;
+//int UtilitySvc::getIndex(const QPointF &dot, const QVector<QPointF> &pointLoc, int OS_OD)
+//{
+//    int index=-1;
 
-    for(int i=0;i<pointLoc.length();i++)
-    {
-        int dist;
-        if(OS_OD==0)
-        {
-            dist=pow(pointLoc[i].x()-dot.x(),2)+pow(pointLoc[i].y()-dot.y(),2);
-        }
-        else
-        {
-            dist=pow(pointLoc[i].x()-(-dot.x()),2)+pow(pointLoc[i].y()-dot.y(),2);
-        }
-        if(dist<FLT_EPSILON){index=i;break;}
-    }
-    return index;
-}
+//    for(int i=0;i<pointLoc.length();i++)
+//    {
+//        int dist;
+//        if(OS_OD==0)
+//        {
+//            dist=pow(pointLoc[i].x()-dot.x(),2)+pow(pointLoc[i].y()-dot.y(),2);
+//        }
+//        else
+//        {
+//            dist=pow(pointLoc[i].x()-(-dot.x()),2)+pow(pointLoc[i].y()-dot.y(),2);
+//        }
+//        if(dist<FLT_EPSILON){index=i;break;}
+//    }
+//    return index;
+//}
 
 bool UtilitySvc::getIsMainTable(const QPointF &loc,bool isMainTable)
 {
@@ -289,17 +289,17 @@ void UtilitySvc::wait(int msecs)
     }
 }
 
-int UtilitySvc::getExpectedDB(const QVector<int> &value_30d, QPointF loc,int OS_OD)
+int UtilitySvc::getExpectedDB(const QVector<int> &value_30d, QPointF loc/*,int OS_OD*/)
 {
     int val;
     if(loc.x()<=30&&loc.y()<=30)
     {
-        int index=getIndex(loc,m_pointLoc_30d,OS_OD);
+        int index=getIndex(loc,m_pointLoc_30d);
         val=value_30d[index];
     }
     else
     {
-        int index=getIndex(loc,m_pointLoc_60d,OS_OD);
+        int index=getIndex(loc,m_pointLoc_60d);
         val=m_value_60d[index];
     }
     //盲点附近的点取反号

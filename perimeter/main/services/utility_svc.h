@@ -26,9 +26,9 @@ public:
 
     static int getIndex(const QPointF& dot,const QVector<QPointF>& pointLoc);
 
-    static int getIndex(const QPointF& dot,const QVector<QPoint>& pointLoc,int OS_OD);
+    static int getIndex(const QPointF& dot,const QVector<QPoint>& pointLoc/*,int OS_OD*/);
 
-    static int getIndex(const QPointF& dot,const QVector<QPointF>& pointLoc,int OS_OD);
+//    static int getIndex(const QPointF& dot,const QVector<QPointF>& pointLoc,int OS_OD);
 
     static bool getIsMainTable(const QPointF & loc,bool isMainTable);
 
@@ -40,7 +40,7 @@ public:
 
     static void wait(int msecs);
 
-    int getExpectedDB(const QVector<int>& value_30d,QPointF loc,int OS_OD);
+    int getExpectedDB(const QVector<int>& value_30d,QPointF loc/*,int OS_OD*/);
 
     QVector<int> getValue30d(int cursorSize,int cursorColor,int age);
 

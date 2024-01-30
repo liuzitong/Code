@@ -385,6 +385,11 @@ void StaticCheck::resetData()
         {
             bool isBaseDot=false;
             auto dot=m_programModel->m_data.dots[i];
+            QVector<int> stimulationDBs;
+            if(isBaseDot||!m_isStartWithBaseDots)
+            {
+                stimulationDBs={m_utilitySvc->getExpectedDB(m_value_30d,{dot.x,dot.y}/*,m_resultModel->m_OS_OD*/)+DBChanged};
+            }
             if(m_resultModel->m_OS_OD!=0) dot.x=-dot.x;
             if(m_isStartWithBaseDots)
             {
@@ -394,11 +399,6 @@ void StaticCheck::resetData()
                         isBaseDot=true;
             }
             //非参考点初始测试DB设置为-999,之后选点的时候根据周围已经检查出的值赋值
-            QVector<int> stimulationDBs;
-            if(isBaseDot||!m_isStartWithBaseDots)
-            {
-                stimulationDBs={m_utilitySvc->getExpectedDB(m_value_30d,{dot.x,dot.y},m_resultModel->m_OS_OD)+DBChanged};
-            }
             if(m_programModel->m_type==Type::ThreshHold&&(!m_programModel->m_params.commonParams.blindDotTest))             //阈值状态下又不测试盲点的盲点附近初始值
             {
 
@@ -413,7 +413,7 @@ void StaticCheck::resetData()
 
             m_dotRecords.push_back(DotRecord{i,QPointF{dot.x,dot.y},stimulationDBs,-initialNumber,isBaseDot,false,-initialNumber,initialNumber});
         }
-        m_centerDotRecord=DotRecord{m_totalCount*2,QPointF{0,0},{m_utilitySvc->getExpectedDB(m_value_30d,{0,0},m_resultModel->m_OS_OD)+DBChanged},-initialNumber,false,false,-initialNumber,initialNumber};
+        m_centerDotRecord=DotRecord{m_totalCount*2,QPointF{0,0},{m_utilitySvc->getExpectedDB(m_value_30d,{0,0}/*,m_resultModel->m_OS_OD*/)+DBChanged},-initialNumber,false,false,-initialNumber,initialNumber};
     }
     else                            //单刺激
     {
