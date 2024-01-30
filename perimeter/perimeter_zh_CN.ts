@@ -538,27 +538,27 @@
         <translation type="vanished">设备正在重新连接</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="122"/>
+        <location filename="main/view/Content.qml" line="126"/>
         <source>Patient</source>
         <translation>患者</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="124"/>
+        <location filename="main/view/Content.qml" line="128"/>
         <source>Check</source>
         <translation>检测</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="138"/>
+        <location filename="main/view/Content.qml" line="142"/>
         <source>Settings</source>
         <translation>设置</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="148"/>
+        <location filename="main/view/Content.qml" line="152"/>
         <source>Customize</source>
         <translation>自定义</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="151"/>
+        <location filename="main/view/Content.qml" line="155"/>
         <source>About</source>
         <translation>关于</translation>
     </message>
@@ -1619,7 +1619,7 @@
     <message>
         <location filename="main/viewModel/general_analysis_vm.cpp" line="602"/>
         <source>Male</source>
-        <translation>男</translation>
+        <translation>男性</translation>
     </message>
     <message>
         <location filename="main/viewModel/general_analysis_vm.cpp" line="602"/>
@@ -1680,6 +1680,11 @@
         <location filename="main/viewModel/general_analysis_vm.cpp" line="614"/>
         <source>Within normal limits</source>
         <translation>正常范围</translation>
+    </message>
+    <message>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="614"/>
+        <source>Abnormally high of sensitivity</source>
+        <translation>异常高敏感度</translation>
     </message>
     <message>
         <location filename="main/viewModel/general_analysis_vm.cpp" line="615"/>
@@ -1970,6 +1975,11 @@
         <translation>边界</translation>
     </message>
     <message>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="364"/>
+        <source>Abnormally high of sensitivity</source>
+        <translation>异常高敏感度</translation>
+    </message>
+    <message>
         <location filename="main/viewModel/general_analysis_vm.cpp" line="365"/>
         <source>GHT</source>
         <translation>青光眼半视野检查</translation>
@@ -2014,7 +2024,7 @@
 <context>
     <name>Perimeter::StaticCheck</name>
     <message>
-        <location filename="main/services/check_svc.cpp" line="827"/>
+        <location filename="main/services/check_svc.cpp" line="831"/>
         <source>Cant&apos;t locate blind dot.Turn off blindDot check.</source>
         <translation>不能定位盲点.关闭盲点检查.</translation>
     </message>
@@ -2319,6 +2329,12 @@
         <location filename="main/view/ProgressAnalysisBaseLine.qml" line="95"/>
         <source>Within normal limits</source>
         <translation>正常范围</translation>
+    </message>
+    <message>
+        <location filename="main/view/ProgressAnalysisBaseLine.qml" line="46"/>
+        <location filename="main/view/ProgressAnalysisBaseLine.qml" line="95"/>
+        <source>Abnormally high of sensitivity</source>
+        <translation>异常高敏感度</translation>
     </message>
     <message>
         <location filename="main/view/ProgressAnalysisBaseLine.qml" line="48"/>
@@ -2817,6 +2833,11 @@
         <translation>正常范围</translation>
     </message>
     <message>
+        <location filename="main/view/ProgressThreeFollowUps.qml" line="54"/>
+        <source>Abnormally high of sensitivity</source>
+        <translation>异常高敏感度</translation>
+    </message>
+    <message>
         <location filename="main/view/ProgressThreeFollowUps.qml" line="55"/>
         <source>no progress</source>
         <translation>没有进展</translation>
@@ -3306,6 +3327,11 @@
         <translation>正常范围</translation>
     </message>
     <message>
+        <location filename="main/view/StaticAnalysisOverview.qml" line="39"/>
+        <source>Abnormally high of sensitivity</source>
+        <translation>异常高敏感度</translation>
+    </message>
+    <message>
         <location filename="main/view/StaticAnalysisOverview.qml" line="42"/>
         <source>program</source>
         <oldsource>program:</oldsource>
@@ -3420,6 +3446,11 @@
         <translation>正常范围</translation>
     </message>
     <message>
+        <location filename="main/view/StaticAnalysisReportOverView.qml" line="49"/>
+        <source>Abnormally high of sensitivity</source>
+        <translation>异常高敏感度</translation>
+    </message>
+    <message>
         <location filename="main/view/StaticAnalysisReportOverView.qml" line="50"/>
         <source>GHT</source>
         <translation>青光眼半视野检查</translation>
@@ -3489,6 +3520,11 @@
         <location filename="main/view/StaticAnalysisReportSingle.qml" line="79"/>
         <source>Within normal limits</source>
         <translation>正常范围</translation>
+    </message>
+    <message>
+        <location filename="main/view/StaticAnalysisReportSingle.qml" line="79"/>
+        <source>Abnormally high of sensitivity</source>
+        <translation>异常高敏感度</translation>
     </message>
     <message>
         <location filename="main/view/StaticAnalysisReportSingle.qml" line="80"/>

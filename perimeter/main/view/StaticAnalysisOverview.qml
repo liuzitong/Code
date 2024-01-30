@@ -36,7 +36,7 @@ Item {
                         height: parent.height;width: parent.height;
                         property var centerDotCheck: [lt+qsTr("On"),lt+qsTr("Off")];
                         property var strategy: [lt+qsTr("Full threshold"),lt+qsTr("Fast threshold"),lt+qsTr("Smart interactive"),lt+qsTr("Fast interactive")]
-                        property var ght: [lt+qsTr("Out of limits"),lt+qsTr("Low sensitivity"),lt+qsTr("Border of limits"),lt+qsTr("Within normal limits")];
+                        property var ght: [lt+qsTr("Out of limits"),lt+qsTr("Low sensitivity"),lt+qsTr("Border of limits"),lt+qsTr("Within normal limits"),lt+qsTr("Abnormally high of sensitivity")];
                         property var proxyModel:
                         [
                             qsTr("program")+":"+model.program,

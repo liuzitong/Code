@@ -229,7 +229,7 @@ void AnalysisSvc::ThresholdAnalysis(int resultId,QVector<int>& dev,QVector<int>&
         int index;
 //        if(radius<=30)
 //        {
-        index=UtilitySvc::getSingleton()->getIndex(QPointF{dot.x,dot.y},m_pointLoc_30d,checkResult.m_OS_OD);
+        index=UtilitySvc::getSingleton()->getIndex(QPointF{dot.x,dot.y},m_pointLoc_30d/*,checkResult.m_OS_OD*/);
         if(index==-1) continue;
         sv[i]=value_30d[index];
 //        }
@@ -357,7 +357,7 @@ void AnalysisSvc::ThresholdAnalysis(int resultId,QVector<int>& dev,QVector<int>&
     for(int i=0;i<mDev.length();i++)
     {
 
-        auto index=UtilitySvc::getSingleton()->getIndex(QPointF(dotList[i].x,dotList[i].y),m_pointLoc_30d,checkResult.m_OS_OD);
+        auto index=UtilitySvc::getSingleton()->getIndex(QPointF(dotList[i].x,dotList[i].y),m_pointLoc_30d/*,checkResult.m_OS_OD*/);
         if(index==-1) continue;
         float radius=sqrt(pow(dotList[i].x,2)+pow(dotList[i].y,2));
         if(radius<30)
@@ -386,57 +386,160 @@ void AnalysisSvc::ThresholdAnalysis(int resultId,QVector<int>& dev,QVector<int>&
     };
 
 
-    float ght[5][2];
-    bool b27=false;
+    int ght[5][2];
+    int ght2[5][2];
+    int pe_GHT[5][4];   //五个区对应4种标准值
     memset(ght,0,sizeof(ght));
+    memset(ght2,0,sizeof(ght));
+    memset(pe_GHT,0,sizeof(pe_GHT));
     for(int i=0;i<int(dotList.size());i++)
     {
-        int v;QPoint dot;
-        if(mDev[i]!=-99)
-            v=-mDev[i];
-
+        QPoint dot;
+        int v=checkResult.m_data.checkData[i];
+        int v2=-mDev[i];
         if(checkResult.m_OS_OD==0)
-            dot={int(dotList[i].x),int(dotList[i].y)};
+            dot={int(-dotList[i].x),int(dotList[i].y)};
         else
-           dot={int(-dotList[i].x),int(dotList[i].y)};
+           dot={int(dotList[i].x),int(dotList[i].y)};
 
-        if(isGHT(m_GHT1_RIGHT,dot)){ght[0][0]+=v;}
-        if(isGHT(m_GHT2_RIGHT,dot)){if(v>=7&&abs(dot.x())==abs(dot.y())) b27=true;ght[1][0]+=v;}
-        if(isGHT(m_GHT3_RIGHT,dot)){ght[2][0]+=v;}
-        if(isGHT(m_GHT4_RIGHT,dot)){ght[3][0]+=v;}
-        if(isGHT(m_GHT5_RIGHT,dot)){ght[4][0]+=v;}
-        if(isGHT(m_GHT1_RIGHT,{dot.x(),-dot.y()})){ght[0][1]+=v;}
-        if(isGHT(m_GHT2_RIGHT,{dot.x(),-dot.y()})){if(v>=7&&abs(dot.x())==abs(dot.y())) b27=true;ght[1][1]+=v;}
-        if(isGHT(m_GHT3_RIGHT,{dot.x(),-dot.y()})){ght[2][1]+=v;}
-        if(isGHT(m_GHT4_RIGHT,{dot.x(),-dot.y()})){ght[3][1]+=v;}
-        if(isGHT(m_GHT5_RIGHT,{dot.x(),-dot.y()})){ght[4][1]+=v;}
+        if(isGHT(m_GHT1_RIGHT,dot)){ght[0][0]+=v;ght2[0][0]+=v2;}
+        if(isGHT(m_GHT2_RIGHT,dot)){ght[1][0]+=v;ght2[1][0]+=v2;}
+        if(isGHT(m_GHT3_RIGHT,dot)){ght[2][0]+=v;ght2[2][0]+=v2;}
+        if(isGHT(m_GHT4_RIGHT,dot)){ght[3][0]+=v;ght2[3][0]+=v2;}
+        if(isGHT(m_GHT5_RIGHT,dot)){ght[4][0]+=v;ght2[4][0]+=v2;}
+        if(isGHT(m_GHT1_RIGHT,{dot.x(),-dot.y()})){ght[0][1]+=v;ght2[0][1]+=v2;}
+        if(isGHT(m_GHT2_RIGHT,{dot.x(),-dot.y()})){ght[1][1]+=v;ght2[1][1]+=v2;}
+        if(isGHT(m_GHT3_RIGHT,{dot.x(),-dot.y()})){ght[2][1]+=v;ght2[2][1]+=v2;}
+        if(isGHT(m_GHT4_RIGHT,{dot.x(),-dot.y()})){ght[3][1]+=v;ght2[3][1]+=v2;}
+        if(isGHT(m_GHT5_RIGHT,{dot.x(),-dot.y()})){ght[4][1]+=v;ght2[4][1]+=v2;}
+
+
+        auto index=UtilitySvc::getSingleton()->getIndex(QPointF(dotList[i].x,dotList[i].y),m_pointLoc_30d/*,checkResult.m_OS_OD*/);
+        if(isGHT(m_GHT1_RIGHT,dot)||isGHT(m_GHT1_RIGHT,{dot.x(),-dot.y()})){pe_GHT[0][0]+=pe_v5[index];pe_GHT[0][1]+=pe_v2[index];pe_GHT[0][2]+=pe_v1[index];pe_GHT[0][3]+=pe_v05[index];}
+        if(isGHT(m_GHT2_RIGHT,dot)||isGHT(m_GHT2_RIGHT,{dot.x(),-dot.y()})){pe_GHT[1][0]+=pe_v5[index];pe_GHT[1][1]+=pe_v2[index];pe_GHT[1][2]+=pe_v1[index];pe_GHT[1][3]+=pe_v05[index];}
+        if(isGHT(m_GHT3_RIGHT,dot)||isGHT(m_GHT3_RIGHT,{dot.x(),-dot.y()})){pe_GHT[2][0]+=pe_v5[index];pe_GHT[2][1]+=pe_v2[index];pe_GHT[2][2]+=pe_v1[index];pe_GHT[2][3]+=pe_v05[index];}
+        if(isGHT(m_GHT4_RIGHT,dot)||isGHT(m_GHT4_RIGHT,{dot.x(),-dot.y()})){pe_GHT[3][0]+=pe_v5[index];pe_GHT[3][1]+=pe_v2[index];pe_GHT[3][2]+=pe_v1[index];pe_GHT[3][3]+=pe_v05[index];}
+        if(isGHT(m_GHT5_RIGHT,dot)||isGHT(m_GHT5_RIGHT,{dot.x(),-dot.y()})){pe_GHT[4][0]+=pe_v5[index];pe_GHT[4][1]+=pe_v2[index];pe_GHT[4][2]+=pe_v1[index];pe_GHT[4][3]+=pe_v05[index];}
+    }
+//    qDebug()<<"**************************";
+
+//    qDebug()<<"$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$";
+//    for(int i=0;i<5;i++)
+//    {
+//        qDebug()<<ght[i][0];
+//        qDebug()<<ght[i][1];
+//    }
+
+//     qDebug()<<"$$$$$$$$$$$$$$$$";
+//    for(int i=0;i<5;i++)
+//    {
+//        for(int j=0;j<4;j++)
+//        {
+//            qDebug()<<pe_GHT[i][j];
+//        }
+//    }
+//    qDebug()<<"=================================================";
+
+    int GHT1=3;
+    int pe=0;    //0 >5%,1<5%,2<2%,3<1%,4<0.5%
+    qDebug()<<"&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&";
+    qDebug()<<ght[1][0];
+    qDebug()<<ght[2][0];
+    qDebug()<<"&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&";
+    for(int i=0;i<5;i++)
+    {
+        int section_pe;
+        int val=abs(ght[i][0]-ght[i][1])*2;   //上下两边相减差值是3个，标准值插值是加了两边的所以要乘以2
+
+        if(val<pe_GHT[i][0])
+        {
+            section_pe=0;
+        }
+        else if(val<pe_GHT[i][1])
+        {
+            section_pe=1;
+        }
+        else if(val<pe_GHT[i][2])
+        {
+            section_pe=2;
+        }
+        else if(val<pe_GHT[i][3])
+        {
+            section_pe=3;
+        }
+        else
+        {
+            section_pe=4;
+        }
+
+        if(pe<section_pe)
+        {
+            pe=section_pe;
+        }
     }
 
-    ght[0][0] *= 1 / 3;
-    ght[1][0] *= 1 / 4;
-    ght[2][0] *= 1 / 5;
-    ght[3][0] *= 1 / 6;
-    ght[4][0] *= 1 / 4;
-
-    ght[0][1] *= 1 / 3;
-    ght[1][1] *= 1 / 4;
-    ght[2][1] *= 1 / 5;
-    ght[3][1] *= 1 / 6;
-    ght[4][1] *= 1 / 4;
-
-    GHT=3;
-    if (ght[0][0] >= 5 || ght[0][1] >= 5 || ght[1][0] >= 5 || ght[1][1] >= 5 ||
-        ght[2][0] >= 6 || ght[2][1] >= 6 || ght[3][0] >= 6 || ght[3][1] >= 6 || ght[4][0] >= 7 || ght[4][1] >= 7)
+    if(pe==0)
     {
-        GHT = 0;
+        GHT1=3;  //"Within normal limits"
     }
-    else if(b27)
+    else if(pe==1||pe==2)
     {
-        GHT = 1;
+        GHT1 = 2; //"Border of limits"
     }
-    else if(ght[0][0] > 3 || ght[0][1] > 3 || ght[2][0] >= 4 || ght[2][1] >= 4 || ght[3][0] >= 4 || ght[3][1] >= 4)
+
+    else if(pe==3||pe==4)
     {
-        GHT = 2;
+        GHT1=0;  //"Out normal limits"
+    }
+
+    int GHT2=3;
+    qDebug()<<"**********************************";
+    qDebug()<<ght2[0][0];
+    qDebug()<<ght2[1][0];
+    qDebug()<<"**********************************";
+    ght2[0][0] *= (1.0 / 3);   //必须要有小数点，不然就是0了。
+    ght2[1][0] *= (1.0 / 4);
+    ght2[2][0] *= (1.0 / 5);
+    ght2[3][0] *= (1.0 / 6);
+    ght2[4][0] *= (1.0 / 4);
+
+    ght2[0][1] *= (1.0 / 3);
+    ght2[1][1] *= (1.0 / 4);
+    ght2[2][1] *= (1.0 / 5);
+    ght2[3][1] *= (1.0 / 6);
+    ght2[4][1] *= (1.0 / 4);
+
+
+
+    qDebug()<< ght2[0][0];
+    if (ght2[0][0] >= 5 || ght2[0][1] >= 5 ||
+        ght2[1][0] >= 5 || ght2[1][1] >= 5 ||
+        ght2[2][0] >= 6 || ght2[2][1] >= 6 ||
+        ght2[3][0] >= 6 || ght2[3][1] >= 6 ||
+        ght2[4][0] >= 7 || ght2[4][1] >= 7)
+    {
+        GHT2 = 0;  //"Out of limits"
+    }
+    else if(ght2[0][0] > 3  || ght2[0][1] > 3 ||
+            ght2[1][0] >= 3 || ght2[1][1] >= 3 ||
+            ght2[2][0] >= 4 || ght2[2][1] >= 4 ||
+            ght2[3][0] >= 4 || ght2[3][1] >= 4 ||
+            ght2[4][0] >= 5 || ght2[4][1] >= 5
+            )
+    {
+        GHT2 = 2; //"Border of limits"
+    }
+    else
+        GHT2=3; //"Within normal limits"
+    qDebug()<<GHT1;
+    qDebug()<<GHT2;
+
+    GHT=qMin(GHT1,GHT2);
+
+    if(GHT==3)
+    {
+        if(md>=6) GHT=4;         //Abnormally high of sensitivity
+        else if(md<=-6) GHT=1;   //General depression of sensitivity
     }
 }
 
@@ -485,7 +588,7 @@ void AnalysisSvc::ThreeInOneAnalysis(int resultId, QVector<int> &dev)
         int index;
         if(radius<=30)
         {
-            index=UtilitySvc::getSingleton()->getIndex(QPointF{dot.x,dot.y},m_pointLoc_30d,checkResult.m_OS_OD);
+            index=UtilitySvc::getSingleton()->getIndex(QPointF{dot.x,dot.y},m_pointLoc_30d/*,checkResult.m_OS_OD*/);
 //            qDebug()<<index;
             if(index==-1) continue;
             sv[i]=value_30d[index];
@@ -493,7 +596,7 @@ void AnalysisSvc::ThreeInOneAnalysis(int resultId, QVector<int> &dev)
 
         else if(radius<=60)
         {
-            index=UtilitySvc::getSingleton()->getIndex(QPointF{dot.x,dot.y},m_pointLoc_60d,checkResult.m_OS_OD);
+            index=UtilitySvc::getSingleton()->getIndex(QPointF{dot.x,dot.y},m_pointLoc_60d/*,checkResult.m_OS_OD*/);
             if(index==-1) continue;
             sv[i]=m_value_60d[index];
 //            if(sv[i]>0) sv[i]-=age_correction;else if(sv[i]<0) sv[i]+=age_correction;
@@ -1496,7 +1599,7 @@ void AnalysisSvc::drawBaseLine(QVector<float> mds,int startYear,int endYear,QVec
 
 int AnalysisSvc::getpeMDev(int MDev,QPointF loc,int OS_OD)
 {
-    auto index=UtilitySvc::getSingleton()->getIndex(loc,m_pointLoc_30d,OS_OD);
+    auto index=UtilitySvc::getSingleton()->getIndex(loc,m_pointLoc_30d/*,OS_OD*/);
     int peMDev;
 
     int v=-MDev;

@@ -116,7 +116,7 @@ StaticAnalysisVm::StaticAnalysisVm(const QVariantList &args)
 
             analysisMethodSvc->drawText(m_dev,m_locs,m_range,m_OS_OD,img,DrawType::Dev);img.save(m_previewFolder+"TotalDeviation.bmp");
             analysisMethodSvc->drawPE(m_peDev,m_locs,m_range,img);img.save(m_previewFolder+"TotalPE.bmp");
-            if(m_md<-5)
+            if(m_md<-20)
             {
                 analysisMethodSvc->drawWords(img,{tr("Pattern Deviation not"),tr("Shown for serverely"),tr("Depressed fields. Refer"),tr("to Total Deviation")},1.0,true);
                 img.save(m_previewFolder+"PatternDeviation.bmp");;img.save(m_previewFolder+"PatternPE.bmp");
@@ -361,7 +361,7 @@ void StaticAnalysisVm::showReport(int report)
     QString strategy;switch(int(commomParams.strategy)){case 0:strategy=tr("Full threshold");break;case 1:strategy=tr("Fast threshold");break;case 2:strategy=tr("Smart interactive");break;case 3:strategy=tr("Fast interactive");break;case 4:strategy=tr("One stage");break;case 5:strategy=tr("Two stages");break;case 6:strategy=tr("Quantify defects");break;case 7:strategy=tr("Single stimulation");break;}
     manager->setReportVariable("Strategy",tr("Strategy")+QString(": ")+strategy);
     manager->setReportVariable("VFI",QString(tr("VFI"))+": "+QString::number(qRound(m_VFI*100))+"%");
-    QString GHT;switch (m_GHT){case 0:GHT=tr("Out of limits");break;case 1:GHT=tr("Low sensitivity");break;case 2:GHT=tr("Border of limits");break;case 3:GHT=tr("Within normal limits");break;}
+    QString GHT;switch (m_GHT){case 0:GHT=tr("Out of limits");break;case 1:GHT=tr("Low sensitivity");break;case 2:GHT=tr("Border of limits");break;case 3:GHT=tr("Within normal limits");case 4:tr("Abnormally high of sensitivity");break;}
     manager->setReportVariable("GHT",tr("GHT")+QString(": ")+GHT);
     manager->setReportVariable("MD",tr("MD")+QString(": ")+QString::number(m_md,'f',2)+(m_p_md<10-FLT_EPSILON?" (P<"+QString::number(m_p_md)+"%)":""));
     manager->setReportVariable("PSD",tr("PSD")+QString(": ")+QString::number(m_psd,'f',2)+(m_p_psd<10-FLT_EPSILON?" (P<"+QString::number(m_p_psd)+"%)":""));
@@ -611,7 +611,7 @@ void StaticAnalysisOverViewVm::showReport(int report,QString diagnosis)
         model->setData( model->index(i,1),QString(tr("check date"))+":"+data[i].checkDate.date().toString("yyyy/MM/dd"));
         QString strategy;switch(int(data[i].strategy)){case 0:strategy=tr("Full threshold");break;case 1:strategy=tr("Fast threshold");break;case 2:strategy=tr("Smart interactive");break;case 3:strategy=tr("Fast interactive");break;}
         model->setData( model->index(i,2),QString(tr("strategy"))+":"+strategy);
-        QString GHT;switch (data[i].GHT){case 0:GHT=tr("Out of limits");break;case 1:GHT=tr("Low sensitivity");break;case 2:GHT=tr("Border of limits");break;case 3:GHT=tr("Within normal limits");break;}
+        QString GHT;switch (data[i].GHT){case 0:GHT=tr("Out of limits");break;case 1:GHT=tr("Low sensitivity");break;case 2:GHT=tr("Border of limits");break;case 3:GHT=tr("Within normal limits");break;case 4:tr("Abnormally high of sensitivity");break;}
         model->setData( model->index(i,3),QString(tr("GHT"))+":"+GHT);
         model->setData( model->index(i,4),QString(tr("eye kind"))+":"+(data[i].OS_OD==0?"OS":"OD"));
         model->setData( model->index(i,5),QString(tr("center dot check"))+":"+(data[i].centerDotCheck?tr("On"):tr("Off")));

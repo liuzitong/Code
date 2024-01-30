@@ -51,7 +51,7 @@ Rectangle {
                             width: parent.width*0.2;height: parent.height;spacing: textHeight*0.3;
                             Repeater{
                                 property var centerDotCheck: [lt+qsTr("On"),lt+qsTr("Off")];
-                                property var ght: [lt+qsTr("Out of limits"),lt+qsTr("Low sensitivity"),lt+qsTr("Border of limits"),lt+qsTr("Within normal limits")];
+                                property var ght: [lt+qsTr("Out of limits"),lt+qsTr("Low sensitivity"),lt+qsTr("Border of limits"),lt+qsTr("Within normal limits"),lt+qsTr("Abnormally high of sensitivity")];
                                 property var progress: [lt+qsTr("no progress"),lt+qsTr("possible progress"),lt+qsTr("very possible progress")];
                                 property int index: progressAnalysisListVm.selectedIndex;
                                 model: [

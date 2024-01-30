@@ -248,7 +248,7 @@ void ProgressAnalysisListVm::getProgressBaseLineReport(QString diagnosis)
 
     for(int i=0;i<2;i++)
     {
-        QString GHTstr[]={tr("Out of limits"),tr("Low sensitivity"),tr("Border of limits"),tr("Within normal limits")};
+        QString GHTstr[]={tr("Out of limits"),tr("Low sensitivity"),tr("Border of limits"),tr("Within normal limits"),tr("Abnormally high of sensitivity")};
         manager->setReportVariable("Date"+QString::number(i),QString(tr("Check date"))+": "+m_currentDataList[i].dateTime.date().toString("yyyy/MM/dd"));
         manager->setReportVariable("programName"+QString::number(i),QString(tr("Program name"))+": "+m_currentDataList[i].program);
         manager->setReportVariable("GHT"+QString::number(i),tr("GHT")+QString(": ")+GHTstr[m_currentDataList[i].GHT]);
@@ -343,7 +343,7 @@ void Perimeter::ProgressAnalysisListVm::getThreeFollowUpsReport(int index,QStrin
     {
         int dataIndex=qMax(index-2,2)+i;
         auto data=m_currentDataList[dataIndex];
-        QString GHTstr[]={tr("Out of limits"),tr("Low sensitivity"),tr("Border of limits"),tr("Within normal limits")};
+        QString GHTstr[]={tr("Out of limits"),tr("Low sensitivity"),tr("Border of limits"),tr("Within normal limits"),tr("Abnormally high of sensitivity")};
         manager->setReportVariable("Date"+QString::number(i),QString(tr("Check date"))+": "+data.dateTime.date().toString("yyyy/MM/dd"));
         manager->setReportVariable("ProgramName"+QString::number(i),QString(tr("Program name"))+": "+data.program);
         manager->setReportVariable("GHT"+QString::number(i),tr("GHT")+QString(": ")+GHTstr[data.GHT]);
@@ -479,7 +479,7 @@ void Perimeter::ProgressAnalysisListVm::getSingleProgressReport(int index,QStrin
     QString strategy;switch(int(commomParams.strategy)){case 0:strategy=tr("Full threshold");break;case 1:strategy=tr("Fast threshold");break;case 2:strategy=tr("Smart interactive");break;case 3:strategy=tr("Fast interactive");break;case 4:strategy=tr("One stage");break;case 5:strategy=tr("Two stages");break;case 6:strategy=tr("Quantify defects");break;case 7:strategy=tr("Single stimulation");break;}
     manager->setReportVariable("Strategy",tr("Strategy")+QString(": ")+strategy);
     manager->setReportVariable("VFI",QString(tr("VFI"))+": "+QString::number(qRound(VFI*100))+"%");
-    QString GHTstr[]={tr("Out of limits"),tr("Low sensitivity"),tr("Border of limits"),tr("Within normal limits")};
+    QString GHTstr[]={tr("Out of limits"),tr("Low sensitivity"),tr("Border of limits"),tr("Within normal limits"),tr("Abnormally high of sensitivity")};
     manager->setReportVariable("GHT",tr("GHT")+QString(": ")+GHTstr[GHT]);
     manager->setReportVariable("MD",tr("MD")+QString(": ")+QString::number(md,'f',2)+(p_md-5<=FLT_EPSILON?" (P<"+QString::number(p_md)+"%)":""));
     manager->setReportVariable("PSD",tr("PSD")+QString(": ")+QString::number(psd,'f',2)+(p_psd-5<=FLT_EPSILON?" (P<"+QString::number(p_psd)+"%)":""));

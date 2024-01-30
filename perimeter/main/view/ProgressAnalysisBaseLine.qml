@@ -43,7 +43,7 @@ Rectangle {
                 width: height;height: parent.height;spacing: textHeight*0.5;
                 Repeater{
                     property var centerDotCheck: [lt+qsTr("On"),lt+qsTr("Off")];
-                    property var ght: [lt+qsTr("Out of limits"),lt+qsTr("Low sensitivity"),lt+qsTr("Border of limits"),lt+qsTr("Within normal limits")];
+                    property var ght: [lt+qsTr("Out of limits"),lt+qsTr("Low sensitivity"),lt+qsTr("Border of limits"),lt+qsTr("Within normal limits"),lt+qsTr("Abnormally high of sensitivity")];
                     model: [
                         {name:lt+qsTr("Date"),param:Qt.formatDateTime(progressAnalysisListVm.getData(0,"dateTime"),"yyyy/MM/dd")},
                         {name:lt+qsTr("Program"),param:progressAnalysisListVm.getData(0,"program")},
@@ -92,7 +92,7 @@ Rectangle {
                 width: height;height: parent.height;spacing: textHeight*0.5;
                 Repeater{
                     property var centerDotCheck: [lt+qsTr("On"),lt+qsTr("Off")];
-                    property var ght: [lt+qsTr("Out of limits"),lt+qsTr("Low sensitivity"),lt+qsTr("Border of limits"),lt+qsTr("Within normal limits")];
+                    property var ght: [lt+qsTr("Out of limits"),lt+qsTr("Low sensitivity"),lt+qsTr("Border of limits"),lt+qsTr("Within normal limits"),lt+qsTr("Abnormally high of sensitivity")];
                     model: [
                         {name:lt+qsTr("Date"),param:Qt.formatDateTime(progressAnalysisListVm.getData(1,"dateTime"),"yyyy/MM/dd")},
                         {name:lt+qsTr("Program"),param:progressAnalysisListVm.getData(1,"program")},

@@ -204,7 +204,7 @@ Item
                     Column{width: parent.width*0.3;height:parent.height;spacing: textHeight*0.5;
                         CusText{width:parent.width;height:textHeight;text:"VFI:"+Math.round(staticAnalysisResult.VFI*100)+"%" ;horizontalAlignment: Text.AlignLeft;}
                         CusText{
-                            property var ght: if(staticAnalysisResult.GHT===0){return lt+qsTr("Out of limits");} else if(staticAnalysisResult.GHT===1){return lt+qsTr("Low sensitivity");}else if(staticAnalysisResult.GHT===2){return lt+qsTr("Border of limits");}else if(staticAnalysisResult.GHT===3){return lt+qsTr("Within normal limits");}
+                            property var ght: if(staticAnalysisResult.GHT===0){return lt+qsTr("Out of limits");} else if(staticAnalysisResult.GHT===1){return lt+qsTr("Low sensitivity");}else if(staticAnalysisResult.GHT===2){return lt+qsTr("Border of limits");}else if(staticAnalysisResult.GHT===3){return lt+qsTr("Within normal limits");}else if(staticAnalysisResult.GHT===4){return lt+qsTr("Abnormally high of sensitivity");}
                             width:parent.width;height:textHeight;horizontalAlignment: Text.AlignLeft;text:lt+qsTr("GHT")+": "+ ght;}
                         CusText{width:parent.width;height:textHeight;text:lt+qsTr("MD")+": "+staticAnalysisResult.md.toFixed(2)+(staticAnalysisResult.p_md.toFixed(2)<10?" (<"+staticAnalysisResult.p_md.toFixed(2)+"%)":"") ;horizontalAlignment: Text.AlignLeft;}
                         CusText{width:parent.width;height:textHeight;text:lt+qsTr("PSD")+": "+staticAnalysisResult.psd.toFixed(2)+(staticAnalysisResult.p_psd.toFixed(2)<10?" (<"+staticAnalysisResult.p_psd.toFixed(2)+"%)" :"");horizontalAlignment: Text.AlignLeft;}

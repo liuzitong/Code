@@ -14,6 +14,8 @@
     "checkZoneRatio":1.4,
     "beginningCheckDBDec":9,
     "beginningCheckDBCount":4,
+    "beginningCheckResultIgnoreCount":4,
+    "beginningCheckResultIgnoreDB":25,
     "boundaryOne":
     {
         "center":{"x":-25,"y":0},
