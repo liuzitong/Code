@@ -116,8 +116,8 @@ UtilitySvc::UtilitySvc()
         m_showCheckingDot=jo["showCheckingDot"].toBool();
         m_beginningCheckDBDec=jo["beginningCheckDBDec"].toInt();
         m_beginningCheckDBCount=jo["beginningCheckDBCount"].toInt();
-//        m_beginningCheckResultIgnoreCount=jo["beginningCheckResultIgnoreCount"].toInt();
-//        m_beginningCheckResultIgnoreDec=jo["beginningCheckResultIgnoreDec"].toInt();
+        m_beginningCheckResultIgnoreCount=jo["beginningCheckResultIgnoreCount"].toInt();
+        m_beginningCheckResultIgnoreDB=jo["beginningCheckResultIgnoreDB"].toInt();
 
         QStringList strs=jo["realTimeEyePosPicSize"].toString().split("*");
         if(strs.size()==2)
