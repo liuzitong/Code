@@ -17,7 +17,6 @@ public:
     ~DeviceSettings()=default;
 
     QString m_VID,m_PID;
-    QJsonObject m_rootObj;
     int m_pupilAutoAlignPixelTolerance;
     int m_castLightDADifferenceTolerance;
     int m_castLightDA;
@@ -44,10 +43,13 @@ public:
     int m_pixelDistFromPupilCenterToMiddleReflectionDot;
     double m_pupilDiameterPixelToMillimeterConstant;
     double m_pupilDeviationPixelToNumberConstant;
+    int m_reconTimes;
+    bool m_settingsRead=false;
     static QSharedPointer<DeviceSettings> getSingleton();
     static QSharedPointer<DeviceSettings> m_singleton;
 
-    void saveSettings();
+    void saveCastLightAdjustStatus();
+    void saveReconTimes();
 };
 
 #endif // DEVICE_SETTINGS_H

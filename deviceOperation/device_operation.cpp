@@ -76,6 +76,8 @@ void DeviceOperation::reconnectDev()
     m_devCtl.reset(nullptr);
     m_status={-1,-1};
     setDeviceStatus(1);
+    DeviceSettings::getSingleton()->m_reconTimes++;
+    DeviceSettings::getSingleton()->saveReconTimes();
     connectDev();
 }
 
@@ -795,7 +797,7 @@ void DeviceOperation::workOnNewStatuData()
 
             DeviceSettings::getSingleton()->m_castLightLastAdjustedDate=QDate::currentDate().toString("yyyy/MM/dd");
             DeviceSettings::getSingleton()->m_castLightDA=m_currentCastLightDA;
-            DeviceSettings::getSingleton()->saveSettings();
+            DeviceSettings::getSingleton()->saveCastLightAdjustStatus();
         }
     }
     emit newStatusData();

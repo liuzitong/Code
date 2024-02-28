@@ -25,7 +25,7 @@ DeviceSettings::DeviceSettings()
         return;
     }
 
-    m_rootObj = jsonDoc.object();
+    QJsonObject m_rootObj = jsonDoc.object();
     QStringList keys = m_rootObj.keys();
     for(int i = 0; i < keys.size(); i++)
 //    {
@@ -48,17 +48,14 @@ DeviceSettings::DeviceSettings()
     m_pixelDistFromPupilCenterToMiddleReflectionDot=m_rootObj.value("pixelDistFromPupilCenterToMiddleReflectionDot").toInt();
     m_pupilDiameterPixelToMillimeterConstant=m_rootObj.value("pupilDiameterPixelToMillimeterConstant").toDouble();
     m_pupilDeviationPixelToNumberConstant=m_rootObj.value("pupilDeviationPixelToNumberConstant").toDouble();
-    m_castLightDA=m_rootObj.value("castLightDA").toInt();
     m_castLightDAChangeRate=m_rootObj.value("castLightDAChangeRate").toDouble();
     m_castLightDAChangeInteval=m_rootObj.value("castLightDAChangeInteval").toInt();
     m_castLightDAChangeMinStep=m_rootObj.value("castLightDAChangeMinStep").toInt();
     m_castLightTargetColor=m_rootObj.value("castLightTargetColor").toInt();
     m_castLightTargetSize=m_rootObj.value("castLightTargetSize").toInt();
     m_castLightDADifferenceTolerance=m_rootObj.value("castLightDADifferenceTolerance").toInt();
-    m_castLightLastAdjustedDate=m_rootObj.value("castLightLastAdjustedDate").toString();
     m_skipAdjustCastLight=m_rootObj.value("skipAdjustCastLight").toBool();
     m_waitingTime=m_rootObj.value("waitingTime").toInt();
-
     m_beepCount=m_rootObj.value("beepCount").toInt();
     m_beepDuration=m_rootObj.value("beepDuration").toInt();
     m_beepInterval=m_rootObj.value("beepInterval").toInt();
@@ -87,6 +84,27 @@ DeviceSettings::DeviceSettings()
         int slot=obj["Slot"].toInt();
         m_colorToSlot.append({color,slot});
     }
+
+    QFile loadFile2(R"(deviceData/castLightAdjustStatus.json)");
+    loadFile2.open(QIODevice::ReadOnly);
+    QByteArray allData2 = loadFile2.readAll();
+    loadFile2.close();
+
+    QJsonParseError jsonError2;
+    QJsonDocument jsonDoc2(QJsonDocument::fromJson(allData2, &jsonError2));
+
+    if(jsonError2.error != QJsonParseError::NoError)
+    {
+        qDebug() << "json error!" << jsonError2.errorString();
+        return;
+    }
+
+    QJsonObject m_rootObj2 = jsonDoc2.object();
+    m_castLightDA=m_rootObj2.value("castLightDA").toInt();
+    m_castLightLastAdjustedDate=m_rootObj2.value("castLightLastAdjustedDate").toString();
+
+    m_reconTimes=0;
+    saveReconTimes();
 }
 
 QSharedPointer<DeviceSettings> DeviceSettings::getSingleton()
@@ -101,13 +119,26 @@ QSharedPointer<DeviceSettings> DeviceSettings::getSingleton()
     return m_singleton;
 }
 
-void DeviceSettings::saveSettings()
+void DeviceSettings::saveCastLightAdjustStatus()
 {
-    m_rootObj["castLightDA"]=m_castLightDA;
-    m_rootObj["castLightLastAdjustedDate"]=m_castLightLastAdjustedDate;
-    QJsonDocument jsonDoc(m_rootObj);
+    QJsonObject rootObj;
+    rootObj["castLightDA"]=m_castLightDA;
+    rootObj["castLightLastAdjustedDate"]=m_castLightLastAdjustedDate;
+    QJsonDocument jsonDoc(rootObj);
     auto data=jsonDoc.toJson();
-    QFile loadFile(R"(deviceData/settings.json)");
+    QFile loadFile(R"(deviceData/castLightAdjustStatus.json)");
+    loadFile.open(QIODevice::WriteOnly);
+    loadFile.write(data,data.length());
+    loadFile.close();
+}
+
+void DeviceSettings::saveReconTimes()
+{
+    QJsonObject rootObj;
+    rootObj["reconTimes"]=m_reconTimes;
+    QJsonDocument jsonDoc(rootObj);
+    auto data=jsonDoc.toJson();
+    QFile loadFile(R"(deviceData/reconTimes.json)");
     loadFile.open(QIODevice::WriteOnly);
     loadFile.write(data,data.length());
     loadFile.close();
