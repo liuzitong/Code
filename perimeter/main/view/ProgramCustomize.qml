@@ -145,17 +145,26 @@ Item {id:root; width: 1366;height: 691; visible: true;anchors.fill:parent;
                                             model: modelData;delegate: delegateProg;clip:true;snapMode: ListView.SnapPosition;
                                         }
                                         Component{id:delegateProg;
-                                            Rectangle{height: (homeTab.height-1)*1/10+1;width: listView.width;color:"white";border.color: backGroundBorderColor;
+                                            Rectangle{height: (homeTab.height-1)*1/10+1;width: listView.width;
+                                                color:"white";
+                                                border.color: backGroundBorderColor;
+                                                Component.onCompleted:
+                                                {
+                                                    currentProgramChanged.connect(function()
+                                                    {
+                                                        if(currentProgram.id==model.program_id) color=CusUtils.rgb(220,222,224); else color="white";
+                                                    });
+                                                }
                                                 CusText{width: parent.width;text:/*CusUtils.getTranslatedStr(model.name)*/lt+model.name;font.pointSize: fontPointSize;}
                                                 MouseArea{ anchors.fill: parent;
                                                     onClicked:
                                                     {
-                                                        console.log(model.name+"  "+model.program_id+" "+model.type);
-                                                        if(programSelection.selectedProgram!=null){programSelection.selectedProgram.color="white";}
-                                                        programSelection.selectedProgram=parent;
-                                                        programSelection.selectedProgram.color=CusUtils.rgb(220,222,224);
+                                                        // if(programSelection.selectedProgram!=null){programSelection.selectedProgram.color="white";}
+                                                        // programSelection.selectedProgram=parent;
+                                                        // programSelection.selectedProgram.color=CusUtils.rgb(220,222,224);
 //                                                        currentProgram=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::StaticProgramVM", false);
 //                                                        currentProgram.hello();
+                                                        console.log(model.name+"  "+model.program_id+" "+model.type);
                                                         if (currentProgram!=null)
                                                         {
                                                             if(currentProgram.type!==2)
@@ -175,6 +184,7 @@ Item {id:root; width: 1366;height: 691; visible: true;anchors.fill:parent;
                                                             currentProgram=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::DynamicProgramVM", false,[model.program_id]);
                                                             dynamicParamsSetting.currentProgram=currentProgram;
                                                         }
+                                                        console.log(currentProgram.id);
                                                         var params=currentProgram.params;
                                                         strategyStack.currentProgramChanged();
                                                         display.currentProgramChanged();
@@ -347,14 +357,14 @@ Item {id:root; width: 1366;height: 691; visible: true;anchors.fill:parent;
                                             currentProgram.params.Range[1]=newProgram.range;
                                             currentProgram.reports=[0,1];
                                         }
-                                        strategyStack.currentProgramChanged();
-                                        display.currentProgramChanged();
                                         console.log(newProgram.programName);
                                         currentProgram.name=newProgram.programName;
                                         currentProgram.category=4;
-                                        currentProgram.insertProgram();
+                                        strategyStack.currentProgramChanged();
+                                        display.currentProgramChanged();
+                                        // currentProgram.insertProgram();
 //                                        currentProgramChanged();
-                                        programLists.refreshData();
+
                                         paramsSetting.enabled=true;
                                         bar.currentIndex=4;
 
@@ -363,7 +373,7 @@ Item {id:root; width: 1366;height: 691; visible: true;anchors.fill:parent;
 //                                CusButton{text:"取消";height: parent.width*0.3;width: parent.width;}
                                 CusButton{
                                     text:lt+qsTr("Save");height: parent.width*0.3;width: parent.width;enabled:currentProgram===null?false:currentProgram.category===4||!locked;
-                                    onClicked: {/*currentProgram.dots.forEach(function(item){console.log("x:"+item.x+" y:"+item.y);});*/currentProgram.updateProgram();}
+                                    onClicked: {/*currentProgram.dots.forEach(function(item){console.log("x:"+item.x+" y:"+item.y);});*/currentProgram.updateProgram();programLists.refreshData();currentProgramChanged();}
                                 }
 
                                 CusButton{text:lt+qsTr("Delete");height: parent.width*0.3;width: parent.width;enabled:currentProgram===null?false:currentProgram.category===4||!locked; onClicked:{ currentProgram.deleteProgram();paramsSetting.enabled=false;programLists.refreshData();}}

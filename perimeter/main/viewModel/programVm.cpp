@@ -1,6 +1,7 @@
 ﻿#include "programVm.h"
 #include <qDebug>
 #include <math.h>
+#include <QMessageBox>
 namespace Perimeter {
 
 StaticProgramVm::StaticProgramVm(const QVariantList &args)
@@ -29,6 +30,7 @@ StaticProgramVm::StaticProgramVm(const QVariantList &args)
         auto pp=new StaticProgramModel();
         m_data.reset(pp);
         ProgramVm::m_data=pp;
+        m_data->m_id=0;
         m_data->m_params.commonParams=
         {
             {0,30},
@@ -76,8 +78,25 @@ StaticProgramVm::StaticProgramVm(const QVariantList &args)
 
 void StaticProgramVm::updateProgram()
 {
-    auto pp=m_data->ModelToDB();
-    qx::dao::update(pp);
+    if(m_data->m_data.dots.size()<=0)
+    {
+        QMessageBox msgBox;
+        msgBox.setText(QObject::tr("You haven't set any check dots."));
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.exec();
+        return;
+    }
+    else
+    {
+        auto pp=m_data->ModelToDB();
+        if(pp->m_id==0)
+        {
+            qx::dao::insert(pp);
+            m_data->m_id=pp->m_id;
+        }
+        else
+            qx::dao::update(pp);
+    }
 }
 
 void StaticProgramVm::insertProgram()
@@ -135,6 +154,7 @@ DynamicProgramVm::DynamicProgramVm(const QVariantList &args)
     if(args.count()==0)
     {
         pp=new DynamicProgramModel;
+        pp->m_id=0;
         pp->m_params={
             {0,90},
             dp::Strategy::standard,
@@ -165,6 +185,26 @@ void DynamicProgramVm::updateProgram()
 {
     auto pp=m_data->ModelToDB();
     qx::dao::update(pp);
+
+    if(m_data->m_data.dots.size()<=0&&m_data->m_params.strategy==DynamicParams::Strategy::standard)
+    {
+        QMessageBox msgBox;
+        msgBox.setText(QObject::tr("You haven't set any check dots."));
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.exec();
+        return;
+    }
+    else
+    {
+        auto pp=m_data->ModelToDB();
+        if(pp->m_id==0)
+        {
+            qx::dao::insert(pp);
+            m_data->m_id=pp->m_id;
+        }
+        else
+            qx::dao::update(pp);
+    }
 }
 
 void DynamicProgramVm::insertProgram()
