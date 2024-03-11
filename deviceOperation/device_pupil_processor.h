@@ -3,6 +3,7 @@
 #include <QByteArray>
 #include <QPoint>
 #include "device_settings.h"
+
 namespace DevOps{
 class DevicePupilProcessor
 {

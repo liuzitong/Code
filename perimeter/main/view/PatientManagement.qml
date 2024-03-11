@@ -488,10 +488,10 @@ Item{
                                    CusText{text:lt+qsTr("Right eye"); horizontalAlignment: Text.AlignRight;width:parent.width*0.15;font.pointSize: fontPointSize;}
                                    Row{
                                        height:parent.height;spacing:(width-8*height)/3;width:newPatient.width*0.7
-                                       LineEdit{ id:rx1_r;width: 2*height;horizontalAlignment: Text.AlignHCenter;/*text:currentPatient==null?"":currentPatient.rx.rx1_r.toFixed(2);*/textInput.validator: DoubleValidator{bottom:0.0;notation: DoubleValidator.StandardNotation;decimals: 2}}
-                                       LineEdit{ id:rx2_r;width: 2*height;horizontalAlignment: Text.AlignHCenter;/*text:currentPatient==null?"":currentPatient.rx.rx2_r.toFixed(2);*/textInput.validator: DoubleValidator{bottom:0.0;notation: DoubleValidator.StandardNotation;decimals: 2}}
-                                       LineEdit{ id:rx3_r;width: 2*height;horizontalAlignment: Text.AlignHCenter;/*text:currentPatient==null?"":currentPatient.rx.rx3_r.toFixed(2);*/textInput.validator: DoubleValidator{bottom:0.0;notation: DoubleValidator.StandardNotation;decimals: 2}}
-                                       LineEdit{ id:visual_r;width: 2*height;horizontalAlignment: Text.AlignHCenter;/*text:currentPatient==null?"":currentPatient.rx.visual_r.toFixed(2);*/textInput.validator: DoubleValidator{bottom:0.0;notation: DoubleValidator.StandardNotation;decimals: 2}}
+                                       LineEdit{ id:rx1_r;width: 2*height;horizontalAlignment: Text.AlignHCenter;/*text:currentPatient==null?"":currentPatient.rx.rx1_r.toFixed(2);*/textInput.validator: DoubleValidator{notation: DoubleValidator.StandardNotation;decimals: 2}}
+                                       LineEdit{ id:rx2_r;width: 2*height;horizontalAlignment: Text.AlignHCenter;/*text:currentPatient==null?"":currentPatient.rx.rx2_r.toFixed(2);*/textInput.validator: DoubleValidator{notation: DoubleValidator.StandardNotation;decimals: 2}}
+                                       LineEdit{ id:rx3_r;width: 2*height;horizontalAlignment: Text.AlignHCenter;/*text:currentPatient==null?"":currentPatient.rx.rx3_r.toFixed(2);*/textInput.validator: DoubleValidator{notation: DoubleValidator.StandardNotation;decimals: 2}}
+                                       LineEdit{ id:visual_r;width: 2*height;horizontalAlignment: Text.AlignHCenter;/*text:currentPatient==null?"":currentPatient.rx.visual_r.toFixed(2);*/textInput.validator: DoubleValidator{notation: DoubleValidator.StandardNotation;decimals: 2}}
 //                                       Component.onCompleted:
 //                                       {
 //                                           currentPatientChanged.connect(function(){
@@ -511,10 +511,10 @@ Item{
                                    CusText{text:lt+qsTr("Left eye"); horizontalAlignment: Text.AlignRight;width:parent.width*0.15;font.pointSize: fontPointSize;}
                                    Row{
                                        height:parent.height;spacing:(width-8*height)/3;width:newPatient.width*0.7
-                                       LineEdit{ id:rx1_l;width: 2*height;horizontalAlignment: Text.AlignHCenter;/*text:currentPatient==null?"":currentPatient.rx.rx1_l.toFixed(2);*/textInput.validator: DoubleValidator{bottom:0.0;notation: DoubleValidator.StandardNotation;decimals: 2}}
-                                       LineEdit{ id:rx2_l;width: 2*height;horizontalAlignment: Text.AlignHCenter;/*text:currentPatient==null?"":currentPatient.rx.rx2_l.toFixed(2);*/textInput.validator: DoubleValidator{bottom:0.0;notation: DoubleValidator.StandardNotation;decimals: 2}}
-                                       LineEdit{ id:rx3_l;width: 2*height;horizontalAlignment: Text.AlignHCenter;/*text:currentPatient==null?"":currentPatient.rx.rx3_l.toFixed(2);*/textInput.validator: DoubleValidator{bottom:0.0;notation: DoubleValidator.StandardNotation;decimals: 2}}
-                                       LineEdit{ id:visual_l;width: 2*height;horizontalAlignment: Text.AlignHCenter;/*text:currentPatient==null?"":currentPatient.rx.visual_l.toFixed(2);*/textInput.validator: DoubleValidator{bottom:0.0;notation: DoubleValidator.StandardNotation;decimals: 2}}
+                                       LineEdit{ id:rx1_l;width: 2*height;horizontalAlignment: Text.AlignHCenter;/*text:currentPatient==null?"":currentPatient.rx.rx1_l.toFixed(2);*/textInput.validator: DoubleValidator{notation: DoubleValidator.StandardNotation;decimals: 2}}
+                                       LineEdit{ id:rx2_l;width: 2*height;horizontalAlignment: Text.AlignHCenter;/*text:currentPatient==null?"":currentPatient.rx.rx2_l.toFixed(2);*/textInput.validator: DoubleValidator{notation: DoubleValidator.StandardNotation;decimals: 2}}
+                                       LineEdit{ id:rx3_l;width: 2*height;horizontalAlignment: Text.AlignHCenter;/*text:currentPatient==null?"":currentPatient.rx.rx3_l.toFixed(2);*/textInput.validator: DoubleValidator{notation: DoubleValidator.StandardNotation;decimals: 2}}
+                                       LineEdit{ id:visual_l;width: 2*height;horizontalAlignment: Text.AlignHCenter;/*text:currentPatient==null?"":currentPatient.rx.visual_l.toFixed(2);*/textInput.validator: DoubleValidator{notation: DoubleValidator.StandardNotation;decimals: 2}}
 //                                       Component.onCompleted:
 //                                       {
 //                                           currentPatientChanged.connect(function(){

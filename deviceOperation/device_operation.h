@@ -218,6 +218,8 @@ private:
     QVector<QPair<QPointF,QPoint>> m_lastDynamicCoordAndXYMotorPos;
     static QSharedPointer<DeviceOperation> m_singleton;
     void moveToAdjustLight(int motorPosX, int motorPosY, int motorPosFocal);
+
+    int doTaskPerimeter();
 //    QTimer m_statusTimer;
 };
 }

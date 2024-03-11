@@ -13,6 +13,7 @@
 #include <QtGlobal>
 #include <iostream>
 #include <QtMath>
+#include <pupilDetectApi.hxx>
 
 //#include <QQmlEngine>
 
@@ -33,8 +34,18 @@ DeviceOperation::DeviceOperation()
     m_currentCastLightDA=DeviceSettings::getSingleton()->m_castLightDA;
     m_config=DeviceData::getSingleton()->m_config;
 
-//    qDebug()<<m_config.deviceIDRef();
-//    m_reconnectTimer.start();
+
+   qDebug()<<m_config.deviceIDRef();
+   m_reconnectTimer.start();
+
+   std::string PROJECT_DIR = ".";
+   std::string spotModelPath = PROJECT_DIR + "/v12t_64_1_9920_spot_model_4.xml";
+   std::string pupilModelPath = PROJECT_DIR + "/v8_64_1_848_pupil_model_4.xml";
+   std::string type = "CPU";
+   initializePupilDetector(pupilModelPath.c_str(), spotModelPath.c_str(), type.c_str());
+
+
+// doTaskPerimeter();
 }
 
 
@@ -319,6 +330,49 @@ void DeviceOperation::moveToAdjustLight(int motorPosX,int motorPosY,int motorPos
                    UsbDev::DevCtl::MotorId_Y
                    });
     move5Motors(isMotorMove,motorPos);
+}
+
+static std::ostream& operator << (std::ostream& os,const Point& rv)
+{
+    return os << "x:" << rv.x << " y:" << rv.y;
+}
+
+int DeviceOperation::doTaskPerimeter()
+{
+    std::vector<std::string> files;
+    std::string PROJECT_DIR = "./";
+    std::string img_dir = PROJECT_DIR + "test_images_three_points/";
+    for (int i = 500; i < 601; i++)
+    {
+        files.push_back(std::to_string(i) + "_side2.tiff");
+    }
+
+    int count = 0;
+
+    for (std::string fn : files)
+    {
+        count++;
+        // std::cout << fn.find_first_of("side") << std::endl;
+        int task_type = 0;
+        if (fn.find_first_of("side") < 15)
+        {
+            task_type = 1;
+        }
+
+        Result res;
+
+        //QImage img(fn.c_str());
+        //img=img.convertToFormat(QImage::Format_Grayscale8);
+        //Image img2{};
+        //img2.width = img.width();
+        //img2.height = img.height();
+        //img2.data_ptr = (char*)(img.bits());
+        //getPupilResultByImage(img2, &res);
+
+        getPupilResultByFilePath((img_dir + fn).c_str(), &res);
+        std::cout << res.pupil.center << std::endl;
+    }
+    return 0;
 }
 
 
