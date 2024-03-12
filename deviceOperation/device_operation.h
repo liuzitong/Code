@@ -17,6 +17,7 @@
 #include <QMutex>
 #include "device_pupil_processor.h"
 
+
 namespace DevOps{
 using LampId=UsbDev::DevCtl::LampId;
 
@@ -204,7 +205,7 @@ public:
 private:
     QElapsedTimer m_autoPupilElapsedTimer;
     QElapsedTimer m_reconnectingElapsedTimer;
-    int m_autoPupilElapsedTime=100;
+    int m_autoPupilElapsedTime=400;
 //    QTimer m_videoTimer;
     QElapsedTimer m_castLightAdjustElapsedTimer;
     bool m_envLightAlarm=false;
@@ -219,7 +220,6 @@ private:
     static QSharedPointer<DeviceOperation> m_singleton;
     void moveToAdjustLight(int motorPosX, int motorPosY, int motorPosFocal);
 
-    int doTaskPerimeter();
 //    QTimer m_statusTimer;
 };
 }

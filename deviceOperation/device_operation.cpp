@@ -34,18 +34,14 @@ DeviceOperation::DeviceOperation()
     m_currentCastLightDA=DeviceSettings::getSingleton()->m_castLightDA;
     m_config=DeviceData::getSingleton()->m_config;
 
-
    qDebug()<<m_config.deviceIDRef();
    m_reconnectTimer.start();
 
    std::string PROJECT_DIR = ".";
-   std::string spotModelPath = PROJECT_DIR + "/v12t_64_1_9920_spot_model_4.xml";
    std::string pupilModelPath = PROJECT_DIR + "/v8_64_1_848_pupil_model_4.xml";
+   std::string spotModelPath = PROJECT_DIR + "/v8_64_1_21100_spot_model_4.xml";
    std::string type = "CPU";
    initializePupilDetector(pupilModelPath.c_str(), spotModelPath.c_str(), type.c_str());
-
-
-// doTaskPerimeter();
 }
 
 
@@ -332,48 +328,6 @@ void DeviceOperation::moveToAdjustLight(int motorPosX,int motorPosY,int motorPos
     move5Motors(isMotorMove,motorPos);
 }
 
-static std::ostream& operator << (std::ostream& os,const Point& rv)
-{
-    return os << "x:" << rv.x << " y:" << rv.y;
-}
-
-int DeviceOperation::doTaskPerimeter()
-{
-    std::vector<std::string> files;
-    std::string PROJECT_DIR = "./";
-    std::string img_dir = PROJECT_DIR + "test_images_three_points/";
-    for (int i = 500; i < 601; i++)
-    {
-        files.push_back(std::to_string(i) + "_side2.tiff");
-    }
-
-    int count = 0;
-
-    for (std::string fn : files)
-    {
-        count++;
-        // std::cout << fn.find_first_of("side") << std::endl;
-        int task_type = 0;
-        if (fn.find_first_of("side") < 15)
-        {
-            task_type = 1;
-        }
-
-        Result res;
-
-        //QImage img(fn.c_str());
-        //img=img.convertToFormat(QImage::Format_Grayscale8);
-        //Image img2{};
-        //img2.width = img.width();
-        //img2.height = img.height();
-        //img2.data_ptr = (char*)(img.bits());
-        //getPupilResultByImage(img2, &res);
-
-        getPupilResultByFilePath((img_dir + fn).c_str(), &res);
-        std::cout << res.pupil.center << std::endl;
-    }
-    return 0;
-}
 
 
 void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB,bool isMainDotInfoTable)
@@ -857,6 +811,12 @@ void DeviceOperation::workOnNewStatuData()
     emit newStatusData();
 }
 
+// static std::ostream& operator << (std::ostream& os,const Point& rv)
+// {
+//     return os << "x:" << rv.x << " y:" << rv.y;
+// }
+
+
 void DeviceOperation::workOnNewFrameData()
 {
     m_frameData=m_devCtl->takeNextPendingFrameData();
@@ -864,26 +824,30 @@ void DeviceOperation::workOnNewFrameData()
     m_frameRawData=m_frameData.rawData();
     m_frameRawDataLock.unlock();
     auto data=m_frameData.rawData();
-    m_devicePupilProcessor.processData((uchar*)data.data(),m_videoSize.width(),m_videoSize.height());
-//    m_devicePupilProcessor.find_point((uchar*)data.data(),m_videoSize.width(),m_videoSize.height());
+
+    Result res;
+    Image image{m_videoSize.width(),m_videoSize.height(),data.data()};
+    getPupilResultByImage(image,&res);
+    // std::cout << res.pupil.center <<" long_axis:"<<res.pupil.long_axis<<" short_axis:"<<res.pupil.short_axis<<" angle:"<<res.pupil.angle<<" " << res.reflectDots[0] << " " << res.reflectDots[1] <<" " << res.reflectDots[2] << std::endl;
     QImage img((uchar*)data.data(),m_videoSize.width(),m_videoSize.height(),QImage::Format_Grayscale8);
     img=img.convertToFormat(QImage::Format_ARGB32);
-    if(m_devicePupilProcessor.m_pupilResValid)
+
+    QPainter painter(&img);
+    painter.setPen(QPen{Qt::yellow,2});
+    auto& pupil=res.pupil;
+
+    if(pupil.center.x>0)
     {
-        QPainter painter(&img);
-        painter.setPen(QPen{Qt::red,2});
-        painter.drawEllipse(m_devicePupilProcessor.m_pupilCenterPoint,m_devicePupilProcessor.m_pupilDiameterPix/2,m_devicePupilProcessor.m_pupilDiameterPix/2);
-        if(m_devicePupilProcessor.m_reflectionResValid)
+        painter.drawEllipse({pupil.center.x,pupil.center.y},pupil.long_axis/2,pupil.short_axis/2);
+        for(auto& dot:res.reflectDots)
         {
-            for(auto&i:m_devicePupilProcessor.m_reflectionDot)
-            {
-                painter.setPen(Qt::green);
-                painter.drawEllipse({qRound(i.x()),qRound(i.y())},3,3);
-            }
+            painter.setPen(Qt::green);
+            painter.drawEllipse({qRound(dot.x),qRound(dot.y)},3,3);
         }
     }
-    QByteArray ba=QByteArray((char*)img.bits(),img.byteCount());
 
+
+    m_devicePupilProcessor.processData(&res);
     if(m_autoPupilElapsedTimer.elapsed()>=m_autoPupilElapsedTime)
     {
         m_autoPupilElapsedTimer.restart();
@@ -897,31 +861,39 @@ void DeviceOperation::workOnNewFrameData()
                 quint8 sps[2]{spsConfig[0],spsConfig[1]};
                 int motorPos[2]{0};
 
-                QPointF pupilDeviation={m_devicePupilProcessor.m_pupilCenterPoint.x()-0.5*m_videoSize.width(),m_devicePupilProcessor.m_pupilCenterPoint.y()-0.5*m_videoSize.height()};
+                QPointF pupilDeviation={res.pupil.center.x-0.5*m_videoSize.width(),res.pupil.center.y-0.5*m_videoSize.height()};
+                // std::cout<<"pupilDeviation x:"<<pupilDeviation.x()<<" y:"<<pupilDeviation.y()<<" torlerance:"<<tolerance<<std::endl;
+
                 if(!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Chin_Hoz)&&qAbs(pupilDeviation.x())>tolerance)
                 {
                     motorPos[0]=-pupilDeviation.x()*step;
                     m_devCtl->moveChinMotors(sps,motorPos,UsbDev::DevCtl::MoveMethod::Relative);
-                    m_autoPupilElapsedTime=200;
+                    m_autoPupilElapsedTime=400;
                 }
                 else
                 {
-                     m_autoPupilElapsedTime=100;
+                    m_autoPupilElapsedTime=200;
                 }
 
                 if(!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Chin_Vert)&&qAbs(pupilDeviation.y())>tolerance)
                 {
                     motorPos[1]=pupilDeviation.y()*step;
                     m_devCtl->moveChinMotors(sps,motorPos,UsbDev::DevCtl::MoveMethod::Relative);
-                    m_autoPupilElapsedTime=200;
+                    m_autoPupilElapsedTime=400;
                 }
                 else
                 {
-                    m_autoPupilElapsedTime=100;
+                    m_autoPupilElapsedTime=200;
                 }
             }
         }
     }
+
+
+
+
+    QByteArray ba=QByteArray((char*)img.bits(),img.byteCount());
+
     emit newFrameData(ba);
     emit pupilDiameterChanged();
 }
@@ -1025,5 +997,6 @@ void DeviceOperation::workOnWorkStatusChanged(int status)
     }
     emit workStatusChanged();
 }
+
 }
 
