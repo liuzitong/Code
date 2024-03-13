@@ -2139,6 +2139,7 @@ CheckSvc::CheckSvc(QObject *parent)
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::envLightAlarmChanged,this,&CheckSvc::envLightAlarmChanged);
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::chinDistAlarmChanged,this,&CheckSvc::chinDistAlarmChanged);
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::newDeviceID,this,&CheckSvc::setDeviceID);
+    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::newDeviceVersion,this,&CheckSvc::setDeviceVersion);
     // connect(this,&CheckSvc::envLightAlarmChanged,[&](){qDebug()<<getEnvLightAlarm();});
 //    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::isDeviceReadyChanged,[&](){if(m_checkState<=2){m_checkState=3;}});
     connect(&m_castLightDimdownTimer,&QTimer::timeout,[&]()

@@ -852,6 +852,7 @@ void DeviceOperation::workOnNewFrameData()
 void DeviceOperation::workOnNewProfile()
 {
     m_profile=m_devCtl->profile();
+    emit newDeviceVersion(QString::number(m_profile.devVersion()));
     m_videoSize=m_profile.videoSize();
 }
 

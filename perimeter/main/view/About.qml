@@ -87,14 +87,21 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                 text: lt+qsTr("Device type")+": " +IcUiQmlApi.appCtrl.settings.deviceInfo;horizontalAlignment: Text.AlignLeft;
                                 font.pointSize:fontPointSize;
                             }
-                            Item{height:parent.height*0.06;width: parent.width; }
+                            Item{height:parent.height*0.03;width: parent.width; }
 
                             CusText{
                                 height:parent.height*0.04;width: parent.width;
                                 text: lt+qsTr("Device ID")+": " +IcUiQmlApi.appCtrl.checkSvc.deviceID;horizontalAlignment: Text.AlignLeft;
                                 font.pointSize:fontPointSize;
                             }
-                            Item{height:parent.height*0.06;width: parent.width; }
+                            Item{height:parent.height*0.03;width: parent.width; }
+
+                            CusText{
+                                height:parent.height*0.04;width: parent.width;
+                                text: lt+qsTr("Device Version")+": " +IcUiQmlApi.appCtrl.checkSvc.deviceVersion;horizontalAlignment: Text.AlignLeft;
+                                font.pointSize:fontPointSize;
+                            }
+                            Item{height:parent.height*0.03;width: parent.width; }
 
                             CusText{
                                 height:parent.height*0.04;width: parent.width;
@@ -104,7 +111,7 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                             }
 
                             Item{
-                                height:parent.height*0.32;width: parent.width;
+                                height:parent.height*0.30;width: parent.width;
                             }
 
                             CusText{
