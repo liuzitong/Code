@@ -52,7 +52,7 @@
     "pupilPixelDiameterMaxLimit": 0.18,
     "pupilPixelDiameterMinLimit": 0.03,
     "pupilReflectionDotLimit": 150,
-    "skipAdjustCastLight": false,
+    "skipAdjustCastLight": true,
     "spotSizeToSlot": [
         {
             "Slot": 0,

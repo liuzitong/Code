@@ -11,7 +11,9 @@ public:
     DevicePupilProcessor();
     void processData(void* result);
     int caculateFixationDeviation(void* result);
+    bool caculateIsTooFar(void *result);
     void clearData();
+
 
     QVector<QVector<int>> m_pupilData;
     double m_pupilDiameter=0;
@@ -21,6 +23,7 @@ public:
     bool m_pupilResValid,m_reflectionResValid;
     int m_pupilGreyLimit;
     int m_pupilReflectionDotWhiteLimit;
+    bool m_isTooFar=false;
     //    bool m_pupilDataGet;
 };
 }

@@ -35,14 +35,11 @@ public:
     quint8 m_motorChinSpeed[2];
     QString localConfigPath,localDataPath;
     QList<QPair<int,int>> m_colorToSlot,m_spotSizeToSlot;
-    int m_pupilGreyLimit;
-    int m_pupilReflectionDotLimit;
     int m_waitingTime;
-    double m_pupilPixelDiameterMaxLimit;
-    double m_pupilPixelDiameterMinLimit;
     int m_pixelDistFromPupilCenterToMiddleReflectionDot;
     double m_pupilDiameterPixelToMillimeterConstant;
     double m_pupilDeviationPixelToNumberConstant;
+    int m_reflectDotDist;
     int m_reconTimes;
     bool m_settingsRead=false;
     static QSharedPointer<DeviceSettings> getSingleton();

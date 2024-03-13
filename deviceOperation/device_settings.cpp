@@ -41,10 +41,6 @@ DeviceSettings::DeviceSettings()
     localConfigPath=m_rootObj.value("localConfigPath").toString();
     localDataPath=m_rootObj.value("localDataPath").toString();
 
-    m_pupilGreyLimit=m_rootObj.value("pupilGreyLimit").toInt();
-    m_pupilReflectionDotLimit=m_rootObj.value("pupilReflectionDotLimit").toDouble();
-    m_pupilPixelDiameterMaxLimit=m_rootObj.value("pupilPixelDiameterMaxLimit").toDouble();
-    m_pupilPixelDiameterMinLimit=m_rootObj.value("pupilPixelDiameterMinLimit").toDouble();
     m_pixelDistFromPupilCenterToMiddleReflectionDot=m_rootObj.value("pixelDistFromPupilCenterToMiddleReflectionDot").toInt();
     m_pupilDiameterPixelToMillimeterConstant=m_rootObj.value("pupilDiameterPixelToMillimeterConstant").toDouble();
     m_pupilDeviationPixelToNumberConstant=m_rootObj.value("pupilDeviationPixelToNumberConstant").toDouble();
@@ -59,6 +55,7 @@ DeviceSettings::DeviceSettings()
     m_beepCount=m_rootObj.value("beepCount").toInt();
     m_beepDuration=m_rootObj.value("beepDuration").toInt();
     m_beepInterval=m_rootObj.value("beepInterval").toInt();
+    m_reflectDotDist=m_rootObj.value("reflectDotDist").toInt();
 
     auto motorSpeed=m_rootObj.value("motorSpeed").toArray();
     for(int i=0;i<motorSpeed.count();i++)

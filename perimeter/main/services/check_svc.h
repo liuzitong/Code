@@ -37,6 +37,7 @@ class CheckSvc: public QObject
     Q_PROPERTY(bool measureDeviation READ getMeasureDeviation WRITE setMeasureDeviation NOTIFY measureDeviationChanged)
     Q_PROPERTY(bool eyeMoveAlarm READ getEyeMoveAlarm WRITE setEyeMoveAlarm NOTIFY eyeMoveAlarmChanged)
     Q_PROPERTY(bool envLightAlarm READ getEnvLightAlarm NOTIFY envLightAlarmChanged)
+    Q_PROPERTY(bool chinDistAlarm READ getChinDistAlarm NOTIFY chinDistAlarmChanged)
     Q_PROPERTY(bool debugMode READ getDebugMode)
     Q_PROPERTY(bool showCheckingDot READ getShowCheckingDot)
     Q_PROPERTY(QString deviceID READ getDeviceID WRITE setDeviceID NOTIFY deviceIDChanged)
@@ -93,6 +94,7 @@ public:
     bool getMeasureDeviation();void setMeasureDeviation(bool value);Q_SIGNAL void measureDeviationChanged(bool value);
     bool getEyeMoveAlarm();void setEyeMoveAlarm(bool value);Q_SIGNAL void eyeMoveAlarmChanged(bool value);
     bool getEnvLightAlarm();Q_SIGNAL void envLightAlarmChanged();
+    bool getChinDistAlarm();Q_SIGNAL void chinDistAlarmChanged();
     bool getDebugMode();
     bool getShowCheckingDot();
     QString getDeviceID(){return m_deviceID;}void setDeviceID(QString id){m_deviceID=id;emit deviceIDChanged();};Q_SIGNAL void deviceIDChanged();

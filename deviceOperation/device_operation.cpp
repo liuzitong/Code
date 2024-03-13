@@ -15,8 +15,6 @@
 #include <QtMath>
 #include <pupilDetectApi.hxx>
 
-//#include <QQmlEngine>
-
 #pragma execution_character_set("utf-8")
 namespace DevOps{
 
@@ -25,17 +23,11 @@ QSharedPointer<DeviceOperation> DeviceOperation::m_singleton=/*QSharedPointer<De
 DeviceOperation::DeviceOperation()
 {
     connect(&m_reconnectTimer,&QTimer::timeout,this,&DeviceOperation::reconnectDev);
-    connect(this,&DeviceOperation::updateDevInfo,[](QString str){qDebug()<<str;});
-//    m_workStatusElapsedTimer.start();
     m_autoPupilElapsedTimer.start();
-//    m_reconnectingElapsedTimer.start();
     m_reconnectTimer.setInterval(5000);                            //复位的时候会短暂收不到数据更新，时间不能太短
     m_waitingTime=DeviceSettings::getSingleton()->m_waitingTime;
     m_currentCastLightDA=DeviceSettings::getSingleton()->m_castLightDA;
     m_config=DeviceData::getSingleton()->m_config;
-
-   qDebug()<<m_config.deviceIDRef();
-   m_reconnectTimer.start();
 
    std::string PROJECT_DIR = ".";
    std::string pupilModelPath = PROJECT_DIR + "/v8_64_1_848_pupil_model_4.xml";
@@ -56,7 +48,7 @@ void DeviceOperation::connectDev()
     if(m_devCtl==nullptr)
     {
         updateDevInfo("connecting.");
-#ifndef _DEBUG
+#ifndef _DEBUG                               //release 情况下重连
         m_reconnectTimer.start();
 #endif
         auto deviceSettings=DeviceSettings::getSingleton();
@@ -70,16 +62,12 @@ void DeviceOperation::disconnectDev()
 {
     m_devCtl.reset(nullptr);
     m_status={-1,-1};
-//    setIsDeviceReady(false);
     setDeviceStatus(0);
 }
 
 void DeviceOperation::reconnectDev()
 {
-//    if(m_reconnectingElapsedTimer.elapsed()<=10000) return;
-//    m_reconnectingElapsedTimer.restart();
     m_eyeglassIntialize=false;
-    qDebug()<<"reconnecting";
     m_devCtl.reset(nullptr);
     m_status={-1,-1};
     setDeviceStatus(1);
@@ -90,13 +78,6 @@ void DeviceOperation::reconnectDev()
 
 QSharedPointer<DeviceOperation> DeviceOperation::getSingleton()
 {
-//    static QMutex mutex;
-//    mutex.lock();
-//    if(m_singleton==nullptr)
-//    {
-//        m_singleton.reset(new DeviceOperation());
-//    }
-//    mutex.unlock();
     return m_singleton;
 }
 
@@ -218,14 +199,12 @@ void DeviceOperation::setLamp(LampId id, int index, bool onOff)
         }
     }
     m_devCtl->setLamp(UsbDev::DevCtl::LampId(id),index,da);
-//    waitForSomeTime(10);
 }
 
 
 void DeviceOperation::setWhiteLamp(bool onOff)
 {
     if(m_deviceStatus!=2) return;
-//    auto config=DeviceData::getSingleton()->m_config;
     auto whiteLampDaPtr=m_config.whiteBackgroundLampDAPtr();
     if(onOff)
     {
@@ -270,12 +249,10 @@ QPointF DeviceOperation::getDyanmicAnswerPos()
 
 bool DeviceOperation::getMotorsBusy(QVector<UsbDev::DevCtl::MotorId> motorIDs)
 {
-//        m_statusLock.lock();
     for(auto& motorId:motorIDs)
     {
         if(m_statusData.isMotorBusy(motorId))
         {
-//                m_statusLock.unlock();
             return true;
         }
     }
@@ -285,8 +262,6 @@ bool DeviceOperation::getMotorsBusy(QVector<UsbDev::DevCtl::MotorId> motorIDs)
 void DeviceOperation::setDB(int DB)
 {
     if(m_deviceStatus!=2) return;
-//    if(m_status.DB==DB) return;
-//    auto config=m_devCtl->config();
     UsbDev::Config config;
     config=m_config;
     quint8 sps[5]{0};
@@ -297,7 +272,6 @@ void DeviceOperation::setDB(int DB)
     sps[3]=spsConfig[3];sps[4]=spsConfig[4];
     waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
     m_devCtl->move5Motors(sps,motorPos);
-//    m_status.DB=DB;
 }
 
 
@@ -476,10 +450,6 @@ void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSiz
     int remainStep=stepCount-stepPerFrame*(totalframe-1);
     int dataLen= remainStep*3*4+8;
     constexpr int openForever=65535;
-//    qDebug()<<totalframe;
-//    qDebug()<<remainStep;
-//    qDebug()<<dataLen;
-//    qDebug()<<stepPerFrame*3*(totalframe-1);
     if(m_deviceStatus==2)
         m_devCtl->sendDynamicData(totalframe,totalframe-1,dataLen,&dotArr[stepPerFrame*3*(totalframe-1)]);     //最后一帧
     waitForSomeTime(1000);
@@ -496,8 +466,6 @@ void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSiz
         openShutter(openForever);
         m_devCtl->startDynamic(speedLevel,speedLevel,speedLevel,stepTime,stepCount);    //开始
     }
-//    thread()->sleep(12);
-//    qDebug()<<"sleep is over";
     delete[] dotArr;
 }
 
@@ -660,16 +628,10 @@ void DeviceOperation::clearPupilData()
 
 void DeviceOperation::workOnNewStatuData()
 {
-#ifndef _DEBUG
-    m_reconnectTimer.start();
+#ifndef _DEBUG                                                      //release 的情况下激活重连功能
+    m_reconnectTimer.start();                                       //收到消息表示连接正常，重新计时
 #endif
-//    if(m_workStatusElapsedTimer.elapsed()>=1000)
-//    {
-//        m_workStatusElapsedTimer.restart();
-//        updateDevInfo("receive new workStatus");
-//    }
     m_statusData=m_devCtl->takeNextPendingStatusData();
-
     using MotorId=UsbDev::DevCtl::MotorId;
     m_statusDataOut.serialNo=m_statusData.serialNO();
     m_statusDataOut.answerpadStatus=m_statusData.answerpadStatus();
@@ -811,12 +773,6 @@ void DeviceOperation::workOnNewStatuData()
     emit newStatusData();
 }
 
-// static std::ostream& operator << (std::ostream& os,const Point& rv)
-// {
-//     return os << "x:" << rv.x << " y:" << rv.y;
-// }
-
-
 void DeviceOperation::workOnNewFrameData()
 {
     m_frameData=m_devCtl->takeNextPendingFrameData();
@@ -828,7 +784,6 @@ void DeviceOperation::workOnNewFrameData()
     Result res;
     Image image{m_videoSize.width(),m_videoSize.height(),data.data()};
     getPupilResultByImage(image,&res);
-    // std::cout << res.pupil.center <<" long_axis:"<<res.pupil.long_axis<<" short_axis:"<<res.pupil.short_axis<<" angle:"<<res.pupil.angle<<" " << res.reflectDots[0] << " " << res.reflectDots[1] <<" " << res.reflectDots[2] << std::endl;
     QImage img((uchar*)data.data(),m_videoSize.width(),m_videoSize.height(),QImage::Format_Grayscale8);
     img=img.convertToFormat(QImage::Format_ARGB32);
 
@@ -848,6 +803,7 @@ void DeviceOperation::workOnNewFrameData()
 
 
     m_devicePupilProcessor.processData(&res);
+    setChinDistAlarm(m_devicePupilProcessor.m_isTooFar);
     if(m_autoPupilElapsedTimer.elapsed()>=m_autoPupilElapsedTime)
     {
         m_autoPupilElapsedTimer.restart();
@@ -862,7 +818,6 @@ void DeviceOperation::workOnNewFrameData()
                 int motorPos[2]{0};
 
                 QPointF pupilDeviation={res.pupil.center.x-0.5*m_videoSize.width(),res.pupil.center.y-0.5*m_videoSize.height()};
-                // std::cout<<"pupilDeviation x:"<<pupilDeviation.x()<<" y:"<<pupilDeviation.y()<<" torlerance:"<<tolerance<<std::endl;
 
                 if(!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Chin_Hoz)&&qAbs(pupilDeviation.x())>tolerance)
                 {
@@ -889,25 +844,19 @@ void DeviceOperation::workOnNewFrameData()
         }
     }
 
-
-
-
     QByteArray ba=QByteArray((char*)img.bits(),img.byteCount());
-
     emit newFrameData(ba);
     emit pupilDiameterChanged();
 }
 
 void DeviceOperation::workOnNewProfile()
 {
-    qDebug()<<"work on new Profile";
     m_profile=m_devCtl->profile();
     m_videoSize=m_profile.videoSize();
 }
 
 void DeviceOperation::workOnNewConfig()
 {
-    qDebug()<<"work on new config";
     UsbDev::Config config=m_devCtl->config();
     quint32 crc=DeviceDataProcesser::calcCrc((quint8*)config.dataPtr()+4, config.dataLen()-4);
     if(DeviceData::getSingleton()->m_config.isEmpty())
@@ -931,8 +880,6 @@ void DeviceOperation::workOnNewConfig()
     m_devicePupilProcessor.m_pupilGreyLimit=m_config.pupilGreyThresholdDAPtr()[0];
     m_devicePupilProcessor.m_pupilReflectionDotWhiteLimit=m_config.pupilGreyThresholdDAPtr()[1];
     emit newDeviceID(QString(m_config.deviceIDRef()));
-//    if(!m_profile.isEmpty()&&!m_config.isEmpty())
-//    {
     auto date=QDate::currentDate();
     auto lastAdjustedDate=QDate::fromString(DeviceSettings::getSingleton()->m_castLightLastAdjustedDate,"yyyy/MM/dd");
     bool adjusted=((date.year()==lastAdjustedDate.year())&&(date.month()==lastAdjustedDate.month())&&(date.day()==lastAdjustedDate.day()));
@@ -944,7 +891,6 @@ void DeviceOperation::workOnNewConfig()
     }
     else
         adjustCastLight();
-//    }
 }
 
 void DeviceOperation::workOnWorkStatusChanged(int status)
@@ -957,7 +903,6 @@ void DeviceOperation::workOnWorkStatusChanged(int status)
     {
         qDebug()<<"Connect Successfully.";
         updateDevInfo("Connect Successfully.");
-//        m_connectTimer.stop();
         connect(m_devCtl.data(),&UsbDev::DevCtl::updateInfo,this,&DeviceOperation::updateDevInfo);
         connect(m_devCtl.data(),&UsbDev::DevCtl::newStatusData,this,&DeviceOperation::workOnNewStatuData);
         connect(m_devCtl.data(),&UsbDev::DevCtl::newFrameData,this,&DeviceOperation::workOnNewFrameData);
@@ -966,12 +911,9 @@ void DeviceOperation::workOnWorkStatusChanged(int status)
 
         m_devCtl->readProfile();
         while (m_profile.isEmpty()) {QApplication::processEvents();}
-//        waitForSomeTime(500);                                          //等一下保证 config后读
 
         m_devCtl->readConfig();
-//        adjustCastLight();
         setDeviceStatus(2);
-//        setIsDeviceReady(true);
 
     }
     else if(/*m_reconnectTimer.elapsed()>=10000&&*/(m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_Disconnected||m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_Disconnected))
@@ -987,16 +929,8 @@ void DeviceOperation::workOnWorkStatusChanged(int status)
             disconnect(m_devCtl.data(),&UsbDev::DevCtl::newConfig,this,&DeviceOperation::workOnNewConfig);
             m_devCtl.reset(nullptr);
         }
-//        setIsDeviceReady(false);
-//        setDeviceStatus(0);
-//        if(m_connectDev)
-//        {
-//            waitForSomeTime(10000);
-//            connectDev();
-//        }
     }
     emit workStatusChanged();
 }
-
 }
 

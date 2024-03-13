@@ -398,8 +398,7 @@ Item {id:root; width: 1366;height: 691
 
                         }
                         Rectangle{
-                            property string tip:checkDisplay.tip==""?(checkSvc.envLightAlarm?"environment light too strong.":""):checkDisplay.tip;
-                            onTipChanged:{console.log("*********************")+ console.log(tip)+console.log("*********************");}
+                            property string tip:checkDisplay.tip==""?((checkSvc.envLightAlarm?"Environment light too strong.":"")+(checkSvc.chinDistAlarm?"Put your chin more forward.":"")):checkDisplay.tip;
                             width: parent.width;height: 20; anchors.bottom: parent.bottom;color: "white";opacity: 0.5;visible:tip!="";
                             CusText {anchors.fill: parent;verticalAlignment: Text.AlignVCenter;text:parent.tip; wrapMode: Text.WordWrap}
 //                            Button{text:"video on";width: parent.width/8;height: parent.height; onClicked: IcUiQmlApi.appCtrl.checkSvc.enterCheckingPage();}

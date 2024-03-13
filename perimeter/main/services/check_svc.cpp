@@ -729,6 +729,7 @@ void StaticCheck::stimulate(bool checkResultIgnore)
             {
                 if(m_measurePupilDeviation)
                     m_resultModel->m_data.fixationDeviation.push_back(m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation);
+                std::cout<<"input deviation:"<<m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation<<std::endl;
 
                 uint dotIndex=m_lastCheckDotRecord[0]->index;
     //            qDebug()<<m_resultModel->m_data.realTimeDB.size();
@@ -749,6 +750,7 @@ void StaticCheck::stimulate(bool checkResultIgnore)
             m_deviceOperation->waitForSomeTime(durationTime);           //假阳
             if(m_measurePupilDeviation)
                 m_resultModel->m_data.fixationDeviation.push_back(-m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation);
+            std::cout<<"input deviation:"<<m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation<<std::endl;
             emit currentCheckingDotChanged({999,999});
     #ifdef _DEBUG
             std::cout<<"***** jiayang"<<"zuo biao x:"<<debug_Loc.x()<<" "<<"zuobiao y:"<<debug_Loc.y()<<"    yong shi:"<<m_stimulationWaitingForAnswerElapsedTimer.elapsed()<<std::endl;
@@ -1356,9 +1358,8 @@ bool StaticCheck::waitForAnswer()
         }
         m_answeredTimes.append(m_stimulationWaitingForAnswerElapsedTimer.elapsed());
     }
-    else if(m_deviceOperation->m_deviceStatus==0)
+    else if(m_deviceOperation->m_deviceStatus!=2)
     {
-//        qDebug()<<"into kebordd!!!!!!!!!!!!*******************************";
         if(KeyBoardFilter::needRefresh)
         {
             while(!KeyBoardFilter::freshed)
@@ -2136,8 +2137,9 @@ CheckSvc::CheckSvc(QObject *parent)
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::castLightAdjustStatusChanged,this,&CheckSvc::castLightAdjustStatusChanged);
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::pupilDiameterChanged,this,&CheckSvc::pupilDiameterChanged);
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::envLightAlarmChanged,this,&CheckSvc::envLightAlarmChanged);
+    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::chinDistAlarmChanged,this,&CheckSvc::chinDistAlarmChanged);
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::newDeviceID,this,&CheckSvc::setDeviceID);
-    connect(this,&CheckSvc::envLightAlarmChanged,[&](){qDebug()<<getEnvLightAlarm();});
+    // connect(this,&CheckSvc::envLightAlarmChanged,[&](){qDebug()<<getEnvLightAlarm();});
 //    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::isDeviceReadyChanged,[&](){if(m_checkState<=2){m_checkState=3;}});
     connect(&m_castLightDimdownTimer,&QTimer::timeout,[&]()
     {
@@ -2338,20 +2340,13 @@ bool CheckSvc::getEyeMoveAlarm(){return m_worker->m_eyeMoveAlarm;}
 
 void CheckSvc::setEyeMoveAlarm(bool value){m_worker->m_eyeMoveAlarm=value;emit eyeMoveAlarmChanged(value);}
 
-bool CheckSvc::getEnvLightAlarm()
-{
-    return DevOps::DeviceOperation::getSingleton()->getEnvLightAlarm();
-}
+bool CheckSvc::getEnvLightAlarm(){return DevOps::DeviceOperation::getSingleton()->getEnvLightAlarm();}
 
-bool CheckSvc::getDebugMode()
-{
-    return UtilitySvc::getSingleton()->m_debugMode;
-}
+bool CheckSvc::getChinDistAlarm(){return DevOps::DeviceOperation::getSingleton()->getChinDistAlarm();}
 
-bool CheckSvc::getShowCheckingDot()
-{
-    return UtilitySvc::getSingleton()->m_showCheckingDot;
-}
+bool CheckSvc::getDebugMode(){return UtilitySvc::getSingleton()->m_debugMode;}
+
+bool CheckSvc::getShowCheckingDot(){return UtilitySvc::getSingleton()->m_showCheckingDot;}
 
 
 

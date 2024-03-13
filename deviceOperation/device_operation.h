@@ -74,7 +74,7 @@ class DEVICEOPERATIONSHARED_EXPORT DeviceOperation:public QObject
     Q_PROPERTY(int castLightAdjustStatus READ getCastLightAdjustStatus WRITE setCastLightAdjustStatus NOTIFY castLightAdjustStatusChanged)
     Q_PROPERTY(bool pupilDiameter READ getPupilDiameter WRITE setPupilDiameter NOTIFY pupilDiameterChanged)
     Q_PROPERTY(bool envLightAlarm READ getEnvLightAlarm WRITE setEnvLightAlarm NOTIFY envLightAlarmChanged)
-
+    Q_PROPERTY(bool chinDistAlarm READ getChinDistAlarm WRITE setChinDistAlarm NOTIFY chinDistAlarmChanged)
 public:
 
     enum class ChinMoveDirection
@@ -156,6 +156,7 @@ public:
 //    bool getReconnecting(){return m_reconnecting;}void setReconnecting(bool value){if(m_reconnecting!=value){m_reconnecting=value;emit reconnectingChanged();}}Q_SIGNAL void reconnectingChanged();
     int getDeviceStatus(){return m_deviceStatus;}void setDeviceStatus(int value){if(m_deviceStatus!=value){m_deviceStatus=value;emit deviceStatusChanged();}}Q_SIGNAL void deviceStatusChanged();
     bool getEnvLightAlarm(){return m_envLightAlarm;}void setEnvLightAlarm(bool value){if(m_envLightAlarm!=value){m_envLightAlarm=value;emit envLightAlarmChanged();}}Q_SIGNAL void envLightAlarmChanged();
+    bool getChinDistAlarm(){return m_cheeckDistAlarm;}void setChinDistAlarm(bool value){if(m_cheeckDistAlarm!=value){m_cheeckDistAlarm=value;emit chinDistAlarmChanged();}}Q_SIGNAL void chinDistAlarmChanged();
     float getPupilDiameter(){return m_devicePupilProcessor.m_pupilDiameter;}void setPupilDiameter(float value){m_devicePupilProcessor.m_pupilDiameter=value;emit pupilDiameterChanged();}Q_SIGNAL void pupilDiameterChanged();
     int getCastLightAdjustStatus(){return m_castLightAdjustStatus;}void setCastLightAdjustStatus(int value){m_castLightAdjustStatus=value;emit castLightAdjustStatusChanged();}Q_SIGNAL void castLightAdjustStatusChanged();
 public:
@@ -209,6 +210,7 @@ private:
 //    QTimer m_videoTimer;
     QElapsedTimer m_castLightAdjustElapsedTimer;
     bool m_envLightAlarm=false;
+    bool m_cheeckDistAlarm=false;
 
 
     bool m_isMainTable;

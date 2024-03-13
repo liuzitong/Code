@@ -12,16 +12,14 @@
 
 namespace DevOps{
 
-DevicePupilProcessor::DevicePupilProcessor()
-{
-
-}
+DevicePupilProcessor::DevicePupilProcessor(){}
 
 void DevicePupilProcessor::processData(void* result)
 {
     Result* res=static_cast<Result*>(result);
     m_pupilResValid=res->pupil.center.x>0;
     m_pupilDeviation=13;
+    m_isTooFar=false;
     if(m_pupilResValid)
     {
         double diameterPix=sqrt(pow(res->pupil.long_axis,2)+pow(res->pupil.short_axis,2));
@@ -47,13 +45,17 @@ void DevicePupilProcessor::processData(void* result)
         if(m_reflectionResValid)
         {
             m_pupilDeviation=caculateFixationDeviation(res);
+            m_isTooFar=caculateIsTooFar(res);
         }
     }
 }
 
 
+
+
 int DevicePupilProcessor::caculateFixationDeviation(void* result)
 {
+
     Result* res=static_cast<Result*>(result);
     QVector<Point> dots={res->reflectDots[0],res->reflectDots[1],res->reflectDots[2]};
     std::sort(dots.begin(),dots.end(),[&](Point p1,Point p2){return p1.x<p2.x;});
@@ -65,12 +67,21 @@ int DevicePupilProcessor::caculateFixationDeviation(void* result)
     return deviation;
 }
 
+bool DevicePupilProcessor::caculateIsTooFar(void *result)
+{
+
+    Result* res=static_cast<Result*>(result);
+    QVector<Point> dots={res->reflectDots[0],res->reflectDots[1],res->reflectDots[2]};
+    std::sort(dots.begin(),dots.end(),[&](Point p1,Point p2){return p1.x<p2.x;});
+    int dist=dots[2].x-dots[0].x;
+    return dist<DeviceSettings::getSingleton()->m_reflectDotDist;
+}
+
 void DevicePupilProcessor::clearData()
 {
     m_pupilDiameter=0;
     m_pupilDiameterArr.clear();
 }
-
 }
 
 
