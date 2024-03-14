@@ -60,7 +60,7 @@ CONFIG(debug, debug|release) {
     CONFIG += console
     DESTDIR=$$PWD/../../bin/debug
 } else {
-    CONFIG += console
+    # CONFIG += console
     LIBS += -L$$PWD/../../../deviceOperation/bin/release
     LIBS += -L$$PWD/../../../perimeter/third-part/LimeReport/build/5.9.7/win64/release/lib
 

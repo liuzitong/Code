@@ -47,7 +47,7 @@
          <x>0</x>
          <y>0</y>
          <width>1438</width>
-         <height>876</height>
+         <height>873</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_33">
@@ -2686,7 +2686,7 @@
                      </widget>
                     </item>
                     <item>
-                     <widget class="QSpinBox" name="spinBox_takingPhotoInteval">
+                     <widget class="QSpinBox" name="spinBox_takingPhotoInterval">
                       <property name="maximumSize">
                        <size>
                         <width>40</width>
@@ -3366,7 +3366,7 @@
                             </property>
                             <property name="sizeHint" stdset="0">
                              <size>
-                              <width>40</width>
+                              <width>20</width>
                               <height>20</height>
                              </size>
                             </property>
@@ -3375,7 +3375,7 @@
                           <item>
                            <widget class="QCheckBox" name="checkBox_calcFocalDist">
                             <property name="text">
-                             <string>算出焦距</string>
+                             <string>计算电机位置</string>
                             </property>
                             <property name="checked">
                              <bool>true</bool>
@@ -3471,19 +3471,6 @@
                              </size>
                             </property>
                            </spacer>
-                          </item>
-                          <item>
-                           <widget class="QPushButton" name="reCalcXYFocalMotorPos">
-                            <property name="maximumSize">
-                             <size>
-                              <width>40</width>
-                              <height>16777215</height>
-                             </size>
-                            </property>
-                            <property name="text">
-                             <string>刷新</string>
-                            </property>
-                           </widget>
                           </item>
                           <item>
                            <widget class="QPushButton" name="pushButton_staticCastTest">
@@ -6104,10 +6091,10 @@
                        <attribute name="horizontalHeaderCascadingSectionResizes">
                         <bool>true</bool>
                        </attribute>
-                       <attribute name="horizontalHeaderDefaultSectionSize">
+                       <attribute name="horizontalHeaderMinimumSectionSize">
                         <number>60</number>
                        </attribute>
-                       <attribute name="horizontalHeaderMinimumSectionSize">
+                       <attribute name="horizontalHeaderDefaultSectionSize">
                         <number>60</number>
                        </attribute>
                        <attribute name="horizontalHeaderStretchLastSection">
@@ -6116,10 +6103,10 @@
                        <attribute name="verticalHeaderVisible">
                         <bool>false</bool>
                        </attribute>
-                       <attribute name="verticalHeaderDefaultSectionSize">
+                       <attribute name="verticalHeaderMinimumSectionSize">
                         <number>20</number>
                        </attribute>
-                       <attribute name="verticalHeaderMinimumSectionSize">
+                       <attribute name="verticalHeaderDefaultSectionSize">
                         <number>20</number>
                        </attribute>
                        <attribute name="verticalHeaderStretchLastSection">
@@ -6153,14 +6140,14 @@
                        <attribute name="horizontalHeaderCascadingSectionResizes">
                         <bool>true</bool>
                        </attribute>
+                       <attribute name="horizontalHeaderMinimumSectionSize">
+                        <number>60</number>
+                       </attribute>
                        <attribute name="horizontalHeaderDefaultSectionSize">
                         <number>60</number>
                        </attribute>
                        <attribute name="horizontalHeaderHighlightSections">
                         <bool>true</bool>
-                       </attribute>
-                       <attribute name="horizontalHeaderMinimumSectionSize">
-                        <number>60</number>
                        </attribute>
                        <attribute name="horizontalHeaderStretchLastSection">
                         <bool>true</bool>
@@ -6168,10 +6155,10 @@
                        <attribute name="verticalHeaderVisible">
                         <bool>false</bool>
                        </attribute>
-                       <attribute name="verticalHeaderDefaultSectionSize">
+                       <attribute name="verticalHeaderMinimumSectionSize">
                         <number>20</number>
                        </attribute>
-                       <attribute name="verticalHeaderMinimumSectionSize">
+                       <attribute name="verticalHeaderDefaultSectionSize">
                         <number>20</number>
                        </attribute>
                        <attribute name="verticalHeaderStretchLastSection">
@@ -6233,14 +6220,14 @@
                        <attribute name="horizontalHeaderCascadingSectionResizes">
                         <bool>true</bool>
                        </attribute>
+                       <attribute name="horizontalHeaderMinimumSectionSize">
+                        <number>60</number>
+                       </attribute>
                        <attribute name="horizontalHeaderDefaultSectionSize">
                         <number>60</number>
                        </attribute>
                        <attribute name="horizontalHeaderHighlightSections">
                         <bool>false</bool>
-                       </attribute>
-                       <attribute name="horizontalHeaderMinimumSectionSize">
-                        <number>60</number>
                        </attribute>
                        <attribute name="horizontalHeaderStretchLastSection">
                         <bool>true</bool>
@@ -6251,10 +6238,10 @@
                        <attribute name="verticalHeaderCascadingSectionResizes">
                         <bool>true</bool>
                        </attribute>
-                       <attribute name="verticalHeaderDefaultSectionSize">
+                       <attribute name="verticalHeaderMinimumSectionSize">
                         <number>20</number>
                        </attribute>
-                       <attribute name="verticalHeaderMinimumSectionSize">
+                       <attribute name="verticalHeaderDefaultSectionSize">
                         <number>20</number>
                        </attribute>
                       </widget>
@@ -6322,14 +6309,14 @@
                        <attribute name="horizontalHeaderCascadingSectionResizes">
                         <bool>true</bool>
                        </attribute>
+                       <attribute name="horizontalHeaderMinimumSectionSize">
+                        <number>60</number>
+                       </attribute>
                        <attribute name="horizontalHeaderDefaultSectionSize">
                         <number>60</number>
                        </attribute>
                        <attribute name="horizontalHeaderHighlightSections">
                         <bool>false</bool>
-                       </attribute>
-                       <attribute name="horizontalHeaderMinimumSectionSize">
-                        <number>60</number>
                        </attribute>
                        <attribute name="horizontalHeaderStretchLastSection">
                         <bool>true</bool>
@@ -6337,10 +6324,10 @@
                        <attribute name="verticalHeaderVisible">
                         <bool>false</bool>
                        </attribute>
-                       <attribute name="verticalHeaderDefaultSectionSize">
+                       <attribute name="verticalHeaderMinimumSectionSize">
                         <number>20</number>
                        </attribute>
-                       <attribute name="verticalHeaderMinimumSectionSize">
+                       <attribute name="verticalHeaderDefaultSectionSize">
                         <number>20</number>
                        </attribute>
                       </widget>
@@ -6408,14 +6395,14 @@
                        <attribute name="horizontalHeaderCascadingSectionResizes">
                         <bool>true</bool>
                        </attribute>
+                       <attribute name="horizontalHeaderMinimumSectionSize">
+                        <number>60</number>
+                       </attribute>
                        <attribute name="horizontalHeaderDefaultSectionSize">
                         <number>60</number>
                        </attribute>
                        <attribute name="horizontalHeaderHighlightSections">
                         <bool>false</bool>
-                       </attribute>
-                       <attribute name="horizontalHeaderMinimumSectionSize">
-                        <number>60</number>
                        </attribute>
                        <attribute name="horizontalHeaderStretchLastSection">
                         <bool>true</bool>
@@ -6423,10 +6410,10 @@
                        <attribute name="verticalHeaderVisible">
                         <bool>false</bool>
                        </attribute>
-                       <attribute name="verticalHeaderDefaultSectionSize">
+                       <attribute name="verticalHeaderMinimumSectionSize">
                         <number>20</number>
                        </attribute>
-                       <attribute name="verticalHeaderMinimumSectionSize">
+                       <attribute name="verticalHeaderDefaultSectionSize">
                         <number>20</number>
                        </attribute>
                       </widget>
@@ -6530,14 +6517,14 @@
                    <attribute name="horizontalHeaderCascadingSectionResizes">
                     <bool>true</bool>
                    </attribute>
+                   <attribute name="horizontalHeaderMinimumSectionSize">
+                    <number>60</number>
+                   </attribute>
                    <attribute name="horizontalHeaderDefaultSectionSize">
                     <number>60</number>
                    </attribute>
                    <attribute name="horizontalHeaderHighlightSections">
                     <bool>false</bool>
-                   </attribute>
-                   <attribute name="horizontalHeaderMinimumSectionSize">
-                    <number>60</number>
                    </attribute>
                    <attribute name="horizontalHeaderStretchLastSection">
                     <bool>true</bool>
@@ -6548,10 +6535,10 @@
                    <attribute name="verticalHeaderCascadingSectionResizes">
                     <bool>true</bool>
                    </attribute>
-                   <attribute name="verticalHeaderDefaultSectionSize">
+                   <attribute name="verticalHeaderMinimumSectionSize">
                     <number>20</number>
                    </attribute>
-                   <attribute name="verticalHeaderMinimumSectionSize">
+                   <attribute name="verticalHeaderDefaultSectionSize">
                     <number>20</number>
                    </attribute>
                    <attribute name="verticalHeaderStretchLastSection">
@@ -6616,14 +6603,14 @@
                    <attribute name="horizontalHeaderCascadingSectionResizes">
                     <bool>true</bool>
                    </attribute>
+                   <attribute name="horizontalHeaderMinimumSectionSize">
+                    <number>60</number>
+                   </attribute>
                    <attribute name="horizontalHeaderDefaultSectionSize">
                     <number>60</number>
                    </attribute>
                    <attribute name="horizontalHeaderHighlightSections">
                     <bool>false</bool>
-                   </attribute>
-                   <attribute name="horizontalHeaderMinimumSectionSize">
-                    <number>60</number>
                    </attribute>
                    <attribute name="horizontalHeaderStretchLastSection">
                     <bool>true</bool>
@@ -6631,10 +6618,10 @@
                    <attribute name="verticalHeaderVisible">
                     <bool>false</bool>
                    </attribute>
-                   <attribute name="verticalHeaderDefaultSectionSize">
+                   <attribute name="verticalHeaderMinimumSectionSize">
                     <number>20</number>
                    </attribute>
-                   <attribute name="verticalHeaderMinimumSectionSize">
+                   <attribute name="verticalHeaderDefaultSectionSize">
                     <number>20</number>
                    </attribute>
                   </widget>

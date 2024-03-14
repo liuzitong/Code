@@ -45,11 +45,12 @@ DeviceSettings::DeviceSettings()
     m_pupilDiameterPixelToMillimeterConstant=m_rootObj.value("pupilDiameterPixelToMillimeterConstant").toDouble();
     m_pupilDeviationPixelToNumberConstant=m_rootObj.value("pupilDeviationPixelToNumberConstant").toDouble();
     m_castLightDAChangeRate=m_rootObj.value("castLightDAChangeRate").toDouble();
-    m_castLightDAChangeInteval=m_rootObj.value("castLightDAChangeInteval").toInt();
+    m_castLightDAChangeInterval=m_rootObj.value("castLightDAChangeInterval").toInt();
     m_castLightDAChangeMinStep=m_rootObj.value("castLightDAChangeMinStep").toInt();
     m_castLightTargetColor=m_rootObj.value("castLightTargetColor").toInt();
     m_castLightTargetSize=m_rootObj.value("castLightTargetSize").toInt();
-    m_castLightDADifferenceTolerance=m_rootObj.value("castLightDADifferenceTolerance").toInt();
+    m_castLightDADifferenceTolerance=m_rootObj.value("castLightDADifferenceTolerance").toDouble();
+    m_castLightStablizeWaitingTime=m_rootObj.value("castLightStablizeWaitingTime").toInt();
     m_skipAdjustCastLight=m_rootObj.value("skipAdjustCastLight").toBool();
     m_waitingTime=m_rootObj.value("waitingTime").toInt();
     m_beepCount=m_rootObj.value("beepCount").toInt();

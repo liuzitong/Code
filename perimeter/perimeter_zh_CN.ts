@@ -3806,7 +3806,7 @@
     </message>
     <message>
         <location filename="main/view/StaticParamsSetting.qml" line="295"/>
-        <source>Inteval time</source>
+        <source>Interval time</source>
         <translation>间隔时间</translation>
     </message>
     <message>

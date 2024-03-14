@@ -18,10 +18,11 @@ public:
 
     QString m_VID,m_PID;
     int m_pupilAutoAlignPixelTolerance;
-    int m_castLightDADifferenceTolerance;
+    double m_castLightDADifferenceTolerance;
+    int m_castLightStablizeWaitingTime;
     int m_castLightDA;
     double m_castLightDAChangeRate;
-    int m_castLightDAChangeInteval;
+    int m_castLightDAChangeInterval;
     int m_castLightDAChangeMinStep;
     int m_castLightTargetColor;
     int m_castLightTargetSize;

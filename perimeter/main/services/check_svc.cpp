@@ -474,9 +474,7 @@ void StaticCheck::Checkprocess()
             emit nextCheckingDotChanged(m_lastCheckDotRecord.last()->loc);
             checkingDot=true;
             getReadyToStimulate(m_lastCheckDotRecord.last()->loc,m_lastCheckDotRecord.last()->StimulationDBs.last());
-
         }
-
     }
 
 //    std::cout<<"waitAndProcessAnswer..........."<<std::endl;
@@ -2140,6 +2138,7 @@ CheckSvc::CheckSvc(QObject *parent)
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::chinDistAlarmChanged,this,&CheckSvc::chinDistAlarmChanged);
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::newDeviceID,this,&CheckSvc::setDeviceID);
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::newDeviceVersion,this,&CheckSvc::setDeviceVersion);
+    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::newTargetCastLightSensorDA,this,&CheckSvc::setTargetCastLightSensorDA);
     // connect(this,&CheckSvc::envLightAlarmChanged,[&](){qDebug()<<getEnvLightAlarm();});
 //    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::isDeviceReadyChanged,[&](){if(m_checkState<=2){m_checkState=3;}});
     connect(&m_castLightDimdownTimer,&QTimer::timeout,[&]()

@@ -164,7 +164,7 @@ private slots:
 
     void on_checkBox_RefreshIO_stateChanged(int arg1);
 
-    void on_reCalcXYFocalMotorPos_clicked(){fillXYMotorAndFocalInfoByXYCoord();};
+    // void on_reCalcXYFocalMotorPos_clicked(){fillXYMotorAndFocalInfoByXYCoord();};
 
     void on_plainTextEdit_rawCommand_textChanged();
 

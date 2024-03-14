@@ -42,6 +42,7 @@ class CheckSvc: public QObject
     Q_PROPERTY(bool showCheckingDot READ getShowCheckingDot)
     Q_PROPERTY(QString deviceID READ getDeviceID WRITE setDeviceID NOTIFY deviceIDChanged)
     Q_PROPERTY(QString deviceVersion READ getDeviceVersion NOTIFY deviceVersionChanged)
+    Q_PROPERTY(int targetCastLightSensorDA READ getTargetCastLightSensorDA WRITE setTargetCastLightSensorDA NOTIFY targetCastLightSensorDAChanged)
 
 
 //    Q_PROPERTY(CheckSvcWorker* worker READ getWorker)
@@ -99,6 +100,7 @@ public:
     bool getShowCheckingDot();
     QString getDeviceID(){return m_deviceID;}void setDeviceID(QString id){m_deviceID=id;emit deviceIDChanged();};Q_SIGNAL void deviceIDChanged();
     QString getDeviceVersion(){return m_deviceVersion;}void setDeviceVersion(QString version){m_deviceVersion=version;emit deviceVersionChanged();}Q_SIGNAL void deviceVersionChanged();
+    int getTargetCastLightSensorDA(){return m_targetCastLightSensorDA;}void setTargetCastLightSensorDA(int value){m_targetCastLightSensorDA=value;emit targetCastLightSensorDAChanged();}Q_SIGNAL void targetCastLightSensorDAChanged();
 //    CheckSvcWorker* getWorker(){return m_worker;}
 
 private:
@@ -126,6 +128,7 @@ private:
     QTimer m_castLightDimdownTimer;
     QString m_deviceID="Not Connected.";
     QString m_deviceVersion="Not Connected.";
+    int m_targetCastLightSensorDA=0;
 };
 }
 #endif // CheckSvc_H

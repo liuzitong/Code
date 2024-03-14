@@ -24,7 +24,7 @@ DeviceOperation::DeviceOperation()
 {
     connect(&m_reconnectTimer,&QTimer::timeout,this,&DeviceOperation::reconnectDev);
     m_autoPupilElapsedTimer.start();
-    m_reconnectTimer.setInterval(5000);                            //复位的时候会短暂收不到数据更新，时间不能太短
+    m_reconnectTimer.setInterval(10000);                            //复位的时候会短暂收不到数据更新，时间不能太短
     m_waitingTime=DeviceSettings::getSingleton()->m_waitingTime;
     m_currentCastLightDA=DeviceSettings::getSingleton()->m_castLightDA;
     m_config=DeviceData::getSingleton()->m_config;
@@ -585,9 +585,9 @@ void DeviceOperation::dimDownCastLight()
 {
     if(m_deviceStatus==2&&m_castLightUp)
     {
-        m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA*0.3);
+        m_devCtl->setLamp(LampId::LampId_castLight,0,qFloor(m_currentCastLightDA*0.3));
 #ifdef _DEBUG
-        std::cout<<"cast light Down"<<m_currentCastLightDA*0.3<<std::endl;
+        std::cout<<"cast light Down"<<qFloor(m_currentCastLightDA*0.3)<<std::endl;
 #endif
         m_castLightUp=false;
     }
@@ -732,10 +732,10 @@ void DeviceOperation::workOnNewStatuData()
 
     }
 
-    if(m_castLightAdjustStatus==2&&m_castLightAdjustElapsedTimer.elapsed()>=DeviceSettings::getSingleton()->m_castLightDAChangeInteval&&m_deviceStatus==2)
+    if(m_castLightAdjustStatus==2&&m_castLightAdjustElapsedTimer.elapsed()>=DeviceSettings::getSingleton()->m_castLightDAChangeInterval&&m_deviceStatus==2)
     {
         updateDevInfo("keep adjust castLightDa");
-        int DADiffTolerance=DeviceSettings::getSingleton()->m_castLightDADifferenceTolerance;
+        double DADiffTolerance=DeviceSettings::getSingleton()->m_castLightDADifferenceTolerance;
         int currentcastLightSensorDA=m_statusData.castLightSensorDA();
         int targetcastLightSensorDA=m_config.castLightSensorDAForLightCorrectionRef();
         updateDevInfo("castlight Da:"+QString::number(m_currentCastLightDA));
@@ -756,8 +756,9 @@ void DeviceOperation::workOnNewStatuData()
             }
             m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA);
             m_castLightAdjustElapsedTimer.restart();
+            m_castLightStablelizeWaitingElapsedTimer.restart();
         }
-        else
+        else if(m_castLightStablelizeWaitingElapsedTimer.elapsed()>DeviceSettings::getSingleton()->m_castLightStablizeWaitingTime)
         {
             setCastLightAdjustStatus(3);
             openShutter(0);
@@ -853,6 +854,7 @@ void DeviceOperation::workOnNewProfile()
 {
     m_profile=m_devCtl->profile();
     emit newDeviceVersion(QString::number(m_profile.devVersion()));
+    emit newTargetCastLightSensorDA(m_config.castLightSensorDAForLightCorrectionRef());
     m_videoSize=m_profile.videoSize();
 }
 

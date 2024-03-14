@@ -75,6 +75,7 @@ class DEVICEOPERATIONSHARED_EXPORT DeviceOperation:public QObject
     Q_PROPERTY(bool pupilDiameter READ getPupilDiameter WRITE setPupilDiameter NOTIFY pupilDiameterChanged)
     Q_PROPERTY(bool envLightAlarm READ getEnvLightAlarm WRITE setEnvLightAlarm NOTIFY envLightAlarmChanged)
     Q_PROPERTY(bool chinDistAlarm READ getChinDistAlarm WRITE setChinDistAlarm NOTIFY chinDistAlarmChanged)
+
 public:
 
     enum class ChinMoveDirection
@@ -150,16 +151,17 @@ signals:
     void newDeviceID(QString version);
     void newDeviceVersion(QString id);
     void updateDevInfo(QString info);
+    void newTargetCastLightSensorDA(int DA);
 
 public:
     bool getAutoAlignPupil(){return m_autoAlignPupil;}void setAutoAlignPupil(bool value){m_autoAlignPupil=value;emit autoAlignPupilChanged();}Q_SIGNAL void autoAlignPupilChanged();
 //    bool getIsDeviceReady(){return m_isDeviceReady;}void setIsDeviceReady(bool value){if(m_isDeviceReady!=value){m_isDeviceReady=value;emit isDeviceReadyChanged();}}Q_SIGNAL void isDeviceReadyChanged();
 //    bool getReconnecting(){return m_reconnecting;}void setReconnecting(bool value){if(m_reconnecting!=value){m_reconnecting=value;emit reconnectingChanged();}}Q_SIGNAL void reconnectingChanged();
     int getDeviceStatus(){return m_deviceStatus;}void setDeviceStatus(int value){if(m_deviceStatus!=value){m_deviceStatus=value;emit deviceStatusChanged();}}Q_SIGNAL void deviceStatusChanged();
-    bool getEnvLightAlarm(){return m_envLightAlarm;}void setEnvLightAlarm(bool value){if(m_envLightAlarm!=value){m_envLightAlarm=value;emit envLightAlarmChanged();}}Q_SIGNAL void envLightAlarmChanged();
-    bool getChinDistAlarm(){return m_cheeckDistAlarm;}void setChinDistAlarm(bool value){if(m_cheeckDistAlarm!=value){m_cheeckDistAlarm=value;emit chinDistAlarmChanged();}}Q_SIGNAL void chinDistAlarmChanged();
     float getPupilDiameter(){return m_devicePupilProcessor.m_pupilDiameter;}void setPupilDiameter(float value){m_devicePupilProcessor.m_pupilDiameter=value;emit pupilDiameterChanged();}Q_SIGNAL void pupilDiameterChanged();
     int getCastLightAdjustStatus(){return m_castLightAdjustStatus;}void setCastLightAdjustStatus(int value){m_castLightAdjustStatus=value;emit castLightAdjustStatusChanged();}Q_SIGNAL void castLightAdjustStatusChanged();
+    bool getEnvLightAlarm(){return m_envLightAlarm;}void setEnvLightAlarm(bool value){if(m_envLightAlarm!=value){m_envLightAlarm=value;emit envLightAlarmChanged();}}Q_SIGNAL void envLightAlarmChanged();
+    bool getChinDistAlarm(){return m_cheeckDistAlarm;}void setChinDistAlarm(bool value){if(m_cheeckDistAlarm!=value){m_cheeckDistAlarm=value;emit chinDistAlarmChanged();}}Q_SIGNAL void chinDistAlarmChanged();
 public:
     DevicePupilProcessor m_devicePupilProcessor;
     Status m_status={-1,-1};
@@ -210,6 +212,7 @@ private:
     int m_autoPupilElapsedTime=400;
 //    QTimer m_videoTimer;
     QElapsedTimer m_castLightAdjustElapsedTimer;
+    QElapsedTimer m_castLightStablelizeWaitingElapsedTimer;
     bool m_envLightAlarm=false;
     bool m_cheeckDistAlarm=false;
 

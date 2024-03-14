@@ -7,7 +7,7 @@
     "castLightDAChangeInteval": 500,
     "castLightDAChangeMinStep": 2,
     "castLightDAChangeRate": 0.1,
-    "castLightDADifferenceTolerance": 10,
+    "castLightDADifferenceTolerance": 0.01,
     "castLightTargetColor": 0,
     "castLightTargetSize": 5,
     "colorToSlot": [
@@ -52,7 +52,7 @@
     "pupilPixelDiameterMaxLimit": 0.18,
     "pupilPixelDiameterMinLimit": 0.03,
     "pupilReflectionDotLimit": 150,
-    "skipAdjustCastLight": true,
+    "skipAdjustCastLight": false,
     "spotSizeToSlot": [
         {
             "Slot": 0,

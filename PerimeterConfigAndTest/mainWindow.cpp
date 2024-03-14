@@ -1381,8 +1381,8 @@ void MainWindow::on_pushButton_stopRunDot_clicked()
 
 void MainWindow::on_pushButton_takePhoto_clicked()
 {
-    int inteval=ui->spinBox_takingPhotoInteval->text().toInt();
-    if(inteval==0)
+    int interval=ui->spinBox_takingPhotoInterval->text().toInt();
+    if(interval==0)
     {
         m_takePhoto=true;
     }
@@ -1393,14 +1393,14 @@ void MainWindow::on_pushButton_takePhoto_clicked()
         if(m_keepTakingPhoto)
         {
             m_takePhoto=true;
-            m_takingPhotoTimer->setInterval(inteval);
+            m_takingPhotoTimer->setInterval(interval);
             m_takingPhotoTimer->start();
-            ui->spinBox_takingPhotoInteval->setEnabled(false);
+            ui->spinBox_takingPhotoInterval->setEnabled(false);
         }
         else
         {
             m_takingPhotoTimer->stop();
-            ui->spinBox_takingPhotoInteval->setEnabled(true);
+            ui->spinBox_takingPhotoInterval->setEnabled(true);
         }
     }
 }
