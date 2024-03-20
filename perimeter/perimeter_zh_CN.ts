@@ -26,17 +26,23 @@
     </message>
     <message>
         <location filename="main/view/About.qml" line="101"/>
+        <source>Device Version</source>
+        <oldsource> Device Version</oldsource>
+        <translation>设备版本</translation>
+    </message>
+    <message>
+        <location filename="main/view/About.qml" line="108"/>
         <source>Version</source>
         <oldsource>Version: </oldsource>
         <translation>软件版本</translation>
     </message>
     <message>
-        <location filename="main/view/About.qml" line="112"/>
+        <location filename="main/view/About.qml" line="119"/>
         <source>Copyright @2019 Chongqing BioNewVision Medical Device Co.Lt.</source>
         <translation>版权所有 ©2019 重庆贝奥新视野医疗设备有限公司.</translation>
     </message>
     <message>
-        <location filename="main/view/About.qml" line="126"/>
+        <location filename="main/view/About.qml" line="133"/>
         <source>OK</source>
         <translation>确定</translation>
     </message>
@@ -293,82 +299,82 @@
         <translation>右眼</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="423"/>
+        <location filename="main/view/Check.qml" line="422"/>
         <source>Back</source>
         <translation>返回</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="443"/>
+        <location filename="main/view/Check.qml" line="442"/>
         <source>Select program</source>
         <translation>选择程序</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="459"/>
+        <location filename="main/view/Check.qml" line="458"/>
         <source>Params setting</source>
         <translation>参数设置</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="484"/>
+        <location filename="main/view/Check.qml" line="483"/>
         <source>Start</source>
         <translation>开始测试</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="484"/>
+        <location filename="main/view/Check.qml" line="483"/>
         <source>Resume</source>
         <translation>恢复检查</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="484"/>
+        <location filename="main/view/Check.qml" line="483"/>
         <source>Pause</source>
         <translation>暂停检查</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="526"/>
+        <location filename="main/view/Check.qml" line="525"/>
         <source>Stop</source>
         <translation>停止测试</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="540"/>
+        <location filename="main/view/Check.qml" line="539"/>
         <source>Switch eye</source>
         <translation>切换眼别</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="567"/>
+        <location filename="main/view/Check.qml" line="566"/>
         <source>Single</source>
         <translation>常规分析</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="567"/>
+        <location filename="main/view/Check.qml" line="566"/>
         <source>Three in one</source>
         <translation>三合一</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="567"/>
+        <location filename="main/view/Check.qml" line="566"/>
         <source>Overview</source>
         <translation>总览</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="567"/>
+        <location filename="main/view/Check.qml" line="566"/>
         <source>Threshold</source>
         <translation>阈值</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="567"/>
+        <location filename="main/view/Check.qml" line="566"/>
         <source>Screening</source>
         <translation>筛选</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="567"/>
+        <location filename="main/view/Check.qml" line="566"/>
         <source>Dynamic</source>
         <translation>动态</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="567"/>
+        <location filename="main/view/Check.qml" line="566"/>
         <source>Dyanmic data</source>
         <translation>动态数据</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="569"/>
+        <location filename="main/view/Check.qml" line="568"/>
         <source>Analysis</source>
         <translation>分析</translation>
     </message>
@@ -487,9 +493,8 @@
         <translation>设备正在重新连接.</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="93"/>
         <source>Device is adjusting light.</source>
-        <translation>设备正在校光.</translation>
+        <translation type="vanished">设备正在校光.</translation>
     </message>
     <message>
         <location filename="main/view/Content.qml" line="98"/>
@@ -1329,6 +1334,13 @@
         <translation>正常范围</translation>
     </message>
     <message>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="251"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="346"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="482"/>
+        <source>Abnormally high of sensitivity</source>
+        <translation>异常高敏感度</translation>
+    </message>
+    <message>
         <location filename="main/viewModel/progressAnalysislistVm.cpp" line="252"/>
         <location filename="main/viewModel/progressAnalysislistVm.cpp" line="347"/>
         <source>Check date</source>
@@ -2024,7 +2036,7 @@
 <context>
     <name>Perimeter::StaticCheck</name>
     <message>
-        <location filename="main/services/check_svc.cpp" line="831"/>
+        <location filename="main/services/check_svc.cpp" line="866"/>
         <source>Cant&apos;t locate blind dot.Turn off blindDot check.</source>
         <translation>不能定位盲点.关闭盲点检查.</translation>
     </message>
@@ -2057,114 +2069,114 @@
         <translation>自定义</translation>
     </message>
     <message>
-        <location filename="main/view/ProgramCustomize.qml" line="194"/>
+        <location filename="main/view/ProgramCustomize.qml" line="204"/>
         <source>Strategy</source>
         <translation>策略</translation>
     </message>
     <message>
-        <location filename="main/view/ProgramCustomize.qml" line="207"/>
-        <location filename="main/view/ProgramCustomize.qml" line="209"/>
+        <location filename="main/view/ProgramCustomize.qml" line="217"/>
+        <location filename="main/view/ProgramCustomize.qml" line="219"/>
         <source>Full threshold</source>
         <translation>全阈值</translation>
     </message>
     <message>
-        <location filename="main/view/ProgramCustomize.qml" line="207"/>
-        <location filename="main/view/ProgramCustomize.qml" line="209"/>
+        <location filename="main/view/ProgramCustomize.qml" line="217"/>
+        <location filename="main/view/ProgramCustomize.qml" line="219"/>
         <source>Fast threshold</source>
         <translation>快速阈值</translation>
     </message>
     <message>
-        <location filename="main/view/ProgramCustomize.qml" line="209"/>
+        <location filename="main/view/ProgramCustomize.qml" line="219"/>
         <source>Smart interactive</source>
         <translation>智能交互式</translation>
     </message>
     <message>
-        <location filename="main/view/ProgramCustomize.qml" line="209"/>
+        <location filename="main/view/ProgramCustomize.qml" line="219"/>
         <source>Fast interactive</source>
         <translation>快速智能交互式</translation>
     </message>
     <message>
-        <location filename="main/view/ProgramCustomize.qml" line="211"/>
+        <location filename="main/view/ProgramCustomize.qml" line="221"/>
         <source>One stage</source>
         <translation>二区法</translation>
     </message>
     <message>
-        <location filename="main/view/ProgramCustomize.qml" line="211"/>
+        <location filename="main/view/ProgramCustomize.qml" line="221"/>
         <source>Two stages</source>
         <translation>三区法</translation>
     </message>
     <message>
-        <location filename="main/view/ProgramCustomize.qml" line="211"/>
+        <location filename="main/view/ProgramCustomize.qml" line="221"/>
         <source>Quantify defects</source>
         <translation>量化缺损</translation>
     </message>
     <message>
-        <location filename="main/view/ProgramCustomize.qml" line="211"/>
+        <location filename="main/view/ProgramCustomize.qml" line="221"/>
         <source>Single stimulation</source>
         <translation>单刺激</translation>
     </message>
     <message>
-        <location filename="main/view/ProgramCustomize.qml" line="304"/>
+        <location filename="main/view/ProgramCustomize.qml" line="314"/>
         <source>New</source>
         <translation>新建</translation>
     </message>
     <message>
-        <location filename="main/view/ProgramCustomize.qml" line="365"/>
+        <location filename="main/view/ProgramCustomize.qml" line="375"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <location filename="main/view/ProgramCustomize.qml" line="369"/>
+        <location filename="main/view/ProgramCustomize.qml" line="379"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="main/view/ProgramCustomize.qml" line="370"/>
+        <location filename="main/view/ProgramCustomize.qml" line="380"/>
         <source>Clear</source>
         <translation>清除</translation>
     </message>
     <message>
-        <location filename="main/view/ProgramCustomize.qml" line="377"/>
+        <location filename="main/view/ProgramCustomize.qml" line="387"/>
         <source>Copy</source>
         <translation>复制</translation>
     </message>
     <message>
-        <location filename="main/view/ProgramCustomize.qml" line="421"/>
+        <location filename="main/view/ProgramCustomize.qml" line="431"/>
         <source>Back</source>
         <translation>返回</translation>
     </message>
     <message>
-        <location filename="main/view/ProgramCustomize.qml" line="427"/>
+        <location filename="main/view/ProgramCustomize.qml" line="437"/>
         <source>Params setting</source>
         <translation>参数设置</translation>
     </message>
     <message>
-        <location filename="main/view/ProgramCustomize.qml" line="428"/>
+        <location filename="main/view/ProgramCustomize.qml" line="438"/>
         <source>Circle dots</source>
         <translation>圆形选点</translation>
     </message>
     <message>
-        <location filename="main/view/ProgramCustomize.qml" line="429"/>
+        <location filename="main/view/ProgramCustomize.qml" line="439"/>
         <source>Rectangle dots</source>
         <translation>矩形选点</translation>
     </message>
     <message>
-        <location filename="main/view/ProgramCustomize.qml" line="436"/>
+        <location filename="main/view/ProgramCustomize.qml" line="446"/>
         <source>Unlock</source>
         <translation>解锁</translation>
     </message>
     <message>
-        <location filename="main/view/ProgramCustomize.qml" line="441"/>
+        <location filename="main/view/ProgramCustomize.qml" line="451"/>
         <source>Unlocked</source>
         <translation>已解锁</translation>
     </message>
     <message>
-        <location filename="main/view/ProgramCustomize.qml" line="448"/>
+        <location filename="main/view/ProgramCustomize.qml" line="458"/>
         <source>OK</source>
         <translation>确定</translation>
     </message>
     <message>
-        <location filename="main/view/ProgramCustomize.qml" line="450"/>
+        <location filename="main/view/ProgramCustomize.qml" line="460"/>
         <source>Input password</source>
         <translation>输入解锁密码</translation>
     </message>
@@ -2724,6 +2736,11 @@
         <translation>边界</translation>
     </message>
     <message>
+        <location filename="main/view/ProgressAnalysisSingle.qml" line="207"/>
+        <source>Abnormally high of sensitivity</source>
+        <translation>异常高敏感度</translation>
+    </message>
+    <message>
         <location filename="main/view/ProgressAnalysisSingle.qml" line="208"/>
         <source>GHT</source>
         <translation>青光眼半视野检查</translation>
@@ -3032,6 +3049,12 @@
         <location filename="third-part/qxpack/indcom/sys/qxpack_ic_usbstormon_win32.cxx" line="167"/>
         <source>USB DISK</source>
         <translation>U盘</translation>
+    </message>
+    <message>
+        <location filename="main/viewModel/programVm.cpp" line="84"/>
+        <location filename="main/viewModel/programVm.cpp" line="192"/>
+        <source>You haven&apos;t set any check dots.</source>
+        <translation>你没有设置任何检查点。</translation>
     </message>
 </context>
 <context>

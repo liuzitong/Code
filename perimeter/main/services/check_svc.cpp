@@ -296,6 +296,7 @@ signals:
     void readyToCheck(bool isReady);
     void measureDeviationChanged(bool value);
     void eyeMoveAlarmChanged(bool value);
+    void eyeMoveAlarmingChanged(bool value);
 };
 
 void Check::lightsOff()
@@ -513,7 +514,7 @@ void StaticCheck::finished()
     emit nextCheckingDotChanged({999,999});
     lightsOff();
     m_deviceOperation->resetMotors({UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
-    m_deviceOperation->beep();
+    m_deviceOperation->beep(3,200,200);
     UtilitySvc::wait(2000);
     lightsOn();
 }
@@ -1832,7 +1833,7 @@ void DynamicCheck::finished()
 {
 //    m_deviceOperation->m_isChecking=false;
     lightsOff();
-    m_deviceOperation->beep();
+    m_deviceOperation->beep(3,200,200);
     m_deviceOperation->resetMotors({UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
     UtilitySvc::wait(2000);
     lightsOn();
@@ -2057,18 +2058,26 @@ void CheckSvcWorker::onTimeOut()
 {
     emit checkTimeChanged(m_time);m_time++;
     if(*m_checkState>=2) return;
-    if(m_eyeMoveAlarm&&m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation>UtilitySvc::getSingleton()->m_deviationLimit)
+    if(m_deviceOperation->m_devicePupilProcessor.m_pupilDeviation>UtilitySvc::getSingleton()->m_deviationLimit)
     {
-        m_deviceOperation->beep();
-        if(m_alarmAndPause)
+        emit eyeMoveAlarmingChanged(true);
+        if(m_eyeMoveAlarm)
         {
-            m_deviationCount++;
-            if(m_deviationCount>UtilitySvc::getSingleton()->m_pauseCheckDeviationCount)
+            m_deviceOperation->beep(1,200,1000);
+            if(m_alarmAndPause)
             {
-                setCheckState(2);
-                m_deviationCount=0;
+                m_deviationCount++;
+                if(m_deviationCount>UtilitySvc::getSingleton()->m_pauseCheckDeviationCount)
+                {
+                    setCheckState(2);
+                    m_deviationCount=0;
+                }
             }
         }
+    }
+    else
+    {
+        emit eyeMoveAlarmingChanged(false);
     }
 }
 
@@ -2101,6 +2110,7 @@ CheckSvc::CheckSvc(QObject *parent)
     connect(this,&CheckSvc::measureDeviationChanged,m_worker,&CheckSvcWorker::workOnMeasureDeviationChanged);
     connect(this,&CheckSvc::measurePupilChanged,m_worker,&CheckSvcWorker::workOnMeasurePupilChanged);
     connect(this,&CheckSvc::eyeMoveAlarmChanged,m_worker,&CheckSvcWorker::workOnEyeMoveAlarmChanged);
+    connect(m_worker,&CheckSvcWorker::eyeMoveAlarmingChanged,this, &CheckSvc::setEyeMoveAlarming);
     connect(m_worker,&CheckSvcWorker::currentCheckingDotChanged,[&](QPointF value){m_currentCheckingDotLoc=value;emit currentCheckingDotLocChanged();});
     connect(m_worker,&CheckSvcWorker::nextCheckingDotChanged,[&](QPointF value){m_nextCheckingDotLoc=value;emit nextCheckingDotLocChanged();});
     connect(m_worker,&CheckSvcWorker::currentCheckingDBChanged,[&](int DB){m_currentCheckingDB=DB;emit currentCheckingDBChanged();});

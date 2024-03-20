@@ -15,9 +15,12 @@ class FrameProvidSvc : public QObject
     Q_PROPERTY(QAbstractVideoSurface *videoSurface READ videoSurface WRITE setVideoSurface)
 
 
+
 public:
     FrameProvidSvc();
     ~FrameProvidSvc();
+
+    Q_INVOKABLE void takePic();
 
     static QSharedPointer<FrameProvidSvc> getSingleton();
 
@@ -51,6 +54,7 @@ private:
     QVideoSurfaceFormat m_format;
     int m_width;
     int m_height;
+    bool m_takePic=false;
     static QSharedPointer<FrameProvidSvc> m_singleton;
 };
 }

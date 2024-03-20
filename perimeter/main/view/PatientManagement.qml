@@ -67,10 +67,10 @@ Item{
                         Row{
                             id:dateSelection; width: parent.width;opacity: 1;height: patientInfo.rowHight;spacing: height*0.4;
                             CusText{text: lt+qsTr("Check date");horizontalAlignment: Text.AlignLeft;width: height*2.5;font.pointSize: fontPointSize;}
-                            LineEdit{/*property string name: "dateFrom";*/id:dateFrom;readOnly:true;radius: height/6;width: height*3.1;}
+                            LineEdit{/*property string name: "dateFrom";*/id:dateFrom;readOnly:true;enabled: false;radius: height/6;width: height*3.1;}
                             CusButton{id:dateFromButton;text:lt+qsTr("Select");width:height*2;onClicked:{calendar.inputObj=dateFrom;calendar.open();}}
                             CusText{text:lt+qsTr("To");width: height*0.6;font.pointSize: fontPointSize;}
-                            LineEdit{/*property string name: "dateTo";*/id:dateTo;readOnly:true;radius: height/6;width: height*3.1;}
+                            LineEdit{/*property string name: "dateTo";*/id:dateTo;readOnly:true;enabled: false;radius: height/6;width: height*3.1;}
                             CusButton{id:dateToButton;text:lt+qsTr("Select");width:height*2;
                                 onClicked:{
                                     if(dateFrom.text!==""&&dateTo.text=="")
@@ -453,7 +453,7 @@ Item{
                                 CusText{text:"*"+lt+qsTr("Birth date")+" "; horizontalAlignment: Text.AlignRight ;width:parent.width*0.20;font.pointSize: fontPointSize;}
                                 Row{
                                     height:parent.height;spacing:(width-6*height)/2;width:newPatient.width*0.6
-                                    Item{height: parent.height;width: 2*height;LineEdit{id:newBirthDate;readOnly:true;width: height*3.1;onTextChanged:{newPatientage.text=CusUtils.getAge(newBirthDate.text);}}}
+                                    Item{height: parent.height;width: 2*height;LineEdit{id:newBirthDate;readOnly:true;enabled:false;width: height*3.1;onTextChanged:{newPatientage.text=CusUtils.getAge(newBirthDate.text);}}}
                                     CusButton{
                                         text:lt+qsTr("Select");width:height*2;onClicked:{calendar.inputObj=newBirthDate;calendar.open();}}
                                     LineEdit{

@@ -110,5 +110,6 @@
         <file>layers/layer_1.png</file>
         <file>layers/layer_2.png</file>
         <file>layers/layer_3.png</file>
+        <file>Pics/base-svg/btn_alarming.gif</file>
     </qresource>
 </RCC>

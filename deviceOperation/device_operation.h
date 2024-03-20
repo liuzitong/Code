@@ -128,8 +128,9 @@ public:
     void lightUpCastLight();
     void dimDownCastLight();
     void resetMotors(QVector<UsbDev::DevCtl::MotorId> motorIDs);
-    void beep();
-    void alarm();
+    void beep(int count,int duration,int interval);
+    void beepCheckOver();
+    // void alarm();
     void clearPupilData();
 
 
@@ -148,9 +149,9 @@ signals:
     void newFrameData(QByteArray ba);
     void newProfile();
     void newConfig();
-    void newDeviceID(QString version);
-    void newDeviceVersion(QString id);
-    void updateDevInfo(QString info);
+    void newDeviceID(QString id);
+    void newDeviceVersion(QString version);
+    // void updateDevInfo(QString info);
     void newTargetCastLightSensorDA(int DA);
 
 public:
@@ -161,7 +162,7 @@ public:
     float getPupilDiameter(){return m_devicePupilProcessor.m_pupilDiameter;}void setPupilDiameter(float value){m_devicePupilProcessor.m_pupilDiameter=value;emit pupilDiameterChanged();}Q_SIGNAL void pupilDiameterChanged();
     int getCastLightAdjustStatus(){return m_castLightAdjustStatus;}void setCastLightAdjustStatus(int value){m_castLightAdjustStatus=value;emit castLightAdjustStatusChanged();}Q_SIGNAL void castLightAdjustStatusChanged();
     bool getEnvLightAlarm(){return m_envLightAlarm;}void setEnvLightAlarm(bool value){if(m_envLightAlarm!=value){m_envLightAlarm=value;emit envLightAlarmChanged();}}Q_SIGNAL void envLightAlarmChanged();
-    bool getChinDistAlarm(){return m_cheeckDistAlarm;}void setChinDistAlarm(bool value){if(m_cheeckDistAlarm!=value){m_cheeckDistAlarm=value;emit chinDistAlarmChanged();}}Q_SIGNAL void chinDistAlarmChanged();
+    bool getChinDistAlarm(){return m_chinDistAlarm;}void setChinDistAlarm(bool value){if(m_chinDistAlarm!=value){m_chinDistAlarm=value;emit chinDistAlarmChanged();}}Q_SIGNAL void chinDistAlarmChanged();
 public:
     DevicePupilProcessor m_devicePupilProcessor;
     Status m_status={-1,-1};
@@ -214,7 +215,7 @@ private:
     QElapsedTimer m_castLightAdjustElapsedTimer;
     QElapsedTimer m_castLightStablelizeWaitingElapsedTimer;
     bool m_envLightAlarm=false;
-    bool m_cheeckDistAlarm=false;
+    bool m_chinDistAlarm=false;
 
 
     bool m_isMainTable;

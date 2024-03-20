@@ -4,6 +4,7 @@
 #include <deviceOperation/device_operation.h>
 #include <memory>
 #include <QPainter>
+#include <QDate>
 namespace Perimeter{
 
 QSharedPointer<FrameProvidSvc> FrameProvidSvc::m_singleton=nullptr;
@@ -16,6 +17,12 @@ FrameProvidSvc::FrameProvidSvc()
 FrameProvidSvc::~FrameProvidSvc()
 {
 
+}
+
+void FrameProvidSvc::takePic()
+{
+    std::cout<<"takePic"<<std::endl;
+    m_takePic=true;
 }
 
 QSharedPointer<FrameProvidSvc> FrameProvidSvc::getSingleton()
@@ -75,6 +82,12 @@ void FrameProvidSvc::onNewVideoContentReceived(QByteArray ba)
 {
     auto videoSize=DevOps::DeviceOperation::getSingleton()->m_videoSize;
     QImage img((uchar*)ba.data(),videoSize.width(),videoSize.height(),QImage::Format::Format_ARGB32);
+    if(m_takePic)
+    {
+        auto filePath=QString("./saveAIPics/")+QDateTime::currentDateTime().toString("yyyy_MM_dd_hh_MM_ss_zzz")+".bmp";
+        img.save(filePath);
+        m_takePic=false;
+    }
     img=img.scaled(m_width,m_height,Qt::AspectRatioMode::KeepAspectRatio);
     drawCrossHair(img);
     QVideoFrame frame(img);

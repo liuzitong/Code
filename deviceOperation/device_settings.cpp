@@ -46,11 +46,13 @@ DeviceSettings::DeviceSettings()
     m_pupilDeviationPixelToNumberConstant=m_rootObj.value("pupilDeviationPixelToNumberConstant").toDouble();
     m_castLightDAChangeRate=m_rootObj.value("castLightDAChangeRate").toDouble();
     m_castLightDAChangeInterval=m_rootObj.value("castLightDAChangeInterval").toInt();
+    std::cout<<"m_castLightDAChangeInterval:"<<m_castLightDAChangeInterval<<std::endl;
     m_castLightDAChangeMinStep=m_rootObj.value("castLightDAChangeMinStep").toInt();
     m_castLightTargetColor=m_rootObj.value("castLightTargetColor").toInt();
     m_castLightTargetSize=m_rootObj.value("castLightTargetSize").toInt();
     m_castLightDADifferenceTolerance=m_rootObj.value("castLightDADifferenceTolerance").toDouble();
     m_castLightStablizeWaitingTime=m_rootObj.value("castLightStablizeWaitingTime").toInt();
+    std::cout<<"m_castLightStablizeWaitingTime:"<<m_castLightStablizeWaitingTime<<std::endl;
     m_skipAdjustCastLight=m_rootObj.value("skipAdjustCastLight").toBool();
     m_waitingTime=m_rootObj.value("waitingTime").toInt();
     m_beepCount=m_rootObj.value("beepCount").toInt();

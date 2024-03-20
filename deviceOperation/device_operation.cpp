@@ -47,7 +47,7 @@ void DeviceOperation::connectDev()
 {
     if(m_devCtl==nullptr)
     {
-        updateDevInfo("connecting.");
+        // updateDevInfo("connecting.");
 #ifndef _DEBUG                               //release 情况下重连
         m_reconnectTimer.start();
 #endif
@@ -365,6 +365,7 @@ void DeviceOperation::adjustCastLight()
     waitForSomeTime(m_waitingTime);
     m_castLightAdjustStatus=2;
     m_castLightAdjustElapsedTimer.start();
+    m_castLightStablelizeWaitingElapsedTimer.start();
 }
 
 
@@ -604,7 +605,16 @@ void DeviceOperation::resetMotors(QVector<UsbDev::DevCtl::MotorId> motorIDs)
     }
 }
 
-void DeviceOperation::beep()
+void DeviceOperation::beep(int count,int duration,int interval)
+{
+    auto devSetting=DeviceSettings::getSingleton();
+    if(m_deviceStatus==2)
+    {
+        m_devCtl->beep(count,duration,interval);
+    }
+}
+
+void DeviceOperation::beepCheckOver()
 {
     auto devSetting=DeviceSettings::getSingleton();
     if(m_deviceStatus==2)
@@ -613,13 +623,13 @@ void DeviceOperation::beep()
     }
 }
 
-void DeviceOperation::alarm()
-{
-    if(m_deviceStatus==2)
-    {
-        m_devCtl->beep(5,100,100);
-    }
-}
+// void DeviceOperation::alarm()
+// {
+//     if(m_deviceStatus==2)
+//     {
+//         m_devCtl->beep(5,100,100);
+//     }
+// }
 
 void DeviceOperation::clearPupilData()
 {
@@ -731,31 +741,39 @@ void DeviceOperation::workOnNewStatuData()
             m_devCtl->setFrontVideo(false);
 
     }
+    // std::cout<<"castLightSensorDAForLightCorrectionRef:"<<m_config.castLightSensorDAForLightCorrectionRef()<<std::endl;
 
-    if(m_castLightAdjustStatus==2&&m_castLightAdjustElapsedTimer.elapsed()>=DeviceSettings::getSingleton()->m_castLightDAChangeInterval&&m_deviceStatus==2)
+    if(m_castLightAdjustStatus==2&&(m_castLightAdjustElapsedTimer.elapsed()>=DeviceSettings::getSingleton()->m_castLightDAChangeInterval)&&m_deviceStatus==2)
     {
-        updateDevInfo("keep adjust castLightDa");
-        double DADiffTolerance=DeviceSettings::getSingleton()->m_castLightDADifferenceTolerance;
+        // std::cout<<"adjusting..."<<std::endl;
+        // updateDevInfo("keep adjust castLightDa");
         int currentcastLightSensorDA=m_statusData.castLightSensorDA();
         int targetcastLightSensorDA=m_config.castLightSensorDAForLightCorrectionRef();
-        updateDevInfo("castlight Da:"+QString::number(m_currentCastLightDA));
-        updateDevInfo("current da:"+QString::number(currentcastLightSensorDA));
+        // updateDevInfo("castlight Da:"+QString::number(m_currentCastLightDA));
+        // updateDevInfo("current da:"+QString::number(currentcastLightSensorDA));
+        // std::cout<<"currentcastLightSensorDA:"<<currentcastLightSensorDA<<" targetcastLightSensorDA:"<<targetcastLightSensorDA<<std::endl;
+        double DADiffTolerance=DeviceSettings::getSingleton()->m_castLightDADifferenceTolerance*(targetcastLightSensorDA);
+
         int DADiff=qAbs(targetcastLightSensorDA-currentcastLightSensorDA);
+        // std::cout<<"DADiff:"<<DADiff<<" DADiffTolerance:"<<DADiffTolerance<<std::endl;
+        int minStep=DeviceSettings::getSingleton()->m_castLightDAChangeMinStep;
+        int maxStep=qRound(DADiff*DeviceSettings::getSingleton()->m_castLightDAChangeRate);
+        int step=qMax(minStep,maxStep);
+
+        if(targetcastLightSensorDA>currentcastLightSensorDA)
+        {
+            m_currentCastLightDA+=step;
+        }
+        else
+        {
+            m_currentCastLightDA-=step;
+        }
+        m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA);
+        m_castLightAdjustElapsedTimer.restart();
+
+        // std::cout<<"m_castLightStablelizeWaitingElapsedTimer:"<<m_castLightStablelizeWaitingElapsedTimer.elapsed()<<std::endl;
         if(DADiff>DADiffTolerance)
         {
-            int minStep=DeviceSettings::getSingleton()->m_castLightDAChangeMinStep;
-            int maxStep=qRound(DADiff*DeviceSettings::getSingleton()->m_castLightDAChangeRate);
-            int step=qMax(minStep,maxStep);
-            if(targetcastLightSensorDA>currentcastLightSensorDA)
-            {
-                m_currentCastLightDA+=step;
-            }
-            else
-            {
-                m_currentCastLightDA-=step;
-            }
-            m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA);
-            m_castLightAdjustElapsedTimer.restart();
             m_castLightStablelizeWaitingElapsedTimer.restart();
         }
         else if(m_castLightStablelizeWaitingElapsedTimer.elapsed()>DeviceSettings::getSingleton()->m_castLightStablizeWaitingTime)
@@ -853,8 +871,7 @@ void DeviceOperation::workOnNewFrameData()
 void DeviceOperation::workOnNewProfile()
 {
     m_profile=m_devCtl->profile();
-    emit newDeviceVersion(QString::number(m_profile.devVersion()));
-    emit newTargetCastLightSensorDA(m_config.castLightSensorDAForLightCorrectionRef());
+    emit newDeviceVersion(QString::number(m_profile.devVersion(),16));
     m_videoSize=m_profile.videoSize();
 }
 
@@ -894,6 +911,8 @@ void DeviceOperation::workOnNewConfig()
     }
     else
         adjustCastLight();
+    emit newTargetCastLightSensorDA(m_config.castLightSensorDAForLightCorrectionRef());
+    // std::cout<<"m_config targetDa:"<<m_config.castLightSensorDAForLightCorrectionRef()<<std::endl;;
 }
 
 void DeviceOperation::workOnWorkStatusChanged(int status)
@@ -905,8 +924,8 @@ void DeviceOperation::workOnWorkStatusChanged(int status)
     if(m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_OK)
     {
         qDebug()<<"Connect Successfully.";
-        updateDevInfo("Connect Successfully.");
-        connect(m_devCtl.data(),&UsbDev::DevCtl::updateInfo,this,&DeviceOperation::updateDevInfo);
+        // updateDevInfo("Connect Successfully.");
+        // connect(m_devCtl.data(),&UsbDev::DevCtl::updateInfo,this,&DeviceOperation::updateDevInfo);
         connect(m_devCtl.data(),&UsbDev::DevCtl::newStatusData,this,&DeviceOperation::workOnNewStatuData);
         connect(m_devCtl.data(),&UsbDev::DevCtl::newFrameData,this,&DeviceOperation::workOnNewFrameData);
         connect(m_devCtl.data(),&UsbDev::DevCtl::newProfile,this,&DeviceOperation::workOnNewProfile);
@@ -925,7 +944,7 @@ void DeviceOperation::workOnWorkStatusChanged(int status)
         if(m_devCtl!=nullptr)
         {
             disconnect(m_devCtl.data(),&UsbDev::DevCtl::workStatusChanged,this,&DeviceOperation::workOnWorkStatusChanged);
-            disconnect(m_devCtl.data(),&UsbDev::DevCtl::updateInfo,this,&DeviceOperation::updateDevInfo);
+            // disconnect(m_devCtl.data(),&UsbDev::DevCtl::updateInfo,this,&DeviceOperation::updateDevInfo);
             disconnect(m_devCtl.data(),&UsbDev::DevCtl::newStatusData,this,&DeviceOperation::workOnNewStatuData);
             disconnect(m_devCtl.data(),&UsbDev::DevCtl::newFrameData,this,&DeviceOperation::workOnNewFrameData);
             disconnect(m_devCtl.data(),&UsbDev::DevCtl::newProfile,this,&DeviceOperation::workOnNewProfile);
