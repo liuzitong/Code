@@ -132,6 +132,20 @@ static void gMsgHandler( QtMsgType type, const QMessageLogContext &ctxt, const Q
 
 }
 
+bool  checkMyselfExist()//如果程序已经有一个在运行，则返回true
+{
+    HANDLE  hMutex = CreateMutex(NULL, FALSE, L"perimeter");
+    if (hMutex && (GetLastError() == ERROR_ALREADY_EXISTS))
+    {
+        CloseHandle(hMutex);
+        hMutex = NULL;
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
 
 
 // ============================================================================
@@ -141,6 +155,7 @@ static void gMsgHandler( QtMsgType type, const QMessageLogContext &ctxt, const Q
 
 int  main ( int argc, char *argv[] )
 {
+    if(checkMyselfExist()) return 0;
     int ret = 0;
     //handle the terminate signal
     signal( SIGTERM, & gSigTerm_Handler );
@@ -152,7 +167,6 @@ int  main ( int argc, char *argv[] )
     p.execute("taskkill /im "+ TEXT_KbdExe+" /f");
     p.execute("taskkill /im "+ TEXT_PermExe+" /f");
     p.close();
-
 
     // start the application
     gPrintMemCntr("pre-stage");
