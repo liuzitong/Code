@@ -805,6 +805,7 @@ void DeviceOperation::workOnNewFrameData()
     getPupilResultByImage(image,&res);
     QImage img((uchar*)data.data(),m_videoSize.width(),m_videoSize.height(),QImage::Format_Grayscale8);
     img=img.convertToFormat(QImage::Format_ARGB32);
+    QByteArray ba1=QByteArray((char*)img.bits(),img.byteCount());
 
     QPainter painter(&img);
     painter.setPen(QPen{Qt::yellow,2});
@@ -819,7 +820,8 @@ void DeviceOperation::workOnNewFrameData()
             painter.drawEllipse({qRound(dot.x),qRound(dot.y)},3,3);
         }
     }
-
+    QByteArray ba2=QByteArray((char*)img.bits(),img.byteCount());
+    emit newFrameData(ba1,ba2,pupil.center.x>0);
 
     m_devicePupilProcessor.processData(&res);
     setChinDistAlarm(m_devicePupilProcessor.m_isTooFar);
@@ -862,9 +864,6 @@ void DeviceOperation::workOnNewFrameData()
             }
         }
     }
-
-    QByteArray ba=QByteArray((char*)img.bits(),img.byteCount());
-    emit newFrameData(ba);
     emit pupilDiameterChanged();
 }
 

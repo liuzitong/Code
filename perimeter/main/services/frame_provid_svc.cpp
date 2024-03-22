@@ -78,19 +78,26 @@ void FrameProvidSvc::setVideoSize(int width, int height)
 
 
 
-void FrameProvidSvc::onNewVideoContentReceived(QByteArray ba)
+void FrameProvidSvc::onNewVideoContentReceived(QByteArray ba1,QByteArray ba2,bool valid)
 {
     auto videoSize=DevOps::DeviceOperation::getSingleton()->m_videoSize;
-    QImage img((uchar*)ba.data(),videoSize.width(),videoSize.height(),QImage::Format::Format_ARGB32);
-    if(m_takePic)
+    QImage img((uchar*)ba1.data(),videoSize.width(),videoSize.height(),QImage::Format::Format_ARGB32);
+    QImage img2((uchar*)ba2.data(),videoSize.width(),videoSize.height(),QImage::Format::Format_ARGB32);
+    if(m_takePic&&valid)
     {
-        auto filePath=QString("./saveAIPics/")+QDateTime::currentDateTime().toString("yyyy_MM_dd_hh_MM_ss_zzz")+".bmp";
+        QString Time=QDateTime::currentDateTime().toString("yyyy_MM_dd_hh_MM_ss_zzz");
+        auto filePath=QString("./saveAIPics/")+Time+"_original.bmp";
         img.save(filePath);
+
+        auto filePath2=QString("./saveAIPics/")+Time+"_marked.bmp";
+        img2.save(filePath2);
+
         m_takePic=false;
     }
-    img=img.scaled(m_width,m_height,Qt::AspectRatioMode::KeepAspectRatio);
-    drawCrossHair(img);
-    QVideoFrame frame(img);
+
+    img2=img2.scaled(m_width,m_height,Qt::AspectRatioMode::KeepAspectRatio);
+    drawCrossHair(img2);
+    QVideoFrame frame(img2);
     setFormat(frame.width(),frame.height(),frame.pixelFormat());
     if (m_surface)
         m_surface->present(frame);

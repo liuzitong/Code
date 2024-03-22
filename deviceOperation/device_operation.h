@@ -146,7 +146,7 @@ public slots:
 signals:
     void workStatusChanged();
     void newStatusData();
-    void newFrameData(QByteArray ba);
+    void newFrameData(QByteArray ba_origin,QByteArray ba_marked,bool valid);
     void newProfile();
     void newConfig();
     void newDeviceID(QString id);
