@@ -4391,6 +4391,11 @@
                       <string>跑点测试</string>
                      </property>
                     </item>
+                    <item>
+                     <property name="text">
+                      <string>校光测试</string>
+                     </property>
+                    </item>
                    </widget>
                   </item>
                   <item>

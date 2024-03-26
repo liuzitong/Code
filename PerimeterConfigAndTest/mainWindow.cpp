@@ -820,6 +820,16 @@ void MainWindow::on_pushButton_testStart_clicked()
             }
             qDebug()<<"run dot over";
         }
+        case 4:
+        {
+            int lightCorrectionX=ui->lineEdit_lightCorrectionX->text().toInt();
+            int lightCorrectionY=ui->lineEdit_lightCorrectionY->text().toInt();
+            int lightCorrectionFocus=ui->lineEdit_lightCorrectionFocus->text().toInt();
+            int  motorPos[5]{lightCorrectionX,lightCorrectionY,lightCorrectionFocus,0,0};
+            quint8 speed[5]{sps[0],sps[1],sps[2],0,0};
+            m_devCtl->move5Motors(speed,motorPos,UsbDev::DevCtl::Abosolute);
+            m_devCtl->openShutter(65535,ui->lineEdit_shutterOpen->text().toInt());
+        }
     }
 }
 
@@ -1015,6 +1025,17 @@ void MainWindow::on_pushButton_shuterTest_clicked()
 void MainWindow::on_comboBox_testFucntion_currentIndexChanged(int index)
 {
     if(index==0) return;
+    else if(index==4)
+    {
+        int lightCorrectionX=ui->lineEdit_lightCorrectionX->text().toInt();
+        int lightCorrectionY=ui->lineEdit_lightCorrectionY->text().toInt();
+        int lightCorrectionFocus=ui->lineEdit_lightCorrectionFocus->text().toInt();
+        int duration=65535;
+        ui->spinBox_shutterOpenDuration->setValue(duration);
+        ui->spinBox_XMotorPos_2->setValue(lightCorrectionX);
+        ui->spinBox_YMotorPos_2->setValue(lightCorrectionY);
+        ui->spinBox_focalMotorPos_2->setValue(lightCorrectionFocus);
+    }
     else
     {
         ui->stackedWidget->setCurrentIndex(index-1);

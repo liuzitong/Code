@@ -9,6 +9,7 @@
 #include <QApplication>
 #include <QIcon>
 #include <QProcess>
+#include <QSurfaceFormat>
 
 #include "perimeter/main/appctrl/perimeter_appctrl.hxx"
 #include "perimeter/base/common/perimeter_memcntr.hxx"
@@ -171,6 +172,13 @@ int  main ( int argc, char *argv[] )
     // start the application
     gPrintMemCntr("pre-stage");
     {
+        QCoreApplication::setAttribute(Qt::AA_UseOpenGLES);
+        QSurfaceFormat fmt;
+        fmt.setDepthBufferSize(16); fmt.setAlphaBufferSize(8); fmt.setRedBufferSize(8); fmt.setGreenBufferSize(8); fmt.setBlueBufferSize(8);
+        fmt.setStencilBufferSize(16);
+        fmt.setVersion(3,0);
+        QSurfaceFormat::setDefaultFormat(fmt);
+
         QCoreApplication::setAttribute(Qt::AA_DisableShaderDiskCache);
         QApplication app(argc, argv);
         JRpcServerSvc jprc_svc; jprc_svc.start(GUNS_JRPC_SVC_NAME);

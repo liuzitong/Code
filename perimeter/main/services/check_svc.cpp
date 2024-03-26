@@ -514,7 +514,7 @@ void StaticCheck::finished()
     emit nextCheckingDotChanged({999,999});
     lightsOff();
     m_deviceOperation->resetMotors({UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
-    m_deviceOperation->beep(3,200,200);
+    m_deviceOperation->beepCheckOver();
     UtilitySvc::wait(2000);
     lightsOn();
 }
@@ -1833,7 +1833,7 @@ void DynamicCheck::finished()
 {
 //    m_deviceOperation->m_isChecking=false;
     lightsOff();
-    m_deviceOperation->beep(3,200,200);
+    m_deviceOperation->beepCheckOver();
     m_deviceOperation->resetMotors({UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
     UtilitySvc::wait(2000);
     lightsOn();
