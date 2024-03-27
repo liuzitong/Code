@@ -41,6 +41,7 @@ INCLUDEPATH += $$PWD/../../../perimeter/third-part/QxOrm/include
 INCLUDEPATH += $$PWD/../../../perimeter/third-part/LimeReport/include
 INCLUDEPATH += $$PWD/../../../perimeter/third-part/LimeReport/limereport/base
 INCLUDEPATH += $$PWD/../../../perimeter/third-part/
+INCLUDEPATH += $$PWD/../../../spdlog/include/
 INCLUDEPATH *= PWD/../../../
 
 LIBS += -L$$PWD/../../../perimeter/third-part/QxOrm/lib

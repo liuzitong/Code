@@ -33,7 +33,7 @@ DeviceOperation::DeviceOperation()
    std::string pupilModelPath = PROJECT_DIR + "/v8_64_1_848_pupil_model_4.xml";
    std::string spotModelPath = PROJECT_DIR + "/v8_64_1_21100_spot_model_4.xml";
    std::string type = "CPU";
-   initializePupilDetector(pupilModelPath.c_str(), spotModelPath.c_str(), type.c_str());
+   ai::initializePupilDetector(pupilModelPath.c_str(), spotModelPath.c_str(), type.c_str());
 }
 
 
@@ -800,8 +800,8 @@ void DeviceOperation::workOnNewFrameData()
     m_frameRawDataLock.unlock();
     auto data=m_frameData.rawData();
 
-    Result res;
-    Image image{m_videoSize.width(),m_videoSize.height(),data.data()};
+    ai::Result res;
+    ai::Image image{m_videoSize.width(),m_videoSize.height(),data.data()};
     getPupilResultByImage(image,&res);
     QImage img((uchar*)data.data(),m_videoSize.width(),m_videoSize.height(),QImage::Format_Grayscale8);
     img=img.convertToFormat(QImage::Format_ARGB32);

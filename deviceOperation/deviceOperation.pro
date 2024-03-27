@@ -7,6 +7,7 @@ QT += widgets
 
 
 INCLUDEPATH += $$PWD/../PupilDetect/Code/pupilDetect/pupilDetectLibrary/include
+INCLUDEPATH += $$PWD/../spdlog/include/
 LIBS += -L$$PWD/../PupilDetect/Code/pupilDetect/lib
 
 CONFIG(debug, debug|release) {

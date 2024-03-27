@@ -26,10 +26,6 @@
 #include "perimeter/third-part/perm/perm_mod.hxx"
 #include "../ipckbd/build/include/common/ipcclientevtmon.hxx"
 #include "../ipckbd/build/include/common/regcommonitem_api.hxx"
-
-
-
-#include <cstdio>
 #include <signal.h>
 #if !defined(WIN32)
 #include <unistd.h>
@@ -146,7 +142,6 @@ bool  checkMyselfExist()//如果程序已经有一个在运行，则返回true
         return false;
     }
 }
-
 
 
 // ============================================================================

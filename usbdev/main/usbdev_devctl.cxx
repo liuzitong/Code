@@ -20,6 +20,7 @@
 #include "qxpack/indcom/sys/qxpack_ic_rmtobjcreator_priv.hxx"
 #include "qxpack/indcom/common/qxpack_ic_queuetemp.hpp"
 #include "qxpack/indcom/sys/qxpack_ic_rmtobjsigblocker_priv.hxx"
+#include <spdlog/spdlog.h>
 //#include <spdlog/spdlog.h>
 //#include <spdlog/sinks/rotating_file_sink.h>
 #include <memory>

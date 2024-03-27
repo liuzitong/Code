@@ -16,7 +16,7 @@ DevicePupilProcessor::DevicePupilProcessor(){}
 
 void DevicePupilProcessor::processData(void* result)
 {
-    Result* res=static_cast<Result*>(result);
+    ai::Result* res=static_cast<ai::Result*>(result);
     m_pupilResValid=res->pupil.center.x>0;
     m_pupilDeviation=13;
     m_isTooFar=false;
@@ -56,9 +56,9 @@ void DevicePupilProcessor::processData(void* result)
 int DevicePupilProcessor::caculateFixationDeviation(void* result)
 {
 
-    Result* res=static_cast<Result*>(result);
-    QVector<Point> dots={res->reflectDots[0],res->reflectDots[1],res->reflectDots[2]};
-    std::sort(dots.begin(),dots.end(),[&](Point p1,Point p2){return p1.x<p2.x;});
+    ai::Result* res=static_cast<ai::Result*>(result);
+    QVector<ai::Point> dots={res->reflectDots[0],res->reflectDots[1],res->reflectDots[2]};
+    std::sort(dots.begin(),dots.end(),[&](ai::Point p1,ai::Point p2){return p1.x<p2.x;});
 
     auto middleDot=dots[1];
     double distX=res->pupil.center.x-middleDot.x;
@@ -70,9 +70,9 @@ int DevicePupilProcessor::caculateFixationDeviation(void* result)
 bool DevicePupilProcessor::caculateIsTooFar(void *result)
 {
 
-    Result* res=static_cast<Result*>(result);
-    QVector<Point> dots={res->reflectDots[0],res->reflectDots[1],res->reflectDots[2]};
-    std::sort(dots.begin(),dots.end(),[&](Point p1,Point p2){return p1.x<p2.x;});
+    ai::Result* res=static_cast<ai::Result*>(result);
+    QVector<ai::Point> dots={res->reflectDots[0],res->reflectDots[1],res->reflectDots[2]};
+    std::sort(dots.begin(),dots.end(),[&](ai::Point p1,ai::Point p2){return p1.x<p2.x;});
     int dist=dots[2].x-dots[0].x;
     return dist<DeviceSettings::getSingleton()->m_reflectDotDist;
 }

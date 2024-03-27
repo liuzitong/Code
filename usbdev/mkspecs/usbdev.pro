@@ -11,6 +11,7 @@ QT += core
 DEFINES *= QT_MESSAGELOGCONTEXT
 
 INCLUDEPATH +=$$PWD/../../include
+INCLUDEPATH += $$PWD/../../spdlog/include/
 
 CONFIG(debug,debug|release) {
     DEFINES *= USBDEV_CFG_DLL

@@ -15,6 +15,7 @@
 #include <QElapsedTimer>
 #include <QTimer>
 #include <QMutex>
+#include <spdlog/spdlog.h>
 #include "device_pupil_processor.h"
 
 
