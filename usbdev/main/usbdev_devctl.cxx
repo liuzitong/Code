@@ -21,14 +21,13 @@
 #include "qxpack/indcom/common/qxpack_ic_queuetemp.hpp"
 #include "qxpack/indcom/sys/qxpack_ic_rmtobjsigblocker_priv.hxx"
 #include <spdlog/spdlog.h>
-//#include <spdlog/spdlog.h>
-//#include <spdlog/sinks/rotating_file_sink.h>
+#include <spdlog/sinks/rotating_file_sink.h>
 #include <memory>
 #pragma execution_character_set("utf-8")
 
 namespace UsbDev {
 
-//static std::shared_ptr<spdlog::logger> logger=NULL;
+static std::shared_ptr<spdlog::logger> logger=nullptr;
 
 // ////////////////////////////////////////////////////////////////////////////
 // helper function
@@ -146,6 +145,15 @@ DevCtl_Worker :: DevCtl_Worker ( quint32 vid_pid, quint32 cfg_id, QObject *pa ) 
     m_status_trg_called.store(0);
     m_key_bmp = 0;
     m_wks = DevCtl::WorkStatus_S_Disconnected;
+
+    if(logger==nullptr)
+    {
+        logger=spdlog::rotating_logger_mt("logger", "logs/log.txt", 1024*1024*100, 30);
+        spdlog::flush_on(spdlog::level::info);
+    }
+
+    connect(this,&DevCtl_Worker::updateInfo,[=](QString info){logger->info("{0}",info.toStdString());});
+    connect(this,&DevCtl_Worker::updateIOInfo,[=](QString info){logger->info("{0}",info.toStdString());});
 }
 
 // ============================================================================
@@ -1004,9 +1012,6 @@ DevCtl :: DevCtl( quint32 vid_pid, quint32 cfg_id, bool )
         Q_RETURN_ARG( int, wks )
     );
     T_PrivPtr( m_obj )->workStatus() = static_cast<DevCtl::WorkStatus>( wks );
-
-
-    connect(this,&DevCtl::newConfig,[&](){qDebug()<<"OOOOOOOOOOOOOOO";});
 }
 
 // ============================================================================

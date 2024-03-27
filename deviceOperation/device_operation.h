@@ -17,7 +17,8 @@
 #include <QMutex>
 #include <spdlog/spdlog.h>
 #include "device_pupil_processor.h"
-
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/rotating_file_sink.h>
 
 namespace DevOps{
 using LampId=UsbDev::DevCtl::LampId;
@@ -61,7 +62,7 @@ struct StatusDataOut
     int xChinMotorCurrPos;
     int yChinMotorCurrPos;
     int envLightDA;
-    int castLightDA;
+    int castLightDA=0;
 };
 
 
@@ -227,6 +228,8 @@ private:
     QVector<QPair<QPointF,QPoint>> m_lastDynamicCoordAndXYMotorPos;
     static QSharedPointer<DeviceOperation> m_singleton;
     void moveToAdjustLight(int motorPosX, int motorPosY, int motorPosFocal);
+
+
 
 //    QTimer m_statusTimer;
 };

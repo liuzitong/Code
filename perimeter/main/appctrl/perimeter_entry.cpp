@@ -27,6 +27,8 @@
 #include "../ipckbd/build/include/common/ipcclientevtmon.hxx"
 #include "../ipckbd/build/include/common/regcommonitem_api.hxx"
 #include <signal.h>
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/rotating_file_sink.h>
 #if !defined(WIN32)
 #include <unistd.h>
 #endif
@@ -157,6 +159,8 @@ int  main ( int argc, char *argv[] )
     signal( SIGTERM, & gSigTerm_Handler );
     qInstallMessageHandler( & gMsgHandler );
 
+    spdlog::rotating_logger_mt("logger", "logs/log.txt", 1024*1024*100, 30);
+    spdlog::flush_on(spdlog::level::info);
 
     QProcess p;
     p.execute("taskkill /im jrpcplatsvr.exe /f");

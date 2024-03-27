@@ -434,6 +434,8 @@ void StaticCheck::resetData()
 //第一次先跑点,直接刺激,第二次跑点,等待上次刺激的应答,然后再刺激,再跑点,再等待上次的应答.(保证再等待应答的同时跑点.)
 void StaticCheck::Checkprocess()
 {
+    auto log=spdlog::get("logger");
+    log->info("checkProcess begin.");
 //    std::cout<<"getReadyToStimulate..........."<<std::endl;
     bool checkingDot=false;
     m_alreadyChecked=false;
@@ -504,6 +506,7 @@ void StaticCheck::Checkprocess()
             m_stimulationCount++;
         m_stimulated=true;
     }
+    log->info("checkProcess end.");
 
 }
 
@@ -1881,6 +1884,8 @@ void CheckSvcWorker::initialize()
 
 void CheckSvcWorker::prepareToCheck()
 {
+    auto log=spdlog::get("logger");
+    log->info("prepareToCheck.");
     int type=m_programVm->getType();
     if(type!=2)
     {
@@ -1947,6 +1952,7 @@ void CheckSvcWorker::prepareToCheck()
 
 void CheckSvcWorker::doWork()
 {
+    auto log=spdlog::get("logger");
     *m_checkState=0;
     m_time=0;
 //    QMetaObject::invokeMethod(m_devationCheckworker,"startChecking",Qt::QueuedConnection);

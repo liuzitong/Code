@@ -29,11 +29,13 @@ DeviceOperation::DeviceOperation()
     m_currentCastLightDA=DeviceSettings::getSingleton()->m_castLightDA;
     m_config=DeviceData::getSingleton()->m_config;
 
-   std::string PROJECT_DIR = ".";
-   std::string pupilModelPath = PROJECT_DIR + "/v8_64_1_848_pupil_model_4.xml";
-   std::string spotModelPath = PROJECT_DIR + "/v8_64_1_21100_spot_model_4.xml";
-   std::string type = "CPU";
-   ai::initializePupilDetector(pupilModelPath.c_str(), spotModelPath.c_str(), type.c_str());
+    std::string PROJECT_DIR = ".";
+    std::string pupilModelPath = PROJECT_DIR + "/v8_64_1_848_pupil_model_4.xml";
+    std::string spotModelPath = PROJECT_DIR + "/v8_64_1_21100_spot_model_4.xml";
+    std::string type = "CPU";
+    ai::initializePupilDetector(pupilModelPath.c_str(), spotModelPath.c_str(), type.c_str());
+    spdlog::rotating_logger_mt("logger", "logs/log.txt", 1024*1024*100, 30);
+    spdlog::flush_on(spdlog::level::info);
 }
 
 
@@ -45,6 +47,8 @@ DeviceOperation::~DeviceOperation()
 //被checkSvcWorker 调用
 void DeviceOperation::connectDev()
 {
+    auto log=spdlog::get("logger");
+    log->info("conect device.");
     if(m_devCtl==nullptr)
     {
         // updateDevInfo("connecting.");
@@ -60,6 +64,8 @@ void DeviceOperation::connectDev()
 
 void DeviceOperation::disconnectDev()
 {
+    auto log=spdlog::get("logger");
+    log->info("disconnect device.");
     m_devCtl.reset(nullptr);
     m_status={-1,-1};
     setDeviceStatus(0);
@@ -67,6 +73,8 @@ void DeviceOperation::disconnectDev()
 
 void DeviceOperation::reconnectDev()
 {
+    auto log=spdlog::get("logger");
+    log->info("reconnect to device.");
     m_eyeglassIntialize=false;
     m_devCtl.reset(nullptr);
     m_status={-1,-1};
@@ -93,6 +101,8 @@ void DeviceOperation::setCursorColorAndCursorSize(int color, int spot)
 #ifdef _DEBUG
     std::cout<<"setCursorColorAndCursorSize"<<std::endl;
 #endif
+    auto log=spdlog::get("logger");
+    log->info("set cursor color and cursor size begins.");
     resetMotors({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
     waitForSomeTime(m_waitingTime);
     waitMotorStop({{UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot}});
@@ -132,16 +142,12 @@ void DeviceOperation::setCursorColorAndCursorSize(int color, int spot)
         int motorPos[5]{0,0,focalPos,0,0};
         waitForSomeTime(m_waitingTime);
         waitMotorStop({UsbDev::DevCtl::MotorId_Focus});
-         //移动焦距电机电机到联动位置,一边转动颜色和光斑
+        log->info("移动焦距电机到目标位置.");
         m_devCtl->move5Motors(std::array<quint8, 5>{0,0,sps[2],0,0}.data(),motorPos);
-//        m_devCtl->move5Motors(std::array<quint8, 5>{0,0,0,1,1}.data(),motorPos,UsbDev::DevCtl::MoveMethod::Relative);                 //取消转动颜色和光斑
-        //焦距电机停止就停止,颜色和光斑
         waitForSomeTime(m_waitingTime);
-//        waitMotorStop({UsbDev::DevCtl::MotorId_Focus});
-//        m_devCtl->move5Motors(std::array<quint8, 5>{1,1,1,1,1}.data(),std::array<int, 5>{0,0,0,0,0}.data(),UsbDev::DevCtl::MoveMethod::Relative);
     }
     {
-        //移动光斑和颜色电机到目标位置
+        log->info("移动光斑和颜色电机到目标位置.");
         int motorPos[5]{0,0,0,colorPos,sizePos}; //单个电机绝对位置不可行
         quint8 speed[5]{0,0,0,sps[3],sps[4]};
         waitForSomeTime(m_waitingTime);
@@ -150,7 +156,7 @@ void DeviceOperation::setCursorColorAndCursorSize(int color, int spot)
     }
 
     {
-         //转一圈拖动光斑和颜色
+        log->info("转一圈拖动光斑和颜色.");
         int  motorPos[5]{0,0,0,color_Circl_Motor_Steps,spot_Circl_Motor_Steps};
         quint8 speed[5]{0,0,0,sps[3],sps[4]};
         waitForSomeTime(m_waitingTime);
@@ -158,7 +164,7 @@ void DeviceOperation::setCursorColorAndCursorSize(int color, int spot)
         m_devCtl->move5Motors(speed,motorPos,UsbDev::DevCtl::Relative);
     }
     {
-        //脱离防止干扰误差
+        log->info("反向相对转动1000，脱离防止干扰误差.");
         int motorPos[5]={0,0,0,-1000,-1000};
         quint8 speed[5]{0,0,0,sps[3],sps[4]};
         waitForSomeTime(m_waitingTime);
@@ -166,7 +172,7 @@ void DeviceOperation::setCursorColorAndCursorSize(int color, int spot)
         m_devCtl->move5Motors(speed,motorPos,UsbDev::DevCtl::Relative);
     }
     {
-         //焦距电机脱离颜色和光斑
+        log->info("焦距电机相对移动10000脱离颜色和光斑.");
         int motorPos[5]={0, 0, 10000, 0 ,0};
         quint8 speed[5]{0,0,sps[2],0,0};
         waitForSomeTime(m_waitingTime);
@@ -177,6 +183,7 @@ void DeviceOperation::setCursorColorAndCursorSize(int color, int spot)
     waitMotorStop({UsbDev::DevCtl::MotorId_Focus});
     m_status.color=color;
     m_status.spot=spot;
+    log->info("set cursor color and cursor size is over.");
 }
 
 void DeviceOperation::setLamp(LampId id, int index, bool onOff)
@@ -261,6 +268,8 @@ bool DeviceOperation::getMotorsBusy(QVector<UsbDev::DevCtl::MotorId> motorIDs)
 
 void DeviceOperation::setDB(int DB)
 {
+    auto log=spdlog::get("logger");
+    log->info("set DB {0}.",DB);
     if(m_deviceStatus!=2) return;
     UsbDev::Config config;
     config=m_config;
@@ -280,6 +289,8 @@ void DeviceOperation::moveToAdjustLight(int motorPosX,int motorPosY,int motorPos
 #ifdef _DEBUG
     std::cout<<"move to adjustlight"<<std::endl;
 #endif
+    auto log=spdlog::get("logger");
+    log->info("move to adjust light positions.");
     int DB=m_config.DBForLightCorrectionRef();
     int motorPos[5];
     motorPos[0]=motorPosX;
@@ -344,6 +355,8 @@ void DeviceOperation::adjustCastLight()
 #ifdef _DEBUG
     std::cout<<"adjustCastLightStart"<<std::endl;
 #endif
+    auto log=spdlog::get("logger");
+    log->info("Adjust cast light begins.");
     int color=DeviceSettings::getSingleton()->m_castLightTargetColor;
     int size=DeviceSettings::getSingleton()->m_castLightTargetSize;
     setCursorColorAndCursorSize(color,size);
@@ -366,11 +379,14 @@ void DeviceOperation::adjustCastLight()
     m_castLightAdjustStatus=2;
     m_castLightAdjustElapsedTimer.start();
     m_castLightStablelizeWaitingElapsedTimer.start();
+    log->info("Adjust cast light is adjusting.");
 }
 
 
 void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSize,int speedLevel,bool isMainDotInfoTable)
 {
+    auto log=spdlog::get("logger");
+    log->info("dynamic stimulate.");
     m_isMainTable=isMainDotInfoTable;
     auto spotSizeToSlot=DeviceSettings::getSingleton()->m_spotSizeToSlot;
     int spotSlot;
@@ -421,9 +437,8 @@ void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSiz
     int* dotArr=new int[stepCount*3];
     QPointF coordSpacePosInfoTemp=begin;
     CoordMotorPosFocalDistInfo coordMotorPosFocalDistInfoTemp;
-    qDebug()<<"start:"<<begin;
-    qDebug()<<"end:"<<end;
-    qDebug()<<QString("分割为%1个点,X步长为%2,Y步长为%3.").arg(QString::number(stepCount)).arg(QString::number(stepLengthX)).arg(QString::number(stepLengthY));
+    log->info("start:{0},{1},end:{2},{3}.",begin.x(),begin.y(),end.x(),end.y());
+    log->info("分割为{0}个点,X步长为{1},Y步长为{2}.",stepCount,stepLengthX,stepLengthY);
     m_lastDynamicCoordAndXYMotorPos.resize(stepCount);
 
     for(int i=0;i<stepCount;i++)
@@ -438,7 +453,7 @@ void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSiz
 
     }
 
-    qDebug()<<("发送移动数据");
+    log->info("发送移动数据");
     constexpr int maxPackageLen=512;
     constexpr int stepPerFrame=(maxPackageLen-8)/(4*3);
     int totalframe=ceil((float)stepCount/stepPerFrame);
@@ -454,7 +469,7 @@ void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSiz
     if(m_deviceStatus==2)
         m_devCtl->sendDynamicData(totalframe,totalframe-1,dataLen,&dotArr[stepPerFrame*3*(totalframe-1)]);     //最后一帧
     waitForSomeTime(1000);
-    qDebug()<<("开始移动");
+    log->info("开始移动");
     if(m_deviceStatus==2)
     {
         waitForSomeTime(m_waitingTime);
@@ -503,6 +518,8 @@ void DeviceOperation::move5Motors(bool isMotorMove[], int MotorPoses[])
 
 void DeviceOperation::waitMotorStop(QVector<UsbDev::DevCtl::MotorId> motorIDs)
 {
+    auto log=spdlog::get("logger");
+    log->info("Wait for motor stop.");
     if(m_deviceStatus!=2) return;
     QElapsedTimer mstimer;
     mstimer.restart();//必须先等一会儿刷新状态
@@ -511,16 +528,20 @@ void DeviceOperation::waitMotorStop(QVector<UsbDev::DevCtl::MotorId> motorIDs)
         if(m_deviceStatus!=2) return;
         QApplication::processEvents();
     }while(getMotorsBusy(motorIDs)/*||(mstimer.elapsed()<100)*/);
+    log->info("Wait for motor stop is over");
 }
 
 void DeviceOperation::waitForSomeTime(int time)
 {
+    auto log=spdlog::get("logger");
+    log->info("Wait for some time {0}ms.",time);
     QElapsedTimer mstimer;
     mstimer.restart();
     do
     {
         QApplication::processEvents();
     }while(mstimer.elapsed()<time);
+    log->info("Wait for some time is over");
 }
 
 void DeviceOperation::moveChin(ChinMoveDirection direction)
@@ -574,6 +595,8 @@ void DeviceOperation::lightUpCastLight()
 {
     if(m_deviceStatus==2&&!m_castLightUp)
     {
+        auto log=spdlog::get("logger");
+        log->info("light up castLight.");
         m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA);
 #ifdef _DEBUG
         std::cout<<"cast light Up:"<<m_currentCastLightDA<<std::endl;
@@ -586,6 +609,8 @@ void DeviceOperation::dimDownCastLight()
 {
     if(m_deviceStatus==2&&m_castLightUp)
     {
+        auto log=spdlog::get("logger");
+        log->info("dim down castLight.");
         m_devCtl->setLamp(LampId::LampId_castLight,0,qFloor(m_currentCastLightDA*0.3));
 #ifdef _DEBUG
         std::cout<<"cast light Down"<<qFloor(m_currentCastLightDA*0.3)<<std::endl;
@@ -676,8 +701,10 @@ void DeviceOperation::workOnNewStatuData()
     m_statusDataOut.castLightDA=m_statusData.castLightSensorDA();
 
     auto eyeglassStatus=m_statusData.eyeglassStatus();
+    auto log=spdlog::get("logger");
     if(m_isAtCheckingPage)
     {
+        log->info("开红外.");
         if(!m_eyeglassIntialize)   //开红外
         {
             setLamp(LampId::LampId_centerInfrared,0,true);
@@ -716,6 +743,7 @@ void DeviceOperation::workOnNewStatuData()
     }
     else if(m_eyeglassIntialize)        //关红外
     {
+        log->info("关红外.");
         setLamp(LampId::LampId_centerInfrared,0,false);
         setLamp(LampId::LampId_eyeglassInfrared,0,false);
         setLamp(LampId::LampId_borderInfrared,0,false);
@@ -745,6 +773,7 @@ void DeviceOperation::workOnNewStatuData()
 
     if(m_castLightAdjustStatus==2&&(m_castLightAdjustElapsedTimer.elapsed()>=DeviceSettings::getSingleton()->m_castLightDAChangeInterval)&&m_deviceStatus==2)
     {
+        log->info("根据反馈的光位置校对光强.");
         // std::cout<<"adjusting..."<<std::endl;
         // updateDevInfo("keep adjust castLightDa");
         int currentcastLightSensorDA=m_statusData.castLightSensorDA();
@@ -778,6 +807,7 @@ void DeviceOperation::workOnNewStatuData()
         }
         else if(m_castLightStablelizeWaitingElapsedTimer.elapsed()>DeviceSettings::getSingleton()->m_castLightStablizeWaitingTime)
         {
+            log->info("完成校光.");
             setCastLightAdjustStatus(3);
             openShutter(0);
             waitForSomeTime(m_waitingTime);
@@ -876,28 +906,34 @@ void DeviceOperation::workOnNewProfile()
 
 void DeviceOperation::workOnNewConfig()
 {
+    auto log=spdlog::get("logger");
+    log->info("接受到新的Config.");
     UsbDev::Config config=m_devCtl->config();
     quint32 crc=DeviceDataProcesser::calcCrc((quint8*)config.dataPtr()+4, config.dataLen()-4);
     if(DeviceData::getSingleton()->m_config.isEmpty())
     {
+        log->info("本地没有Config,保存config.");
         QString filePath = R"(./deviceData/config.cfg)";
         QFile file(filePath);
         if(file.open(QIODevice::WriteOnly))
         {
             file.write((char*)config.dataPtr(),config.dataLen());
         }
+        log->info("使用下位机config");
         m_config=config;
     }
     else
     {
+        log->info("本地有Config,下位机config计算得到crc:{0}, 记录crc:{1}.",crc,config.crcVeryficationRef());
         if(crc==config.crcVeryficationRef())
         {
+            log->info("使用下位机config");
             m_config=config;
         }
     }
 
-    m_devicePupilProcessor.m_pupilGreyLimit=m_config.pupilGreyThresholdDAPtr()[0];
-    m_devicePupilProcessor.m_pupilReflectionDotWhiteLimit=m_config.pupilGreyThresholdDAPtr()[1];
+    // m_devicePupilProcessor.m_pupilGreyLimit=m_config.pupilGreyThresholdDAPtr()[0];
+    // m_devicePupilProcessor.m_pupilReflectionDotWhiteLimit=m_config.pupilGreyThresholdDAPtr()[1];
     emit newDeviceID(QString(m_config.deviceIDRef()));
     auto date=QDate::currentDate();
     auto lastAdjustedDate=QDate::fromString(DeviceSettings::getSingleton()->m_castLightLastAdjustedDate,"yyyy/MM/dd");
@@ -916,12 +952,16 @@ void DeviceOperation::workOnNewConfig()
 
 void DeviceOperation::workOnWorkStatusChanged(int status)
 {
+    auto log=spdlog::get("logger");
+    log->info("work status changed.");
     if(m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_ConnectToDev)
     {
+        log->info("in connecting.");
         qDebug()<<"in connecting.";
     }
     if(m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_OK)
     {
+        log->info("Connect Successfully.");
         qDebug()<<"Connect Successfully.";
         // updateDevInfo("Connect Successfully.");
         // connect(m_devCtl.data(),&UsbDev::DevCtl::updateInfo,this,&DeviceOperation::updateDevInfo);
@@ -939,6 +979,7 @@ void DeviceOperation::workOnWorkStatusChanged(int status)
     }
     else if(/*m_reconnectTimer.elapsed()>=10000&&*/(m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_Disconnected||m_devCtl->workStatus()==UsbDev::DevCtl::WorkStatus::WorkStatus_S_Disconnected))
     {
+        log->info("Disconnected.");
         qDebug()<<"Disconnected";
         if(m_devCtl!=nullptr)
         {

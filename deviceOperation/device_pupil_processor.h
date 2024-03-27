@@ -21,8 +21,8 @@ public:
     double m_pupilDiameterPix;
     QVector<float> m_pupilDiameterArr;
     bool m_pupilResValid,m_reflectionResValid;
-    int m_pupilGreyLimit;
-    int m_pupilReflectionDotWhiteLimit;
+    // int m_pupilGreyLimit;
+    // int m_pupilReflectionDotWhiteLimit;
     bool m_isTooFar=false;
     //    bool m_pupilDataGet;
 };
