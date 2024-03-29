@@ -127,6 +127,7 @@ public:
     bool getMotorsBusy(QVector<UsbDev::DevCtl::MotorId> motorIDs);
     void waitForSomeTime(int time);
     void waitMotorStop(QVector<UsbDev::DevCtl::MotorId> motorIDs);
+    void waitShutterClose();
     void lightUpCastLight();
     void dimDownCastLight();
     void resetMotors(QVector<UsbDev::DevCtl::MotorId> motorIDs);

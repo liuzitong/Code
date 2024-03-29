@@ -771,6 +771,7 @@ void StaticCheck::stimulate(bool checkResultIgnore)
     }
     m_deviceOperation->m_isWaitingForStaticStimulationAnswer=true;
     m_stimulationWaitingForAnswerElapsedTimer.restart();
+    m_deviceOperation->waitShutterClose();
 }
 
 void StaticCheck::getReadyToStimulate(QPointF loc, int DB)

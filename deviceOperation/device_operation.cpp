@@ -339,11 +339,7 @@ void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB,bool
     motorPos[4]=config.DbPosMappingPtr()[DB][1];
     bool isMotorMove[5]{true,true,true,true,true};
     waitForSomeTime(m_waitingTime);
-    while(qAbs(m_statusData.motorPosition(UsbDev::DevCtl::MotorId_Shutter)-m_config.shutterOpenPosRef())<70)
-    {
-        if(m_deviceStatus!=2) return;
-        QApplication::processEvents();
-    }
+    waitShutterClose();
     move5Motors(isMotorMove,motorPos);
     waitForSomeTime(m_waitingTime);
 }
@@ -529,6 +525,15 @@ void DeviceOperation::waitMotorStop(QVector<UsbDev::DevCtl::MotorId> motorIDs)
         QApplication::processEvents();
     }while(getMotorsBusy(motorIDs)/*||(mstimer.elapsed()<100)*/);
     log->info("Wait for motor stop is over");
+}
+
+void DeviceOperation::waitShutterClose()
+{
+    while(qAbs(m_statusData.motorPosition(UsbDev::DevCtl::MotorId_Shutter)-m_config.shutterOpenPosRef())<70)
+    {
+        if(m_deviceStatus!=2) return;
+        QApplication::processEvents();
+    }
 }
 
 void DeviceOperation::waitForSomeTime(int time)
