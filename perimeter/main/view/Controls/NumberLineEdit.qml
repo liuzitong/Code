@@ -27,6 +27,7 @@ Item{
         id:textInput;
         anchors.fill: parent;
         text:value;
+        objectName: "UserInputItem.TextField";
         horizontalAlignment: Text.AlignLeft
         renderType: Text.NativeRendering
         verticalAlignment: Text.AlignVCenter
@@ -35,7 +36,7 @@ Item{
         selectByMouse: true;
         selectionColor: "yellow"
         background: Rectangle {id:recbackground;border.width: 1;radius: root.radius;color:readOnly? "#e4e6e8":"white" ;border.color: "#bdc0c6"}
-        Keys.onPressed: { switch (event.key){/*EnterKey*/ case 16777220:console.log("qqq");root.enterPressed();inputFinished();break;}}
+        Keys.onPressed: { switch (event.key){case 16777220:root.enterPressed();inputFinished();break;}}
         validator: RegExpValidator { regExp: /[0-9]+/ }
         onFocusChanged: if(!focus) inputFinished();
         onTextChanged: value=text;

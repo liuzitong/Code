@@ -59,6 +59,7 @@ DeviceSettings::DeviceSettings()
     m_beepDuration=m_rootObj.value("beepDuration").toInt();
     m_beepInterval=m_rootObj.value("beepInterval").toInt();
     m_reflectDotDist=m_rootObj.value("reflectDotDist").toInt();
+    m_reconnectTime=m_rootObj.value("reconnectTime").toInt();
 
     auto motorSpeed=m_rootObj.value("motorSpeed").toArray();
     for(int i=0;i<motorSpeed.count();i++)

@@ -43,6 +43,7 @@ public:
     int m_reflectDotDist;
     int m_reconTimes;
     bool m_settingsRead=false;
+    int m_reconnectTime;
     static QSharedPointer<DeviceSettings> getSingleton();
     static QSharedPointer<DeviceSettings> m_singleton;
 

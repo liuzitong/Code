@@ -515,6 +515,8 @@ void StaticCheck::finished()
 //    m_deviceOperation->m_isChecking=false;
     emit currentCheckingDotChanged({999,999});
     emit nextCheckingDotChanged({999,999});
+    UtilitySvc::wait(50);
+    m_deviceOperation->waitShutterClose();
     lightsOff();
     m_deviceOperation->resetMotors({UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
     m_deviceOperation->beepCheckOver();
@@ -771,7 +773,6 @@ void StaticCheck::stimulate(bool checkResultIgnore)
     }
     m_deviceOperation->m_isWaitingForStaticStimulationAnswer=true;
     m_stimulationWaitingForAnswerElapsedTimer.restart();
-    m_deviceOperation->waitShutterClose();
 }
 
 void StaticCheck::getReadyToStimulate(QPointF loc, int DB)

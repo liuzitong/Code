@@ -24,7 +24,7 @@ DeviceOperation::DeviceOperation()
 {
     connect(&m_reconnectTimer,&QTimer::timeout,this,&DeviceOperation::reconnectDev);
     m_autoPupilElapsedTimer.start();
-    m_reconnectTimer.setInterval(10000);                            //复位的时候会短暂收不到数据更新，时间不能太短
+    m_reconnectTimer.setInterval(DeviceSettings::getSingleton()->m_reconnectTime);                            //复位的时候会短暂收不到数据更新，时间不能太短
     m_waitingTime=DeviceSettings::getSingleton()->m_waitingTime;
     m_currentCastLightDA=DeviceSettings::getSingleton()->m_castLightDA;
     m_config=DeviceData::getSingleton()->m_config;
@@ -529,9 +529,9 @@ void DeviceOperation::waitMotorStop(QVector<UsbDev::DevCtl::MotorId> motorIDs)
 
 void DeviceOperation::waitShutterClose()
 {
+    if(m_deviceStatus!=2) return;
     while(qAbs(m_statusData.motorPosition(UsbDev::DevCtl::MotorId_Shutter)-m_config.shutterOpenPosRef())<70)
     {
-        if(m_deviceStatus!=2) return;
         QApplication::processEvents();
     }
 }
