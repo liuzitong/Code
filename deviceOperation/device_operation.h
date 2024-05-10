@@ -110,7 +110,6 @@ public:
 
     void connectDev();
     void disconnectDev();
-//    void connectOrdisConnectDev();
     void getReadyToStimulate(QPointF loc,int spotSize,int DB,bool isMainDotInfoTable);
     void adjustCastLight();
     void dynamicStimulate(QPointF begin, QPointF end, int cursorSize,int speedLevel,bool isMainDotInfoTable);
@@ -201,7 +200,7 @@ public:
 //    bool m_isStaticCheckPausing;
     bool m_isWaitingForStaticStimulationAnswer;
     bool m_staticStimulationAnswer;
-    int m_castLightAdjustStatus=0;    //0:未标准,1:调整光斑和位置,2:矫正的光强,3:校准完成
+    int m_castLightAdjustStatus=0;    //0:未标准,1:调整偏移位置,2:矫正的光强,3:校准完成
     int m_currentCastLightDA;
     bool m_castLightUp=false;
     QByteArray m_frameRawData;
@@ -213,10 +212,26 @@ public:
 private:
     QElapsedTimer m_autoPupilElapsedTimer;
     QElapsedTimer m_reconnectingElapsedTimer;
+
     int m_autoPupilElapsedTime=400;
 //    QTimer m_videoTimer;
     QElapsedTimer m_castLightAdjustElapsedTimer;
     QElapsedTimer m_castLightStablelizeWaitingElapsedTimer;
+
+    /**
+     * 调整方法，X方向直线扫描，扫描角度范围X:-6~6,Y:30~42,扫描间隔为step度
+     * 先确定水平方向上得到两端角度，求出中间的X角度。然后以角度X，Y方向扫描。
+     * 得到两端的电机坐标，平均值就是新的矫正位置坐标。
+     **/
+
+    int m_deviationCalibrationStatus=0;   //0:不需要或者调整完成 1：调整X中 2：调整Y中
+    int m_deviationCalibrationForward=true;
+    QElapsedTimer m_deviationCalibrationTimer;
+    int m_deviationCalibrationLineIndex=0;
+    int m_deviationCalibrationLevel=0;
+    double m_deviationYCoord=30;
+    QVector<double> m_deviationCalibrationXCoord;  //[0]:一端边界，[1]：另一端边界
+    QVector<double> m_deviationCalibrationYCoord;  //[0]:一端边界，[1]：另一端边界
     bool m_envLightAlarm=false;
     bool m_chinDistAlarm=false;
 

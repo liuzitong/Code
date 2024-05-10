@@ -5,10 +5,6 @@
 #include <device_settings.h>
 
 namespace DevOps{
-
-//QSharedPointer<DeviceDataProcesser> DeviceDataProcesser::m_singleton=nullptr;
-//bool DeviceDataProcesser::isMainDotInfoTable=true;
-
 int DeviceDataProcesser::interpolation(int value[], QPointF loc)
 {
     double secondVal[2];
@@ -35,15 +31,7 @@ int DeviceDataProcesser::getFocusMotorPosByDist(int focalDist, int spotSlot,int 
 CoordMotorPosFocalDistInfo DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoord(const QPointF loc,bool isMainDotInfoTable)
 {
     CoordMotorPosFocalDistInfo coordSpacePosInfo;
-//    if(loc.x()<-30)
-//    {
-//        isMainDotInfoTable=true;
-//    }
-//    else if(loc.x()>30)
-//    {
-//        isMainDotInfoTable=false;
-//    }
-    //有15格,所以要加15,Y要反号
+//有15格,所以要加15,Y要反号
     int x1=floor(loc.x()/6.0f)+15;int x2=ceil(loc.x()/6.0f)+15;
     int y1=floor(-loc.y()/6.0f)+15;int y2=ceil(-loc.y()/6.0f)+15;
 //    qDebug()<<"x1:"<<x1<<"x2:"<<x2;
@@ -75,27 +63,25 @@ CoordMotorPosFocalDistInfo DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoo
     auto config=DeviceOperation::getSingleton()->m_config;
     if(isMainDotInfoTable)
     {
-        auto centerX=config.mainTableCenterXRef();
-        auto centerY=config.mainTableCenterYRef();
+        auto centerX=config.mainTableCenterXRef()+DeviceSettings::getSingleton()->m_deviationCalibrationXMotorDeviation;
+        auto centerY=config.mainTableCenterYRef()+DeviceSettings::getSingleton()->m_deviationCalibrationYMotorDeviation;
         coordSpacePosInfo.motorX+=centerX;
         coordSpacePosInfo.motorY+=centerY;
     }
     else
     {
-        auto secondaryCenterX=config.secondaryTableCenterXRef();
-        auto secondaryCenterY=config.secondaryTableCenterYRef();
+        auto secondaryCenterX=config.secondaryTableCenterXRef()+DeviceSettings::getSingleton()->m_deviationCalibrationXMotorDeviation;
+        auto secondaryCenterY=config.secondaryTableCenterYRef()-DeviceSettings::getSingleton()->m_deviationCalibrationYMotorDeviation;
         coordSpacePosInfo.motorX+=secondaryCenterX;
         coordSpacePosInfo.motorY+=secondaryCenterY;
     }
 
     for(unsigned int i=0;i<sizeof(arr)/sizeof(int);i++) {arr[i]=fourDots[i].focalDist;}
     coordSpacePosInfo.focalDist=interpolation(arr,locInterpol);
-//    qDebug()<<QString("X motor:%1,Y motor:%2,focal :%3.").
-//              arg(QString::number(coordSpacePosInfo.motorX)).
-//              arg(QString::number(coordSpacePosInfo.motorY)).
-//              arg(QString::number(coordSpacePosInfo.focalDist));
     return coordSpacePosInfo;
 }
+
+
 
 quint16 DeviceDataProcesser::calcCrc(quint8 *p_data, int data_len)
 {

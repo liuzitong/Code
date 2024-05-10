@@ -44,10 +44,16 @@ public:
     int m_reconTimes;
     bool m_settingsRead=false;
     int m_reconnectTime;
+    int m_deviationCalibrationXMotorDeviation;       //正表副表都向左边。
+    int m_deviationCalibrationYMotorDeviation;       //正表向上，副表向下。
+    int m_deviationCalibrationStep;          //X方向上的扫描角度
+
+    int m_deviationCalibrationWatingTime;
     static QSharedPointer<DeviceSettings> getSingleton();
     static QSharedPointer<DeviceSettings> m_singleton;
 
     void saveCastLightAdjustStatus();
+    void saveDeviationCalibrationStatus();
     void saveReconTimes();
 };
 
