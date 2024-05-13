@@ -710,7 +710,7 @@ void MainWindow::on_pushButton_testStart_clicked()
                 int  spot_Circl_Motor_Steps=m_profile.motorRange(UsbDev::DevCtl::MotorId_Light_Spot).second-m_profile.motorRange(UsbDev::DevCtl::MotorId_Light_Spot).first;
 
                 {
-                    int focalPos=m_config.focusPosForSpotAndColorChangeRef();
+                    int focalPos=ui->lineEdit_focusUnite->text().toInt();
                     int motorPos[5]{0,0,focalPos,0,0};
                     waitMotorStop({UsbDev::DevCtl::MotorId_Focus});
                     m_devCtl->move5Motors(std::array<quint8, 5>{0,0,sps[2],0,0}.data(),motorPos);
