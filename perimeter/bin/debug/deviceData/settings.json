@@ -4,11 +4,11 @@
     "beepCount": 3,
     "beepDuration": 200,
     "beepInterval": 200,
-    "castLightDAChangeInteval": 1000,
+    "castLightDAChangeInterval": 2000,
     "castLightDAChangeMinStep": 2,
-    "castLightDAChangeRate": 0.03,
-    "castLightDADifferenceTolerance": 0.01,
-    "castLightStablizeWaitingTime":10000,
+    "castLightDAChangeRate": 0.003,
+    "castLightDADifferenceTolerance": 0.005,
+    "castLightStablizeWaitingTime":20000,
     "castLightTargetColor": 0,
     "castLightTargetSize": 5,
     "colorToSlot": [
@@ -49,8 +49,9 @@
     "pupilAutoAlignPixelTolerance": 2,
     "pupilAutoAlignStep": 170,
     "pupilDeviationPixelToNumberConstant": 0.5,
-    "pupilDiameterPixelToMillimeterConstant": 0.085,
-    "skipAdjustCastLight": true,
+    "pupilDiameterPixelToMillimeterConstant": 0.047,
+    "reconnectTime":1000000,
+    "skipAdjustCastLight": false,
     "spotSizeToSlot": [
         {
             "Slot": 0,

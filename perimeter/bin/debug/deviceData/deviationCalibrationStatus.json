@@ -1,5 +1,7 @@
 {
-    "deviationCalibrationXMotorDeviation":0,
-    "deviationCalibrationYMotorDeviation":0,
-    "deviationCalibrationStep":0.5
+    "deviationCalibrationFail": false,
+    "deviationCalibrationStep": 3,
+    "deviationCalibrationWatingTime": 10000,
+    "deviationCalibrationXMotorDeviation": 244,
+    "deviationCalibrationYMotorDeviation": -58
 }

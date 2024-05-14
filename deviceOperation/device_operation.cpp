@@ -374,7 +374,7 @@ void DeviceOperation::adjustCastLight()
     qDebug()<<m_currentCastLightDA;
     m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA);
     waitForSomeTime(m_waitingTime);
-    m_castLightAdjustStatus=2;
+    setCastLightAdjustStatus(2);
     m_castLightAdjustElapsedTimer.restart();
     m_castLightStablelizeWaitingElapsedTimer.restart();
     m_deviationCalibrationTimer.restart();
@@ -382,7 +382,7 @@ void DeviceOperation::adjustCastLight()
 }
 
 
-void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSize,int speedLevel,bool isMainDotInfoTable)
+void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSize,int speedLevel,bool isMainDotInfoTable,double stepLengthFactor)
 {
     auto log=spdlog::get("logger");
     log->info("dynamic stimulate.");
@@ -411,7 +411,7 @@ void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSiz
                    });
     move5Motors(isMotorMove,motorPos);
     auto data=DeviceData::getSingleton()->m_localTableData.m_dynamicLenAndTimeData;
-    auto stepLength=data(speedLevel,0)*0.01;
+    auto stepLength=data(speedLevel,0)*stepLengthFactor;
     auto stepTime=data(speedLevel,1);
 
     float stepLengthX,stepLengthY;
@@ -444,6 +444,14 @@ void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSiz
     {
         coordSpacePosInfoTemp.rx()+=stepLengthX;
         coordSpacePosInfoTemp.ry()+=stepLengthY;
+        if(abs(coordSpacePosInfoTemp.rx()-round(coordSpacePosInfoTemp.rx()))<0.001)             //防止整数角度误差，造成超界
+        {
+            coordSpacePosInfoTemp.rx()=round(coordSpacePosInfoTemp.rx());
+        }
+        if(abs(coordSpacePosInfoTemp.ry()-round(coordSpacePosInfoTemp.ry()))<0.001)
+        {
+            coordSpacePosInfoTemp.ry()=round(coordSpacePosInfoTemp.ry());
+        }
         coordMotorPosFocalDistInfoTemp=DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoord(coordSpacePosInfoTemp,isMainDotInfoTable);
         dotArr[i*3+0]=coordMotorPosFocalDistInfoTemp.motorX;
         dotArr[i*3+1]=coordMotorPosFocalDistInfoTemp.motorY;
@@ -711,6 +719,10 @@ void DeviceOperation::workOnNewStatuData()
     m_statusDataOut.envLightDA=m_statusData.envLightSensorDA();
     m_statusDataOut.castLightDA=m_statusData.castLightSensorDA();
 
+    emit newStatusData();
+
+    if(m_workingOnStatus) return;
+    m_workingOnStatus=true;
     auto eyeglassStatus=m_statusData.eyeglassStatus();
     auto log=spdlog::get("logger");
     if(m_isAtCheckingPage)
@@ -782,7 +794,6 @@ void DeviceOperation::workOnNewStatuData()
     }
     // std::cout<<"castLightSensorDAForLightCorrectionRef:"<<m_config.castLightSensorDAForLightCorrectionRef()<<std::endl;
 
-
     bool motorBusy=getMotorsBusy({UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y});
     int currentcastLightSensorDA=m_statusData.castLightSensorDA();
     int targetcastLightSensorDA=m_config.castLightSensorDAForLightCorrectionRef();
@@ -798,11 +809,14 @@ void DeviceOperation::workOnNewStatuData()
 
         if(m_deviationCalibrationTimer.elapsed()>DeviceSettings::getSingleton()->m_deviationCalibrationWatingTime)           //过了一段时间光强依然很低，所以就判定没照到
         {
-            if(currentcastLightSensorDA<targetcastLightSensorDA*0.1)
+            if(currentcastLightSensorDA<DeviceSettings::getSingleton()->m_deviationCalibrationDA)
             {
                 m_deviationCalibrationStatus=1;
-                m_castLightAdjustStatus=0;
+                DeviceSettings::getSingleton()->m_deviationCalibrationXMotorDeviation=0;
+                DeviceSettings::getSingleton()->m_deviationCalibrationYMotorDeviation=0;
+                setCastLightAdjustStatus(1);
                 m_devCtl->setLamp(LampId::LampId_castLight,0,DeviceSettings::getSingleton()->m_castLightDA);
+                m_currentCastLightDA=DeviceSettings::getSingleton()->m_castLightDA;
             }
         }
 
@@ -842,42 +856,60 @@ void DeviceOperation::workOnNewStatuData()
         if(motorBusy)
         {
             auto coord=getDyanmicAnswerPos();
-            if(currentcastLightSensorDA>targetcastLightSensorDA*0.1)
+            qDebug()<<"coord: "<<coord<<" :x"<<m_statusData.motorPosition(MotorId::MotorId_X)<<" :y"<<m_statusData.motorPosition(MotorId::MotorId_Y)<<" da:"<<currentcastLightSensorDA;
+            if(currentcastLightSensorDA>DeviceSettings::getSingleton()->m_deviationCalibrationDA&&m_deviationCalibrationXCoord.size()==0)
             {
                 m_deviationCalibrationXCoord.push_back(coord.x());
+                qDebug()<<m_deviationCalibrationXCoord;
             }
-            if(currentcastLightSensorDA<targetcastLightSensorDA*0.1&&m_deviationCalibrationXCoord.size()==1)   //说明已经接触过感应器
+            if(currentcastLightSensorDA<DeviceSettings::getSingleton()->m_deviationCalibrationDA&&m_deviationCalibrationXCoord.size()==1)   //说明已经接触过感应器
             {
                 m_deviationCalibrationXCoord.push_back(coord.x());
                 m_deviationCalibrationStatus=2;
                 stopDynamic();
                 waitForSomeTime(50);
+                qDebug()<<m_deviationCalibrationXCoord;
                 //开始Y向扫描
                 double xCoord=0.5*(m_deviationCalibrationXCoord[0]+m_deviationCalibrationXCoord[1]);
-                dynamicStimulate({xCoord,30},{xCoord,42},DeviceSettings::getSingleton()->m_castLightTargetSize,1,true);
+                dynamicStimulate({xCoord,30},{xCoord,42},DeviceSettings::getSingleton()->m_castLightTargetSize,1,true,0.003);
             }
         }
         else                     //继续X向扫描
         {
             static double direction=1.0f;
-            dynamicStimulate({6*direction,m_deviationYCoord},{-6*direction,m_deviationYCoord},DeviceSettings::getSingleton()->m_castLightTargetSize,1,true);
+            dynamicStimulate({6*direction,m_deviationYCoord},{-6*direction,m_deviationYCoord},DeviceSettings::getSingleton()->m_castLightTargetSize,1,true,0.003);
             direction=-direction;
             m_deviationYCoord+=DeviceSettings::getSingleton()->m_deviationCalibrationStep;
+            if(m_deviationYCoord>42)
+            {
+                openShutter(0);
+                waitForSomeTime(m_waitingTime);
+                waitMotorStop({UsbDev::DevCtl::MotorId_Shutter});
+                m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA*0.3);
+                DeviceSettings::getSingleton()->m_deviationCalibrationFail=true;
+                DeviceSettings::getSingleton()->saveDeviationCalibrationStatus();
+                setCastLightAdjustStatus(3);
+                m_deviationCalibrationStatus=0;
+            }
+
         }
     }
+
 
     if(m_deviationCalibrationStatus==2)
     {
         if(motorBusy)
         {
             auto coord=getDyanmicAnswerPos();
-            if(currentcastLightSensorDA>targetcastLightSensorDA*0.1)
+            if(currentcastLightSensorDA>DeviceSettings::getSingleton()->m_deviationCalibrationDA&&m_deviationCalibrationYCoord.size()==0)
             {
                 m_deviationCalibrationYCoord.push_back(coord.y());
+                qDebug()<<m_deviationCalibrationYCoord;
             }
-            if(currentcastLightSensorDA<targetcastLightSensorDA*0.1&&m_deviationCalibrationYCoord.size()==1)   //说明已经接触过感应器
+            if(currentcastLightSensorDA<DeviceSettings::getSingleton()->m_deviationCalibrationDA&&m_deviationCalibrationYCoord.size()==1)   //说明已经接触过感应器
             {
                 m_deviationCalibrationYCoord.push_back(coord.y());
+                qDebug()<<m_deviationCalibrationYCoord;
                 m_deviationCalibrationStatus=0;
                 stopDynamic();
                 waitForSomeTime(50);
@@ -889,8 +921,21 @@ void DeviceOperation::workOnNewStatuData()
                 adjustCastLight();
             }
         }
+        else
+        {
+            m_deviationCalibrationStatus=0;
+            stopDynamic();
+            waitForSomeTime(50);
+            QPointF coord={0.5*(m_deviationCalibrationXCoord[0]+m_deviationCalibrationXCoord[1]),m_deviationCalibrationYCoord[0]};
+            auto coordSpacePosInfo=DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoord(coord,true);
+            DeviceSettings::getSingleton()->m_deviationCalibrationXMotorDeviation=coordSpacePosInfo.motorX-m_config.xMotorPosForLightCorrectionRef();
+            DeviceSettings::getSingleton()->m_deviationCalibrationYMotorDeviation=coordSpacePosInfo.motorY-m_config.yMotorPosForLightCorrectionRef();
+            DeviceSettings::getSingleton()->saveDeviationCalibrationStatus();
+            adjustCastLight();
+        }
     }
-    emit newStatusData();
+    m_workingOnStatus=false;
+
 }
 
 void DeviceOperation::workOnNewFrameData()
@@ -1010,7 +1055,8 @@ void DeviceOperation::workOnNewConfig()
     auto lastAdjustedDate=QDate::fromString(DeviceSettings::getSingleton()->m_castLightLastAdjustedDate,"yyyy/MM/dd");
     bool adjusted=((date.year()==lastAdjustedDate.year())&&(date.month()==lastAdjustedDate.month())&&(date.day()==lastAdjustedDate.day()));
     bool skipAdjustCastLight=DeviceSettings::getSingleton()->m_skipAdjustCastLight;
-    if(adjusted||skipAdjustCastLight)
+    bool deviationCalibrationFail=DeviceSettings::getSingleton()->m_deviationCalibrationFail;
+    if(adjusted||skipAdjustCastLight||deviationCalibrationFail)
     {
         setCastLightAdjustStatus(3);
         dimDownCastLight();

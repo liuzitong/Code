@@ -90,7 +90,9 @@ Rectangle {
                         CusText
                         {
                             property string deviceStatus: IcUiQmlApi.appCtrl.checkSvc.deviceStatus===1?(qsTr("Device is reconnecting.")+lt):"";
-                            property string castLightStatus: IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus!==3?(qsTr("Device is adjusting light current DA:"+IcUiQmlApi.appCtrl.deviceStatusData.castLightDA+" target DA:"+IcUiQmlApi.appCtrl.checkSvc.targetCastLightSensorDA+".")+lt):"" ;
+
+                            property string castLightStatus: IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus!==3?(qsTr("Device is adjusting light please wait.")+lt+"Current DA:"+IcUiQmlApi.appCtrl.deviceStatusData.castLightDA+" target DA:"+IcUiQmlApi.appCtrl.checkSvc.targetCastLightSensorDA+"."):"" ;
+
                             property string checkStatus:
                             {
                                 if(checkPage.visible)

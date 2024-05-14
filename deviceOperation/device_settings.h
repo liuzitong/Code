@@ -46,7 +46,9 @@ public:
     int m_reconnectTime;
     int m_deviationCalibrationXMotorDeviation;       //正表副表都向左边。
     int m_deviationCalibrationYMotorDeviation;       //正表向上，副表向下。
-    int m_deviationCalibrationStep;          //X方向上的扫描角度
+    double m_deviationCalibrationStep;          //X方向上的扫描角度
+    bool m_deviationCalibrationFail;
+    int m_deviationCalibrationDA;        //低于次值一段时间就开始对位
 
     int m_deviationCalibrationWatingTime;
     static QSharedPointer<DeviceSettings> getSingleton();

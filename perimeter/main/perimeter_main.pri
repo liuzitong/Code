@@ -39,8 +39,8 @@
     include( $$PWD/database/database.pri )
     include( $$PWD/model/model.pri )
     include( $$PWD/viewModel/viewModel.pri )
-    include( $$PWD/../../../../usbdev-build/usbdev/usbdev.pri )
-    include( $$PWD/../../../../deviceOperation-build/deviceOperation.pri )
+    # include( $$PWD/../../../../usbdev-build/usbdev/usbdev.pri )
+    # include( $$PWD/../../../../deviceOperation-build/deviceOperation.pri )
 
 }
 

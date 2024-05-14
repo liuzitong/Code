@@ -39,7 +39,6 @@ void DevicePupilProcessor::processData(void* result)
             if(i.x>0) m_refectionResValidCount++;
         }
 
-
         m_reflectionResValid=(m_refectionResValidCount==3);
 
         if(m_reflectionResValid)

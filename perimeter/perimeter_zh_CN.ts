@@ -274,107 +274,117 @@
         <translation>测试时间</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="287"/>
+        <location filename="main/view/Check.qml" line="288"/>
         <source>Pupil diameter</source>
         <translation>瞳孔直径</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="292"/>
+        <location filename="main/view/Check.qml" line="293"/>
         <source>Eye move alarm</source>
         <translation>眼动警报</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="297"/>
+        <location filename="main/view/Check.qml" line="299"/>
         <source>Fixation deviation</source>
         <translation>固视偏移</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="368"/>
+        <location filename="main/view/Check.qml" line="370"/>
         <source>Left eye</source>
         <translation>左眼</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="368"/>
+        <location filename="main/view/Check.qml" line="370"/>
         <source>Right eye</source>
         <translation>右眼</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="422"/>
+        <location filename="main/view/Check.qml" line="403"/>
+        <source>Environment light is too strong.</source>
+        <translation>环境光太强。</translation>
+    </message>
+    <message>
+        <location filename="main/view/Check.qml" line="403"/>
+        <source>Put your chin more forward.</source>
+        <translation>把你的下巴靠前一点。</translation>
+    </message>
+    <message>
+        <location filename="main/view/Check.qml" line="424"/>
         <source>Back</source>
         <translation>返回</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="442"/>
+        <location filename="main/view/Check.qml" line="444"/>
         <source>Select program</source>
         <translation>选择程序</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="458"/>
+        <location filename="main/view/Check.qml" line="460"/>
         <source>Params setting</source>
         <translation>参数设置</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="483"/>
+        <location filename="main/view/Check.qml" line="485"/>
         <source>Start</source>
         <translation>开始测试</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="483"/>
+        <location filename="main/view/Check.qml" line="485"/>
         <source>Resume</source>
         <translation>恢复检查</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="483"/>
+        <location filename="main/view/Check.qml" line="485"/>
         <source>Pause</source>
         <translation>暂停检查</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="525"/>
+        <location filename="main/view/Check.qml" line="527"/>
         <source>Stop</source>
         <translation>停止测试</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="539"/>
+        <location filename="main/view/Check.qml" line="541"/>
         <source>Switch eye</source>
         <translation>切换眼别</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="566"/>
+        <location filename="main/view/Check.qml" line="568"/>
         <source>Single</source>
         <translation>常规分析</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="566"/>
+        <location filename="main/view/Check.qml" line="568"/>
         <source>Three in one</source>
         <translation>三合一</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="566"/>
+        <location filename="main/view/Check.qml" line="568"/>
         <source>Overview</source>
         <translation>总览</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="566"/>
+        <location filename="main/view/Check.qml" line="568"/>
         <source>Threshold</source>
         <translation>阈值</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="566"/>
+        <location filename="main/view/Check.qml" line="568"/>
         <source>Screening</source>
         <translation>筛选</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="566"/>
+        <location filename="main/view/Check.qml" line="568"/>
         <source>Dynamic</source>
         <translation>动态</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="566"/>
+        <location filename="main/view/Check.qml" line="568"/>
         <source>Dyanmic data</source>
         <translation>动态数据</translation>
     </message>
     <message>
-        <location filename="main/view/Check.qml" line="568"/>
+        <location filename="main/view/Check.qml" line="570"/>
         <source>Analysis</source>
         <translation>分析</translation>
     </message>
@@ -493,77 +503,74 @@
         <translation>设备正在重新连接.</translation>
     </message>
     <message>
-        <source>Device is adjusting light.</source>
-        <translation type="vanished">设备正在校光.</translation>
+        <location filename="main/view/Content.qml" line="94"/>
+        <source>Device is adjusting light please wait.</source>
+        <translation>设备正在校光请等待.</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="98"/>
+        <location filename="main/view/Content.qml" line="100"/>
         <source>Start</source>
         <oldsource>Start.</oldsource>
         <translation>开始</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="99"/>
+        <location filename="main/view/Content.qml" line="101"/>
         <source>Checking</source>
         <oldsource>Checking.</oldsource>
         <translation>检查中</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="100"/>
+        <location filename="main/view/Content.qml" line="102"/>
         <source>Pausing</source>
         <oldsource>Pausing.</oldsource>
         <translation>暂停中</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="101"/>
+        <location filename="main/view/Content.qml" line="103"/>
         <source>Stoping</source>
         <oldsource>Stoping.</oldsource>
         <translation>停止中</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="102"/>
+        <location filename="main/view/Content.qml" line="104"/>
         <source>Finishing</source>
         <oldsource>Finishing.</oldsource>
         <translation>结束中</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="103"/>
+        <location filename="main/view/Content.qml" line="105"/>
         <source>Stopped</source>
         <oldsource>Stopped.</oldsource>
         <translation>已停止</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="104"/>
+        <location filename="main/view/Content.qml" line="106"/>
         <source>Finished</source>
         <oldsource>Finished.</oldsource>
         <translation>已完成</translation>
     </message>
     <message>
-        <source>Device is reconnecting</source>
-        <translation type="vanished">设备正在重新连接</translation>
-    </message>
-    <message>
-        <location filename="main/view/Content.qml" line="126"/>
+        <location filename="main/view/Content.qml" line="128"/>
         <source>Patient</source>
         <translation>患者</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="128"/>
+        <location filename="main/view/Content.qml" line="130"/>
         <source>Check</source>
         <translation>检测</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="142"/>
+        <location filename="main/view/Content.qml" line="144"/>
         <source>Settings</source>
         <translation>设置</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="152"/>
+        <location filename="main/view/Content.qml" line="154"/>
         <source>Customize</source>
         <translation>自定义</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="155"/>
+        <location filename="main/view/Content.qml" line="157"/>
         <source>About</source>
         <translation>关于</translation>
     </message>
@@ -2036,7 +2043,7 @@
 <context>
     <name>Perimeter::StaticCheck</name>
     <message>
-        <location filename="main/services/check_svc.cpp" line="866"/>
+        <location filename="main/services/check_svc.cpp" line="872"/>
         <source>Cant&apos;t locate blind dot.Turn off blindDot check.</source>
         <translation>不能定位盲点.关闭盲点检查.</translation>
     </message>

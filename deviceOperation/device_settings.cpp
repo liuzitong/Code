@@ -60,7 +60,6 @@ DeviceSettings::DeviceSettings()
     m_beepInterval=m_rootObj.value("beepInterval").toInt();
     m_reflectDotDist=m_rootObj.value("reflectDotDist").toInt();
     m_reconnectTime=m_rootObj.value("reconnectTime").toInt();
-    m_deviationCalibrationWatingTime=m_rootObj.value("castLightStablizeWaitingTime").toInt();
 
     auto motorSpeed=m_rootObj.value("motorSpeed").toArray();
     for(int i=0;i<motorSpeed.count();i++)
@@ -122,6 +121,9 @@ DeviceSettings::DeviceSettings()
     m_deviationCalibrationXMotorDeviation=m_rootObj3.value("deviationCalibrationXMotorDeviation").toInt();
     m_deviationCalibrationYMotorDeviation=m_rootObj3.value("deviationCalibrationYMotorDeviation").toInt();
     m_deviationCalibrationStep=m_rootObj3.value("deviationCalibrationStep").toDouble();
+    m_deviationCalibrationFail=m_rootObj3.value("deviationCalibrationFail").toBool();
+    m_deviationCalibrationWatingTime=m_rootObj3.value("deviationCalibrationWatingTime").toInt();
+    m_deviationCalibrationDA=m_rootObj3.value("deviationCalibrationDA").toInt();
 
 }
 
@@ -140,9 +142,9 @@ QSharedPointer<DeviceSettings> DeviceSettings::getSingleton()
 void DeviceSettings::saveCastLightAdjustStatus()
 {
     QJsonObject rootObj;
-    QJsonDocument jsonDoc(rootObj);
     rootObj["castLightDA"]=m_castLightDA;
     rootObj["castLightLastAdjustedDate"]=m_castLightLastAdjustedDate;
+    QJsonDocument jsonDoc(rootObj);
     auto data=jsonDoc.toJson();
     QFile loadFile(R"(deviceData/castLightAdjustStatus.json)");
     loadFile.open(QIODevice::WriteOnly);
@@ -153,24 +155,32 @@ void DeviceSettings::saveCastLightAdjustStatus()
 void DeviceSettings::saveDeviationCalibrationStatus()
 {
     QFile loadFile(R"(deviceData/deviationCalibrationStatus.json)");
-    loadFile.open(QIODevice::ReadWrite);
+    loadFile.open(QIODevice::ReadOnly);
     QByteArray allData = loadFile.readAll();
+    loadFile.close();
+
     QJsonParseError jsonError;
     QJsonDocument jsonDoc(QJsonDocument::fromJson(allData, &jsonError));
     QJsonObject rootObj = jsonDoc.object();
     rootObj["deviationCalibrationXMotorDeviation"]=m_deviationCalibrationXMotorDeviation;
     rootObj["deviationCalibrationYMotorDeviation"]=m_deviationCalibrationYMotorDeviation;
+    rootObj["deviationCalibrationFail"]=m_deviationCalibrationFail;
     jsonDoc.setObject(rootObj);
     auto data=jsonDoc.toJson();
-    loadFile.write(data,data.length());
-    loadFile.close();
+
+    QFile loadFile2(R"(deviceData/deviationCalibrationStatus.json)");
+    loadFile2.open(QIODevice::WriteOnly);
+    loadFile2.write(data,data.length());
+    loadFile2.close();
 }
 
 void DeviceSettings::saveReconTimes()
 {
     QFile loadFile(R"(deviceData/reconTimes.json)");
-    loadFile.open(QIODevice::ReadWrite);
+    loadFile.open(QIODevice::ReadOnly);
     QByteArray allData = loadFile.readAll();
+    loadFile.close();
+
     QJsonParseError jsonError;
     QJsonDocument jsonDoc(QJsonDocument::fromJson(allData, &jsonError));
     QJsonObject rootObj = jsonDoc.object();
@@ -178,6 +188,9 @@ void DeviceSettings::saveReconTimes()
     rootObj["reconTimes"]=m_reconTimes;
     jsonDoc.setObject(rootObj);
     auto data=jsonDoc.toJson();
-    loadFile.write(data,data.length());
-    loadFile.close();
+
+    QFile loadFile2(R"(deviceData/reconTimes.json)");
+    loadFile2.open(QIODevice::WriteOnly);
+    loadFile2.write(data,data.length());
+    loadFile2.close();
 }

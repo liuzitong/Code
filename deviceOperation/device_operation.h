@@ -112,7 +112,7 @@ public:
     void disconnectDev();
     void getReadyToStimulate(QPointF loc,int spotSize,int DB,bool isMainDotInfoTable);
     void adjustCastLight();
-    void dynamicStimulate(QPointF begin, QPointF end, int cursorSize,int speedLevel,bool isMainDotInfoTable);
+    void dynamicStimulate(QPointF begin, QPointF end, int cursorSize,int speedLevel,bool isMainDotInfoTable,double stepLengthFactor=0.01);
     void stopDynamic();
     void openShutter(int durationTime);
     void move5Motors(bool isMotorMove[],int MotorPoses[]);
@@ -229,12 +229,13 @@ private:
     QElapsedTimer m_deviationCalibrationTimer;
     int m_deviationCalibrationLineIndex=0;
     int m_deviationCalibrationLevel=0;
-    double m_deviationYCoord=30;
+    double m_deviationYCoord=30;   //30~42
     QVector<double> m_deviationCalibrationXCoord;  //[0]:一端边界，[1]：另一端边界
     QVector<double> m_deviationCalibrationYCoord;  //[0]:一端边界，[1]：另一端边界
     bool m_envLightAlarm=false;
     bool m_chinDistAlarm=false;
 
+    bool m_workingOnStatus=false;
 
     bool m_isMainTable;
     int m_waitingTime;
