@@ -9,40 +9,68 @@
         <translation>关于</translation>
     </message>
     <message>
-        <location filename="main/view/About.qml" line="69"/>
         <source>Computer automatic perimeter system</source>
-        <translation>电脑自动视野仪系统</translation>
+        <translation type="vanished">电脑自动视野仪系统</translation>
     </message>
     <message>
         <location filename="main/view/About.qml" line="87"/>
+        <source>SoftWare Name</source>
+        <translation>软件名称</translation>
+    </message>
+    <message>
+        <location filename="main/view/About.qml" line="87"/>
+        <source>project  perimeter software</source>
+        <translation>投射式视野仪软件</translation>
+    </message>
+    <message>
+        <location filename="main/view/About.qml" line="95"/>
+        <source>Software Model</source>
+        <translation>软件型号</translation>
+    </message>
+    <message>
+        <location filename="main/view/About.qml" line="102"/>
+        <source>Publish Version</source>
+        <translation>发布版本</translation>
+    </message>
+    <message>
+        <location filename="main/view/About.qml" line="109"/>
+        <source>Full Version</source>
+        <translation>完整版本</translation>
+    </message>
+    <message>
+        <location filename="main/view/About.qml" line="119"/>
         <source>Device type</source>
         <oldsource>Device type: </oldsource>
         <translation>设备类型</translation>
     </message>
     <message>
-        <location filename="main/view/About.qml" line="94"/>
+        <location filename="main/view/About.qml" line="133"/>
         <source>Device ID</source>
         <translation>设备ID</translation>
     </message>
     <message>
-        <location filename="main/view/About.qml" line="101"/>
+        <location filename="main/view/About.qml" line="140"/>
+        <source>Internal version</source>
+        <translation>内部版本</translation>
+    </message>
+    <message>
+        <location filename="main/view/About.qml" line="126"/>
         <source>Device Version</source>
         <oldsource> Device Version</oldsource>
         <translation>设备版本</translation>
     </message>
     <message>
-        <location filename="main/view/About.qml" line="108"/>
         <source>Version</source>
         <oldsource>Version: </oldsource>
-        <translation>软件版本</translation>
+        <translation type="vanished">软件版本</translation>
     </message>
     <message>
-        <location filename="main/view/About.qml" line="119"/>
+        <location filename="main/view/About.qml" line="152"/>
         <source>Copyright @2019 Chongqing BioNewVision Medical Device Co.Lt.</source>
         <translation>版权所有 ©2019 重庆贝奥新视野医疗设备有限公司.</translation>
     </message>
     <message>
-        <location filename="main/view/About.qml" line="133"/>
+        <location filename="main/view/About.qml" line="166"/>
         <source>OK</source>
         <translation>确定</translation>
     </message>

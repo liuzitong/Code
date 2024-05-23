@@ -64,13 +64,13 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                             id: column
                             property int rowHeight: height/12;
                             anchors.fill: parent;
-                            Item{
-                                height:parent.height*0.11;width: parent.width;
-                                CusText{width:parent.width;text:lt+qsTr("Computer automatic perimeter system"); fontSizeMode: Text.VerticalFit;
-                                    anchors.horizontalCenter: parent.horizontalCenter;font.pointSize:fontPointSize*1.5;
-                                }
-                            }
-                            Item{height:parent.height*0.06;width: parent.width; }
+                            // Item{
+                            //     height:parent.height*0.11;width: parent.width;
+                            //     CusText{width:parent.width;text:lt+qsTr("Computer automatic perimeter system"); fontSizeMode: Text.VerticalFit;
+                            //         anchors.horizontalCenter: parent.horizontalCenter;font.pointSize:fontPointSize*1.5;
+                            //     }
+                            // }
+                            // Item{height:parent.height*0.06;width: parent.width; }
 
                             Item{ height:parent.height*0.065;width: parent.width;
                                 Image {
@@ -84,34 +84,67 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
 
                             CusText{
                                 height:parent.height*0.04;width: parent.width;
-                                text: lt+qsTr("Device type")+": " +IcUiQmlApi.appCtrl.settings.deviceInfo;horizontalAlignment: Text.AlignLeft;
+                                text: lt+qsTr("SoftWare Name")+": " +qsTr("project  perimeter software");horizontalAlignment: Text.AlignLeft;
                                 font.pointSize:fontPointSize;
                             }
-                            Item{height:parent.height*0.03;width: parent.width; }
+                            Item{height:parent.height*0.02;width: parent.width; }
+
 
                             CusText{
                                 height:parent.height*0.04;width: parent.width;
-                                text: lt+qsTr("Device ID")+": " +IcUiQmlApi.appCtrl.checkSvc.deviceID;horizontalAlignment: Text.AlignLeft;
+                                text: lt+qsTr("Software Model")+": " +"BIO";horizontalAlignment: Text.AlignLeft;
                                 font.pointSize:fontPointSize;
                             }
-                            Item{height:parent.height*0.03;width: parent.width; }
+                            Item{height:parent.height*0.02;width: parent.width; }
+
+                            CusText{
+                                height:parent.height*0.04;width: parent.width;
+                                text: lt+qsTr("Publish Version")+": "+"V1.1";horizontalAlignment: Text.AlignLeft;
+                                font.pointSize:fontPointSize;
+                            }
+                            Item{height:parent.height*0.02;width: parent.width; }
+
+                            CusText{
+                                height:parent.height*0.04;width: parent.width;
+                                text: lt+qsTr("Full Version")+": "+"V1.1.0.0517";
+                                horizontalAlignment: Text.AlignLeft;
+                                font.pointSize:fontPointSize;
+                            }
+                            Item{height:parent.height*0.02;width: parent.width; }
+
+                            Item{height:parent.height*0.12;width: parent.width; }
+
+                            CusText{
+                                height:parent.height*0.04;width: parent.width;
+                                text: lt+qsTr("Device type")+": " +IcUiQmlApi.appCtrl.settings.deviceInfo;horizontalAlignment: Text.AlignLeft;
+                                font.pointSize:fontPointSize;
+                            }
+                            Item{height:parent.height*0.02;width: parent.width; }
 
                             CusText{
                                 height:parent.height*0.04;width: parent.width;
                                 text: lt+qsTr("Device Version")+": "+IcUiQmlApi.appCtrl.checkSvc.deviceVersion;horizontalAlignment: Text.AlignLeft;
                                 font.pointSize:fontPointSize;
                             }
-                            Item{height:parent.height*0.03;width: parent.width; }
+                            Item{height:parent.height*0.02;width: parent.width; }
 
                             CusText{
                                 height:parent.height*0.04;width: parent.width;
-                                text: lt+qsTr("Version")+": "+IcUiQmlApi.appCtrl.settings.version;
-                                horizontalAlignment: Text.AlignLeft;
+                                text: lt+qsTr("Device ID")+": " +IcUiQmlApi.appCtrl.checkSvc.deviceID;horizontalAlignment: Text.AlignLeft;
                                 font.pointSize:fontPointSize;
                             }
+                            Item{height:parent.height*0.02;width: parent.width; }
+
+                            CusText{
+                                height:parent.height*0.04;width: parent.width;
+                                text: lt+qsTr("Internal version")+": " +IcUiQmlApi.appCtrl.settings.version;horizontalAlignment: Text.AlignLeft;
+                                font.pointSize:fontPointSize;
+                            }
+                            Item{height:parent.height*0.02;width: parent.width; }
+
 
                             Item{
-                                height:parent.height*0.30;width: parent.width;
+                                height:parent.height*0.10;width: parent.width;
                             }
 
                             CusText{
@@ -121,7 +154,7 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                 horizontalAlignment: Text.AlignHCenter
                                 font.pointSize:fontPointSize;
                             }
-                            Item{height:parent.height*0.12;width: parent.width; }
+                            Item{height:parent.height*0.10;width: parent.width; }
 
 
 

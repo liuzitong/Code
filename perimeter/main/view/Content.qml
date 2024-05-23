@@ -6,6 +6,7 @@ import QtQuick.Controls.Styles 1.4
 import qxpack.indcom.ui_qml_base 1.0
 import perimeter.main.view.Controls 1.0
 import perimeter.main.view.Utils 1.0
+import qxpack.indcom.ui_qml_control 1.0
 
 Rectangle {
     id: root;visible: true;width: 1366;height: 768;color: backGroundColor;
@@ -41,18 +42,99 @@ Rectangle {
 
     About{id:about;anchors.fill: parent;}
 
+    ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml_contro
+        id:idPopup
+        // reqEnterEventLoop:true;
+        anchors.fill: parent;
+        property bool result;
+        contentItem:
+        Rectangle{
+            id: idContent; color: "#60606060";implicitWidth: idPopup.width; implicitHeight: idPopup.height;
+            Rectangle
+            {
+            // [HINT] Popup element need implicitWidth & implicitHeight to calc. the right position
+                id: menu; width:idPopup.width*0.22; height: idPopup.height*0.20;color: "#f0f1f2";radius: 5;/*width:480; height:480;*/
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                border.color: "#7C7C7C";
+                Column{
+                    anchors.fill: parent;
+                    Canvas{
+                        id:header;height: parent.height*.2;width: parent.width;
+                        property alias radius: menu.radius;
+                        onPaint: {
+                            var ctx = getContext("2d");
+                            ctx.beginPath(); // Start the path
+                            ctx.moveTo(1,height);
+                            ctx.lineTo(1, radius-1); // Set the path origin
+                            ctx.arc(radius,radius,radius-1,Math.PI,Math.PI*1.5);
+                            ctx.lineTo(width-radius, 1);// Set the path destination
+                            ctx.arc(width-radius,radius,radius-1,Math.PI*1.5,0);
+                            ctx.lineTo(width-1, height);
+                            ctx.closePath();
+                            context.fillStyle = "#D2D2D3"
+                            ctx.fill();
+                        }
+                        CusText{text:lt+qsTr("  Warning"); horizontalAlignment: Text.AlignLeft;}
+                    }
+                    Item
+                    {
+                        width: parent.width;
+                        height:parent.height*.8
+                        Item{anchors.top: parent.top; anchors.bottom: parent.bottom;anchors.left: parent.left;anchors.right:parent.right;anchors.rightMargin: parent.height*0.1;anchors.leftMargin: parent.height*0.1;anchors.topMargin: parent.height*0.1;anchors.bottomMargin: parent.height*0.1;
+                            Column {anchors.fill: parent;spacing: height*0.2;
+                                Item{width:parent.width;height:parent.height*0.05;}
+                                CusText{width:parent.width;height:parent.height*0.15;text:lt+qsTr("Patient is checking,are you sure?"); horizontalAlignment: Text.AlignLeft;}
+                                Flow{width:parent.width;height:parent.height*0.3;spacing: width*0.1;layoutDirection: Qt.RightToLeft;
+                                    CusButton{text:lt+qsTr(lt+qsTr("Cancel"));onClicked: {idPopup.result=false;idPopup.close();}}
+                                    CusButton{text:lt+qsTr(lt+qsTr("OK"));onClicked:{idPopup.result=true;idPopup.close();}}
+                                }
+                            }
+                        }
+                    }
+
+
+                }
+            }
+        }
+    }
+
+
     Column {
         id: column;anchors.fill: parent
         Rectangle{
             id:topRibbon;width: parent.width;height: parent.height*0.1;color: "#333e44";
-            CusButton{imageHightScale: 1;height:image.sourceSize.height;width:image.sourceSize.width; anchors.right: parent.right;  anchors.top: parent.top; rec.visible: false;imageSrc: "qrc:/Pics/base-svg/window_4close_1normal.svg";hoverImageSrc:"qrc:/Pics/base-svg/window_4close_2hover.svg";pressImageSrc: "qrc:/Pics/base-svg/window_4close_3press.svg";onClicked: Qt.quit()}
+            CusButton{imageHightScale: 1;height:image.sourceSize.height;width:image.sourceSize.width; anchors.right: parent.right;  anchors.top: parent.top; rec.visible: false;imageSrc: "qrc:/Pics/base-svg/window_4close_1normal.svg";hoverImageSrc:"qrc:/Pics/base-svg/window_4close_2hover.svg";pressImageSrc: "qrc:/Pics/base-svg/window_4close_3press.svg";
+                onReleased: function() { Qt.callLater(tryClose); }
+                function tryClose(){
+                    if(checkPage.atCheckingPage==true)
+                    {
+                        if(IcUiQmlApi.appCtrl.checkSvc.checkState<5)
+                        {
+                            idPopup.open();
+                            if(idPopup.result==false)
+                            {
+                                // console.log("false");
+                                return;
+                            }
+                            else
+                            {
+                                // console.log("true");
+                                IcUiQmlApi.appCtrl.checkSvc.stop();
+                            }
+                        }
+                        IcUiQmlApi.appCtrl.checkSvc.leaveCheck();
+                    }
+                    Qt.quit();
+                }
+            }
             Item{anchors.fill: parent;anchors.margins:parent.height*0.07;
                 Column{anchors.fill:parent;spacing: height*0.1
                     Item{width: parent.width;height: parent.height*0.30;
                         Flow{height:parent.height;spacing: height*0.2
                             Image {width: height;height: parent.height;source: "qrc:/Pics/user-svg/0syseye_logo.svg";}
-                            CusText{text:lt+qsTr("Computer automatic perimeter system"); horizontalAlignment: Text.AlignLeft;color: "white";font.pointSize: height*0.5;width:isEng?height*15:height*10;}
-
+                            // CusText{text:lt+qsTr("Computer automatic perimeter system"); horizontalAlignment: Text.AlignLeft;color: "white";font.pointSize: height*0.5;width:isEng?height*15:height*10;}
+                            Item{height:parent.height;width:parent.width*0.1;}
                             Flow{
                                 id:patientInfo;visible: false;height: parent.height;spacing: height*0.5;
                                 Flow{

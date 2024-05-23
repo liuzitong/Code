@@ -268,7 +268,7 @@ public slots:
         DevOps::DeviceOperation::getSingleton()->disconnectDev();    //连接设备
     }
 
-    void lightsOff(){m_check->lightsOff();}
+    void lightsOff(){if(m_check!=nullptr) m_check->lightsOff();}
 
     void lightsOn(){if(m_check!=nullptr) m_check->lightsOn();}
 
@@ -2214,7 +2214,7 @@ void CheckSvc::stop()
     {
         setCheckState(3);
     }
-    if(m_programVm->getType()==2)
+    if((m_programVm!=nullptr)&&(m_programVm->getType()==2))
     {
         m_worker->stopDynamic();
     }
@@ -2296,6 +2296,7 @@ void CheckSvc::leaveCheck()
     DevOps::DeviceOperation::getSingleton()->dimDownCastLight();
     m_atCheckingPage=false;
     QMetaObject::invokeMethod(m_worker,"lightsOff",Qt::QueuedConnection);
+    UtilitySvc::wait(200);
 }
 
 void CheckSvc::castlightUp()
