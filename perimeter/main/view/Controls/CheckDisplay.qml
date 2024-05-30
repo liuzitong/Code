@@ -130,10 +130,7 @@ Item{
         }
         displayCanvas.requestPaint();
     }
-
-
     signal painted();
-    antialiasing: true
 
     CusText{id:dotPosDisplay;text:""; horizontalAlignment: Text.AlignLeft;z:1; anchors.top: parent.top; anchors.topMargin: 0.07*parent.height; anchors.left: parent.left; anchors.leftMargin: 0.03*parent.width;width: parent.width*0.06;height: parent.height*0.05;}
 

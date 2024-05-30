@@ -76,6 +76,8 @@ Item
                             {
                                 id:diagnosis;anchors.fill: parent;anchors.margins: 3;
                                 width:parent.width*1.0;height: parent.height*0.70;
+                                objectName: "UserInputItem.TextField";
+                                property string vkbdLangCountry : root.lang;
                                 text:currentCheckResult==null?"":currentCheckResult.diagnosis;
                                 selectionColor: "blue";selectByMouse: true;
                                 font.pointSize: textHeight;font.family: "Consolas";

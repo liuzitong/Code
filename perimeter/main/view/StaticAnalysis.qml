@@ -114,6 +114,8 @@ Item
                             TextInput
                             {
                                 id:diagnosis;anchors.fill: parent;anchors.margins: 3;
+                                objectName: "UserInputItem.TextField";
+                                property string vkbdLangCountry : root.lang;
                                 width:parent.width*1.0;height: parent.height*0.70;
                                 text:currentCheckResult==null?"":currentCheckResult.diagnosis;
                                 selectionColor: "blue";selectByMouse: true;

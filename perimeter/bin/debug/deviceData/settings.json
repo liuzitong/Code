@@ -50,7 +50,7 @@
     "pupilAutoAlignStep": 170,
     "pupilDeviationPixelToNumberConstant": 0.5,
     "pupilDiameterPixelToMillimeterConstant": 0.047,
-    "reconnectTime":1000000,
+    "reconnectTime":10000,
     "skipAdjustCastLight": false,
     "spotSizeToSlot": [
         {

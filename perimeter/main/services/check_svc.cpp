@@ -1605,7 +1605,7 @@ void DynamicCheck::stimulate(QPointF begin, QPointF end)
 QVector<QPointF> DynamicCheck::waitForAnswer()
 {
     static int watiForAnswerCount=0;
-    if(m_deviceOperation->m_deviceStatus==0)
+    if(m_deviceOperation->m_deviceStatus!=2)
     {
         UtilitySvc::wait(50);  //刷新下状态
         UtilitySvc::wait(1000);  //虚拟测试表示耗费时间

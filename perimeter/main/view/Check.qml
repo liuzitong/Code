@@ -159,7 +159,7 @@ Item {id:root; width: 1366;height: 691
                                             Row{width:parent.width;height: parent.height*0.65/3;spacing: width*0.05;
                                                 CusText{text:lt+qsTr("Program name"); horizontalAlignment: Text.AlignLeft;width: parent.width*0.45;}
                                                 LineEdit {
-                                                    text:currentProgram==null?"":currentProgram.name; width: parent.width*0.50;textInput.readOnly: true;
+                                                    text:currentProgram==null?"":currentProgram.name; width: parent.width*0.50;textInput.readOnly: true;enabled:false;
                                                     Component.onCompleted: {currentProgramChanged.connect(function(){text=currentProgram.name});}
                                                 }
                                             }
@@ -170,7 +170,7 @@ Item {id:root; width: 1366;height: 691
                                                     property var cursorColor: [lt+qsTr("White"),lt+qsTr("Red"),lt+qsTr("Blue")];
                                                     property var params:currentProgram.type!==2?currentProgram.params.commonParams:currentProgram.params;
                                                     text:currentProgram==null?"":cursorSize[params.cursorSize]+","+cursorColor[params.cursorColor];
-                                                    width: parent.width*0.50;textInput.readOnly: true;
+                                                    width: parent.width*0.50;textInput.readOnly: true;enabled:false;
                                                 }
                                             }
                                             Row{width:parent.width;height: parent.height*0.65/3;spacing: width*0.05;
@@ -179,7 +179,7 @@ Item {id:root; width: 1366;height: 691
                                                     property var staticStrategy: [lt+qsTr("Full threshold"),lt+qsTr("Fast threshold"),lt+qsTr("Smart interactive"),lt+qsTr("Fast interative"),lt+qsTr("One stage"),lt+qsTr("Two stages"),lt+qsTr("Quantify defects"),lt+qsTr("Single stimulus")];
                                                     property var dynamicStrategy: [lt+qsTr("Standard"),lt+qsTr("Blind area"),lt+qsTr("Dark area"),lt+qsTr("Single stimulus")]
                                                     property var params:currentProgram.type!==2?currentProgram.params.commonParams:currentProgram.params;
-                                                    width: parent.width*0.5;textInput.readOnly: true;
+                                                    width: parent.width*0.5;textInput.readOnly: true;enabled:false;
                                                     text:currentProgram.type!==2?staticStrategy[params.strategy]:dynamicStrategy[params.strategy];
 //                                                    Component.onCompleted: {currentProgramChanged.connect(function(){
 //                                                        text="";
@@ -203,7 +203,7 @@ Item {id:root; width: 1366;height: 691
                                                 LineEdit{
                                                     property var checkedDots:currentCheckResult===null?0:currentCheckResult.type===2?0:currentCheckResult.resultData.falsePositiveCount;
                                                     property var totalDots: currentCheckResult===null?0:currentCheckResult.type===2?0:currentCheckResult.resultData.falsePositiveTestCount;
-                                                    text:currentCheckResult===null?"":currentCheckResult.type===2?"":checkedDots+"/"+totalDots;width: parent.width*0.5;textInput.readOnly: true;
+                                                    text:currentCheckResult===null?"":currentCheckResult.type===2?"":checkedDots+"/"+totalDots;width: parent.width*0.5;textInput.readOnly: true;enabled:false;
                                                 }
                                             }
                                             Row{width:parent.width;height: parent.height*0.65/3;spacing: width*0.05;
@@ -214,7 +214,7 @@ Item {id:root; width: 1366;height: 691
                                                     text:currentCheckResult===null?"":currentCheckResult.type===2?"":checkedDots+"/"+totalDots;
 //                                                    text:if(currentCheckResult!==null&&currentCheckResult.type!==2) {return checkedDots+"/"+totalDots;} else {return "";}
                                                     width: parent.width*0.5;
-                                                    textInput.readOnly: true;
+                                                    textInput.readOnly: true;enabled:false;
                                                 }
                                             }
                                             Row{ width:parent.width;height: parent.height*0.65/3;spacing: width*0.05;
@@ -222,7 +222,7 @@ Item {id:root; width: 1366;height: 691
                                                 LineEdit{
                                                     property var checkedDots: currentCheckResult===null?0:currentCheckResult.type===2?0:currentCheckResult.resultData.fixationLostCount;
                                                     property var totalDots: currentCheckResult===null?0:currentCheckResult.type===2?0:currentCheckResult.resultData.fixationLostTestCount;
-                                                    text:currentCheckResult===null?"":currentCheckResult.type===2?"":checkedDots+"/"+totalDots;width: parent.width*0.5;textInput.readOnly: true;
+                                                    text:currentCheckResult===null?"":currentCheckResult.type===2?"":checkedDots+"/"+totalDots;width: parent.width*0.5;textInput.readOnly: true;enabled:false;
                                                 }
                                             }
                                         }
@@ -238,14 +238,14 @@ Item {id:root; width: 1366;height: 691
                                                     property var checkedDots: IcUiQmlApi.appCtrl.checkSvc.checkedCount;
                                                     property var totalDots: IcUiQmlApi.appCtrl.checkSvc.totalCount;
 //                                                    property var totalDots: currentProgram===null?0:currentProgram.data.dots.length/*+centerDot*/;
-                                                    text:checkedDots+"/"+totalDots;width: parent.width*0.5;textInput.readOnly: true;
+                                                    text:checkedDots+"/"+totalDots;width: parent.width*0.5;textInput.readOnly: true;enabled:false;
                                                 }
                                             }
                                             Row{width:parent.width;height: parent.height*1/3;spacing: width*0.05;
                                                 CusText{text:lt+qsTr("Check timespan"); horizontalAlignment: Text.AlignLeft;width: parent.width*0.45;font.pointSize: fontPointSize;}
                                                 LineEdit{
                                                     property int timeSpan: IcUiQmlApi.appCtrl.checkSvc.checkTime;
-                                                    text:Math.floor(timeSpan/60)+":"+timeSpan%60;width: parent.width*0.5;textInput.readOnly: true;}
+                                                    text:Math.floor(timeSpan/60)+":"+timeSpan%60;width: parent.width*0.5;textInput.readOnly: true;enabled:false;}
                                             }
                                         }
                                     }
@@ -275,7 +275,7 @@ Item {id:root; width: 1366;height: 691
                                 }
                                 Item{id:controlPanel;width:controlPanel.height*4/3;height: parent.height*0.23;anchors.horizontalCenter: parent.horizontalCenter;
                                     CusButton {id:autoButton;width: parent.width*0.35;height: parent.height*0.28;buttonColor: backGroundColor; text:checkSvc.autoAlignPupil?"Auto":"Manual";borderColor: "black";anchors.horizontalCenter: parent.horizontalCenter; anchors.verticalCenter: parent.verticalCenter;onClicked: {checkSvc.autoAlignPupil=!checkSvc.autoAlignPupil;}}
-                                    CusButton {id:upButton;rec.visible: false;anchors.left: parent.Top;height: image.sourceSize.height*root.height/691;imageHightScale:1.0;width: image.sourceSize.width*root.width/1366;anchors.horizontalCenter: parent.horizontalCenter;imageSrc: "qrc:/Pics/capture-svg/arrow_1up.svg";onPressed:{imageHightScale=1.1;checkSvc.moveChinUp();}onReleased:{imageHightScale=1.0;checkSvc.stopMovingChin();}}
+                                    CusButton {id:upButton;rec.visible: false;anchors.top: parent.top;height: image.sourceSize.height*root.height/691;imageHightScale:1.0;width: image.sourceSize.width*root.width/1366;anchors.horizontalCenter: parent.horizontalCenter;imageSrc: "qrc:/Pics/capture-svg/arrow_1up.svg";onPressed:{imageHightScale=1.1;checkSvc.moveChinUp();}onReleased:{imageHightScale=1.0;checkSvc.stopMovingChin();}}
                                     CusButton {id:downButton;rec.visible: false;anchors.bottom: parent.bottom; height: image.sourceSize.height*root.height/691;imageHightScale:1.0;width: image.sourceSize.width*root.width/1366;anchors.horizontalCenter: parent.horizontalCenter;imageSrc: "qrc:/Pics/capture-svg/arrow_2down.svg";onPressed:{imageHightScale=1.1;checkSvc.moveChinDown();}onReleased:{imageHightScale=1.0;checkSvc.stopMovingChin();}}
                                     CusButton {id:leftButton;rec.visible: false; anchors.right: autoButton.left; anchors.verticalCenter: parent.verticalCenter; imageHightScale:1.0;height: image.sourceSize.height*root.height/691; anchors.rightMargin:(controlPanel.height-autoButton.height-upButton.height*2)/2;width: image.sourceSize.width*root.width/1366;imageSrc: "qrc:/Pics/capture-svg/arrow_3left.svg";onPressed:{imageHightScale=1.1;checkSvc.moveChinRight();}onReleased:{imageHightScale=1.0;checkSvc.stopMovingChin();}}
                                     CusButton {id:rightButton;rec.visible: false;anchors.left: autoButton.right;anchors.verticalCenter: parent.verticalCenter;imageHightScale:1.0;height: image.sourceSize.height*root.height/691; anchors.leftMargin:(controlPanel.height-autoButton.height-upButton.height*2)/2;width: image.sourceSize.width*root.width/1366; imageSrc: "qrc:/Pics/capture-svg/arrow_4right.svg";onPressed:{imageHightScale=1.1;checkSvc.moveChinLeft();}onReleased:{imageHightScale=1.0;checkSvc.stopMovingChin();}}
@@ -286,7 +286,7 @@ Item {id:root; width: 1366;height: 691
                                             Row{width:parent.width;height: parent.height*0.75/3;spacing: width*0.05;
                                                 CusCheckBox{id:pupilDiameter;checked:true;onCheckedChanged:checkSvc.measurePupil=checked;}
                                                 CusText{text:lt+qsTr("Pupil diameter"); horizontalAlignment: Text.AlignLeft;width: parent.width*0.5;font.pointSize: fontPointSize;}
-                                                LineEdit{text:(IcUiQmlApi.appCtrl.checkSvc.pupilDiameter>0&&pupilDiameter.checked)?IcUiQmlApi.appCtrl.checkSvc.pupilDiameter.toFixed(2):"";width: parent.width*0.25;textInput.readOnly:true;}
+                                                LineEdit{text:(IcUiQmlApi.appCtrl.checkSvc.pupilDiameter>0&&pupilDiameter.checked)?IcUiQmlApi.appCtrl.checkSvc.pupilDiameter.toFixed(2):"";width: parent.width*0.25;textInput.readOnly:true;enabled:false;}
                                             }
                                             Row{id: row;width:parent.width;height: parent.height*0.75/3;spacing: width*0.05;
                                                 CusCheckBox{id:eyeMoveAlarm;checked:false;onCheckedChanged:checkSvc.eyeMoveAlarm=checked;}

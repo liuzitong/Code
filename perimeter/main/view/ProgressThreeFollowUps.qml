@@ -125,6 +125,8 @@ Rectangle {
                         {
                             id:diagnosis;anchors.fill: parent;anchors.margins: 3;
                             width:parent.width*1.0;height: parent.height*0.70;
+                            objectName: "UserInputItem.TextField";
+                            property string vkbdLangCountry : root.lang;
                             selectionColor: "blue";selectByMouse: true;
                             font.pointSize: fontPointSize;font.family: "Consolas";
                             wrapMode: Text.WrapAnywhere;renderType: Text.NativeRendering;

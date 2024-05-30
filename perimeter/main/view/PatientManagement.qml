@@ -457,7 +457,7 @@ Item{
                                     CusButton{
                                         text:lt+qsTr("Select");width:height*2;onClicked:{calendar.inputObj=newBirthDate;calendar.open();}}
                                     LineEdit{
-                                        id:newPatientage;width: height*2;text:"";radius: height*0.2;horizontalAlignment: Text.AlignHCenter;readOnly: true;backgroundColor:backGroundColor;
+                                        id:newPatientage;width: height*2;text:"";radius: height*0.2;horizontalAlignment: Text.AlignHCenter;readOnly: true;enabled:false;backgroundColor:backGroundColor;
                                     }
                                 }
                             }

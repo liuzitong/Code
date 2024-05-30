@@ -213,7 +213,7 @@ ModalPopupDialog/* Rectangle*/{   // this is the wrapped Popup element in ui_qml
 
                     Item {
                         width: parent.width;
-                        height: parent.height*0.15
+                        height: parent.height*0.165
                         Flow{
                             anchors.top: parent.top
                             anchors.topMargin: parent.height*0.34;

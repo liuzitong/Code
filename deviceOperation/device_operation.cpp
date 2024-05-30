@@ -52,9 +52,9 @@ void DeviceOperation::connectDev()
     if(m_devCtl==nullptr)
     {
         // updateDevInfo("connecting.");
-#ifndef _DEBUG                               //release 情况下重连
+// #ifndef _DEBUG                               //release 情况下重连
         m_reconnectTimer.start();
-#endif
+// #endif
         auto deviceSettings=DeviceSettings::getSingleton();
         quint32 vid_pid=deviceSettings->m_VID.toInt(nullptr,16)<<16|deviceSettings->m_PID.toInt(nullptr,16);
         m_devCtl.reset(UsbDev::DevCtl::createInstance(vid_pid));
@@ -682,9 +682,9 @@ void DeviceOperation::clearPupilData()
 
 void DeviceOperation::workOnNewStatuData()
 {
-#ifndef _DEBUG                                                      //release 的情况下激活重连功能
+// #ifndef _DEBUG                                                      //release 的情况下激活重连功能
     m_reconnectTimer.start();                                       //收到消息表示连接正常，重新计时
-#endif
+// #endif
     m_statusData=m_devCtl->takeNextPendingStatusData();
     using MotorId=UsbDev::DevCtl::MotorId;
     m_statusDataOut.serialNo=m_statusData.serialNO();
