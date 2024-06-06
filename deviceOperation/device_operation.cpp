@@ -14,6 +14,7 @@
 #include <iostream>
 #include <QtMath>
 #include <pupilDetectApi.hxx>
+#include <QMessageBox>
 
 #pragma execution_character_set("utf-8")
 namespace DevOps{
@@ -887,6 +888,9 @@ void DeviceOperation::workOnNewStatuData()
                 waitMotorStop({UsbDev::DevCtl::MotorId_Shutter});
                 m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA*0.3);
                 DeviceSettings::getSingleton()->m_deviationCalibrationFail=true;
+                QMessageBox msgBox;
+                msgBox.setText(tr("Deviation calibration fail.Please contact customer service.This is serious."));
+                msgBox.exec();
                 DeviceSettings::getSingleton()->saveDeviationCalibrationStatus();
                 setCastLightAdjustStatus(3);
                 m_deviationCalibrationStatus=0;
@@ -1056,6 +1060,12 @@ void DeviceOperation::workOnNewConfig()
     bool adjusted=((date.year()==lastAdjustedDate.year())&&(date.month()==lastAdjustedDate.month())&&(date.day()==lastAdjustedDate.day()));
     bool skipAdjustCastLight=DeviceSettings::getSingleton()->m_skipAdjustCastLight;
     bool deviationCalibrationFail=DeviceSettings::getSingleton()->m_deviationCalibrationFail;
+    if(deviationCalibrationFail)
+    {
+        QMessageBox msgBox;
+        msgBox.setText(tr("Deviation calibration fail.Please contact customer service.This is serious."));
+        msgBox.exec();
+    }
     if(adjusted||skipAdjustCastLight||deviationCalibrationFail)
     {
         setCastLightAdjustStatus(3);
