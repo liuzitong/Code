@@ -217,6 +217,7 @@ private:
 //    QTimer m_videoTimer;
     QElapsedTimer m_castLightAdjustElapsedTimer;
     QElapsedTimer m_castLightStablelizeWaitingElapsedTimer;
+    QSharedPointer<DeviceSettings> m_deviceSettings;
 
     /**
      * 调整方法，X方向直线扫描，扫描角度范围X:-6~6,Y:30~42,扫描间隔为step度

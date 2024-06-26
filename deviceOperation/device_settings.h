@@ -24,6 +24,7 @@ public:
     double m_castLightDAChangeRate;
     int m_castLightDAChangeInterval;
     int m_castLightDAChangeMinStep;
+    int m_castLightDALimit;
     int m_castLightTargetColor;
     int m_castLightTargetSize;
     QString m_castLightLastAdjustedDate;

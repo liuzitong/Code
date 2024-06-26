@@ -11,6 +11,7 @@
     "castLightStablizeWaitingTime":20000,
     "castLightTargetColor": 0,
     "castLightTargetSize": 5,
+    "castLightDALimit": 4095,
     "colorToSlot": [
         {
             "Color": 0,

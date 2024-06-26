@@ -25,10 +25,12 @@ DeviceOperation::DeviceOperation()
 {
     connect(&m_reconnectTimer,&QTimer::timeout,this,&DeviceOperation::reconnectDev);
     m_autoPupilElapsedTimer.start();
-    m_reconnectTimer.setInterval(DeviceSettings::getSingleton()->m_reconnectTime);                            //复位的时候会短暂收不到数据更新，时间不能太短
-    m_waitingTime=DeviceSettings::getSingleton()->m_waitingTime;
-    m_currentCastLightDA=DeviceSettings::getSingleton()->m_castLightDA;
+    m_deviceSettings=DeviceSettings::getSingleton();
+    m_reconnectTimer.setInterval(m_deviceSettings->m_reconnectTime);                            //复位的时候会短暂收不到数据更新，时间不能太短
+    m_waitingTime=m_deviceSettings->m_waitingTime;
+    m_currentCastLightDA=m_deviceSettings->m_castLightDA;
     m_config=DeviceData::getSingleton()->m_config;
+
 
     std::string PROJECT_DIR = ".";
     std::string pupilModelPath = PROJECT_DIR + "/v8_64_1_848_pupil_model_4.xml";
@@ -80,8 +82,8 @@ void DeviceOperation::reconnectDev()
     m_devCtl.reset(nullptr);
     m_status={-1,-1};
     setDeviceStatus(1);
-    DeviceSettings::getSingleton()->m_reconTimes++;
-    DeviceSettings::getSingleton()->saveReconTimes();
+    m_deviceSettings->m_reconTimes++;
+    m_deviceSettings->saveReconTimes();
     connectDev();
 }
 
@@ -110,8 +112,8 @@ void DeviceOperation::setCursorColorAndCursorSize(int color, int spot)
     auto profile=m_profile;
     auto config=m_config;
     quint8 sps[5]={1,1,1,1,1};
-    auto colorToSlot=DeviceSettings::getSingleton()->m_colorToSlot;
-    auto spotSizeToSlot=DeviceSettings::getSingleton()->m_spotSizeToSlot;
+    auto colorToSlot=m_deviceSettings->m_colorToSlot;
+    auto spotSizeToSlot=m_deviceSettings->m_spotSizeToSlot;
     int colorSlot,spotSlot;
     for(auto&i:colorToSlot)
     {
@@ -278,7 +280,7 @@ void DeviceOperation::setDB(int DB)
     int motorPos[5]{0};
     motorPos[3]=config.DbPosMappingPtr()[DB][0];
     motorPos[4]=config.DbPosMappingPtr()[DB][1];
-    auto spsConfig=DeviceSettings::getSingleton()->m_5MotorSpeed;
+    auto spsConfig=m_deviceSettings->m_5MotorSpeed;
     sps[3]=spsConfig[3];sps[4]=spsConfig[4];
     waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
     m_devCtl->move5Motors(sps,motorPos);
@@ -321,7 +323,7 @@ void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB,bool
     m_isMainTable=isMainDotInfoTable;
     if(m_deviceStatus!=2) return;
     auto coordSpacePosInfo=DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoord(loc,isMainDotInfoTable);
-    auto spotSizeToSlot=DeviceSettings::getSingleton()->m_spotSizeToSlot;
+    auto spotSizeToSlot=m_deviceSettings->m_spotSizeToSlot;
     int spotSlot;
     for(auto&i:spotSizeToSlot)
     {
@@ -354,14 +356,14 @@ void DeviceOperation::adjustCastLight()
 #endif
     auto log=spdlog::get("logger");
     log->info("Adjust cast light begins.");
-    int color=DeviceSettings::getSingleton()->m_castLightTargetColor;
-    int size=DeviceSettings::getSingleton()->m_castLightTargetSize;
+    int color=m_deviceSettings->m_castLightTargetColor;
+    int size=m_deviceSettings->m_castLightTargetSize;
     setCursorColorAndCursorSize(color,size);
     qDebug()<<m_config.xMotorPosForLightCorrectionRef();
     qDebug()<<m_config.yMotorPosForLightCorrectionRef();
     qDebug()<<m_config.focalLengthMotorPosForLightCorrectionRef();
-    moveToAdjustLight(m_config.xMotorPosForLightCorrectionRef()+DeviceSettings::getSingleton()->m_deviationCalibrationXMotorDeviation,
-                      m_config.yMotorPosForLightCorrectionRef()+DeviceSettings::getSingleton()->m_deviationCalibrationYMotorDeviation,
+    moveToAdjustLight(m_config.xMotorPosForLightCorrectionRef()+m_deviceSettings->m_deviationCalibrationXMotorDeviation,
+                      m_config.yMotorPosForLightCorrectionRef()+m_deviceSettings->m_deviationCalibrationYMotorDeviation,
                       m_config.focalLengthMotorPosForLightCorrectionRef());
     waitForSomeTime(m_waitingTime);
     waitMotorStop({UsbDev::DevCtl::MotorId_Color,
@@ -388,7 +390,7 @@ void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSiz
     auto log=spdlog::get("logger");
     log->info("dynamic stimulate.");
     m_isMainTable=isMainDotInfoTable;
-    auto spotSizeToSlot=DeviceSettings::getSingleton()->m_spotSizeToSlot;
+    auto spotSizeToSlot=m_deviceSettings->m_spotSizeToSlot;
     int spotSlot;
     for(auto&i:spotSizeToSlot)
     {
@@ -514,7 +516,7 @@ void DeviceOperation::openShutter(int durationTime)
 
 void DeviceOperation::move5Motors(bool isMotorMove[], int MotorPoses[])
 {
-    auto spsConfig=DeviceSettings::getSingleton()->m_5MotorSpeed;
+    auto spsConfig=m_deviceSettings->m_5MotorSpeed;
     quint8 sps[7]{0};
     for(int i=0;i<5;i++)
     {
@@ -568,7 +570,7 @@ void DeviceOperation::moveChin(ChinMoveDirection direction)
 {
     if(m_deviceStatus!=2) return;
     auto profile=m_devCtl->profile();
-    auto spsConfig=DeviceSettings::getSingleton()->m_motorChinSpeed;
+    auto spsConfig=m_deviceSettings->m_motorChinSpeed;
 
     quint8 sps[2]{0,0};
     int motorPos[2]{0,0};
@@ -642,7 +644,7 @@ void DeviceOperation::dimDownCastLight()
 void DeviceOperation::resetMotors(QVector<UsbDev::DevCtl::MotorId> motorIDs)
 {
     if(m_deviceStatus!=2) return;
-    auto spsConfig=DeviceSettings::getSingleton()->m_motorChinSpeed;
+    auto spsConfig=m_deviceSettings->m_motorChinSpeed;
     for(auto& motorID:motorIDs)
     {
         int speed=spsConfig[motorID];
@@ -798,46 +800,71 @@ void DeviceOperation::workOnNewStatuData()
     bool motorBusy=getMotorsBusy({UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y});
     int currentcastLightSensorDA=m_statusData.castLightSensorDA();
     int targetcastLightSensorDA=m_config.castLightSensorDAForLightCorrectionRef();
-    if(m_deviationCalibrationStatus==0&&m_castLightAdjustStatus==2&&(m_castLightAdjustElapsedTimer.elapsed()>=DeviceSettings::getSingleton()->m_castLightDAChangeInterval)&&m_deviceStatus==2)
+
+    if(m_deviationCalibrationStatus==0&&m_castLightAdjustStatus==2&&(m_castLightAdjustElapsedTimer.elapsed()>=m_deviceSettings->m_castLightDAChangeInterval)&&m_deviceStatus==2)
     {
         log->info("根据反馈的光位置校对光强.");
-        double DADiffTolerance=DeviceSettings::getSingleton()->m_castLightDADifferenceTolerance*(targetcastLightSensorDA);
+        double DADiffTolerance=m_deviceSettings->m_castLightDADifferenceTolerance*(targetcastLightSensorDA);
         int DADiff=qAbs(targetcastLightSensorDA-currentcastLightSensorDA);
         // std::cout<<"DADiff:"<<DADiff<<" DADiffTolerance:"<<DADiffTolerance<<std::endl;
-        int minStep=DeviceSettings::getSingleton()->m_castLightDAChangeMinStep;
-        int maxStep=qRound(DADiff*DeviceSettings::getSingleton()->m_castLightDAChangeRate);
+        int minStep=m_deviceSettings->m_castLightDAChangeMinStep;
+        int maxStep=qRound(DADiff*m_deviceSettings->m_castLightDAChangeRate);
         int step=qMax(minStep,maxStep);
 
-        if(m_deviationCalibrationTimer.elapsed()>DeviceSettings::getSingleton()->m_deviationCalibrationWatingTime)           //过了一段时间光强依然很低，所以就判定没照到
+        if(m_deviationCalibrationTimer.elapsed()>m_deviceSettings->m_deviationCalibrationWatingTime)           //过了一段时间光强依然很低，所以就判定没照到
         {
-            if(currentcastLightSensorDA<DeviceSettings::getSingleton()->m_deviationCalibrationDA)
+            if(currentcastLightSensorDA<m_deviceSettings->m_deviationCalibrationDA)
             {
                 m_deviationCalibrationStatus=1;
-                DeviceSettings::getSingleton()->m_deviationCalibrationXMotorDeviation=0;
-                DeviceSettings::getSingleton()->m_deviationCalibrationYMotorDeviation=0;
+                m_deviceSettings->m_deviationCalibrationXMotorDeviation=0;
+                m_deviceSettings->m_deviationCalibrationYMotorDeviation=0;
                 setCastLightAdjustStatus(1);
-                m_devCtl->setLamp(LampId::LampId_castLight,0,DeviceSettings::getSingleton()->m_castLightDA);
-                m_currentCastLightDA=DeviceSettings::getSingleton()->m_castLightDA;
+                m_devCtl->setLamp(LampId::LampId_castLight,0,m_deviceSettings->m_castLightDA);
+                m_currentCastLightDA=m_deviceSettings->m_castLightDA;
             }
         }
 
         if(targetcastLightSensorDA>currentcastLightSensorDA)
         {
+            if(m_currentCastLightDA==m_deviceSettings->m_castLightDALimit)
+            {
+                QMessageBox msgBox;
+                msgBox.setText(tr("Bulb can't reach target brightness.Please contact customer service.This is serious"));
+                msgBox.exec();
+
+                setCastLightAdjustStatus(3);
+                openShutter(0);
+                waitForSomeTime(m_waitingTime);
+                waitMotorStop({UsbDev::DevCtl::MotorId_Shutter});
+                m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA*0.3);
+
+                m_deviceSettings->m_castLightLastAdjustedDate=QDate::currentDate().toString("yyyy/MM/dd");
+                m_deviceSettings->m_castLightDA=m_currentCastLightDA;
+                m_deviceSettings->saveCastLightAdjustStatus();
+            }
+
             m_currentCastLightDA+=step;
+            if(m_currentCastLightDA>=m_deviceSettings->m_castLightDALimit)
+            {
+                m_currentCastLightDA=m_deviceSettings->m_castLightDALimit;
+            }
         }
         else
         {
             m_currentCastLightDA-=step;
         }
+
+
         m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA);
         m_castLightAdjustElapsedTimer.restart();
 
         // std::cout<<"m_castLightStablelizeWaitingElapsedTimer:"<<m_castLightStablelizeWaitingElapsedTimer.elapsed()<<std::endl;
+
         if(DADiff>DADiffTolerance)
         {
             m_castLightStablelizeWaitingElapsedTimer.restart();
         }
-        else if(m_castLightStablelizeWaitingElapsedTimer.elapsed()>DeviceSettings::getSingleton()->m_castLightStablizeWaitingTime)
+        else if(m_castLightStablelizeWaitingElapsedTimer.elapsed()>m_deviceSettings->m_castLightStablizeWaitingTime)
         {
             log->info("完成校光.");
             setCastLightAdjustStatus(3);
@@ -846,9 +873,9 @@ void DeviceOperation::workOnNewStatuData()
             waitMotorStop({UsbDev::DevCtl::MotorId_Shutter});
             m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA*0.3);
 
-            DeviceSettings::getSingleton()->m_castLightLastAdjustedDate=QDate::currentDate().toString("yyyy/MM/dd");
-            DeviceSettings::getSingleton()->m_castLightDA=m_currentCastLightDA;
-            DeviceSettings::getSingleton()->saveCastLightAdjustStatus();
+            m_deviceSettings->m_castLightLastAdjustedDate=QDate::currentDate().toString("yyyy/MM/dd");
+            m_deviceSettings->m_castLightDA=m_currentCastLightDA;
+            m_deviceSettings->saveCastLightAdjustStatus();
         }
     }
 
@@ -858,12 +885,12 @@ void DeviceOperation::workOnNewStatuData()
         {
             auto coord=getDyanmicAnswerPos();
             qDebug()<<"coord: "<<coord<<" :x"<<m_statusData.motorPosition(MotorId::MotorId_X)<<" :y"<<m_statusData.motorPosition(MotorId::MotorId_Y)<<" da:"<<currentcastLightSensorDA;
-            if(currentcastLightSensorDA>DeviceSettings::getSingleton()->m_deviationCalibrationDA&&m_deviationCalibrationXCoord.size()==0)
+            if(currentcastLightSensorDA>m_deviceSettings->m_deviationCalibrationDA&&m_deviationCalibrationXCoord.size()==0)
             {
                 m_deviationCalibrationXCoord.push_back(coord.x());
                 qDebug()<<m_deviationCalibrationXCoord;
             }
-            if(currentcastLightSensorDA<DeviceSettings::getSingleton()->m_deviationCalibrationDA&&m_deviationCalibrationXCoord.size()==1)   //说明已经接触过感应器
+            if(currentcastLightSensorDA<m_deviceSettings->m_deviationCalibrationDA&&m_deviationCalibrationXCoord.size()==1)   //说明已经接触过感应器
             {
                 m_deviationCalibrationXCoord.push_back(coord.x());
                 m_deviationCalibrationStatus=2;
@@ -872,26 +899,26 @@ void DeviceOperation::workOnNewStatuData()
                 qDebug()<<m_deviationCalibrationXCoord;
                 //开始Y向扫描
                 double xCoord=0.5*(m_deviationCalibrationXCoord[0]+m_deviationCalibrationXCoord[1]);
-                dynamicStimulate({xCoord,30},{xCoord,42},DeviceSettings::getSingleton()->m_castLightTargetSize,1,true,0.003);
+                dynamicStimulate({xCoord,30},{xCoord,42},m_deviceSettings->m_castLightTargetSize,1,true,0.003);
             }
         }
         else                     //继续X向扫描
         {
             static double direction=1.0f;
-            dynamicStimulate({6*direction,m_deviationYCoord},{-6*direction,m_deviationYCoord},DeviceSettings::getSingleton()->m_castLightTargetSize,1,true,0.003);
+            dynamicStimulate({6*direction,m_deviationYCoord},{-6*direction,m_deviationYCoord},m_deviceSettings->m_castLightTargetSize,1,true,0.003);
             direction=-direction;
-            m_deviationYCoord+=DeviceSettings::getSingleton()->m_deviationCalibrationStep;
+            m_deviationYCoord+=m_deviceSettings->m_deviationCalibrationStep;
             if(m_deviationYCoord>42)
             {
                 openShutter(0);
                 waitForSomeTime(m_waitingTime);
                 waitMotorStop({UsbDev::DevCtl::MotorId_Shutter});
                 m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA*0.3);
-                DeviceSettings::getSingleton()->m_deviationCalibrationFail=true;
+                m_deviceSettings->m_deviationCalibrationFail=true;
                 QMessageBox msgBox;
                 msgBox.setText(tr("Deviation calibration fail.Please contact customer service.This is serious."));
                 msgBox.exec();
-                DeviceSettings::getSingleton()->saveDeviationCalibrationStatus();
+                m_deviceSettings->saveDeviationCalibrationStatus();
                 setCastLightAdjustStatus(3);
                 m_deviationCalibrationStatus=0;
             }
@@ -905,12 +932,12 @@ void DeviceOperation::workOnNewStatuData()
         if(motorBusy)
         {
             auto coord=getDyanmicAnswerPos();
-            if(currentcastLightSensorDA>DeviceSettings::getSingleton()->m_deviationCalibrationDA&&m_deviationCalibrationYCoord.size()==0)
+            if(currentcastLightSensorDA>m_deviceSettings->m_deviationCalibrationDA&&m_deviationCalibrationYCoord.size()==0)
             {
                 m_deviationCalibrationYCoord.push_back(coord.y());
                 qDebug()<<m_deviationCalibrationYCoord;
             }
-            if(currentcastLightSensorDA<DeviceSettings::getSingleton()->m_deviationCalibrationDA&&m_deviationCalibrationYCoord.size()==1)   //说明已经接触过感应器
+            if(currentcastLightSensorDA<m_deviceSettings->m_deviationCalibrationDA&&m_deviationCalibrationYCoord.size()==1)   //说明已经接触过感应器
             {
                 m_deviationCalibrationYCoord.push_back(coord.y());
                 qDebug()<<m_deviationCalibrationYCoord;
@@ -919,9 +946,9 @@ void DeviceOperation::workOnNewStatuData()
                 waitForSomeTime(50);
                 QPointF coord={0.5*(m_deviationCalibrationXCoord[0]+m_deviationCalibrationXCoord[1]),0.5*(m_deviationCalibrationYCoord[0]+m_deviationCalibrationYCoord[1])};
                 auto coordSpacePosInfo=DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoord(coord,true);
-                DeviceSettings::getSingleton()->m_deviationCalibrationXMotorDeviation=coordSpacePosInfo.motorX-m_config.xMotorPosForLightCorrectionRef();
-                DeviceSettings::getSingleton()->m_deviationCalibrationYMotorDeviation=coordSpacePosInfo.motorY-m_config.yMotorPosForLightCorrectionRef();
-                DeviceSettings::getSingleton()->saveDeviationCalibrationStatus();
+                m_deviceSettings->m_deviationCalibrationXMotorDeviation=coordSpacePosInfo.motorX-m_config.xMotorPosForLightCorrectionRef();
+                m_deviceSettings->m_deviationCalibrationYMotorDeviation=coordSpacePosInfo.motorY-m_config.yMotorPosForLightCorrectionRef();
+                m_deviceSettings->saveDeviationCalibrationStatus();
                 adjustCastLight();
             }
         }
@@ -932,9 +959,9 @@ void DeviceOperation::workOnNewStatuData()
             waitForSomeTime(50);
             QPointF coord={0.5*(m_deviationCalibrationXCoord[0]+m_deviationCalibrationXCoord[1]),m_deviationCalibrationYCoord[0]};
             auto coordSpacePosInfo=DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoord(coord,true);
-            DeviceSettings::getSingleton()->m_deviationCalibrationXMotorDeviation=coordSpacePosInfo.motorX-m_config.xMotorPosForLightCorrectionRef();
-            DeviceSettings::getSingleton()->m_deviationCalibrationYMotorDeviation=coordSpacePosInfo.motorY-m_config.yMotorPosForLightCorrectionRef();
-            DeviceSettings::getSingleton()->saveDeviationCalibrationStatus();
+            m_deviceSettings->m_deviationCalibrationXMotorDeviation=coordSpacePosInfo.motorX-m_config.xMotorPosForLightCorrectionRef();
+            m_deviceSettings->m_deviationCalibrationYMotorDeviation=coordSpacePosInfo.motorY-m_config.yMotorPosForLightCorrectionRef();
+            m_deviceSettings->saveDeviationCalibrationStatus();
             adjustCastLight();
         }
     }
@@ -982,9 +1009,9 @@ void DeviceOperation::workOnNewFrameData()
         {
             if(m_autoAlignPupil)                //自动对眼位
             {
-                auto step=DeviceSettings::getSingleton()->m_pupilAutoAlignStep;
-                int tolerance=DeviceSettings::getSingleton()->m_pupilAutoAlignPixelTolerance;
-                auto spsConfig=DeviceSettings::getSingleton()->m_motorChinSpeed;
+                auto step=m_deviceSettings->m_pupilAutoAlignStep;
+                int tolerance=m_deviceSettings->m_pupilAutoAlignPixelTolerance;
+                auto spsConfig=m_deviceSettings->m_motorChinSpeed;
                 quint8 sps[2]{spsConfig[0],spsConfig[1]};
                 int motorPos[2]{0};
 
@@ -1056,10 +1083,10 @@ void DeviceOperation::workOnNewConfig()
     // m_devicePupilProcessor.m_pupilReflectionDotWhiteLimit=m_config.pupilGreyThresholdDAPtr()[1];
     emit newDeviceID(QString(m_config.deviceIDRef()));
     auto date=QDate::currentDate();
-    auto lastAdjustedDate=QDate::fromString(DeviceSettings::getSingleton()->m_castLightLastAdjustedDate,"yyyy/MM/dd");
+    auto lastAdjustedDate=QDate::fromString(m_deviceSettings->m_castLightLastAdjustedDate,"yyyy/MM/dd");
     bool adjusted=((date.year()==lastAdjustedDate.year())&&(date.month()==lastAdjustedDate.month())&&(date.day()==lastAdjustedDate.day()));
-    bool skipAdjustCastLight=DeviceSettings::getSingleton()->m_skipAdjustCastLight;
-    bool deviationCalibrationFail=DeviceSettings::getSingleton()->m_deviationCalibrationFail;
+    bool skipAdjustCastLight=m_deviceSettings->m_skipAdjustCastLight;
+    bool deviationCalibrationFail=m_deviceSettings->m_deviationCalibrationFail;
     if(deviationCalibrationFail)
     {
         QMessageBox msgBox;
