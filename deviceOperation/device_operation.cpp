@@ -811,25 +811,24 @@ void DeviceOperation::workOnNewStatuData()
         int maxStep=qRound(DADiff*m_deviceSettings->m_castLightDAChangeRate);
         int step=qMax(minStep,maxStep);
 
-        if(m_deviationCalibrationTimer.elapsed()>m_deviceSettings->m_deviationCalibrationWatingTime)           //过了一段时间光强依然很低，所以就判定没照到
+        if(m_deviationCalibrationTimer.elapsed()>m_deviceSettings->m_deviationCalibrationWatingTime&&currentcastLightSensorDA<m_deviceSettings->m_deviationCalibrationDA)           //过了一段时间光强依然很低，所以就判定没照到
         {
-            if(currentcastLightSensorDA<m_deviceSettings->m_deviationCalibrationDA)
-            {
-                m_deviationCalibrationStatus=1;
-                m_deviceSettings->m_deviationCalibrationXMotorDeviation=0;
-                m_deviceSettings->m_deviationCalibrationYMotorDeviation=0;
-                setCastLightAdjustStatus(1);
-                m_devCtl->setLamp(LampId::LampId_castLight,0,m_deviceSettings->m_castLightDA);
-                m_currentCastLightDA=m_deviceSettings->m_castLightDA;
-            }
+            m_deviationCalibrationStatus=1;
+            m_deviceSettings->m_deviationCalibrationXMotorDeviation=0;
+            m_deviceSettings->m_deviationCalibrationYMotorDeviation=0;
+            log->critical("start Deviation calibration fail.");
+            setCastLightAdjustStatus(1);
+            m_devCtl->setLamp(LampId::LampId_castLight,0,m_deviceSettings->m_castLightDA);
+            m_currentCastLightDA=m_deviceSettings->m_castLightDA;
         }
 
-        if(targetcastLightSensorDA>currentcastLightSensorDA)
+        if(targetcastLightSensorDA>currentcastLightSensorDA&&currentcastLightSensorDA>m_deviceSettings->m_deviationCalibrationDA)                       //照到了但是达不到光强
         {
-            if(m_currentCastLightDA==m_deviceSettings->m_castLightDALimit)
+            if(m_currentCastLightDA==m_deviceSettings->m_castLightDALimit)                                                                              //超时判定灯盘粗了
             {
                 QMessageBox msgBox;
-                msgBox.setText(tr("Bulb can't reach target brightness.Please contact customer service.This is serious"));
+                log->critical("Bulb can't reach target brightness.");
+                msgBox.setText(tr("Bulb can't reach target brightness.Please Change bulb or contact customer service.This is serious"));
                 msgBox.exec();
 
                 setCastLightAdjustStatus(3);
@@ -841,12 +840,15 @@ void DeviceOperation::workOnNewStatuData()
                 m_deviceSettings->m_castLightLastAdjustedDate=QDate::currentDate().toString("yyyy/MM/dd");
                 m_deviceSettings->m_castLightDA=m_currentCastLightDA;
                 m_deviceSettings->saveCastLightAdjustStatus();
+                goto End;
             }
-
-            m_currentCastLightDA+=step;
-            if(m_currentCastLightDA>=m_deviceSettings->m_castLightDALimit)
+            else
             {
-                m_currentCastLightDA=m_deviceSettings->m_castLightDALimit;
+                m_currentCastLightDA+=step;
+                if(m_currentCastLightDA>=m_deviceSettings->m_castLightDALimit)
+                {
+                    m_currentCastLightDA=m_deviceSettings->m_castLightDALimit;
+                }
             }
         }
         else
@@ -876,6 +878,7 @@ void DeviceOperation::workOnNewStatuData()
             m_deviceSettings->m_castLightLastAdjustedDate=QDate::currentDate().toString("yyyy/MM/dd");
             m_deviceSettings->m_castLightDA=m_currentCastLightDA;
             m_deviceSettings->saveCastLightAdjustStatus();
+            goto End;
         }
     }
 
@@ -916,6 +919,7 @@ void DeviceOperation::workOnNewStatuData()
                 m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA*0.3);
                 m_deviceSettings->m_deviationCalibrationFail=true;
                 QMessageBox msgBox;
+                log->critical("Deviation calibration fail.");
                 msgBox.setText(tr("Deviation calibration fail.Please contact customer service.This is serious."));
                 msgBox.exec();
                 m_deviceSettings->saveDeviationCalibrationStatus();
@@ -965,6 +969,7 @@ void DeviceOperation::workOnNewStatuData()
             adjustCastLight();
         }
     }
+    End:
     m_workingOnStatus=false;
 
 }
@@ -1085,6 +1090,7 @@ void DeviceOperation::workOnNewConfig()
     auto date=QDate::currentDate();
     auto lastAdjustedDate=QDate::fromString(m_deviceSettings->m_castLightLastAdjustedDate,"yyyy/MM/dd");
     bool adjusted=((date.year()==lastAdjustedDate.year())&&(date.month()==lastAdjustedDate.month())&&(date.day()==lastAdjustedDate.day()));
+    adjusted=false;    //现在改成每次都校光
     bool skipAdjustCastLight=m_deviceSettings->m_skipAdjustCastLight;
     bool deviationCalibrationFail=m_deviceSettings->m_deviationCalibrationFail;
     if(deviationCalibrationFail)
