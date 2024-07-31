@@ -19,6 +19,20 @@ Rectangle {
     property var currentPatient: patientPage.currentPatient;
     property var permission: null;
     signal login;
+    property var castLightAdjustStatus:IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus;
+    onCastLightAdjustStatusChanged:
+    {
+        if(IcUiQmlApi.appCtrl.checkSvc.debugMode) return;
+        if(castLightAdjustStatus===3)  //校准完成
+        {
+            idPopup2.close();
+        }
+        if(castLightAdjustStatus===1||castLightAdjustStatus===2)   //调整偏移位置 ||矫正的光强
+        {
+            idPopup2.open();
+        }
+    }
+
 
     onPermissionChanged:
     {
@@ -41,6 +55,21 @@ Rectangle {
     Settings{id:settings;anchors.fill: parent;}
 
     About{id:about;anchors.fill: parent;}
+
+    ModalPopupDialog
+    {
+        id:idPopup2
+        anchors.fill: parent;
+        contentItem:
+        Rectangle{
+            color: "#60606060";implicitWidth: idPopup.width; implicitHeight: idPopup.height;
+            Rectangle
+            {
+                CusText:"The device is calibrating,please wait a few minutes."
+            }
+        }
+    }
+
 
     ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml_contro
         id:idPopup

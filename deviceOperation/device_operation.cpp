@@ -829,7 +829,7 @@ void DeviceOperation::workOnNewStatuData()
             if(m_currentCastLightDA==m_deviceSettings->m_castLightDALimit)
             {
                 QMessageBox msgBox;
-                msgBox.setText(tr("Bulb can't reach target brightness.Please contact customer service.This is serious"));
+                msgBox.setText(tr("Bulb can't reach target brightness.Please Change bulb or contact customer service.This is serious"));
                 msgBox.exec();
 
                 setCastLightAdjustStatus(3);
@@ -1085,6 +1085,7 @@ void DeviceOperation::workOnNewConfig()
     auto date=QDate::currentDate();
     auto lastAdjustedDate=QDate::fromString(m_deviceSettings->m_castLightLastAdjustedDate,"yyyy/MM/dd");
     bool adjusted=((date.year()==lastAdjustedDate.year())&&(date.month()==lastAdjustedDate.month())&&(date.day()==lastAdjustedDate.day()));
+    adjusted=false;    //现在改成每次都校光
     bool skipAdjustCastLight=m_deviceSettings->m_skipAdjustCastLight;
     bool deviationCalibrationFail=m_deviceSettings->m_deviationCalibrationFail;
     if(deviationCalibrationFail)
