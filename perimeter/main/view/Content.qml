@@ -175,8 +175,8 @@ Rectangle {
                                 IcUiQmlApi.appCtrl.checkSvc.stop();
                             }
                         }
-                        IcUiQmlApi.appCtrl.checkSvc.leaveCheck();
                     }
+                    IcUiQmlApi.appCtrl.checkSvc.leaveCheck();
                     Qt.quit();
                 }
             }

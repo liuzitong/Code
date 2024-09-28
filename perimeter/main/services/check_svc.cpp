@@ -13,6 +13,7 @@
 #include <perimeter/main/services/keyboard_filter.h>
 #include <QtConcurrent/QtConcurrent>
 
+
 namespace Perimeter
 {
 constexpr int MaxDB=51;

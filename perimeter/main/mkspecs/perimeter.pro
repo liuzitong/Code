@@ -9,6 +9,7 @@ QT += datavisualization
 #QT += concurrent
 CONFIG += thread
 CONFIG += c++11
+
 CONFIG -= app_bundle
 DEFINES += QT_DEPRECATED_WARNINGS QT_MESSAGELOGCONTEXT _QX_NO_PRECOMPILED_HEADER
 QMAKE_CFLAGS += /utf-8
@@ -26,6 +27,8 @@ include( $$PWD/../../base/perimeter_base.pri )
 include( $$PWD/../../main/perimeter_main.pri )
 include( $$PWD/../../third-part/qxpackic_all.pri )
 include( $$PWD/../../third-part/perm/perm.pri )
+include( $$PWD/../../third-part/dcmtk/dcmtk.pri )
+
 #include( $$PWD/../../../deviceOperation-build/deviceOperation.pri )
 # ///////////////////////////////////////////////////////////////////////////
 # put the final app into /tmp for debug

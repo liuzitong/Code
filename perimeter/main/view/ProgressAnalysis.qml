@@ -84,7 +84,7 @@ Column {
 
             Item{height: parent.height;width:parent.width*0.28;
                 Item{id: item1;anchors.fill: parent;anchors.margins:parent.height*0.15;
-                    Row
+                    Flow
                     {
                         height: parent.height; layoutDirection: Qt.RightToLeft;spacing: height*0.8;width: parent.width
                         anchors.horizontalCenter: parent.horizontalCenter
@@ -96,6 +96,17 @@ Column {
                                 case 0:progressAnalysisListVm.getProgressBaseLineReport(diagnosis);return;
                                 case 1:progressAnalysisListVm.getThreeFollowUpsReport(progressAnalysisListVm.selectedIndex,diagnosis);return;
                                 case 2:progressAnalysisListVm.getSingleProgressReport(progressAnalysisListVm.selectedIndex,diagnosis);return;
+                                }
+                            }
+                        }
+                        CusButton{text:lt+qsTr("UploadDicom");onClicked:
+                            {
+                                var diagnosis=content.item.diagnosis
+                                switch (report)
+                                {
+                                case 0:progressAnalysisListVm.getProgressBaseLineReport(diagnosis,true);return;
+                                case 1:progressAnalysisListVm.getThreeFollowUpsReport(progressAnalysisListVm.selectedIndex,diagnosis,true);return;
+                                case 2:progressAnalysisListVm.getSingleProgressReport(progressAnalysisListVm.selectedIndex,diagnosis,true);return;
                                 }
                             }
                         }
