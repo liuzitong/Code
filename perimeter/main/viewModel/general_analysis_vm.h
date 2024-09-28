@@ -21,7 +21,7 @@ public:
     Q_INVOKABLE QPointF getClickDot(float MouseX,float MouseY,float width,float height);
     Q_INVOKABLE QPointF getPixFromPoint(QPointF point,float width,float height);
     Q_INVOKABLE int getSelectedDotIndex(){return m_selectedDotIndex;}Q_SIGNAL void selectedDotIndexChanged();
-    Q_INVOKABLE void showReport(int report);
+    Q_INVOKABLE void showReport(int report,bool uploadDicom=false);
     Q_INVOKABLE QObject* getResult();
 
     int getType(){return m_type;}
@@ -49,7 +49,7 @@ class DynamicAnalysisVm: public QObject
 public:
     Q_INVOKABLE explicit DynamicAnalysisVm(const QVariantList & );
     Q_INVOKABLE virtual ~DynamicAnalysisVm();
-    Q_INVOKABLE void showReport(int report);
+    Q_INVOKABLE void showReport(int report,bool uploadDicom=false);
 
     int getType(){return m_type;}
 private:
@@ -124,7 +124,7 @@ class StaticAnalysisOverViewVm:public QObject
 public:
     Q_INVOKABLE explicit StaticAnalysisOverViewVm(const QVariantList & );
     Q_INVOKABLE virtual ~StaticAnalysisOverViewVm();
-    Q_INVOKABLE void showReport(int report,QString diagnosis);
+    Q_INVOKABLE void showReport(int report,QString diagnosis,bool uploadDicom=false);
 
     int getType(){return 3;}
     OverViewListVm* getResultList(){return m_overViewList.data();}

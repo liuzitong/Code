@@ -106,8 +106,7 @@ Column {
 
             Item{height: parent.height;width:parent.width*0.28;
                 Item{anchors.fill: parent;anchors.margins:parent.height*0.15;
-                    Row
-                    {
+                    Flow{
                         height: parent.height; layoutDirection: Qt.RightToLeft;spacing: height*0.8;width: parent.width
                         anchors.horizontalCenter: parent.horizontalCenter
                         CusButton{text:lt+qsTr("Print");onClicked:
@@ -117,6 +116,14 @@ Column {
                                 else
                                     analysisVm.showReport(report,content.item.diagnosis);
                             }}
+                        CusButton{text:lt+qsTr("UploadDicom");onClicked:
+                            {
+                                if(analysisVm.type!==3)
+                                    analysisVm.showReport(report,true);
+                                else
+                                    analysisVm.showReport(report,content.item.diagnosis,true);
+                            }
+                        }
                     }
                 }
             }

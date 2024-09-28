@@ -797,7 +797,7 @@ void  DevCtlPriv :: ensureTimer( bool sw )
 #ifdef QT_DEBUG
                     tmr->setInterval( 1000/10 );
 #else
-                    tmr->setInterval( 1000/30 );
+                    tmr->setInterval( 1000/10 );
 #endif
                     tmr->setSingleShot( false );
                     return tmr;
@@ -811,7 +811,7 @@ void  DevCtlPriv :: ensureTimer( bool sw )
                 m_t_tmr, []( void *)->QObject*{
                     QTimer *tmr = usbdev_new_qobj( QTimer );
 #ifdef QT_DEBUG
-                    tmr->setInterval( 1000/20 );
+                    tmr->setInterval( 1000/30 );
 #else
                     tmr->setInterval( 1000/60 );
 #endif

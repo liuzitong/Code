@@ -29,6 +29,7 @@
 #include <signal.h>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/rotating_file_sink.h>
+#include <perimeter/main/services/dicom.h>
 #if !defined(WIN32)
 #include <unistd.h>
 #endif

@@ -49,6 +49,7 @@ SOURCES += \
     $$PWD/services/check_svc.cpp \
     $$PWD/services/analysis_svc.cpp \
     $$PWD/object_wrapper.cpp \
+    $$PWD/services/dicom.cpp \
     $$PWD/services/translate_svc.cpp \
     $$PWD/services/utility_svc.cpp \
     $$PWD/services/frame_provid_svc.cpp \
@@ -60,6 +61,7 @@ HEADERS += \
     $$PWD/services/check_svc.h \
     $$PWD/services/analysis_svc.h \
     $$PWD/object_wrapper.h \
+    $$PWD/services/dicom.h \
     $$PWD/services/translate_svc.h \
     $$PWD/services/utility_svc.h \
     $$PWD/services/frame_provid_svc.h \

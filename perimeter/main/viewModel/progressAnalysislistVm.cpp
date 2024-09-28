@@ -2,11 +2,13 @@
 #include <perimeter/main/database/checkResult.h>
 #include <perimeter/main/services/analysis_svc.h>
 #include <perimeter/main/viewModel/general_analysis_vm.h>
+#include <QMessageBox>
 #include <QSharedPointer>
 #include <QVector>
 #include "perimeter/main/appctrl/perimeter_appctrl.hxx"
 #include "perimeter/third-part/qxpack/indcom/ui_qml_base/qxpack_ic_ui_qml_api.hxx"
 #include <perimeter/main/services/utility_svc.h>
+#include <perimeter/main/services/dicom.h>
 
 namespace Perimeter {
 
@@ -179,7 +181,7 @@ QVariant Perimeter::ProgressAnalysisListVm::getSingleProgressPreview(int index,i
     return QVariant(progress.last());
 }
 
-void ProgressAnalysisListVm::getProgressBaseLineReport(QString diagnosis)
+void ProgressAnalysisListVm::getProgressBaseLineReport(QString diagnosis,bool uploadDicom)
 {
     auto analysisSvc=AnalysisSvc::getSingleton();
     QVector<float> mdList;
@@ -280,13 +282,25 @@ void ProgressAnalysisListVm::getProgressBaseLineReport(QString diagnosis)
     manager->setReportVariable("version", tr("Version")+": "+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("version").toString());
 
 
-    UtilitySvc::reportEngine->setShowProgressDialog(true);
-    UtilitySvc::reportEngine->setPreviewScaleType(LimeReport::ScaleType::Percents,50);
-    UtilitySvc::reportEngine->previewReport(/*LimeReport::PreviewHint::ShowAllPreviewBars*/);
+    if(!uploadDicom)
+    {
+        UtilitySvc::reportEngine->setPreviewScaleType(LimeReport::ScaleType::Percents,50);
+        UtilitySvc::reportEngine->previewReport(/*LimeReport::PreviewHint::ShowAllPreviewBars*/);   //耗时非常长
+    }
+    else
+    {
+        UtilitySvc::reportEngine->printToPDF("./dicom");
+        auto dicom=Dicom::getSingleton();
+        bool res=dicom->upLoadDcm(m_patient);
+        QString info=res?tr("Upload executed."):tr("Upload failed.");
 
+        QMessageBox msgBox;
+        msgBox.setText(info);
+        msgBox.exec();
+    }
 }
 
-void Perimeter::ProgressAnalysisListVm::getThreeFollowUpsReport(int index,QString diagnosis)
+void Perimeter::ProgressAnalysisListVm::getThreeFollowUpsReport(int index,QString diagnosis,bool uploadDicom)
 {
     auto analysisSvc=AnalysisSvc::getSingleton();
     QVector<QVector<int>> val,mPE,mDev,progressVal,progressPicVal;
@@ -370,12 +384,25 @@ void Perimeter::ProgressAnalysisListVm::getThreeFollowUpsReport(int index,QStrin
     manager->setReportVariable("version",tr("Version")+": "+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("version").toString());
 
 
-    UtilitySvc::reportEngine->setShowProgressDialog(true);
-    UtilitySvc::reportEngine->setPreviewScaleType(LimeReport::ScaleType::Percents,50);
-    UtilitySvc::reportEngine->previewReport(/*LimeReport::PreviewHint::ShowAllPreviewBars*/);
+    if(!uploadDicom)
+    {
+        UtilitySvc::reportEngine->setPreviewScaleType(LimeReport::ScaleType::Percents,50);
+        UtilitySvc::reportEngine->previewReport(/*LimeReport::PreviewHint::ShowAllPreviewBars*/);   //耗时非常长
+    }
+    else
+    {
+        UtilitySvc::reportEngine->printToPDF("./dicom");
+        auto dicom=Dicom::getSingleton();
+        bool res=dicom->upLoadDcm(m_patient);
+        QString info=res?tr("Upload executed."):tr("Upload failed.");
+
+        QMessageBox msgBox;
+        msgBox.setText(info);
+        msgBox.exec();
+    }
 }
 
-void Perimeter::ProgressAnalysisListVm::getSingleProgressReport(int index,QString diagnosis)
+void Perimeter::ProgressAnalysisListVm::getSingleProgressReport(int index,QString diagnosis,bool uploadDicom)
 {
     CheckResult_ptr checkResult_ptr(new CheckResult());
     checkResult_ptr->m_id=m_selectedResultId;
@@ -502,9 +529,22 @@ void Perimeter::ProgressAnalysisListVm::getSingleProgressReport(int index,QStrin
     manager->setReportVariable("deviceInfo",tr("Device info")+": "+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("deviceInfo").toString());
     manager->setReportVariable("version",tr("Version")+": "+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("version").toString());
 
-    UtilitySvc::reportEngine->setShowProgressDialog(true);
-    UtilitySvc::reportEngine->setPreviewScaleType(LimeReport::ScaleType::Percents,50);
-    UtilitySvc::reportEngine->previewReport(/*LimeReport::PreviewHint::ShowAllPreviewBars*/);
+    if(!uploadDicom)
+    {
+        UtilitySvc::reportEngine->setPreviewScaleType(LimeReport::ScaleType::Percents,50);
+        UtilitySvc::reportEngine->previewReport(/*LimeReport::PreviewHint::ShowAllPreviewBars*/);   //耗时非常长
+    }
+    else
+    {
+        UtilitySvc::reportEngine->printToPDF("./dicom");
+        auto dicom=Dicom::getSingleton();
+        bool res=dicom->upLoadDcm(m_patient);
+        QString info=res?tr("Upload executed."):tr("Upload failed.");
+
+        QMessageBox msgBox;
+        msgBox.setText(info);
+        msgBox.exec();
+    }
 }
 
 

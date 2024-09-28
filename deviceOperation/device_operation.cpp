@@ -15,11 +15,44 @@
 #include <QtMath>
 #include <pupilDetectApi.hxx>
 #include <QMessageBox>
+#include <Windows.h>
 
 #pragma execution_character_set("utf-8")
 namespace DevOps{
 
 QSharedPointer<DeviceOperation> DeviceOperation::m_singleton=/*QSharedPointer<DeviceOperation>(new DeviceOperation())*/nullptr;
+
+
+// #include <windows.h>
+
+// double get_cpu_usage()
+// {
+//     static _FILETIME pre_idle_time;
+//     static _FILETIME pre_kernel_time;
+//     static _FILETIME pre_user_time;
+
+//     // 空闲时间
+//     FILETIME idle_time;
+//     // 内核时间
+//     FILETIME kernel_time;
+//     // 用户时间
+//     FILETIME user_time;
+//     BOOL ret = GetSystemTimes(&idle_time, &kernel_time, &user_time);
+
+//     qint64 idle = CompareFileTime(&pre_idle_time, &idle_time);
+//     qint64 kernel = CompareFileTime(&pre_kernel_time, &kernel_time);
+//     qint64 user = CompareFileTime(&pre_user_time, &user_time);
+
+//     float rate = (kernel + user - idle) / (1.0*(kernel + user));
+
+//     pre_idle_time = idle_time;
+//     pre_kernel_time = kernel_time;
+//     pre_user_time = user_time;
+
+//     return rate;
+// }
+
+
 
 DeviceOperation::DeviceOperation()
 {
@@ -976,6 +1009,9 @@ void DeviceOperation::workOnNewStatuData()
 
 void DeviceOperation::workOnNewFrameData()
 {
+    // double usage=get_cpu_usage();
+    // std::cout<<usage<<std::endl;
+    // if(usage>=80.0f) return;
     m_frameData=m_devCtl->takeNextPendingFrameData();
     m_frameRawDataLock.lock();
     m_frameRawData=m_frameData.rawData();

@@ -8,7 +8,7 @@
     "castLightDAChangeMinStep": 2,
     "castLightDAChangeRate": 0.003,
     "castLightDADifferenceTolerance": 0.005,
-    "castLightStablizeWaitingTime":20000,
+    "castLightStablizeWaitingTime":10000,
     "castLightTargetColor": 0,
     "castLightTargetSize": 5,
     "castLightDALimit": 4095,
@@ -52,7 +52,7 @@
     "pupilDeviationPixelToNumberConstant": 0.5,
     "pupilDiameterPixelToMillimeterConstant": 0.047,
     "reconnectTime":10000,
-    "skipAdjustCastLight": false,
+    "skipAdjustCastLight": true,
     "spotSizeToSlot": [
         {
             "Slot": 0,

@@ -93,9 +93,14 @@
         <translation>新建患者</translation>
     </message>
     <message>
-        <location filename="main/view/Analysis.qml" line="113"/>
+        <location filename="main/view/Analysis.qml" line="112"/>
         <source>Print</source>
         <translation>打印</translation>
+    </message>
+    <message>
+        <location filename="main/view/Analysis.qml" line="119"/>
+        <source>UploadDicom</source>
+        <translation>上传Dicom</translation>
     </message>
 </context>
 <context>
@@ -425,12 +430,12 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="main/view/Controls/CheckDisplay.qml" line="165"/>
+        <location filename="main/view/Controls/CheckDisplay.qml" line="162"/>
         <source>radius</source>
         <translation>半径</translation>
     </message>
     <message>
-        <location filename="main/view/Controls/CheckDisplay.qml" line="165"/>
+        <location filename="main/view/Controls/CheckDisplay.qml" line="162"/>
         <source>angle</source>
         <translation>角度</translation>
     </message>
@@ -486,119 +491,138 @@
 <context>
     <name>Content</name>
     <message>
-        <location filename="main/view/Content.qml" line="54"/>
         <source>Computer automatic perimeter system</source>
-        <translation>电脑自动视野仪系统</translation>
+        <translation type="vanished">电脑自动视野仪系统</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="60"/>
+        <location filename="main/view/Content.qml" line="131"/>
+        <source>  Warning</source>
+        <translation>  警告</translation>
+    </message>
+    <message>
+        <location filename="main/view/Content.qml" line="140"/>
+        <source>Patient is checking,are you sure?</source>
+        <translation>正在检查，你确定吗？</translation>
+    </message>
+    <message>
+        <location filename="main/view/Content.qml" line="142"/>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <location filename="main/view/Content.qml" line="143"/>
+        <source>OK</source>
+        <translation>确定</translation>
+    </message>
+    <message>
+        <location filename="main/view/Content.qml" line="195"/>
         <source>Name</source>
         <translation>姓名</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="65"/>
+        <location filename="main/view/Content.qml" line="200"/>
         <source>Sex</source>
         <translation>性别</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="66"/>
+        <location filename="main/view/Content.qml" line="201"/>
         <source>Male</source>
         <translation>男性</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="66"/>
+        <location filename="main/view/Content.qml" line="201"/>
         <source>Female</source>
         <translation>女性</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="66"/>
+        <location filename="main/view/Content.qml" line="201"/>
         <source>Others</source>
         <translation>其它</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="71"/>
+        <location filename="main/view/Content.qml" line="206"/>
         <source>Age</source>
         <translation>年龄</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="87"/>
+        <location filename="main/view/Content.qml" line="222"/>
         <source>Login</source>
         <translation>登录</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="92"/>
+        <location filename="main/view/Content.qml" line="227"/>
         <source>Device is reconnecting.</source>
         <translation>设备正在重新连接.</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="94"/>
+        <location filename="main/view/Content.qml" line="229"/>
         <source>Device is adjusting light please wait.</source>
         <translation>设备正在校光请等待.</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="100"/>
+        <location filename="main/view/Content.qml" line="235"/>
         <source>Start</source>
         <oldsource>Start.</oldsource>
         <translation>开始</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="101"/>
+        <location filename="main/view/Content.qml" line="236"/>
         <source>Checking</source>
         <oldsource>Checking.</oldsource>
         <translation>检查中</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="102"/>
+        <location filename="main/view/Content.qml" line="237"/>
         <source>Pausing</source>
         <oldsource>Pausing.</oldsource>
         <translation>暂停中</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="103"/>
+        <location filename="main/view/Content.qml" line="238"/>
         <source>Stoping</source>
         <oldsource>Stoping.</oldsource>
         <translation>停止中</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="104"/>
+        <location filename="main/view/Content.qml" line="239"/>
         <source>Finishing</source>
         <oldsource>Finishing.</oldsource>
         <translation>结束中</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="105"/>
+        <location filename="main/view/Content.qml" line="240"/>
         <source>Stopped</source>
         <oldsource>Stopped.</oldsource>
         <translation>已停止</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="106"/>
+        <location filename="main/view/Content.qml" line="241"/>
         <source>Finished</source>
         <oldsource>Finished.</oldsource>
         <translation>已完成</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="128"/>
+        <location filename="main/view/Content.qml" line="263"/>
         <source>Patient</source>
         <translation>患者</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="130"/>
+        <location filename="main/view/Content.qml" line="265"/>
         <source>Check</source>
         <translation>检测</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="144"/>
+        <location filename="main/view/Content.qml" line="279"/>
         <source>Settings</source>
         <translation>设置</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="154"/>
+        <location filename="main/view/Content.qml" line="289"/>
         <source>Customize</source>
         <translation>自定义</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="157"/>
+        <location filename="main/view/Content.qml" line="292"/>
         <source>About</source>
         <translation>关于</translation>
     </message>
@@ -709,47 +733,47 @@
         <translation>诊断</translation>
     </message>
     <message>
-        <location filename="main/view/DynamicAnalysis.qml" line="86"/>
+        <location filename="main/view/DynamicAnalysis.qml" line="88"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <location filename="main/view/DynamicAnalysis.qml" line="123"/>
+        <location filename="main/view/DynamicAnalysis.qml" line="125"/>
         <source>Iospter ident</source>
         <translation>等视标识线</translation>
     </message>
     <message>
-        <location filename="main/view/DynamicAnalysis.qml" line="123"/>
+        <location filename="main/view/DynamicAnalysis.qml" line="125"/>
         <source>Degrees start</source>
         <translation>离心度起点</translation>
     </message>
     <message>
-        <location filename="main/view/DynamicAnalysis.qml" line="123"/>
+        <location filename="main/view/DynamicAnalysis.qml" line="125"/>
         <source>Meridian start</source>
         <translation>子午线起点</translation>
     </message>
     <message>
-        <location filename="main/view/DynamicAnalysis.qml" line="123"/>
+        <location filename="main/view/DynamicAnalysis.qml" line="125"/>
         <source>Degrees stop</source>
         <translation>离心度停止</translation>
     </message>
     <message>
-        <location filename="main/view/DynamicAnalysis.qml" line="123"/>
+        <location filename="main/view/DynamicAnalysis.qml" line="125"/>
         <source>Meridian stop</source>
         <translation>子午线停止</translation>
     </message>
     <message>
-        <location filename="main/view/DynamicAnalysis.qml" line="123"/>
+        <location filename="main/view/DynamicAnalysis.qml" line="125"/>
         <source>Stimulus response</source>
         <translation>刺激亮度反应</translation>
     </message>
     <message>
-        <location filename="main/view/DynamicAnalysis.qml" line="151"/>
+        <location filename="main/view/DynamicAnalysis.qml" line="153"/>
         <source>Seen</source>
         <translation>看见</translation>
     </message>
     <message>
-        <location filename="main/view/DynamicAnalysis.qml" line="151"/>
+        <location filename="main/view/DynamicAnalysis.qml" line="153"/>
         <source>UnSeen</source>
         <translation>未看见</translation>
     </message>
@@ -1231,95 +1255,105 @@
 <context>
     <name>Perimeter::DynamicAnalysisVm</name>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="509"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="525"/>
         <source>Male</source>
         <translation>男性</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="509"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="525"/>
         <source>Female</source>
         <translation>女性</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="514"/>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="519"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="530"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="535"/>
         <source>Visual acuity</source>
         <translation>视力</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="521"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="537"/>
         <source>Pupil diameter</source>
         <translation>瞳孔直径</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="527"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="543"/>
         <source>White</source>
         <translation>白色</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="527"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="543"/>
         <source>Red</source>
         <translation>红色</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="527"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="543"/>
         <source>Blue</source>
         <translation>蓝色</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="530"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="546"/>
         <source>Check timespan</source>
         <translation>测试时间</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="531"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="547"/>
         <source>Stimulus cursor</source>
         <translation>刺激光标</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="553"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="569"/>
         <source>Seen</source>
         <translation>看见</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="553"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="569"/>
         <source>Unseen</source>
         <translation>未看见</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="563"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="579"/>
         <source>Device info</source>
         <translation>设备信息</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="564"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="580"/>
         <source>Version</source>
         <translation>软件版本</translation>
+    </message>
+    <message>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="594"/>
+        <source>Upload executed.</source>
+        <translation>已执行上传。</translation>
+    </message>
+    <message>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="594"/>
+        <source>Upload failed.</source>
+        <translation>上传失败。</translation>
     </message>
 </context>
 <context>
     <name>Perimeter::OverViewListVm</name>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="707"/>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="724"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="751"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="768"/>
         <source>Pattern Deviation not</source>
         <translation>模式偏差不会</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="707"/>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="724"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="751"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="768"/>
         <source>Shown for serverely</source>
         <translation>在严重缺损</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="707"/>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="724"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="751"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="768"/>
         <source>Depressed fields. Refer</source>
         <translation>的情况显示</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="707"/>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="724"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="751"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="768"/>
         <source>to Total Deviation</source>
         <translation>参考总体偏差</translation>
     </message>
@@ -1327,336 +1361,350 @@
 <context>
     <name>Perimeter::ProgressAnalysisListVm</name>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="244"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="337"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="448"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="246"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="351"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="475"/>
         <source>Male</source>
         <translation>男性</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="244"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="337"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="448"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="246"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="351"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="475"/>
         <source>Female</source>
         <translation>女性</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="251"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="346"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="482"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="253"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="360"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="509"/>
         <source>Out of limits</source>
         <translation>超出界限</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="251"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="346"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="482"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="253"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="360"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="509"/>
         <source>Low sensitivity</source>
         <translation>普遍敏感度降低</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="251"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="346"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="482"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="253"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="360"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="509"/>
         <source>Border of limits</source>
         <translation>边界</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="251"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="346"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="482"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="253"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="360"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="509"/>
         <source>Within normal limits</source>
         <translation>正常范围</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="251"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="346"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="482"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="253"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="360"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="509"/>
         <source>Abnormally high of sensitivity</source>
         <translation>异常高敏感度</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="252"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="347"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="254"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="361"/>
         <source>Check date</source>
         <oldsource>checkDate</oldsource>
         <translation>检查日期</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="253"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="348"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="255"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="362"/>
         <source>Program name</source>
         <translation>程序名</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="254"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="349"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="483"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="256"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="363"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="510"/>
         <source>GHT</source>
         <translation>青光眼半视野检查</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="256"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="350"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="473"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="258"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="364"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="500"/>
         <source>Center dot check</source>
         <translation>中心点检测</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="257"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="351"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="474"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="259"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="365"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="501"/>
         <source>On</source>
         <translation>打开</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="257"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="351"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="474"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="259"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="365"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="501"/>
         <source>Off</source>
         <translation>关闭</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="259"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="352"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="484"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="261"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="366"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="511"/>
         <source>MD</source>
         <translation>平均缺损</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="260"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="353"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="485"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="262"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="367"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="512"/>
         <source>PSD</source>
         <translation>平均标准差</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="261"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="356"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="468"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="263"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="370"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="495"/>
         <source>Fixation losses</source>
         <translation>固视丢失</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="262"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="357"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="469"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="264"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="371"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="496"/>
         <source>False positive rate</source>
         <translation>假阳性率</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="263"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="358"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="470"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="265"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="372"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="497"/>
         <source>False negative rate</source>
         <translation>假阴性率</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="273"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="275"/>
         <source>Progress speed</source>
         <oldsource>ProgressSpeed</oldsource>
         <translation>进展速度</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="274"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="276"/>
         <source>Slope insignificant</source>
         <translation>斜率不明显</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="274"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="276"/>
         <source>Slope significant</source>
         <translation>斜率明显</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="275"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="277"/>
         <source>Slope status</source>
         <oldsource>SlopeStatus</oldsource>
         <translation>斜率情况</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="276"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="278"/>
         <source>Average MD</source>
         <oldsource>AverageMD</oldsource>
         <translation>平均缺损均值</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="279"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="369"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="502"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="281"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="383"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="529"/>
         <source>Device info</source>
         <oldsource>Device Info</oldsource>
         <translation>设备信息</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="280"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="370"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="503"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="282"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="384"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="530"/>
         <source>Version</source>
         <translation>软件版本</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="354"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="495"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="295"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="397"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="542"/>
+        <source>Upload executed.</source>
+        <translation>已执行上传。</translation>
+    </message>
+    <message>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="295"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="397"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="542"/>
+        <source>Upload failed.</source>
+        <translation>上传失败。</translation>
+    </message>
+    <message>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="368"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="522"/>
         <source>No progress</source>
         <translation>没有进展</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="354"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="495"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="368"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="522"/>
         <source>Possible progress</source>
         <translation>可能的进展</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="354"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="495"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="368"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="522"/>
         <source>Very possible progress</source>
         <translation>很有可能的进展</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="355"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="496"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="369"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="523"/>
         <source>Progress</source>
         <translation>进展</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="365"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="379"/>
         <source>BaseLine average MD</source>
         <oldsource>baseLine average MD</oldsource>
         <translation>基线平均缺损</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="453"/>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="458"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="480"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="485"/>
         <source>Visual acuity</source>
         <translation>视力</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="460"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="487"/>
         <source>Pupil diameter</source>
         <translation>瞳孔直径</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="463"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="490"/>
         <source>No alarm</source>
         <translation>不报警</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="463"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="490"/>
         <source>Only alarm</source>
         <translation>只报警</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="463"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="490"/>
         <source>Alarm and pause</source>
         <translation>报警并暂停</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="464"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="491"/>
         <source>Center dot</source>
         <translation>中心点</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="464"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="491"/>
         <source>Small diamond</source>
         <translation>小菱形</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="464"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="491"/>
         <source>Big diamond</source>
         <translation>大菱形</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="464"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="491"/>
         <source>Bottom dot</source>
         <translation>底点</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="465"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="492"/>
         <source>Eye move alarm mode</source>
         <translation>眼动报警模式</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="466"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="493"/>
         <source>Fixation target</source>
         <translation>固视目标</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="472"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="499"/>
         <source>Check timespan</source>
         <translation>测试时间</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="476"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="503"/>
         <source>White</source>
         <translation>白色</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="476"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="503"/>
         <source>Red</source>
         <translation>红色</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="476"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="503"/>
         <source>Blue</source>
         <translation>蓝色</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="477"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="504"/>
         <source>Stimulus cursor</source>
         <translation>刺激光标</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="478"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="505"/>
         <source>Background color</source>
         <translation>背景颜色</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="479"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="506"/>
         <source>Full threshold</source>
         <translation>全阈值</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="479"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="506"/>
         <source>Fast threshold</source>
         <translation>快速阈值</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="479"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="506"/>
         <source>Smart interactive</source>
         <translation>智能交互式</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="479"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="506"/>
         <source>Fast interactive</source>
         <translation>快速智能交互式</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="479"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="506"/>
         <source>One stage</source>
         <translation>二区法</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="479"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="506"/>
         <source>Two stages</source>
         <translation>三区法</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="479"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="506"/>
         <source>Quantify defects</source>
         <translation>量化缺损</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="479"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="506"/>
         <source>Single stimulation</source>
         <translation>单刺激</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="480"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="507"/>
         <source>Strategy</source>
         <translation>策略</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="481"/>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="508"/>
         <source>VFI</source>
         <translation></translation>
     </message>
@@ -1664,414 +1712,434 @@
 <context>
     <name>Perimeter::StaticAnalysisOverViewVm</name>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="602"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="632"/>
         <source>Male</source>
         <translation>男性</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="602"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="632"/>
         <source>Female</source>
         <translation>女</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="610"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="640"/>
         <source>program</source>
         <translation>程序</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="611"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="641"/>
         <source>check date</source>
         <translation>检查日期</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="612"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="642"/>
         <source>Full threshold</source>
         <translation>全阈值</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="612"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="642"/>
         <source>Fast threshold</source>
         <translation>快速阈值</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="612"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="642"/>
         <source>Smart interactive</source>
         <translation>智能交互式</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="612"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="642"/>
         <source>Fast interactive</source>
         <translation>快速智能交互式</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="613"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="643"/>
         <source>strategy</source>
         <translation>策略</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="614"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="644"/>
         <source>Out of limits</source>
         <translation>超出界限</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="614"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="644"/>
         <source>Low sensitivity</source>
         <translation>普遍敏感度降低</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="614"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="644"/>
         <source>Border of limits</source>
         <translation>边界</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="614"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="644"/>
         <source>Within normal limits</source>
         <translation>正常范围</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="614"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="644"/>
         <source>Abnormally high of sensitivity</source>
         <translation>异常高敏感度</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="615"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="645"/>
         <source>GHT</source>
         <translation>青光眼半视野检查</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="616"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="646"/>
         <source>eye kind</source>
         <translation>眼别</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="617"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="647"/>
         <source>center dot check</source>
         <translation>中心点检查</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="617"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="647"/>
         <source>On</source>
         <translation>打开</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="617"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="647"/>
         <source>Off</source>
         <translation>关闭</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="618"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="648"/>
         <source>MD</source>
         <translation>平均缺损</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="619"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="649"/>
         <source>PSD</source>
         <translation>平均标准差</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="627"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="657"/>
         <source>Device info</source>
         <translation>设备信息</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="628"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="658"/>
         <source>Version</source>
         <translation>软件版本</translation>
+    </message>
+    <message>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="671"/>
+        <source>Upload executed.</source>
+        <translation>已执行上传。</translation>
+    </message>
+    <message>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="671"/>
+        <source>Upload failed.</source>
+        <translation>上传失败。</translation>
     </message>
 </context>
 <context>
     <name>Perimeter::StaticAnalysisVm</name>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="329"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="331"/>
         <source>Male</source>
         <oldsource>male</oldsource>
         <translation>男性</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="334"/>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="339"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="336"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="341"/>
         <source>Visual acuity</source>
         <oldsource>visualAcuity</oldsource>
         <translation>视力</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="341"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="343"/>
         <source>Pupil diameter</source>
         <oldsource>pupilDiameter</oldsource>
         <translation>瞳孔直径</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="345"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="347"/>
         <source>No alarm</source>
         <oldsource>No Alarm</oldsource>
         <translation>不报警</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="345"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="347"/>
         <source>Only alarm</source>
         <translation>只报警</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="348"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="350"/>
         <source>Eye move alarm mode</source>
         <oldsource>Pause and alarm</oldsource>
         <translation>眼动报警模式</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="347"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="349"/>
         <source>Center dot</source>
         <translation>中心点</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="121"/>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="147"/>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="254"/>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="277"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="123"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="149"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="256"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="279"/>
         <source>Pattern Deviation not</source>
         <translation>模式偏差不会</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="121"/>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="147"/>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="254"/>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="277"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="123"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="149"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="256"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="279"/>
         <source>Shown for serverely</source>
         <translation>在严重缺损</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="121"/>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="147"/>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="254"/>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="277"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="123"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="149"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="256"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="279"/>
         <source>Depressed fields. Refer</source>
         <translation>的情况显示</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="121"/>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="147"/>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="254"/>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="277"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="123"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="149"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="256"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="279"/>
         <source>to Total Deviation</source>
         <translation>参考总体偏差</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="329"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="331"/>
         <source>Female</source>
         <translation>女</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="345"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="347"/>
         <source>Alarm and pause</source>
         <translation>报警并暂停</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="347"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="349"/>
         <source>Bottom dot</source>
         <translation>底点</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="347"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="349"/>
         <source>Small diamond</source>
         <translation>小菱形</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="347"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="349"/>
         <source>Big diamond</source>
         <translation>大菱形</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="349"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="351"/>
         <source>Fixation target</source>
         <oldsource>Fixation Target</oldsource>
         <translation>固视目标</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="351"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="353"/>
         <source>Fixation losses</source>
         <oldsource>Fixation Losses</oldsource>
         <translation>固视丢失</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="352"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="354"/>
         <source>False positive rate</source>
         <oldsource>False Pos errors</oldsource>
         <translation>假阳错误</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="353"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="355"/>
         <source>False negative rate</source>
         <oldsource>False Neg errors</oldsource>
         <translation>假阴错误</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="355"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="357"/>
         <source>Check timespan</source>
         <translation>测试时间</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="356"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="358"/>
         <source>Center dot check</source>
         <oldsource>CenterDotCheck</oldsource>
         <translation>中心点检测</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="356"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="358"/>
         <source>On</source>
         <translation>打开</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="356"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="358"/>
         <source>Off</source>
         <translation>关闭</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="358"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="360"/>
         <source>White</source>
         <translation>白色</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="358"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="360"/>
         <source>Red</source>
         <translation>红色</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="358"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="360"/>
         <source>Blue</source>
         <translation>蓝色</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="359"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="361"/>
         <source>Stimulus cursor</source>
         <oldsource>Stimulus</oldsource>
         <translation>刺激光标</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="360"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="362"/>
         <source>Background color</source>
         <oldsource>Background</oldsource>
         <translation>背景颜色</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="361"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="363"/>
         <source>Full threshold</source>
         <translation>全阈值</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="361"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="363"/>
         <source>Fast threshold</source>
         <translation>快速阈值</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="361"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="363"/>
         <source>Fast interactive</source>
         <translation>快速智能交互式</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="361"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="363"/>
         <source>One stage</source>
         <translation>二区法</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="361"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="363"/>
         <source>Two stages</source>
         <translation>三区法</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="361"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="363"/>
         <source>Quantify defects</source>
         <translation>量化缺损</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="361"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="363"/>
         <source>Single stimulation</source>
         <translation>单刺激</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="361"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="363"/>
         <source>Smart interactive</source>
         <translation>智能交互式</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="362"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="364"/>
         <source>Strategy</source>
         <translation>策略</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="363"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="365"/>
         <source>VFI</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="364"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="366"/>
         <source>Out of limits</source>
         <translation>超出界限</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="364"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="366"/>
         <source>Low sensitivity</source>
         <translation>普遍敏感度降低</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="364"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="366"/>
         <source>Within normal limits</source>
         <translation>正常范围</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="364"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="366"/>
         <source>Border of limits</source>
         <translation>边界</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="364"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="366"/>
         <source>Abnormally high of sensitivity</source>
         <translation>异常高敏感度</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="365"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="367"/>
         <source>GHT</source>
         <translation>青光眼半视野检查</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="366"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="368"/>
         <source>MD</source>
         <translation>平均缺损</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="367"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="369"/>
         <source>PSD</source>
         <translation>平均标准差</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="404"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="406"/>
         <source>Seen</source>
         <translation>看见</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="405"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="407"/>
         <source>Weak seen</source>
         <translation>弱视</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="406"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="408"/>
         <source>Unseen</source>
         <translation>未看见</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="416"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="418"/>
         <source>Device info</source>
         <oldsource>Device Info</oldsource>
         <translation>设备信息</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="417"/>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="419"/>
         <source>Version</source>
         <translation>软件版本</translation>
+    </message>
+    <message>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="431"/>
+        <source>Upload executed.</source>
+        <translation>已执行上传。</translation>
+    </message>
+    <message>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="431"/>
+        <source>Upload failed.</source>
+        <translation>上传失败。</translation>
     </message>
 </context>
 <context>
     <name>Perimeter::StaticCheck</name>
     <message>
-        <location filename="main/services/check_svc.cpp" line="872"/>
+        <location filename="main/services/check_svc.cpp" line="873"/>
         <source>Cant&apos;t locate blind dot.Turn off blindDot check.</source>
         <translation>不能定位盲点.关闭盲点检查.</translation>
     </message>
@@ -2316,6 +2384,11 @@
         <location filename="main/view/ProgressAnalysis.qml" line="91"/>
         <source>Print</source>
         <translation>打印</translation>
+    </message>
+    <message>
+        <location filename="main/view/ProgressAnalysis.qml" line="102"/>
+        <source>UploadDicom</source>
+        <translation>上传Dicom</translation>
     </message>
 </context>
 <context>
@@ -2741,92 +2814,92 @@
         <translation type="vanished">保存</translation>
     </message>
     <message>
-        <location filename="main/view/ProgressAnalysisSingle.qml" line="177"/>
+        <location filename="main/view/ProgressAnalysisSingle.qml" line="179"/>
         <source>Total deviation</source>
         <translation>总体偏差</translation>
     </message>
     <message>
-        <location filename="main/view/ProgressAnalysisSingle.qml" line="178"/>
+        <location filename="main/view/ProgressAnalysisSingle.qml" line="180"/>
         <source>Pattern deviation</source>
         <translation>模式偏差</translation>
     </message>
     <message>
-        <location filename="main/view/ProgressAnalysisSingle.qml" line="207"/>
+        <location filename="main/view/ProgressAnalysisSingle.qml" line="209"/>
         <source>Out of limits</source>
         <translation>超出界限</translation>
     </message>
     <message>
-        <location filename="main/view/ProgressAnalysisSingle.qml" line="207"/>
+        <location filename="main/view/ProgressAnalysisSingle.qml" line="209"/>
         <source>Low sensitivity</source>
         <translation>普遍敏感度降低</translation>
     </message>
     <message>
-        <location filename="main/view/ProgressAnalysisSingle.qml" line="207"/>
+        <location filename="main/view/ProgressAnalysisSingle.qml" line="209"/>
         <source>Within normal limits</source>
         <translation>正常范围</translation>
     </message>
     <message>
-        <location filename="main/view/ProgressAnalysisSingle.qml" line="207"/>
+        <location filename="main/view/ProgressAnalysisSingle.qml" line="209"/>
         <source>Border of limits</source>
         <translation>边界</translation>
     </message>
     <message>
-        <location filename="main/view/ProgressAnalysisSingle.qml" line="207"/>
+        <location filename="main/view/ProgressAnalysisSingle.qml" line="209"/>
         <source>Abnormally high of sensitivity</source>
         <translation>异常高敏感度</translation>
     </message>
     <message>
-        <location filename="main/view/ProgressAnalysisSingle.qml" line="208"/>
+        <location filename="main/view/ProgressAnalysisSingle.qml" line="210"/>
         <source>GHT</source>
         <translation>青光眼半视野检查</translation>
     </message>
     <message>
-        <location filename="main/view/ProgressAnalysisSingle.qml" line="209"/>
+        <location filename="main/view/ProgressAnalysisSingle.qml" line="211"/>
         <source>MD</source>
         <translation>平均缺损</translation>
     </message>
     <message>
-        <location filename="main/view/ProgressAnalysisSingle.qml" line="210"/>
+        <location filename="main/view/ProgressAnalysisSingle.qml" line="212"/>
         <source>PSD</source>
         <translation>平均标准差</translation>
     </message>
     <message>
-        <location filename="main/view/ProgressAnalysisSingle.qml" line="222"/>
+        <location filename="main/view/ProgressAnalysisSingle.qml" line="224"/>
         <source>no progress</source>
         <translation>没有进展</translation>
     </message>
     <message>
-        <location filename="main/view/ProgressAnalysisSingle.qml" line="222"/>
+        <location filename="main/view/ProgressAnalysisSingle.qml" line="224"/>
         <source>possible progress</source>
         <translation>可能的进展</translation>
     </message>
     <message>
-        <location filename="main/view/ProgressAnalysisSingle.qml" line="222"/>
+        <location filename="main/view/ProgressAnalysisSingle.qml" line="224"/>
         <source>very possible progress</source>
         <translation>很有可能的进展</translation>
     </message>
     <message>
-        <location filename="main/view/ProgressAnalysisSingle.qml" line="225"/>
+        <location filename="main/view/ProgressAnalysisSingle.qml" line="227"/>
         <source>BaseLine dates</source>
         <translation>基线检查日期</translation>
     </message>
     <message>
-        <location filename="main/view/ProgressAnalysisSingle.qml" line="230"/>
+        <location filename="main/view/ProgressAnalysisSingle.qml" line="232"/>
         <source>Previous dates</source>
         <translation>以前的追踪检查日期</translation>
     </message>
     <message>
-        <location filename="main/view/ProgressAnalysisSingle.qml" line="237"/>
+        <location filename="main/view/ProgressAnalysisSingle.qml" line="239"/>
         <source>Deterioarted</source>
         <translation>恶化</translation>
     </message>
     <message>
-        <location filename="main/view/ProgressAnalysisSingle.qml" line="237"/>
+        <location filename="main/view/ProgressAnalysisSingle.qml" line="239"/>
         <source>Consecutiveness</source>
         <translation>连续</translation>
     </message>
     <message>
-        <location filename="main/view/ProgressAnalysisSingle.qml" line="237"/>
+        <location filename="main/view/ProgressAnalysisSingle.qml" line="239"/>
         <source>Out of range</source>
         <translation>超出范围</translation>
     </message>
@@ -3327,7 +3400,7 @@
         <translation>诊断</translation>
     </message>
     <message>
-        <location filename="main/view/StaticAnalysis.qml" line="125"/>
+        <location filename="main/view/StaticAnalysis.qml" line="127"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>

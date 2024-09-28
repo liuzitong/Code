@@ -24,12 +24,12 @@ Rectangle {
     function openOrCloseInfoPopup()
     {
         if(IcUiQmlApi.appCtrl.checkSvc.debugMode) return;
-        if(castLightAdjustStatus===3)
+        if(castLightAdjustStatus===3||castLightAdjustStatus===0)
         {
             idPopup2.close();
 
         }
-        if((castLightAdjustStatus!==3)&&visible)   //调整偏移位置 ||矫正的光强
+        else if(visible)   //调整偏移位置 ||矫正的光强
         {
             idPopup2.open();
         }
@@ -74,6 +74,7 @@ Rectangle {
         id:idPopup2
         anchors.fill: parent;
         property string info: "";
+        visible: false;
         reqEnterEventLoop:false;
         contentItem:
         Rectangle{
@@ -175,8 +176,8 @@ Rectangle {
                                 IcUiQmlApi.appCtrl.checkSvc.stop();
                             }
                         }
-                        IcUiQmlApi.appCtrl.checkSvc.leaveCheck();
                     }
+                    IcUiQmlApi.appCtrl.checkSvc.leaveCheck();
                     Qt.quit();
                 }
             }
