@@ -39,9 +39,9 @@ Item
                         Repeater{
                             property var params: currentCheckResult.params;
                             property int timeSpan:currentCheckResult.resultData.testTimespan;
-                            property var fixationMonitor: [lt+qsTr("No alarm"),lt+qsTr("Only alarm"),lt+qsTr("Alarm and pause")];
+                            property var fixationMonitor: [lt+qsTr("No remind"),lt+qsTr("Only remind"),lt+qsTr("Remind and pause")];
 
-                            model: [{name:lt+qsTr("Eye move alarm mode"),param:fixationMonitor[params.fixationMonitor]},{name:lt+qsTr("Check time"),param:Math.floor(timeSpan/60)+":"+timeSpan%60}]
+                            model: [{name:lt+qsTr("Eye move remind mode"),param:fixationMonitor[params.fixationMonitor]},{name:lt+qsTr("Check time"),param:Math.floor(timeSpan/60)+":"+timeSpan%60}]
                            CusText{text:modelData.name+":  "+modelData.param; horizontalAlignment: Text.AlignLeft;height:textHeight;width: parent.width;}
                         }
                     }

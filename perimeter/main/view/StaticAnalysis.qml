@@ -68,12 +68,12 @@ Item
                         Repeater{
                             property var params: currentCheckResult.params.commonParams;
                             property int timeSpan:currentCheckResult.resultData.testTimespan;
-                            property var fixationMonitor: [lt+qsTr("No alarm"),lt+qsTr("Only alarm"),lt+qsTr("Alarm and pause")];
+                            property var fixationMonitor: [lt+qsTr("No remind"),lt+qsTr("Only remind"),lt+qsTr("Remind and pause")];
                             property var fixationTarget: [lt+qsTr("Center dot"),lt+qsTr("Small diamond"),lt+qsTr("Big diamond"),lt+qsTr("Bottom dot")]
                             property var centerDotCheck: [lt+qsTr("On"),lt+qsTr("Off")];
 
                             model: [
-                                {name:lt+qsTr("Eye move alarm mode"),param:fixationMonitor[params.fixationMonitor]},
+                                {name:lt+qsTr("Eye move remind mode"),param:fixationMonitor[params.fixationMonitor]},
                                 {name:lt+qsTr("Fixation target"),param:fixationTarget[params.fixationTarget]},
                                 {name:lt+qsTr("Fixation loss rate"),param:currentCheckResult.resultData.fixationLostCount+'/'+currentCheckResult.resultData.fixationLostTestCount},
                                 {name:lt+qsTr("False positive rate"),param:Math.round(currentCheckResult.resultData.falsePositiveCount/currentCheckResult.resultData.falsePositiveTestCount*100)+"%"},

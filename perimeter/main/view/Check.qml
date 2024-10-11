@@ -290,7 +290,7 @@ Item {id:root; width: 1366;height: 691
                                             }
                                             Row{id: row;width:parent.width;height: parent.height*0.75/3;spacing: width*0.05;
                                                 CusCheckBox{id:eyeMoveAlarm;checked:false;onCheckedChanged:checkSvc.eyeMoveAlarm=checked;}
-                                                CusText{text:lt+qsTr("Eye move alarm"); horizontalAlignment: Text.AlignLeft;width: parent.width*0.50;font.pointSize: fontPointSize;}
+                                                CusText{text:lt+qsTr("Eye move remind"); horizontalAlignment: Text.AlignLeft;width: parent.width*0.50;font.pointSize: fontPointSize;}
                                                 AnimatedImage {visible:checkSvc.eyeMoveAlarming&&(checkSvc.checkState==1||checkSvc.checkState==0);source: "qrc:/Pics/base-svg/btn_alarming.gif";height:parent.height*0.6; anchors.verticalCenter: parent.verticalCenter;width: height; }
                                                 // AnimatedImage{visible:/*checkSvc.eyeMoveAlarming*/true;height:parent.height*0.6; anchors.verticalCenter: parent.verticalCenter;width: height; }
                                             }

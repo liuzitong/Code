@@ -209,7 +209,7 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                    }
                                    Item{
                                        width: parent.width; height:parent.parent.rowHeight;
-                                       CusText{text:lt+qsTr("Response delay time"); anchors.left: parent.left; anchors.leftMargin: 0;width: parent.width*0.45;horizontalAlignment: Text.AlignLeft;font.pointSize:fontPointSize;}
+                                       CusText{text:lt+qsTr("Response delay time")+"(ms)"; anchors.left: parent.left; anchors.leftMargin: 0;width: parent.width*0.45;horizontalAlignment: Text.AlignLeft;font.pointSize:fontPointSize;}
                                        NumberLineEdit{
                                            width: parent.width*0.5; anchors.right: parent.right;step:50;max:5000;min:0;
                                            Component.onCompleted: {
@@ -247,9 +247,9 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                    }
                                    Item{
                                        width: parent.width; height:parent.parent.rowHeight;
-                                       CusText{text:lt+qsTr("Eye move alarm mode"); anchors.left: parent.left; anchors.leftMargin: 0;width: parent.width*0.45;horizontalAlignment: Text.AlignLeft;font.pointSize:fontPointSize;}
+                                       CusText{text:lt+qsTr("Eye move remind mode"); anchors.left: parent.left; anchors.leftMargin: 0;width: parent.width*0.45;horizontalAlignment: Text.AlignLeft;font.pointSize:fontPointSize;}
                                        CusComboBox{
-                                           width: parent.width*0.5; anchors.right: parent.right;model:[lt+qsTr("Only alarm"),lt+qsTr("Alarm and pause")];currentIndex:currentProgram===null?0:currentProgram.params.commonParams.fixationMonitor;
+                                           width: parent.width*0.5; anchors.right: parent.right;model:[lt+qsTr("Only remind"),lt+qsTr("Remind and pause")];currentIndex:currentProgram===null?0:currentProgram.params.commonParams.fixationMonitor;
                                            Component.onCompleted: {idPopup.ok.connect(function(){currentProgram.params.commonParams.fixationMonitor=currentIndex;})}
                                        }
                                    }
@@ -284,7 +284,7 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                     height: parent.height;width: parent.width*0.45;spacing:parent.rowHeight*0.45;
                                     Item{
                                         width: parent.width; height:parent.parent.rowHeight;
-                                        CusText{text:lt+qsTr("Stimulus time"); anchors.left: parent.left; anchors.leftMargin: 0;width: parent.width*0.45;horizontalAlignment: Text.AlignLeft;font.pointSize:fontPointSize;}
+                                        CusText{text:lt+qsTr("Stimulus time")+"(ms)"; anchors.left: parent.left; anchors.leftMargin: 0;width: parent.width*0.45;horizontalAlignment: Text.AlignLeft;font.pointSize:fontPointSize;}
                                         NumberLineEdit{
                                             width: parent.width*0.5; anchors.right: parent.right;step:50;max:500000;min:0;
                                             Component.onCompleted: {idPopup.ok.connect(function(){currentProgram.params.fixedParams.stimulationTime=value;});idPopup.currentProgramChanged.connect(function(){value=currentProgram.params.fixedParams.stimulationTime;});}
@@ -292,7 +292,7 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                     }
                                     Item{
                                         width: parent.width; height:parent.parent.rowHeight;
-                                        CusText{text:lt+qsTr("Interval time"); anchors.left: parent.left; anchors.leftMargin: 0;width: parent.width*0.45;horizontalAlignment: Text.AlignLeft;font.pointSize:fontPointSize;}
+                                        CusText{text:lt+qsTr("Interval time")+"(ms)"; anchors.left: parent.left; anchors.leftMargin: 0;width: parent.width*0.45;horizontalAlignment: Text.AlignLeft;font.pointSize:fontPointSize;}
                                         NumberLineEdit{
                                             width: parent.width*0.5; anchors.right: parent.right;step:50;max:500000;min:0;
                                             Component.onCompleted: {idPopup.ok.connect(function(){currentProgram.params.fixedParams.intervalTime=value;});idPopup.currentProgramChanged.connect(function(){value=currentProgram.params.fixedParams.intervalTime;});}
@@ -353,7 +353,7 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
 
                                    Item{
                                        width: parent.width; height:parent.parent.rowHeight;
-                                       CusText{text:lt+qsTr("Least waiting time"); anchors.left: parent.left; anchors.leftMargin: 0;width: parent.width*0.45;horizontalAlignment: Text.AlignLeft;font.pointSize:fontPointSize;wrapMode: Text.WordWrap;}
+                                       CusText{text:lt+qsTr("Least waiting time")+"(ms)"; anchors.left: parent.left; anchors.leftMargin: 0;width: parent.width*0.45;horizontalAlignment: Text.AlignLeft;font.pointSize:fontPointSize;wrapMode: Text.WordWrap;}
                                        NumberLineEdit{
                                            width: parent.width*0.5; anchors.right: parent.right;step:50;max:5000;min:1;
                                            Component.onCompleted: {idPopup.ok.connect(function(){currentProgram.params.fixedParams.leastWaitingTime=value;});idPopup.currentProgramChanged.connect(function(){value=currentProgram.params.fixedParams.leastWaitingTime;}); }

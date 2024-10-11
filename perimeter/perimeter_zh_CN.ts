@@ -313,8 +313,9 @@
     </message>
     <message>
         <location filename="main/view/Check.qml" line="293"/>
-        <source>Eye move alarm</source>
-        <translation>眼动警报</translation>
+        <source>Eye move remind</source>
+        <oldsource>Eye move alarm</oldsource>
+        <translation>眼动提示</translation>
     </message>
     <message>
         <location filename="main/view/Check.qml" line="299"/>
@@ -639,23 +640,33 @@
     <name>DynamicAnalysis</name>
     <message>
         <location filename="main/view/DynamicAnalysis.qml" line="42"/>
-        <source>No alarm</source>
-        <translation>不报警</translation>
+        <source>No remind</source>
+        <oldsource>No alarm</oldsource>
+        <translation>不提示</translation>
     </message>
     <message>
-        <location filename="main/view/DynamicAnalysis.qml" line="42"/>
         <source>Only alarm</source>
-        <translation>只报警</translation>
+        <translation type="vanished">只报警</translation>
+    </message>
+    <message>
+        <source>Alarm and pause</source>
+        <translation type="vanished">报警并暂停</translation>
     </message>
     <message>
         <location filename="main/view/DynamicAnalysis.qml" line="42"/>
-        <source>Alarm and pause</source>
-        <translation>报警并暂停</translation>
+        <source>Only remind</source>
+        <translation>仅提示</translation>
+    </message>
+    <message>
+        <location filename="main/view/DynamicAnalysis.qml" line="42"/>
+        <source>Remind and pause</source>
+        <translation>提示并暂停</translation>
     </message>
     <message>
         <location filename="main/view/DynamicAnalysis.qml" line="44"/>
-        <source>Eye move alarm mode</source>
-        <translation>眼动报警模式</translation>
+        <source>Eye move remind mode</source>
+        <oldsource>Eye move alarm mode</oldsource>
+        <translation>眼动提示模式</translation>
     </message>
     <message>
         <location filename="main/view/DynamicAnalysis.qml" line="44"/>
@@ -899,19 +910,24 @@
     </message>
     <message>
         <location filename="main/view/DynamicParamsSetting.qml" line="190"/>
-        <source>Eye move alarm</source>
-        <translation>眼动警报</translation>
+        <source>Eye move remind</source>
+        <oldsource>Eye move alarm</oldsource>
+        <translation>眼动提示</translation>
     </message>
     <message>
         <location filename="main/view/DynamicParamsSetting.qml" line="192"/>
-        <source>Only alarm</source>
-        <oldsource>No alarm</oldsource>
-        <translation>仅报警</translation>
+        <source>Only remind</source>
+        <oldsource>Only alarm</oldsource>
+        <translation>仅提示</translation>
     </message>
     <message>
         <location filename="main/view/DynamicParamsSetting.qml" line="192"/>
+        <source>Remind and pause</source>
+        <translation>提示并暂停</translation>
+    </message>
+    <message>
         <source>Alarm and pause</source>
-        <translation>报警并暂停</translation>
+        <translation type="vanished">报警并暂停</translation>
     </message>
     <message>
         <location filename="main/view/DynamicParamsSetting.qml" line="225"/>
@@ -1585,18 +1601,27 @@
     </message>
     <message>
         <location filename="main/viewModel/progressAnalysislistVm.cpp" line="490"/>
-        <source>No alarm</source>
-        <translation>不报警</translation>
+        <source>No remind</source>
+        <oldsource>No alarm</oldsource>
+        <translation>不提示</translation>
     </message>
     <message>
         <location filename="main/viewModel/progressAnalysislistVm.cpp" line="490"/>
+        <source>Only remind</source>
+        <translation>仅报警</translation>
+    </message>
+    <message>
+        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="490"/>
+        <source>Remind and pause</source>
+        <translation>提示并暂停</translation>
+    </message>
+    <message>
         <source>Only alarm</source>
-        <translation>只报警</translation>
+        <translation type="vanished">只报警</translation>
     </message>
     <message>
-        <location filename="main/viewModel/progressAnalysislistVm.cpp" line="490"/>
         <source>Alarm and pause</source>
-        <translation>报警并暂停</translation>
+        <translation type="vanished">报警并暂停</translation>
     </message>
     <message>
         <location filename="main/viewModel/progressAnalysislistVm.cpp" line="491"/>
@@ -1620,8 +1645,9 @@
     </message>
     <message>
         <location filename="main/viewModel/progressAnalysislistVm.cpp" line="492"/>
-        <source>Eye move alarm mode</source>
-        <translation>眼动报警模式</translation>
+        <source>Eye move remind mode</source>
+        <oldsource>Eye move alarm mode</oldsource>
+        <translation>眼动提示模式</translation>
     </message>
     <message>
         <location filename="main/viewModel/progressAnalysislistVm.cpp" line="493"/>
@@ -1860,20 +1886,19 @@
     </message>
     <message>
         <location filename="main/viewModel/general_analysis_vm.cpp" line="347"/>
-        <source>No alarm</source>
-        <oldsource>No Alarm</oldsource>
-        <translation>不报警</translation>
+        <source>No remind</source>
+        <oldsource>No alarm</oldsource>
+        <translation>不提示</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="347"/>
         <source>Only alarm</source>
-        <translation>只报警</translation>
+        <translation type="vanished">只报警</translation>
     </message>
     <message>
         <location filename="main/viewModel/general_analysis_vm.cpp" line="350"/>
-        <source>Eye move alarm mode</source>
-        <oldsource>Pause and alarm</oldsource>
-        <translation>眼动报警模式</translation>
+        <source>Eye move remind mode</source>
+        <oldsource>Eye move alarm mode</oldsource>
+        <translation>眼动提示模式</translation>
     </message>
     <message>
         <location filename="main/viewModel/general_analysis_vm.cpp" line="349"/>
@@ -1918,9 +1943,18 @@
         <translation>女</translation>
     </message>
     <message>
-        <location filename="main/viewModel/general_analysis_vm.cpp" line="347"/>
         <source>Alarm and pause</source>
-        <translation>报警并暂停</translation>
+        <translation type="vanished">报警并暂停</translation>
+    </message>
+    <message>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="347"/>
+        <source>Only remind</source>
+        <translation>仅提示</translation>
+    </message>
+    <message>
+        <location filename="main/viewModel/general_analysis_vm.cpp" line="347"/>
+        <source>Remind and pause</source>
+        <translation>提示并暂停</translation>
     </message>
     <message>
         <location filename="main/viewModel/general_analysis_vm.cpp" line="349"/>
@@ -3230,18 +3264,27 @@
     <name>StaticAnalysis</name>
     <message>
         <location filename="main/view/StaticAnalysis.qml" line="71"/>
-        <source>No alarm</source>
-        <translation>不报警</translation>
+        <source>No remind</source>
+        <oldsource>No alarm</oldsource>
+        <translation>不提示</translation>
     </message>
     <message>
-        <location filename="main/view/StaticAnalysis.qml" line="71"/>
         <source>Only alarm</source>
-        <translation>只报警</translation>
+        <translation type="vanished">只报警</translation>
+    </message>
+    <message>
+        <source>Alarm and pause</source>
+        <translation type="vanished">报警并暂停</translation>
     </message>
     <message>
         <location filename="main/view/StaticAnalysis.qml" line="71"/>
-        <source>Alarm and pause</source>
-        <translation>报警并暂停</translation>
+        <source>Only remind</source>
+        <translation>仅提示</translation>
+    </message>
+    <message>
+        <location filename="main/view/StaticAnalysis.qml" line="71"/>
+        <source>Remind and pause</source>
+        <translation>提示并暂停</translation>
     </message>
     <message>
         <location filename="main/view/StaticAnalysis.qml" line="72"/>
@@ -3276,8 +3319,9 @@
     </message>
     <message>
         <location filename="main/view/StaticAnalysis.qml" line="76"/>
-        <source>Eye move alarm mode</source>
-        <translation>眼动报警模式</translation>
+        <source>Eye move remind mode</source>
+        <oldsource>Eye move alarm mode</oldsource>
+        <translation>眼动提示模式</translation>
     </message>
     <message>
         <location filename="main/view/StaticAnalysis.qml" line="77"/>
@@ -3835,6 +3879,11 @@
         <translation>黄色</translation>
     </message>
     <message>
+        <location filename="main/view/StaticParamsSetting.qml" line="252"/>
+        <source>Remind and pause</source>
+        <translation>提示并暂停</translation>
+    </message>
+    <message>
         <source>Cyan·yellow Check</source>
         <translation type="vanished">兰·黄测试</translation>
     </message>
@@ -3908,8 +3957,9 @@
     </message>
     <message>
         <location filename="main/view/StaticParamsSetting.qml" line="250"/>
-        <source>Eye move alarm mode</source>
-        <translation>眼动报警模式</translation>
+        <source>Eye move remind mode</source>
+        <oldsource>Eye move alarm mode</oldsource>
+        <translation>眼动提示模式</translation>
     </message>
     <message>
         <source>No alarm</source>
@@ -3917,13 +3967,13 @@
     </message>
     <message>
         <location filename="main/view/StaticParamsSetting.qml" line="252"/>
-        <source>Only alarm</source>
-        <translation>仅报警</translation>
+        <source>Only remind</source>
+        <oldsource>Only alarm</oldsource>
+        <translation>仅提示</translation>
     </message>
     <message>
-        <location filename="main/view/StaticParamsSetting.qml" line="252"/>
         <source>Alarm and pause</source>
-        <translation>报警并暂停</translation>
+        <translation type="vanished">报警并暂停</translation>
     </message>
     <message>
         <location filename="main/view/StaticParamsSetting.qml" line="258"/>

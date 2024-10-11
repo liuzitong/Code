@@ -344,10 +344,10 @@ void StaticAnalysisVm::showReport(int report,bool uploadDicom)
 
     auto commomParams=m_checkResult.m_params.commonParams;
     QString fixationMonitor;
-    switch (int(commomParams.fixationMonitor)){case 0:fixationMonitor=tr("No alarm"); break;case 1:fixationMonitor=tr("Only alarm");break;case 2:fixationMonitor=tr("Alarm and pause");break;}
+    switch (int(commomParams.fixationMonitor)){case 0:fixationMonitor=tr("No remind"); break;case 1:fixationMonitor=tr("Only remind");break;case 2:fixationMonitor=tr("Remind and pause");break;}
     QString fixationTarget;
     switch (int(commomParams.fixationTarget)){case 0:fixationTarget=tr("Center dot");break;case 1:fixationTarget=tr("Small diamond");break;case 2:fixationTarget=tr("Big diamond");break;case 3:fixationTarget=tr("Bottom dot");break;}
-    manager->setReportVariable("fixationMonitor",tr("Eye move alarm mode")+QString(": ")+fixationMonitor);
+    manager->setReportVariable("fixationMonitor",tr("Eye move remind mode")+QString(": ")+fixationMonitor);
     manager->setReportVariable("fixationTarget",tr("Fixation target")+QString(": ")+fixationTarget);
     auto resultData=m_checkResult.m_data;
     manager->setReportVariable("fixationLosses",tr("Fixation losses")+QString(": ")+QString::number(resultData.fixationLostCount)+"/"+QString::number(resultData.fixationLostTestCount));
