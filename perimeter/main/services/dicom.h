@@ -23,6 +23,8 @@ private:
     QString dcmFilePath="dicom.dcm";
     QString serverIP;
     QString serverPort;
+    QString aec;
+    QString aet;
 
 };
 

@@ -21,6 +21,8 @@ Dicom::Dicom()
     auto jo=JsonDoc.object();
     serverIP=jo["serverIP"].toString();
     serverPort=jo["severPort"].toString();
+    aec=jo["aec"].toString();
+    aet=jo["aet"].toString();
 }
 
 
@@ -67,7 +69,7 @@ bool Dicom::upLoadDcm(PatientModel patientModel)
     p.start(cmdLine);
     if(p.waitForFinished())
     {
-        QString cmdUpload=QString("storescu.exe -xy "+serverIP+" "+serverPort+" -aec DCM4CHEE -aet DCM4CHEE "+dcmFilePath);
+        QString cmdUpload=QString("storescu.exe -xy "+serverIP+" "+serverPort+" -aec "+aec+" -aet "+aet+" "+dcmFilePath);
         p.start(cmdUpload);
         if(p.waitForFinished())
         {
