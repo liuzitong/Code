@@ -150,7 +150,7 @@ QString PatientVm::getPatientID()
 
 void PatientVm::setPatientID(QString value)
 {
-    m_data->m_patientId=value;
+    m_data->m_patientId=value;emit patientIdChanged();
 }
 
 QString PatientVm::getName()
@@ -160,7 +160,7 @@ QString PatientVm::getName()
 
 void PatientVm::setName(QString value)
 {
-   m_data->m_name=value;
+   m_data->m_name=value;emit nameChanged();
 }
 
 int PatientVm::getSex()
@@ -170,7 +170,7 @@ int PatientVm::getSex()
 
 void PatientVm::setSex(int value)
 {
-    m_data->m_sex=sex(value);
+    m_data->m_sex=sex(value);emit sexChanged();
 }
 
 QString PatientVm::getBirthDate()
@@ -184,7 +184,7 @@ void PatientVm::setBirthDate(QString date)
     int year=list[0].toInt();
     int month=list[1].toInt();
     int day=list[2].toInt();
-    m_data->m_birthDate.setDate(year,month,day);
+    m_data->m_birthDate.setDate(year,month,day);emit birthDateChanged();
 }
 
 QDateTime PatientVm::getLastUpdate()

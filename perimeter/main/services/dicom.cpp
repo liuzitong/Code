@@ -7,6 +7,8 @@
 #include <QProcess>
 
 
+
+
 Dicom* Dicom::singleton=nullptr;
 
 Dicom::Dicom()
@@ -49,6 +51,7 @@ QString Dicom::cmdPdfToDcm(QVector<QPair<DcmTagKey, QString>> infos)
         QString kv = QString(" ")+"-k "+QString::number(group,16)+","+QString::number(element,16)+"="+value;
         cmd+=kv;
     }
+    cmd+=" -k 0x0008,0x0005=utf-8";
     return cmd;
 }
 
@@ -61,8 +64,10 @@ bool Dicom::upLoadDcm(PatientModel patientModel)
             {DCM_PatientName,patientModel.m_name},
             {DCM_PatientAge,QString::number(patientModel.m_age)},
             {DCM_PatientSex,patientModel.m_sex==sex::male?"M":patientModel.m_sex==sex::female?"F":"O"},
-            {DCM_PatientID,QString::number(patientModel.m_id)},
-            {DCM_PatientBirthDate,patientModel.m_birthDate.toString("yyyyMMdd")}
+            {DCM_PatientID,patientModel.m_patientId},
+            {DCM_PatientBirthDate,patientModel.m_birthDate.toString("yyyyMMdd")},
+            {DCM_StudyDate,QDateTime::currentDateTime().date().toString("yyyyMMdd")},
+            {DCM_StudyTime,QDateTime::currentDateTime().time().toString("hhmmss")},
         };
     QString cmdLine=cmdPdfToDcm(infos);
     QProcess p(nullptr);

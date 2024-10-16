@@ -10,6 +10,7 @@
 #include <QIcon>
 #include <QProcess>
 #include <QSurfaceFormat>
+#include <QTextCodec>
 
 #include "perimeter/main/appctrl/perimeter_appctrl.hxx"
 #include "perimeter/base/common/perimeter_memcntr.hxx"
@@ -180,7 +181,9 @@ int  main ( int argc, char *argv[] )
         QSurfaceFormat::setDefaultFormat(fmt);
 
         QCoreApplication::setAttribute(Qt::AA_DisableShaderDiskCache);
+
         QApplication app(argc, argv);
+
         JRpcServerSvc jprc_svc; jprc_svc.start(GUNS_JRPC_SVC_NAME);
         Perimeter::AppCtrl *app_ctrl = new Perimeter::AppCtrl;
         app_ctrl->doInit();

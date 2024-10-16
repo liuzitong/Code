@@ -16,10 +16,10 @@ class PERIMETER_API PatientVm: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(long id READ getID WRITE setID)
-    Q_PROPERTY(QString patientId READ getPatientID WRITE setPatientID)
-    Q_PROPERTY(QString name READ getName WRITE setName)
-    Q_PROPERTY(int sex READ getSex WRITE setSex)
-    Q_PROPERTY(QString birthDate READ getBirthDate WRITE setBirthDate)
+    Q_PROPERTY(QString patientId READ getPatientID WRITE setPatientID NOTIFY patientIdChanged)
+    Q_PROPERTY(QString name READ getName WRITE setName NOTIFY nameChanged)
+    Q_PROPERTY(int sex READ getSex WRITE setSex NOTIFY sexChanged)
+    Q_PROPERTY(QString birthDate READ getBirthDate WRITE setBirthDate NOTIFY birthDateChanged)
     Q_PROPERTY(QObject* rx READ getRx WRITE setRx NOTIFY rxChanged)
     Q_PROPERTY(QDateTime lastUpdate READ getLastUpdate WRITE setLastUpdate)
     Q_PROPERTY(int age READ getAge)
@@ -35,10 +35,10 @@ public:
 //    Q_INVOKABLE int age();
 //    PatientVm& operator=(const PatientVm& other);
     long getID();void setID(long value);
-    QString getPatientID();void setPatientID(QString value);
-    QString getName();void setName(QString value);
-    int getSex();void setSex(int value);
-    QString getBirthDate();void setBirthDate(QString value);
+    QString getPatientID();void setPatientID(QString value);Q_SIGNAL void patientIdChanged();
+    QString getName();void setName(QString value);Q_SIGNAL void nameChanged();
+    int getSex();void setSex(int value);Q_SIGNAL void sexChanged();
+    QString getBirthDate();void setBirthDate(QString value);Q_SIGNAL void birthDateChanged();
     QObject* getRx(){return m_rx;}void setRx(QObject* value){m_rx=value;emit rxChanged(value);}Q_SIGNAL void rxChanged(QObject* value);
     QDateTime getLastUpdate();void setLastUpdate(QDateTime lastUpdate);
     int getAge(){return m_data->m_age;}

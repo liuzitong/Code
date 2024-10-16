@@ -1,4 +1,4 @@
-﻿#include "general_analysis_vm.h"
+#include "general_analysis_vm.h"
 #include <QMessageBox>
 #include <QVariant>
 #include <perimeter/main/services/analysis_svc.h>
