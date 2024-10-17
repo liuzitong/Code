@@ -1,4 +1,4 @@
-﻿import QtQuick 2.6
+import QtQuick 2.6
 import QtQuick.Controls 2.0
 import QtQuick.Window 2.3
 import QtQml 2.2
@@ -289,6 +289,7 @@ Item{
                                                             rx3_l.text=modifyPatient.rx.rx3_l.toFixed(2);
                                                             visual_l.text=modifyPatient.rx.visual_l.toFixed(2);
                                                             if(CommonSettings.deletePermission) patientReviseButton.enabled=true;
+
                                                         }
                                                     }
                                                 }
@@ -611,6 +612,11 @@ Item{
                             if(parseFloat(visual_r.text).toString()!=="NaN")
                                 modifyPatient.rx.visual_r=parseFloat(visual_r.text);
                             modifyPatient.update();
+                            if(modifyPatient.id===currentPatient.id)
+                            {
+                                IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::PatientVm", currentPatient);
+                                currentPatient=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::PatientVm", false,[modifyPatient.id]);
+                            }
                             query.startQuery();
                         }
                     }
