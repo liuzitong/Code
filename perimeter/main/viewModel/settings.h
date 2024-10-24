@@ -1,4 +1,4 @@
-﻿#ifndef SETTINGS_H
+#ifndef SETTINGS_H
 #define SETTINGS_H
 
 #include <QObject>
@@ -11,6 +11,8 @@ class Settings :public QObject
     Q_OBJECT
     Q_PROPERTY(QString hospitalName READ getHospitalName WRITE setHospitalName NOTIFY hospitalNameChanged)
     Q_PROPERTY(QString language READ getLanguage WRITE setLanguage NOTIFY languageChanged)
+    Q_PROPERTY(QString publishVersion READ getPublishVersion)
+    Q_PROPERTY(QString fullVersion READ getFullVersion)
     Q_PROPERTY(QString version READ getVersion WRITE setVersion NOTIFY versionChanged)
     Q_PROPERTY(QString deviceInfo READ getDeviceInfo WRITE setDeviceInfo NOTIFY deviceInfoChanged)
     Q_PROPERTY(bool isRuntimeLangEng READ getIsRuntimeLangEng WRITE setIsRuntimeLangEng NOTIFY isRuntimeLangEngChanged)
@@ -29,6 +31,8 @@ public:
     Q_INVOKABLE void save();
     QString getHospitalName(){return m_hospitalName;}void setHospitalName(QString value){m_hospitalName=value;emit hospitalNameChanged(value);}Q_SIGNAL void hospitalNameChanged(QString value);
     QString getLanguage(){return m_language;}void setLanguage(QString value){m_language=value;emit languageChanged(value);} Q_SIGNAL void languageChanged(QString value);
+    QString getPublishVersion(){return m_publishVersion;}
+    QString getFullVersion(){return m_fullVersion;}
     QString getVersion(){return m_version;}void setVersion(QString value){m_version=value;emit versionChanged(value);}Q_SIGNAL void versionChanged(QString value);
     QString getDeviceInfo(){return m_deviceInfo;}void setDeviceInfo(QString value){m_deviceInfo=value;emit deviceInfoChanged(value);}Q_SIGNAL void deviceInfoChanged(QString value);
     bool getIsRuntimeLangEng(){return m_isRuntimeLangEng;}void setIsRuntimeLangEng(bool value){m_isRuntimeLangEng=value;emit isRuntimeLangEngChanged(value);}Q_SIGNAL void isRuntimeLangEngChanged(bool value);
@@ -53,6 +57,8 @@ private:
 private:
     QString m_hospitalName;
     QString m_language;
+    QString m_publishVersion;
+    QString m_fullVersion;
     QString m_version;
     QString m_deviceInfo;
     QString m_programUnlockPwd;

@@ -1,4 +1,4 @@
-﻿#include "settings.h"
+#include "settings.h"
 #include <QJsonArray>
 #include <qfile.h>
 #include <qjsondocument.h>
@@ -18,6 +18,8 @@ Settings::Settings()
         auto jo=JsonDoc.object();
         m_hospitalName=jo["hospitalName"].toString();
         m_language=jo["language"].toString();
+        m_publishVersion=jo["publishVersion"].toString();
+        m_fullVersion=jo["fullVersion"].toString();
         m_version=jo["version"].toString();
         m_deviceInfo=jo["deviceInfo"].toString();
         m_defaultProgramId=jo["defaultProgramId"].toInt();
@@ -36,6 +38,8 @@ void Settings::save()
     QJsonObject jo{
         {"hospitalName",m_hospitalName},
         {"language",m_language},
+        {"publishVersion",m_publishVersion},
+        {"fullVersion",m_fullVersion},
         {"version",m_version},
         {"deviceInfo",m_deviceInfo},
         {"defaultProgramId",m_defaultProgramId},

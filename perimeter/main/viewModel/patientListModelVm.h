@@ -1,4 +1,4 @@
-﻿#ifndef PATIENTMODELLIST_H
+#ifndef PATIENTMODELLIST_H
 #define PATIENTMODELLIST_H
 #include "perimeter/base/common/perimeter_def.h"
 #include <QAbstractListModel>
