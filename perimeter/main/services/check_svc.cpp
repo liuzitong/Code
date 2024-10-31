@@ -1,4 +1,4 @@
-﻿#include "check_svc.h"
+#include "check_svc.h"
 #include <QApplication>
 #include <QThread>
 #include <QTimer>
@@ -2125,12 +2125,23 @@ CheckSvc::CheckSvc(QObject *parent)
     connect(m_worker,&CheckSvcWorker::currentCheckingDBChanged,[&](int DB){m_currentCheckingDB=DB;emit currentCheckingDBChanged();});
     connect(m_worker,&CheckSvcWorker::currentCheckingDotAnswerStatus,[&](int status){m_currentCheckingDotAnswerStatus=status;emit currentCheckingDotAnswerStatusChanged();qDebug()<<"checsvc answer status";});
     connect(m_worker,&CheckSvcWorker::tipChanged,this,&CheckSvc::setTips);
+
     connect(m_worker,&CheckSvcWorker::sendErrorInfo,this, [](QString errorInfo)
     {
         QMessageBox msgBox;
         msgBox.setText(errorInfo);
         msgBox.exec();
     });
+
+    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::sendErroRInfo,this,[&](QString errorInfo)
+            {
+                QMessageBox msgBox;
+                msgBox.setText(errorInfo);
+                msgBox.exec();
+            });
+
+
+
     connect(m_worker,&CheckSvcWorker::readyToCheck,[&](bool isReady){setReadyToCheck(isReady);});
 //    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::isDeviceReadyChanged,this,&CheckSvc::devReadyChanged);
     connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::deviceStatusChanged,this,[&]()

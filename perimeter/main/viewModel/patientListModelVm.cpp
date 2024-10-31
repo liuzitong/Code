@@ -188,7 +188,7 @@ void PatientListModelVm:: deletePatient(long id)
         QDir qdir2(fileDir);
 //        auto list=qdir2.entryList(QDir::NoDotAndDotDot);
 //        qDebug()<<list;
-        if(qdir2.entryList(QDir::NoDotAndDotDot).length()==0)
+        if(qdir2.entryList(QDir::AllDirs|QDir::NoDotAndDotDot).length()==0)
         {
             qdir2.removeRecursively();
         }

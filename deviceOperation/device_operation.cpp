@@ -14,7 +14,6 @@
 #include <iostream>
 #include <QtMath>
 #include <pupilDetectApi.hxx>
-#include <QMessageBox>
 #include <Windows.h>
 
 #pragma execution_character_set("utf-8")
@@ -139,7 +138,8 @@ void DeviceOperation::setCursorColorAndCursorSize(int color, int spot)
 #endif
     auto log=spdlog::get("logger");
     log->info("set cursor color and cursor size begins.");
-    resetMotors({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
+    // resetMotors({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
+    moveColorAndSpotMotorAvoidCollision();
     waitForSomeTime(m_waitingTime);
     waitMotorStop({{UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot}});
     auto profile=m_profile;
@@ -496,7 +496,7 @@ void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSiz
 
     }
 
-    log->info("发送移动数据");
+    log->info("send move data");
     constexpr int maxPackageLen=512;
     constexpr int stepPerFrame=(maxPackageLen-8)/(4*3);
     int totalframe=ceil((float)stepCount/stepPerFrame);
@@ -512,7 +512,7 @@ void DeviceOperation::dynamicStimulate(QPointF begin, QPointF end, int cursorSiz
     if(m_deviceStatus==2)
         m_devCtl->sendDynamicData(totalframe,totalframe-1,dataLen,&dotArr[stepPerFrame*3*(totalframe-1)]);     //最后一帧
     waitForSomeTime(1000);
-    log->info("开始移动");
+    log->info("begin move");
     if(m_deviceStatus==2)
     {
         waitForSomeTime(m_waitingTime);
@@ -560,6 +560,23 @@ void DeviceOperation::move5Motors(bool isMotorMove[], int MotorPoses[])
     }
     if(m_deviceStatus==2)
         m_devCtl->move5Motors(sps,MotorPoses);
+}
+
+void DeviceOperation::moveColorAndSpotMotorAvoidCollision()
+{
+    if(m_deviceStatus!=2) return;
+    waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
+    auto colorPos=m_config.switchColorMotorPosPtr()[0]+m_deviceSettings->m_stepOffset;
+    auto spotPos=m_config.switchLightSpotMotorPosPtr()[0]+m_deviceSettings->m_stepOffset;
+
+    int motorPos[5];
+    motorPos[0]=0;
+    motorPos[1]=0;
+    motorPos[2]=0;
+    motorPos[3]=colorPos;
+    motorPos[4]=spotPos;
+    bool isMotorMove[5]{false,false,false,true,true};
+    move5Motors(isMotorMove,motorPos);
 }
 
 void DeviceOperation::waitMotorStop(QVector<UsbDev::DevCtl::MotorId> motorIDs)
@@ -859,10 +876,8 @@ void DeviceOperation::workOnNewStatuData()
         {
             if(m_currentCastLightDA==m_deviceSettings->m_castLightDALimit)                                                                              //超时判定灯盘粗了
             {
-                QMessageBox msgBox;
                 log->critical("Bulb can't reach target brightness.");
-                msgBox.setText(tr("Bulb can't reach target brightness.Please Change bulb or contact customer service.This is serious"));
-                msgBox.exec();
+                sendErroRInfo(tr("Bulb can't reach target brightness.Please Change bulb or contact customer service.This is serious"));
 
                 setCastLightAdjustStatus(3);
                 openShutter(0);
@@ -951,10 +966,8 @@ void DeviceOperation::workOnNewStatuData()
                 waitMotorStop({UsbDev::DevCtl::MotorId_Shutter});
                 m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA*0.3);
                 m_deviceSettings->m_deviationCalibrationFail=true;
-                QMessageBox msgBox;
+                sendErroRInfo(tr("Deviation calibration fail.Please contact customer service.This is serious."));
                 log->critical("Deviation calibration fail.");
-                msgBox.setText(tr("Deviation calibration fail.Please contact customer service.This is serious."));
-                msgBox.exec();
                 m_deviceSettings->saveDeviationCalibrationStatus();
                 setCastLightAdjustStatus(3);
                 m_deviationCalibrationStatus=0;
@@ -1131,9 +1144,7 @@ void DeviceOperation::workOnNewConfig()
     bool deviationCalibrationFail=m_deviceSettings->m_deviationCalibrationFail;
     if(deviationCalibrationFail)
     {
-        QMessageBox msgBox;
-        msgBox.setText(tr("Deviation calibration fail.Please contact customer service.This is serious."));
-        msgBox.exec();
+        sendErroRInfo(tr("Deviation calibration fail.Please contact customer service.This is serious."));
     }
     if(adjusted||skipAdjustCastLight||deviationCalibrationFail)
     {

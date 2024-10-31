@@ -1,4 +1,4 @@
-﻿#ifndef DEVICEOPERATION_H
+#ifndef DEVICEOPERATION_H
 #define DEVICEOPERATION_H
 
 #include "device_operation_global.h"
@@ -65,7 +65,7 @@ struct StatusDataOut
     int castLightDA=0;
 };
 
-
+//在子线程运作
 class DEVICEOPERATIONSHARED_EXPORT DeviceOperation:public QObject
 {
     Q_OBJECT
@@ -116,6 +116,7 @@ public:
     void stopDynamic();
     void openShutter(int durationTime);
     void move5Motors(bool isMotorMove[],int MotorPoses[]);
+    void moveColorAndSpotMotorAvoidCollision();
     void setCursorColorAndCursorSize(int color, int size);
     void setDB(int DB);
     void setLamp(LampId id,int index,bool onOff);
@@ -155,6 +156,7 @@ signals:
     void newDeviceVersion(QString version);
     // void updateDevInfo(QString info);
     void newTargetCastLightSensorDA(int DA);
+    void sendErroRInfo(QString string);
 
 public:
     bool getAutoAlignPupil(){return m_autoAlignPupil;}void setAutoAlignPupil(bool value){m_autoAlignPupil=value;emit autoAlignPupilChanged();}Q_SIGNAL void autoAlignPupilChanged();

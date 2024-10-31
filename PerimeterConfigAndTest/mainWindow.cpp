@@ -706,6 +706,8 @@ void MainWindow::on_pushButton_testStart_clicked()
         {
             if(m_status.currentColorSlot!=colorSlot||m_status.currentLightSpotPos!=spotSlot)              //变换到改变光斑颜色位置
             {
+                showDevInfo("移动到避免碰撞位.");
+                moveColorAndSpotMotorAvoidCollision();
                 int  color_Circl_Motor_Steps=m_profile.motorRange(UsbDev::DevCtl::MotorId_Color).second-m_profile.motorRange(UsbDev::DevCtl::MotorId_Color).first;
                 int  spot_Circl_Motor_Steps=m_profile.motorRange(UsbDev::DevCtl::MotorId_Light_Spot).second-m_profile.motorRange(UsbDev::DevCtl::MotorId_Light_Spot).first;
 
@@ -1834,6 +1836,30 @@ bool MainWindow::waitForAnswer()
     }
     return false;
 }
+
+void MainWindow::moveColorAndSpotMotorAvoidCollision()
+{
+    waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
+    auto colorPos=m_config.switchColorMotorPosPtr()[0]+m_settings.m_stepOffset;
+    auto spotPos=m_config.switchLightSpotMotorPosPtr()[0]+m_settings.m_stepOffset;
+
+    int motorPos[5];
+    motorPos[0]=0;
+    motorPos[1]=0;
+    motorPos[2]=0;
+    motorPos[3]=colorPos;
+    motorPos[4]=spotPos;
+
+    quint8 sps[5];
+    sps[0]=ui->spinBox_XMotorSpeed_2->value();
+    sps[1]=ui->spinBox_YMotorSpeed_2->value();
+    sps[2]=ui->spinBox_focalMotorSpeed_2->value();
+    sps[3]=ui->spinBox_colorMotorSpeed_2->value();
+    sps[4]=ui->spinBox_spotMotorSpeed_2->value();
+
+    m_devCtl->move5Motors(std::array<quint8, 5>{0,0,0,sps[3],sps[4]}.data(),motorPos);
+}
+
 
 
 

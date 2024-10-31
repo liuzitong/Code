@@ -39,6 +39,8 @@ Settings::Settings()
     m_PID = m_rootObj.value("PID").toString();
     m_VID = m_rootObj.value("VID").toString();
 
+    m_stepOffset=m_rootObj.value("stepOffset").toInt();
+
     m_updateIOInfo=m_rootObj.value("updateIOInfo").toBool();
     m_updateRefreshInfo=m_rootObj.value("updateRefreshInfo").toBool();
     m_updateRefreshIOInfo=m_rootObj.value("updateRefreshIOInfo").toBool();

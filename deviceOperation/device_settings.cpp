@@ -40,19 +40,24 @@ DeviceSettings::DeviceSettings()
     m_pupilAutoAlignStep=m_rootObj.value("pupilAutoAlignStep").toInt();
     localConfigPath=m_rootObj.value("localConfigPath").toString();
     localDataPath=m_rootObj.value("localDataPath").toString();
+    m_stepOffset=m_rootObj.value("stepOffset").toInt();
 
     m_pixelDistFromPupilCenterToMiddleReflectionDot=m_rootObj.value("pixelDistFromPupilCenterToMiddleReflectionDot").toInt();
     m_pupilDiameterPixelToMillimeterConstant=m_rootObj.value("pupilDiameterPixelToMillimeterConstant").toDouble();
     m_pupilDeviationPixelToNumberConstant=m_rootObj.value("pupilDeviationPixelToNumberConstant").toDouble();
     m_castLightDAChangeRate=m_rootObj.value("castLightDAChangeRate").toDouble();
     m_castLightDAChangeInterval=m_rootObj.value("castLightDAChangeInterval").toInt();
+#ifdef _DEBUG
     std::cout<<"m_castLightDAChangeInterval:"<<m_castLightDAChangeInterval<<std::endl;
+#endif
     m_castLightDAChangeMinStep=m_rootObj.value("castLightDAChangeMinStep").toInt();
     m_castLightTargetColor=m_rootObj.value("castLightTargetColor").toInt();
     m_castLightTargetSize=m_rootObj.value("castLightTargetSize").toInt();
     m_castLightDADifferenceTolerance=m_rootObj.value("castLightDADifferenceTolerance").toDouble();
     m_castLightStablizeWaitingTime=m_rootObj.value("castLightStablizeWaitingTime").toInt();
+#ifdef _DEBUG
     std::cout<<"m_castLightStablizeWaitingTime:"<<m_castLightStablizeWaitingTime<<std::endl;
+#endif
     m_skipAdjustCastLight=m_rootObj.value("skipAdjustCastLight").toBool();
     m_waitingTime=m_rootObj.value("waitingTime").toInt();
     m_beepCount=m_rootObj.value("beepCount").toInt();

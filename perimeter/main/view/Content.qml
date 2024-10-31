@@ -24,7 +24,7 @@ Rectangle {
     function openOrCloseInfoPopup()
     {
         if(IcUiQmlApi.appCtrl.checkSvc.debugMode) return;
-        if(castLightAdjustStatus===3||castLightAdjustStatus===0)
+        if(castLightAdjustStatus===3)
         {
             idPopup2.close();
 
@@ -88,8 +88,12 @@ Rectangle {
                     font.pointSize: CommonSettings.fontPointSize*2;
                     color:"green";
                 }
-            }
+                // CusButton{imageHightScale: 1;height:image.sourceSize.height;width:image.sourceSize.width; anchors.right: parent.right;  anchors.top: parent.top; rec.visible: false;imageSrc: "qrc:/Pics/base-svg/window_4close_1normal.svg";hoverImageSrc:"qrc:/Pics/base-svg/window_4close_2hover.svg";pressImageSrc: "qrc:/Pics/base-svg/window_4close_3press.svg";
+                //     onReleased: { idPopup2.close();}
+                // }
+                CusButton{id:dateFromButton;anchors.right: parent.right;  anchors.top: parent.top;text:lt+qsTr("Close");height:parent.height*0.25;width:height*2;onClicked:{idPopup2.close();}}
 
+            }
 
         }
     }
