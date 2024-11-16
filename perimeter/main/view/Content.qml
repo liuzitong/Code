@@ -82,15 +82,7 @@ Rectangle {
             Rectangle
             {
                 color: "#d0ffffff";width:parent.width*0.7;height:parent.height*0.2;anchors.centerIn: parent;radius:15;
-                CusText{
-                    anchors.centerIn: parent;
-                    text:"The device is calibrating,please wait a few minutes.";
-                    font.pointSize: CommonSettings.fontPointSize*2;
-                    color:"green";
-                }
-                // CusButton{imageHightScale: 1;height:image.sourceSize.height;width:image.sourceSize.width; anchors.right: parent.right;  anchors.top: parent.top; rec.visible: false;imageSrc: "qrc:/Pics/base-svg/window_4close_1normal.svg";hoverImageSrc:"qrc:/Pics/base-svg/window_4close_2hover.svg";pressImageSrc: "qrc:/Pics/base-svg/window_4close_3press.svg";
-                //     onReleased: { idPopup2.close();}
-                // }
+                CusText{anchors.centerIn: parent;text:qsTr("The device is calibrating,please wait a few minutes.");font.pointSize: CommonSettings.fontPointSize*2;color:"green";}
                 CusButton{id:dateFromButton;anchors.right: parent.right;  anchors.top: parent.top;text:lt+qsTr("Close");height:parent.height*0.25;width:height*2;onClicked:{idPopup2.close();}}
 
             }

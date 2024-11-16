@@ -496,134 +496,144 @@
         <translation type="vanished">电脑自动视野仪系统</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="131"/>
+        <location filename="main/view/Content.qml" line="87"/>
+        <source>The device is calibrating,please wait a few minutes.</source>
+        <translation>设备正在校光，请等待几分钟。</translation>
+    </message>
+    <message>
+        <location filename="main/view/Content.qml" line="94"/>
+        <source>Close</source>
+        <translation>关闭</translation>
+    </message>
+    <message>
+        <location filename="main/view/Content.qml" line="135"/>
         <source>  Warning</source>
         <translation>  警告</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="140"/>
+        <location filename="main/view/Content.qml" line="144"/>
         <source>Patient is checking,are you sure?</source>
         <translation>正在检查，你确定吗？</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="142"/>
+        <location filename="main/view/Content.qml" line="146"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="143"/>
+        <location filename="main/view/Content.qml" line="147"/>
         <source>OK</source>
         <translation>确定</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="195"/>
+        <location filename="main/view/Content.qml" line="199"/>
         <source>Name</source>
         <translation>姓名</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="200"/>
+        <location filename="main/view/Content.qml" line="204"/>
         <source>Sex</source>
         <translation>性别</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="201"/>
+        <location filename="main/view/Content.qml" line="205"/>
         <source>Male</source>
         <translation>男性</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="201"/>
+        <location filename="main/view/Content.qml" line="205"/>
         <source>Female</source>
         <translation>女性</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="201"/>
+        <location filename="main/view/Content.qml" line="205"/>
         <source>Others</source>
         <translation>其它</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="206"/>
+        <location filename="main/view/Content.qml" line="210"/>
         <source>Age</source>
         <translation>年龄</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="222"/>
+        <location filename="main/view/Content.qml" line="226"/>
         <source>Login</source>
         <translation>登录</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="227"/>
+        <location filename="main/view/Content.qml" line="231"/>
         <source>Device is reconnecting.</source>
         <translation>设备正在重新连接.</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="229"/>
+        <location filename="main/view/Content.qml" line="233"/>
         <source>Device is adjusting light please wait.</source>
         <translation>设备正在校光请等待.</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="235"/>
+        <location filename="main/view/Content.qml" line="239"/>
         <source>Start</source>
         <oldsource>Start.</oldsource>
         <translation>开始</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="236"/>
+        <location filename="main/view/Content.qml" line="240"/>
         <source>Checking</source>
         <oldsource>Checking.</oldsource>
         <translation>检查中</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="237"/>
+        <location filename="main/view/Content.qml" line="241"/>
         <source>Pausing</source>
         <oldsource>Pausing.</oldsource>
         <translation>暂停中</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="238"/>
+        <location filename="main/view/Content.qml" line="242"/>
         <source>Stoping</source>
         <oldsource>Stoping.</oldsource>
         <translation>停止中</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="239"/>
+        <location filename="main/view/Content.qml" line="243"/>
         <source>Finishing</source>
         <oldsource>Finishing.</oldsource>
         <translation>结束中</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="240"/>
+        <location filename="main/view/Content.qml" line="244"/>
         <source>Stopped</source>
         <oldsource>Stopped.</oldsource>
         <translation>已停止</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="241"/>
+        <location filename="main/view/Content.qml" line="245"/>
         <source>Finished</source>
         <oldsource>Finished.</oldsource>
         <translation>已完成</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="263"/>
+        <location filename="main/view/Content.qml" line="267"/>
         <source>Patient</source>
         <translation>患者</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="265"/>
+        <location filename="main/view/Content.qml" line="269"/>
         <source>Check</source>
         <translation>检测</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="279"/>
+        <location filename="main/view/Content.qml" line="283"/>
         <source>Settings</source>
         <translation>设置</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="289"/>
+        <location filename="main/view/Content.qml" line="293"/>
         <source>Customize</source>
         <translation>自定义</translation>
     </message>
     <message>
-        <location filename="main/view/Content.qml" line="292"/>
+        <location filename="main/view/Content.qml" line="296"/>
         <source>About</source>
         <translation>关于</translation>
     </message>
@@ -1063,7 +1073,7 @@
         <location filename="main/view/PatientManagement.qml" line="71"/>
         <location filename="main/view/PatientManagement.qml" line="74"/>
         <location filename="main/view/PatientManagement.qml" line="123"/>
-        <location filename="main/view/PatientManagement.qml" line="458"/>
+        <location filename="main/view/PatientManagement.qml" line="459"/>
         <source>Select</source>
         <translation>选择</translation>
     </message>
@@ -1085,41 +1095,41 @@
     <message>
         <location filename="main/view/PatientManagement.qml" line="89"/>
         <location filename="main/view/PatientManagement.qml" line="163"/>
-        <location filename="main/view/PatientManagement.qml" line="393"/>
-        <location filename="main/view/PatientManagement.qml" line="672"/>
+        <location filename="main/view/PatientManagement.qml" line="394"/>
+        <location filename="main/view/PatientManagement.qml" line="678"/>
         <source>Patient ID</source>
         <translation>患者ID</translation>
     </message>
     <message>
         <location filename="main/view/PatientManagement.qml" line="89"/>
         <location filename="main/view/PatientManagement.qml" line="164"/>
-        <location filename="main/view/PatientManagement.qml" line="399"/>
+        <location filename="main/view/PatientManagement.qml" line="400"/>
         <source>Name</source>
         <translation>姓名</translation>
     </message>
     <message>
         <location filename="main/view/PatientManagement.qml" line="89"/>
         <location filename="main/view/PatientManagement.qml" line="165"/>
-        <location filename="main/view/PatientManagement.qml" line="419"/>
+        <location filename="main/view/PatientManagement.qml" line="420"/>
         <source>Sex</source>
         <translation>性别</translation>
     </message>
     <message>
         <location filename="main/view/PatientManagement.qml" line="89"/>
         <location filename="main/view/PatientManagement.qml" line="166"/>
-        <location filename="main/view/PatientManagement.qml" line="453"/>
+        <location filename="main/view/PatientManagement.qml" line="454"/>
         <source>Birth date</source>
         <translation>出生日期</translation>
     </message>
     <message>
         <location filename="main/view/PatientManagement.qml" line="108"/>
-        <location filename="main/view/PatientManagement.qml" line="406"/>
+        <location filename="main/view/PatientManagement.qml" line="407"/>
         <source>First name</source>
         <translation>名字</translation>
     </message>
     <message>
         <location filename="main/view/PatientManagement.qml" line="110"/>
-        <location filename="main/view/PatientManagement.qml" line="413"/>
+        <location filename="main/view/PatientManagement.qml" line="414"/>
         <source>Last name</source>
         <translation>姓氏</translation>
     </message>
@@ -1138,7 +1148,7 @@
     <message>
         <location filename="main/view/PatientManagement.qml" line="117"/>
         <location filename="main/view/PatientManagement.qml" line="177"/>
-        <location filename="main/view/PatientManagement.qml" line="432"/>
+        <location filename="main/view/PatientManagement.qml" line="433"/>
         <source>Others</source>
         <translation>其它</translation>
     </message>
@@ -1148,122 +1158,122 @@
         <translation>载入</translation>
     </message>
     <message>
-        <location filename="main/view/PatientManagement.qml" line="306"/>
+        <location filename="main/view/PatientManagement.qml" line="307"/>
         <source>The</source>
         <translation>第</translation>
     </message>
     <message>
-        <location filename="main/view/PatientManagement.qml" line="306"/>
+        <location filename="main/view/PatientManagement.qml" line="307"/>
         <source>Page</source>
         <translation>页</translation>
     </message>
     <message>
-        <location filename="main/view/PatientManagement.qml" line="306"/>
+        <location filename="main/view/PatientManagement.qml" line="307"/>
         <source>Total</source>
         <translation>总共</translation>
     </message>
     <message>
-        <location filename="main/view/PatientManagement.qml" line="306"/>
+        <location filename="main/view/PatientManagement.qml" line="307"/>
         <source>Records</source>
         <translation>条纪录</translation>
     </message>
     <message>
-        <location filename="main/view/PatientManagement.qml" line="479"/>
+        <location filename="main/view/PatientManagement.qml" line="480"/>
         <source>Sphere</source>
         <translation>球面</translation>
     </message>
     <message>
-        <location filename="main/view/PatientManagement.qml" line="480"/>
+        <location filename="main/view/PatientManagement.qml" line="481"/>
         <source>Cylinder</source>
         <translation>柱面</translation>
     </message>
     <message>
-        <location filename="main/view/PatientManagement.qml" line="481"/>
+        <location filename="main/view/PatientManagement.qml" line="482"/>
         <source>Axis</source>
         <translation>轴向</translation>
     </message>
     <message>
-        <location filename="main/view/PatientManagement.qml" line="482"/>
+        <location filename="main/view/PatientManagement.qml" line="483"/>
         <source>Visual acuity</source>
         <translation>视力</translation>
     </message>
     <message>
-        <location filename="main/view/PatientManagement.qml" line="488"/>
+        <location filename="main/view/PatientManagement.qml" line="489"/>
         <source>Right eye</source>
         <translation>右眼</translation>
     </message>
     <message>
-        <location filename="main/view/PatientManagement.qml" line="511"/>
+        <location filename="main/view/PatientManagement.qml" line="512"/>
         <source>Left eye</source>
         <translation>左眼</translation>
     </message>
     <message>
-        <location filename="main/view/PatientManagement.qml" line="536"/>
+        <location filename="main/view/PatientManagement.qml" line="537"/>
         <source>Calculate</source>
         <translation>计算</translation>
     </message>
     <message>
-        <location filename="main/view/PatientManagement.qml" line="572"/>
+        <location filename="main/view/PatientManagement.qml" line="573"/>
         <source>Exit</source>
         <translation>关闭</translation>
     </message>
     <message>
-        <location filename="main/view/PatientManagement.qml" line="582"/>
+        <location filename="main/view/PatientManagement.qml" line="583"/>
         <source>Recheck</source>
         <translation>复查</translation>
     </message>
     <message>
-        <location filename="main/view/PatientManagement.qml" line="587"/>
+        <location filename="main/view/PatientManagement.qml" line="588"/>
         <source>Modify</source>
         <translation>修改</translation>
     </message>
     <message>
-        <location filename="main/view/PatientManagement.qml" line="618"/>
+        <location filename="main/view/PatientManagement.qml" line="624"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="main/view/PatientManagement.qml" line="630"/>
+        <location filename="main/view/PatientManagement.qml" line="636"/>
         <source>View reports</source>
         <translation>查看报告</translation>
     </message>
     <message>
-        <location filename="main/view/PatientManagement.qml" line="645"/>
+        <location filename="main/view/PatientManagement.qml" line="651"/>
         <source>Check</source>
         <translation>检测</translation>
     </message>
     <message>
-        <location filename="main/view/PatientManagement.qml" line="657"/>
+        <location filename="main/view/PatientManagement.qml" line="663"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <location filename="main/view/PatientManagement.qml" line="676"/>
+        <location filename="main/view/PatientManagement.qml" line="682"/>
         <source>name</source>
         <translation>名字</translation>
     </message>
     <message>
-        <location filename="main/view/PatientManagement.qml" line="678"/>
+        <location filename="main/view/PatientManagement.qml" line="684"/>
         <source>Patient name</source>
         <translation>病人名字</translation>
     </message>
     <message>
-        <location filename="main/view/PatientManagement.qml" line="683"/>
+        <location filename="main/view/PatientManagement.qml" line="689"/>
         <source>birth date</source>
         <translation>出生日期</translation>
     </message>
     <message>
-        <location filename="main/view/PatientManagement.qml" line="685"/>
+        <location filename="main/view/PatientManagement.qml" line="691"/>
         <source>Patient birth date</source>
         <translation>病人出生日期</translation>
     </message>
     <message>
-        <location filename="main/view/PatientManagement.qml" line="690"/>
+        <location filename="main/view/PatientManagement.qml" line="696"/>
         <source>can&apos;t be blank</source>
         <translation>不能为空</translation>
     </message>
     <message>
-        <location filename="main/view/PatientManagement.qml" line="725"/>
+        <location filename="main/view/PatientManagement.qml" line="731"/>
         <source>New</source>
         <translation>新建</translation>
     </message>

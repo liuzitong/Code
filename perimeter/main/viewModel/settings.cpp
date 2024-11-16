@@ -1,4 +1,4 @@
-#include "settings.h"
+﻿#include "settings.h"
 #include <QJsonArray>
 #include <qfile.h>
 #include <qjsondocument.h>
@@ -26,6 +26,7 @@ Settings::Settings()
         m_defaultProgramType=jo["defaultProgramType"].toInt();
         m_programUnlockPwd=jo["programUnlockPwd"].toString();
         m_virtualKeyBoard=jo["virtualKeyBoard"].toBool();
+        m_showUserAuthorities=jo["showUserAuthorities"].toBool();
         changeLang();
         jsonFile.close();
     }
@@ -45,7 +46,8 @@ void Settings::save()
         {"defaultProgramId",m_defaultProgramId},
         {"defaultProgramType",m_defaultProgramType},
         {"programUnlockPwd",m_programUnlockPwd},
-        {"virtualKeyBoard",m_virtualKeyBoard}
+        {"virtualKeyBoard",m_virtualKeyBoard},
+        {"showUserAuthorities",m_showUserAuthorities}
     };
     QJsonDocument jsonDoc;
     jsonDoc.setObject(jo);

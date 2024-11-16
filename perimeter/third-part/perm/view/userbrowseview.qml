@@ -94,7 +94,7 @@ IcPageBase {   // this is the wrapped Popup element in ui_qml_control
 
                         Rectangle { Layout.fillWidth: true; Layout.fillHeight: true; color: idUserInfoList.currentIndex == index ? "#C7C7C7" : "#FFFFFF";
 
-                            Button { id: idUserPermBtn; anchors.centerIn: parent; width: 130; height: 38; text: qsTr("User Permission");
+                            Button { id: idUserPermBtn; anchors.centerIn: parent; width: 130; height: 38; text: qsTr("User Permission");visible: IcUiQmlApi.appCtrl.settings.showUserAuthorities;
                                 background: Rectangle { implicitWidth: 130; implicitHeight: 38; border.color: "#6E6E6E"; border.width: 1; color: idUserPermBtn.down ? "#bdc0c6" : "#E0E0E0"; radius: 5; }
                                 contentItem: Label { text: idUserPermBtn.text; color: idUserPermBtn.down ? "#0064b6" : "#202020"; font.pixelSize: 16;  verticalAlignment: Text.AlignVCenter; wrapMode: Text.WordWrap; }
                                 onClicked: { idUserInfoList.currentIndex = index; idUserInfoList.focus = true; IcUiQmlApi.postMetaCall( idPriv.user_mgr_vm, "activePermList" ); }
