@@ -53,7 +53,7 @@
     "pupilDeviationPixelToNumberConstant": 0.5,
     "pupilDiameterPixelToMillimeterConstant": 0.047,
     "reconnectTime":10000,
-    "skipAdjustCastLight": true,
+    "skipAdjustCastLight": false,
     "spotSizeToSlot": [
         {
             "Slot": 0,

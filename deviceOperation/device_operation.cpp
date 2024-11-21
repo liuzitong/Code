@@ -409,6 +409,7 @@ void DeviceOperation::adjustCastLight()
     openShutter(65535);
     qDebug()<<m_currentCastLightDA;
     m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA);
+    m_castLightUp=true;
     waitForSomeTime(m_waitingTime);
     setCastLightAdjustStatus(2);
     m_castLightAdjustElapsedTimer.restart();
@@ -780,9 +781,9 @@ void DeviceOperation::workOnNewStatuData()
     auto log=spdlog::get("logger");
     if(m_isAtCheckingPage)
     {
-        log->info("开红外.");
         if(!m_eyeglassIntialize)   //开红外
         {
+            log->info("开红外.");
             setLamp(LampId::LampId_centerInfrared,0,true);
             setLamp(LampId::LampId_eyeglassInfrared,0,eyeglassStatus);
             setLamp(LampId::LampId_borderInfrared,0,!eyeglassStatus);
@@ -861,12 +862,13 @@ void DeviceOperation::workOnNewStatuData()
         int maxStep=qRound(DADiff*m_deviceSettings->m_castLightDAChangeRate);
         int step=qMax(minStep,maxStep);
 
+
         if(m_deviationCalibrationTimer.elapsed()>m_deviceSettings->m_deviationCalibrationWatingTime&&currentcastLightSensorDA<m_deviceSettings->m_deviationCalibrationDA)           //过了一段时间光强依然很低，所以就判定没照到
         {
             m_deviationCalibrationStatus=1;
             m_deviceSettings->m_deviationCalibrationXMotorDeviation=0;
             m_deviceSettings->m_deviationCalibrationYMotorDeviation=0;
-            log->critical("start Deviation calibration fail.");
+            log->critical("start Deviation calibration.");
             setCastLightAdjustStatus(1);
             m_devCtl->setLamp(LampId::LampId_castLight,0,m_deviceSettings->m_castLightDA);
             m_currentCastLightDA=m_deviceSettings->m_castLightDA;
@@ -922,6 +924,7 @@ void DeviceOperation::workOnNewStatuData()
             waitForSomeTime(m_waitingTime);
             waitMotorStop({UsbDev::DevCtl::MotorId_Shutter});
             m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA*0.3);
+            m_castLightUp=false;
 
             m_deviceSettings->m_castLightLastAdjustedDate=QDate::currentDate().toString("yyyy/MM/dd");
             m_deviceSettings->m_castLightDA=m_currentCastLightDA;
@@ -956,7 +959,7 @@ void DeviceOperation::workOnNewStatuData()
         else                     //继续X向扫描
         {
             static double direction=1.0f;
-            dynamicStimulate({6*direction,m_deviationYCoord},{-6*direction,m_deviationYCoord},m_deviceSettings->m_castLightTargetSize,1,true,0.003);
+            dynamicStimulate({6*direction,m_deviationYCoord},{-6*direction,m_deviationYCoord},m_deviceSettings->m_castLightTargetSize,1,true);
             direction=-direction;
             m_deviationYCoord+=m_deviceSettings->m_deviationCalibrationStep;
             if(m_deviationYCoord>42)
@@ -969,6 +972,8 @@ void DeviceOperation::workOnNewStatuData()
                 sendErroRInfo(tr("Deviation calibration fail.Please contact customer service.This is serious."));
                 log->critical("Deviation calibration fail.");
                 m_deviceSettings->saveDeviationCalibrationStatus();
+                resetMotors({UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Y,UsbDev::DevCtl::MotorId_Focus});
+                waitForSomeTime(5000);
                 setCastLightAdjustStatus(3);
                 m_deviationCalibrationStatus=0;
             }

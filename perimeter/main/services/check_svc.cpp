@@ -1,4 +1,4 @@
-#include "check_svc.h"
+﻿#include "check_svc.h"
 #include <QApplication>
 #include <QThread>
 #include <QTimer>
@@ -39,7 +39,7 @@ public:
     virtual void resetData()=0;
     virtual void finished()=0;
     virtual void lightsOn()=0;
-    void lightsOff();
+    static void lightsOff();
 //signals:
 //    void  checkStateChanged();
 //protected:
@@ -269,7 +269,7 @@ public slots:
         DevOps::DeviceOperation::getSingleton()->disconnectDev();    //连接设备
     }
 
-    void lightsOff(){if(m_check!=nullptr) m_check->lightsOff();}
+    void lightsOff(){Check::lightsOff();}
 
     void lightsOn(){if(m_check!=nullptr) m_check->lightsOn();}
 
@@ -302,11 +302,12 @@ signals:
 
 void Check::lightsOff()
 {
-    for(int i=0;i<4;i++) m_deviceOperation->setLamp(DevOps::LampId::LampId_bigDiamond,i,false);
-    m_deviceOperation->setLamp(DevOps::LampId::LampId_centerFixation,0,false);
-    for(int i=0;i<4;i++) m_deviceOperation->setLamp(DevOps::LampId::LampId_smallDiamond,i,false);
-    m_deviceOperation->setWhiteLamp(false);
-    m_deviceOperation->setLamp(DevOps::LampId::LampId_yellowBackground,0,false);
+    auto deviceOperation=DevOps::DeviceOperation::getSingleton();
+    for(int i=0;i<4;i++) deviceOperation->setLamp(DevOps::LampId::LampId_bigDiamond,i,false);
+    deviceOperation->setLamp(DevOps::LampId::LampId_centerFixation,0,false);
+    for(int i=0;i<4;i++) deviceOperation->setLamp(DevOps::LampId::LampId_smallDiamond,i,false);
+    deviceOperation->setWhiteLamp(false);
+    deviceOperation->setLamp(DevOps::LampId::LampId_yellowBackground,0,false);
 }
 
 void StaticCheck::initialize()
@@ -2306,6 +2307,8 @@ void CheckSvc::leaveCheck()
     qDebug()<<"trunOffVideo";
     DevOps::DeviceOperation::getSingleton()->leaveCheckingPage();
     DevOps::DeviceOperation::getSingleton()->dimDownCastLight();
+    DevOps::DeviceOperation::getSingleton()->openShutter(0);
+
     m_atCheckingPage=false;
     QMetaObject::invokeMethod(m_worker,"lightsOff",Qt::QueuedConnection);
     UtilitySvc::wait(200);

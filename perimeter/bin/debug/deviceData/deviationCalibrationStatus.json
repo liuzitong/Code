@@ -1,4 +1,5 @@
 {
+    "deviationCalibrationDA": 20000,
     "deviationCalibrationFail": true,
     "deviationCalibrationStep": 3,
     "deviationCalibrationWatingTime": 10000,

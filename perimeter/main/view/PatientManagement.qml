@@ -1,4 +1,4 @@
-import QtQuick 2.6
+﻿import QtQuick 2.6
 import QtQuick.Controls 2.0
 import QtQuick.Window 2.3
 import QtQml 2.2
@@ -570,7 +570,14 @@ Item{
     }
     Rectangle{id:bottomRibbon;width: parent.width;height: parent.height*1/15;color: "#333e44";anchors.bottom: parent.bottom
         Row{anchors.fill: parent;anchors.margins:parent.height*0.15;
-            CusButton{text:lt+qsTr("Exit");onClicked:Qt.quit();}
+            CusButton{
+                text:lt+qsTr("Exit");
+                onReleased: function() { Qt.callLater(tryClose); }
+                function tryClose(){
+                    IcUiQmlApi.appCtrl.checkSvc.leaveCheck();
+                    Qt.quit();
+                }
+            }
             Item{height: parent.height;width: parent.width*0.08}
             Item
             {
