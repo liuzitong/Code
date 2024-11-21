@@ -28,6 +28,7 @@ Rectangle {
         {
             idPopup2.close();
 
+
         }
         else if(visible)   //调整偏移位置 ||矫正的光强
         {
@@ -185,7 +186,7 @@ Rectangle {
                             // CusText{text:lt+qsTr("Computer automatic perimeter system"); horizontalAlignment: Text.AlignLeft;color: "white";font.pointSize: height*0.5;width:isEng?height*15:height*10;}
                             Item{height:parent.height;width:parent.width*0.1;}
                             Flow{
-                                id:patientInfo;visible: false;height: parent.height;spacing: height*0.5;
+                                id:patientInfo;visible: true;height: parent.height;spacing: height*0.5;
                                 Flow{
                                     height: parent.height;
                                     CusText{text:lt+qsTr("Name")+":  "; horizontalAlignment: Text.AlignRight;color:"white";width: 2*height;font.pointSize: height*0.4;}
@@ -294,8 +295,8 @@ Rectangle {
 
         Item{
             id:contentPage;width:parent.width;height: parent.height*0.90;
-            PatientManagement{id:patientPage;anchors.fill:parent;visible: true; onChangePage: contentPage.changePage(pageName,"patientManagement",params);}
-            Check{id:checkPage;anchors.fill: parent;visible: false;currentPatient: root.currentPatient;onChangePage: contentPage.changePage(pageName,"check",params);}
+            PatientManagement{id:patientPage;anchors.fill:parent;visible: false; onChangePage: contentPage.changePage(pageName,"patientManagement",params);}
+            Check{id:checkPage;anchors.fill: parent;visible: true;currentPatient: root.currentPatient;onChangePage: contentPage.changePage(pageName,"check",params);}
             ProgramCustomize{id:programPage;anchors.fill: parent;visible: false;onChangePage: contentPage.changePage(pageName,"programCustomize",params);}
             AnalysisLobby{id:analysisLobbypage;anchors.fill: parent;visible: false;currentPatient: root.currentPatient;onChangePage: contentPage.changePage(pageName,"analysisLobby",params);}
             Analysis{id:analysisPage;anchors.fill: parent;visible: false;currentPatient: root.currentPatient;onChangePage: contentPage.changePage(pageName,"analysis",params);}

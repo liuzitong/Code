@@ -46,6 +46,8 @@ Item {id:root; width: 1366;height: 691
                     else
                         currentProgram=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::DynamicProgramVM", false,[program_id]);
                 }
+                IcUiQmlApi.appCtrl.checkSvc.enterCheck();
+                startButton.clicked();
             }
         });
         checkSvc.deviceStatusChanged.connect(function()
@@ -481,6 +483,7 @@ Item {id:root; width: 1366;height: 691
 //                            }
                             CusButton{
                                 property int checkState: IcUiQmlApi.appCtrl.checkSvc.checkState;
+                                id:startButton;
                                 enabled: (IcUiQmlApi.appCtrl.checkSvc.debugMode||(IcUiQmlApi.appCtrl.checkSvc.deviceStatus===2))&&IcUiQmlApi.appCtrl.checkSvc.readyToCheck&&(currentProgram.type!==2||checkDisplay.dynamicSelectedDotsReady)&&!(checkState===3||checkState===4);
                                 text:{if(checkState===5||checkState===6) return lt+qsTr("Start");if(checkState===2) return lt+qsTr("Resume");if(checkState===0||checkState===1) return lt+qsTr("Pause")}
                                 onClicked:{

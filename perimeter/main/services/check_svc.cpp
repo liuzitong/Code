@@ -1,4 +1,4 @@
-#include "check_svc.h"
+﻿#include "check_svc.h"
 #include <QApplication>
 #include <QThread>
 #include <QTimer>
@@ -39,7 +39,7 @@ public:
     virtual void resetData()=0;
     virtual void finished()=0;
     virtual void lightsOn()=0;
-    void lightsOff();
+    static void lightsOff();
 //signals:
 //    void  checkStateChanged();
 //protected:
@@ -269,7 +269,7 @@ public slots:
         DevOps::DeviceOperation::getSingleton()->disconnectDev();    //连接设备
     }
 
-    void lightsOff(){if(m_check!=nullptr) m_check->lightsOff();}
+    void lightsOff(){Check::lightsOff();}
 
     void lightsOn(){if(m_check!=nullptr) m_check->lightsOn();}
 
@@ -302,11 +302,12 @@ signals:
 
 void Check::lightsOff()
 {
-    for(int i=0;i<4;i++) m_deviceOperation->setLamp(DevOps::LampId::LampId_bigDiamond,i,false);
-    m_deviceOperation->setLamp(DevOps::LampId::LampId_centerFixation,0,false);
-    for(int i=0;i<4;i++) m_deviceOperation->setLamp(DevOps::LampId::LampId_smallDiamond,i,false);
-    m_deviceOperation->setWhiteLamp(false);
-    m_deviceOperation->setLamp(DevOps::LampId::LampId_yellowBackground,0,false);
+    auto deviceOperation=DevOps::DeviceOperation::getSingleton();
+    for(int i=0;i<4;i++) deviceOperation->setLamp(DevOps::LampId::LampId_bigDiamond,i,false);
+    deviceOperation->setLamp(DevOps::LampId::LampId_centerFixation,0,false);
+    for(int i=0;i<4;i++) deviceOperation->setLamp(DevOps::LampId::LampId_smallDiamond,i,false);
+    deviceOperation->setWhiteLamp(false);
+    deviceOperation->setLamp(DevOps::LampId::LampId_yellowBackground,0,false);
 }
 
 void StaticCheck::initialize()
@@ -1324,63 +1325,66 @@ bool StaticCheck::waitForAnswer()
 {
 //    emit currentCheckingDotAnswerStatus(0);
     bool answerResult=false;
-    if(m_deviceOperation->m_deviceStatus==2)
-    {
-    //    qDebug()<<"waitForAnswer";
-        int waitTime;
-        auto commonParams=m_resultModel->m_params.commonParams;
-        auto fixedParams=m_resultModel->m_params.fixedParams;
-        if(m_answeredTimes.size()<=10||commonParams.responseAutoAdapt==false)
-        {
+    // if(m_deviceOperation->m_deviceStatus==2)
+    // {
+    // //    qDebug()<<"waitForAnswer";
+    //     int waitTime;
+    //     auto commonParams=m_resultModel->m_params.commonParams;
+    //     auto fixedParams=m_resultModel->m_params.fixedParams;
+    //     if(m_answeredTimes.size()<=10||commonParams.responseAutoAdapt==false)
+    //     {
 
-            waitTime=fixedParams.stimulationTime+fixedParams.intervalTime;
-    //        qDebug()<<"fixxed wait Time is:"+QString::number(waitTime);
-        }
-        else
-        {
-            constexpr int maxWaitTime=4000;
-            int sum=0;
-            for(auto&i:m_answeredTimes) sum+=i;
-            waitTime=qMin(sum/(m_answeredTimes.size())+commonParams.responseDelayTime,maxWaitTime);
-            m_answeredTimes.pop_front();
-    //        qDebug()<<"autoAdapt wait Time is:"+QString::number(waitTime);
-        }
+    //         waitTime=fixedParams.stimulationTime+fixedParams.intervalTime;
+    // //        qDebug()<<"fixxed wait Time is:"+QString::number(waitTime);
+    //     }
+    //     else
+    //     {
+    //         constexpr int maxWaitTime=4000;
+    //         int sum=0;
+    //         for(auto&i:m_answeredTimes) sum+=i;
+    //         waitTime=qMin(sum/(m_answeredTimes.size())+commonParams.responseDelayTime,maxWaitTime);
+    //         m_answeredTimes.pop_front();
+    // //        qDebug()<<"autoAdapt wait Time is:"+QString::number(waitTime);
+    //     }
 
 
-        while((m_stimulationWaitingForAnswerElapsedTimer.elapsed()<waitTime)&&(!answerResult))   //应答时间内
-        {
-            if(m_deviceOperation->m_deviceStatus!=2||*m_checkState==3) break;
-            if(m_deviceOperation->m_staticStimulationAnswer)
-            {
+    //     while((m_stimulationWaitingForAnswerElapsedTimer.elapsed()<waitTime)&&(!answerResult))   //应答时间内
+    //     {
+    //         if(m_deviceOperation->m_deviceStatus!=2||*m_checkState==3) break;
+    //         if(m_deviceOperation->m_staticStimulationAnswer)
+    //         {
 
-                m_deviceOperation->m_isWaitingForStaticStimulationAnswer=false;
-                m_deviceOperation->m_staticStimulationAnswer=false;
-                answerResult=true;
-                UtilitySvc::wait(m_programModel->m_params.fixedParams.leastWaitingTime);                //最小等待时间
-            }
-            else
-                QApplication::processEvents();
-        }
-        m_answeredTimes.append(m_stimulationWaitingForAnswerElapsedTimer.elapsed());
-    }
-    else if(m_deviceOperation->m_deviceStatus!=2)
-    {
-        if(KeyBoardFilter::needRefresh)
-        {
-            while(!KeyBoardFilter::freshed)
-            {
-                QApplication::processEvents();
-            }
-            answerResult=KeyBoardFilter::answered;
-            KeyBoardFilter::freshed=false;
-        }
-        else
-        {
+    //             m_deviceOperation->m_isWaitingForStaticStimulationAnswer=false;
+    //             m_deviceOperation->m_staticStimulationAnswer=false;
+    //             answerResult=true;
+    //             UtilitySvc::wait(m_programModel->m_params.fixedParams.leastWaitingTime);                //最小等待时间
+    //         }
+    //         else
+    //             QApplication::processEvents();
+    //     }
+    //     m_answeredTimes.append(m_stimulationWaitingForAnswerElapsedTimer.elapsed());
+    // }
+    // else if(m_deviceOperation->m_deviceStatus!=2)
+    // {
+    //     if(KeyBoardFilter::needRefresh)
+    //     {
+    //         while(!KeyBoardFilter::freshed)
+    //         {
+    //             QApplication::processEvents();
+    //         }
+    //         answerResult=KeyBoardFilter::answered;
+    //         KeyBoardFilter::freshed=false;
+    //     }
+    //     else
+    //     {
 
-            answerResult=qrand()%100<50;
-            UtilitySvc::wait(300);
-        }
-    }
+    //         answerResult=qrand()%100<50;
+    //         UtilitySvc::wait(300);
+    //     }
+    // }
+
+    answerResult=qrand()%100<50;
+    UtilitySvc::wait(1000);
 
     emit currentCheckingDotAnswerStatus(answerResult?2:1);
 //    qDebug()<<answerResult;
@@ -2173,7 +2177,7 @@ CheckSvc::CheckSvc(QObject *parent)
 //    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::isDeviceReadyChanged,[&](){if(m_checkState<=2){m_checkState=3;}});
     connect(&m_castLightDimdownTimer,&QTimer::timeout,[&]()
     {
-        if(m_checkState>=3)
+        if(m_checkState>=3&&DevOps::DeviceOperation::getSingleton()->m_castLightAdjustStatus==3)
             DevOps::DeviceOperation::getSingleton()->dimDownCastLight();
     });
     m_castLightDimdownTimer.setInterval(30000);
@@ -2306,6 +2310,8 @@ void CheckSvc::leaveCheck()
     qDebug()<<"trunOffVideo";
     DevOps::DeviceOperation::getSingleton()->leaveCheckingPage();
     DevOps::DeviceOperation::getSingleton()->dimDownCastLight();
+    DevOps::DeviceOperation::getSingleton()->openShutter(0);
+
     m_atCheckingPage=false;
     QMetaObject::invokeMethod(m_worker,"lightsOff",Qt::QueuedConnection);
     UtilitySvc::wait(200);

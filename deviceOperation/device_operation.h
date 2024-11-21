@@ -1,4 +1,4 @@
-#ifndef DEVICEOPERATION_H
+﻿#ifndef DEVICEOPERATION_H
 #define DEVICEOPERATION_H
 
 #include "device_operation_global.h"
@@ -204,7 +204,7 @@ public:
     bool m_staticStimulationAnswer;
     int m_castLightAdjustStatus=0;    //0:未标准,1:调整偏移位置,2:矫正的光强,3:校准完成
     int m_currentCastLightDA;
-    bool m_castLightUp=false;
+    bool m_castLightUp=true;
     QByteArray m_frameRawData;
     QMutex m_frameRawDataLock;
     BackgroundLight m_backgroundLight;
