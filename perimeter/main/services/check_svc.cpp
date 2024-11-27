@@ -2174,7 +2174,7 @@ CheckSvc::CheckSvc(QObject *parent)
 //    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::isDeviceReadyChanged,[&](){if(m_checkState<=2){m_checkState=3;}});
     connect(&m_castLightDimdownTimer,&QTimer::timeout,[&]()
     {
-        if(m_checkState>=3)
+        if(m_checkState>=3&&DevOps::DeviceOperation::getSingleton()->m_castLightAdjustStatus==3)
             DevOps::DeviceOperation::getSingleton()->dimDownCastLight();
     });
     m_castLightDimdownTimer.setInterval(30000);
