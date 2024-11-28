@@ -391,6 +391,7 @@ void DeviceOperation::adjustCastLight()
     log->info("Adjust cast light begins.");
     int color=m_deviceSettings->m_castLightTargetColor;
     int size=m_deviceSettings->m_castLightTargetSize;
+    lightsOff();
     setCursorColorAndCursorSize(color,size);
     qDebug()<<m_config.xMotorPosForLightCorrectionRef();
     qDebug()<<m_config.yMotorPosForLightCorrectionRef();
@@ -732,6 +733,15 @@ void DeviceOperation::beepCheckOver()
 void DeviceOperation::clearPupilData()
 {
     m_devicePupilProcessor.clearData();
+}
+
+void DeviceOperation::lightsOff()
+{
+    for(int i=0;i<4;i++) setLamp(DevOps::LampId::LampId_bigDiamond,i,false);
+    setLamp(DevOps::LampId::LampId_centerFixation,0,false);
+    for(int i=0;i<4;i++)setLamp(DevOps::LampId::LampId_smallDiamond,i,false);
+    setWhiteLamp(false);
+    setLamp(DevOps::LampId::LampId_yellowBackground,0,false);
 }
 
 void DeviceOperation::workOnNewStatuData()

@@ -135,6 +135,7 @@ public:
     void beepCheckOver();
     // void alarm();
     void clearPupilData();
+    void lightsOff();
 
 
 private:
