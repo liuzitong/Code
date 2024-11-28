@@ -39,7 +39,7 @@ public:
     virtual void resetData()=0;
     virtual void finished()=0;
     virtual void lightsOn()=0;
-    static void lightsOff();
+    // static void lightsOff();
 //signals:
 //    void  checkStateChanged();
 //protected:
@@ -269,7 +269,7 @@ public slots:
         DevOps::DeviceOperation::getSingleton()->disconnectDev();    //连接设备
     }
 
-    void lightsOff(){Check::lightsOff();}
+    void lightsOff(){m_deviceOperation->lightsOff();}
 
     void lightsOn(){if(m_check!=nullptr) m_check->lightsOn();}
 
@@ -300,15 +300,15 @@ signals:
     void eyeMoveAlarmingChanged(bool value);
 };
 
-void Check::lightsOff()
-{
-    auto deviceOperation=DevOps::DeviceOperation::getSingleton();
-    for(int i=0;i<4;i++) deviceOperation->setLamp(DevOps::LampId::LampId_bigDiamond,i,false);
-    deviceOperation->setLamp(DevOps::LampId::LampId_centerFixation,0,false);
-    for(int i=0;i<4;i++) deviceOperation->setLamp(DevOps::LampId::LampId_smallDiamond,i,false);
-    deviceOperation->setWhiteLamp(false);
-    deviceOperation->setLamp(DevOps::LampId::LampId_yellowBackground,0,false);
-}
+// void Check::lightsOff()
+// {
+//     auto deviceOperation=DevOps::DeviceOperation::getSingleton();
+//     for(int i=0;i<4;i++) deviceOperation->setLamp(DevOps::LampId::LampId_bigDiamond,i,false);
+//     deviceOperation->setLamp(DevOps::LampId::LampId_centerFixation,0,false);
+//     for(int i=0;i<4;i++) deviceOperation->setLamp(DevOps::LampId::LampId_smallDiamond,i,false);
+//     deviceOperation->setWhiteLamp(false);
+//     deviceOperation->setLamp(DevOps::LampId::LampId_yellowBackground,0,false);
+// }
 
 void StaticCheck::initialize()
 {
@@ -519,7 +519,7 @@ void StaticCheck::finished()
     emit nextCheckingDotChanged({999,999});
     UtilitySvc::wait(50);
     m_deviceOperation->waitShutterClose();
-    lightsOff();
+    m_deviceOperation->lightsOff();
     m_deviceOperation->resetMotors({UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
     m_deviceOperation->beepCheckOver();
     UtilitySvc::wait(2000);
@@ -1839,7 +1839,7 @@ void DynamicCheck::checkWaiting()
 void DynamicCheck::finished()
 {
 //    m_deviceOperation->m_isChecking=false;
-    lightsOff();
+    m_deviceOperation->lightsOff();
     m_deviceOperation->beepCheckOver();
     m_deviceOperation->resetMotors({UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_X,UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
     UtilitySvc::wait(2000);
@@ -1913,7 +1913,7 @@ void CheckSvcWorker::prepareToCheck()
         auto cursorSize=((StaticCheck*)m_check.data())->m_programModel->m_params.commonParams.cursorSize;
         auto cursorColor=((StaticCheck*)m_check.data())->m_programModel->m_params.commonParams.cursorColor;
         m_alarmAndPause=((StaticCheck*)m_check.data())->m_programModel->m_params.commonParams.fixationMonitor==FixationMonitor::alarmAndPause;
-        m_check->lightsOff();
+        m_deviceOperation->lightsOff();
         if(m_atCheckingPage)
         {
             m_check->lightsOn();
@@ -1931,7 +1931,7 @@ void CheckSvcWorker::prepareToCheck()
         auto cursorSize=((DynamicCheck*)m_check.data())->m_programModel->m_params.cursorSize;
         auto cursorColor=((DynamicCheck*)m_check.data())->m_programModel->m_params.cursorColor;
         m_alarmAndPause=((DynamicCheck*)m_check.data())->m_programModel->m_params.fixationMonitor==FixationMonitor::alarmAndPause;
-        m_check->lightsOff();
+        m_deviceOperation->lightsOff();
         m_check->lightsOn();
         m_deviceOperation->setCursorColorAndCursorSize(int(cursorColor),int(cursorSize));
         UtilitySvc::wait(100);
