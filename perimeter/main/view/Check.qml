@@ -29,8 +29,13 @@ Item {id:root; width: 1366;height: 691
     property bool atCheckingPage: false;
     onChangePage: {IcUiQmlApi.appCtrl.checkSvc.leaveCheck();atCheckingPage=false;}
 
+    property bool readyToCheck:  IcUiQmlApi.appCtrl.checkSvc.readyToCheck;
+
+
 
     Component.onCompleted:{
+        IcUiQmlApi.appCtrl.checkSvc.connectDev();
+        IcUiQmlApi.appCtrl.checkSvc.enterCheck();
         frameProvidSvc=IcUiQmlApi.appCtrl.frameProvidSvc;
         checkSvc.checkResultChanged.connect(currentCheckResultChanged);
         checkSvc.castLightAdjustStatusChanged.connect(function()
@@ -46,8 +51,8 @@ Item {id:root; width: 1366;height: 691
                     else
                         currentProgram=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::DynamicProgramVM", false,[program_id]);
                 }
-                IcUiQmlApi.appCtrl.checkSvc.enterCheck();
-                startButton.clicked();
+                // IcUiQmlApi.appCtrl.checkSvc.prepareToCheck();
+                // startButton.clicked();
             }
         });
         checkSvc.deviceStatusChanged.connect(function()
@@ -69,7 +74,6 @@ Item {id:root; width: 1366;height: 691
                 }
             }
         });
-        IcUiQmlApi.appCtrl.checkSvc.connectDev();
 //        refresh();
     }
 
@@ -89,6 +93,13 @@ Item {id:root; width: 1366;height: 691
         }
     }
     onCurrentPatientChanged: {IcUiQmlApi.appCtrl.checkSvc.patient=currentPatient;}
+
+    onReadyToCheckChanged: {
+        if(IcUiQmlApi.appCtrl.checkSvc.readyToCheck)
+        {
+            startButton.clicked();
+        }
+    }
 
     onRefresh: {
         if (currentProgram==null)
@@ -525,6 +536,14 @@ Item {id:root; width: 1366;height: 691
                                         IcUiQmlApi.appCtrl.checkSvc.pause();
                                     }
                                 }
+
+                                // onCheckStateChanged: {
+                                //     if(checkState===5||checkState===6)
+                                //     {
+                                //         IcUiQmlApi.appCtrl.checkSvc.leaveCheck();
+                                //         Qt.quit();
+                                //     }
+                                // }
                             }
                             CusButton{
                                 text:lt+qsTr("Stop");enabled: IcUiQmlApi.appCtrl.checkSvc.checkState<=2;

@@ -51,6 +51,8 @@ public:
     bool m_deviationCalibrationFail;
     int m_deviationCalibrationDA;        //低于次值一段时间就开始对位
     int m_stepOffset;
+    int m_castLightAdjustCount;
+    int m_castLightAdjustSuccessCount;
 
     int m_deviationCalibrationWatingTime;
     static QSharedPointer<DeviceSettings> getSingleton();

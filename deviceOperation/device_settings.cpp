@@ -109,6 +109,8 @@ DeviceSettings::DeviceSettings()
     QJsonObject m_rootObj2 = jsonDoc2.object();
     m_castLightDA=m_rootObj2.value("castLightDA").toInt();
     m_castLightLastAdjustedDate=m_rootObj2.value("castLightLastAdjustedDate").toString();
+    m_castLightAdjustCount=m_rootObj2.value("castLightAdjustCount").toInt()+1;
+    m_castLightAdjustSuccessCount=m_rootObj2.value("castLightAdjustSuccessCount").toInt();
 
     QFile loadFile3(R"(deviceData/deviationCalibrationStatus.json)");
     loadFile3.open(QIODevice::ReadOnly);
@@ -147,9 +149,12 @@ QSharedPointer<DeviceSettings> DeviceSettings::getSingleton()
 
 void DeviceSettings::saveCastLightAdjustStatus()
 {
+    std::cout<<"save adjustlight"<<std::endl;
     QJsonObject rootObj;
     rootObj["castLightDA"]=m_castLightDA;
     rootObj["castLightLastAdjustedDate"]=m_castLightLastAdjustedDate;
+    rootObj["castLightAdjustCount"]=m_castLightAdjustCount;
+    rootObj["castLightAdjustSuccessCount"]=m_castLightAdjustSuccessCount;
     QJsonDocument jsonDoc(rootObj);
     auto data=jsonDoc.toJson();
     QFile loadFile(R"(deviceData/castLightAdjustStatus.json)");

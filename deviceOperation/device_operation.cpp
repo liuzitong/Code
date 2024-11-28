@@ -894,6 +894,7 @@ void DeviceOperation::workOnNewStatuData()
             }
             else
             {
+                std::cout<<"up adjustlight"<<std::endl;
                 m_currentCastLightDA+=step;
                 if(m_currentCastLightDA>=m_deviceSettings->m_castLightDALimit)
                 {
@@ -903,6 +904,7 @@ void DeviceOperation::workOnNewStatuData()
         }
         else
         {
+            std::cout<<"down adjustlight"<<std::endl;
             m_currentCastLightDA-=step;
         }
 
@@ -919,16 +921,18 @@ void DeviceOperation::workOnNewStatuData()
         else if(m_castLightStablelizeWaitingElapsedTimer.elapsed()>m_deviceSettings->m_castLightStablizeWaitingTime)
         {
             log->info("完成校光.");
+            std::cout<<"finished adjustlight"<<std::endl;
+            m_deviceSettings->m_castLightLastAdjustedDate=QDate::currentDate().toString("yyyy/MM/dd");
+            m_deviceSettings->m_castLightDA=m_currentCastLightDA;
+            m_deviceSettings->m_castLightAdjustSuccessCount+=1;
+            std::cout<<"save adjustlight!!!!!!!!!!!!!!"<<std::endl;
+            m_deviceSettings->saveCastLightAdjustStatus();
             setCastLightAdjustStatus(3);
             openShutter(0);
             waitForSomeTime(m_waitingTime);
             waitMotorStop({UsbDev::DevCtl::MotorId_Shutter});
             m_devCtl->setLamp(LampId::LampId_castLight,0,m_currentCastLightDA*0.3);
             m_castLightUp=false;
-
-            m_deviceSettings->m_castLightLastAdjustedDate=QDate::currentDate().toString("yyyy/MM/dd");
-            m_deviceSettings->m_castLightDA=m_currentCastLightDA;
-            m_deviceSettings->saveCastLightAdjustStatus();
             goto End;
         }
     }
