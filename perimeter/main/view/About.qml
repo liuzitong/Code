@@ -1,4 +1,4 @@
-import QtQuick 2.7
+﻿import QtQuick 2.7
 import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
 import perimeter.main.view.Controls 1.0
@@ -16,6 +16,7 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
 //    property alias contentHeight: idContent.implicitHeight;
 //    property int textHeight: height*0.02;
     property int fontPointSize: CommonSettings.fontPointSize;
+    property bool showInternalVersion: false;
 
 
 
@@ -73,6 +74,11 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                             // Item{height:parent.height*0.06;width: parent.width; }
 
                             Item{ height:parent.height*0.065;width: parent.width;
+                                MouseArea
+                                {
+                                    anchors.fill: parent;
+                                    onDoubleClicked:{showInternalVersion=!showInternalVersion;}
+                                }
                                 Image {
                                     id: name
                                     anchors.horizontalCenter: parent.horizontalCenter;
@@ -117,51 +123,44 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                             CusText{
                                 height:parent.height*0.04;width: parent.width;
                                 text: lt+qsTr("Device type")+": " +IcUiQmlApi.appCtrl.settings.deviceInfo;horizontalAlignment: Text.AlignLeft;
-                                font.pointSize:fontPointSize;
+                                font.pointSize:fontPointSize;visible: showInternalVersion;
                             }
                             Item{height:parent.height*0.02;width: parent.width; }
 
                             CusText{
                                 height:parent.height*0.04;width: parent.width;
                                 text: lt+qsTr("Device Version")+": "+IcUiQmlApi.appCtrl.checkSvc.deviceVersion;horizontalAlignment: Text.AlignLeft;
-                                font.pointSize:fontPointSize;
+                                font.pointSize:fontPointSize;visible: showInternalVersion;
                             }
                             Item{height:parent.height*0.02;width: parent.width; }
 
                             CusText{
                                 height:parent.height*0.04;width: parent.width;
                                 text: lt+qsTr("Device ID")+": " +IcUiQmlApi.appCtrl.checkSvc.deviceID;horizontalAlignment: Text.AlignLeft;
-                                font.pointSize:fontPointSize;
+                                font.pointSize:fontPointSize;visible: showInternalVersion;
                             }
                             Item{height:parent.height*0.02;width: parent.width; }
 
                             CusText{
                                 height:parent.height*0.04;width: parent.width;
                                 text: lt+qsTr("Internal version")+": " +IcUiQmlApi.appCtrl.settings.version;horizontalAlignment: Text.AlignLeft;
-                                font.pointSize:fontPointSize;
+                                font.pointSize:fontPointSize;visible: showInternalVersion;
                             }
-                            Item{height:parent.height*0.02;width: parent.width; }
-
-
-                            Item{
-                                height:parent.height*0.10;width: parent.width;
-                            }
+                        }
+                        Column{
+                            height: parent.height*0.20; anchors.bottom: parent.bottom; width: parent.width;
 
                             CusText{
-                                height:parent.height*0.04;width: parent.width;
+                                height:parent.height*0.4;width: parent.width;
                                 text: lt+qsTr("Copyright @2019 Chongqing BioNewVision Medical Device Co.Lt.");
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 horizontalAlignment: Text.AlignHCenter
                                 font.pointSize:fontPointSize;
                             }
-                            Item{height:parent.height*0.10;width: parent.width; }
+                            Item{height:parent.height*0.18;width: parent.width; }
 
-
-
-                        }
-                        Item{
-                            height: parent.height*0.08; anchors.bottom: parent.bottom; width: parent.width;
                             CusButton{
+                                height:parent.height*0.42;width:height*3;
                                 buttonColor: "#e0e0e0";
                                 text:lt+qsTr("OK")
                                 anchors.horizontalCenter: parent.horizontalCenter

@@ -454,11 +454,11 @@ Item{
                                 CusText{text:"*"+lt+qsTr("Birth date")+" "; horizontalAlignment: Text.AlignRight ;width:parent.width*0.20;font.pointSize: fontPointSize;}
                                 Row{
                                     height:parent.height;spacing:(width-6*height)/2;width:newPatient.width*0.6
-                                    Item{height: parent.height;width: 2*height;LineEdit{id:newBirthDate;readOnly:true;enabled:false;width: height*3.1;onTextChanged:{newPatientage.text=CusUtils.getAge(newBirthDate.text);}}}
+                                    Item{height: parent.height;width: 2*height;LineEdit{id:newBirthDate;enabled:false;width: height*3.1;onTextChanged:{newPatientage.text=CusUtils.getAge(newBirthDate.text);}}}
                                     CusButton{
                                         text:lt+qsTr("Select");width:height*2;onClicked:{calendar.inputObj=newBirthDate;calendar.open();}}
                                     LineEdit{
-                                        id:newPatientage;width: height*2;text:"";radius: height*0.2;horizontalAlignment: Text.AlignHCenter;readOnly: true;enabled:false;backgroundColor:backGroundColor;
+                                        id:newPatientage;width: height*2;text:"";radius: height*0.2;horizontalAlignment: Text.AlignHCenter;enabled:false;backgroundColor:backGroundColor;
                                     }
                                 }
                             }
