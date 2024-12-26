@@ -54,11 +54,11 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                             Column{height: parent.height;width: (parent.width*0.9-content.rowHeight*3)/2;spacing: content.rowHeight;
                                 Row{width: parent.width;height: content.rowHeight;spacing: width*0.1;
                                     CusText{text:"X0";width: parent.width*0.3;font.pointSize: CommonSettings.fontPointSize;}
-                                    NumberLineEdit{id:x0;width: parent.width*0.6;step:1;max:range[1];min:-range[1];}
+                                    NumberLineEdit{id:x0;width: parent.width*0.6;step:1;max:-1;min:-range[1];value:-1;textInput.validator:RegExpValidator { regExp: /^(-[0-9]+)/ }}
                                 }
                                 Row{width: parent.width;height: content.rowHeight;spacing: width*0.1;
                                     CusText{text:"Y0";width: parent.width*0.3;font.pointSize: CommonSettings.fontPointSize;}
-                                    NumberLineEdit{id:y0;width: parent.width*0.6;step:1;max:range[1];min:-range[1];}
+                                    NumberLineEdit{id:y0;width: parent.width*0.6;step:1;max:range[1];min:1;value:1;/*textInput.validator:RegExpValidator { regExp: /^(-?[0-9]+)/ }*/}
                                 }
                             }
 
@@ -89,15 +89,15 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                             Column{height: parent.height;width: (parent.width*0.9-content.rowHeight*3)/2;spacing: content.rowHeight;
                                 Row{width: parent.width;height: content.rowHeight;spacing: width*0.1
                                     CusText{text:"X1";width: parent.width*0.3;font.pointSize: CommonSettings.fontPointSize;}
-                                    NumberLineEdit{id:x1;width: parent.width*0.6;step:1;max:range[1];min:-range[1];}
+                                    NumberLineEdit{id:x1;width: parent.width*0.6;step:1;max:range[1];value:1;min:1;}
                                 }
                                 Row{width: parent.width;height: content.rowHeight;spacing: width*0.1;
                                     CusText{text:"Y1";width: parent.width*0.3;font.pointSize: CommonSettings.fontPointSize;}
-                                    NumberLineEdit{id:y1;width: parent.width*0.6;step:1;max:range[1];min:-range[1];}
+                                    NumberLineEdit{id:y1;width: parent.width*0.6;step:1;max:-1;min:-range[1];value:-1;textInput.validator:RegExpValidator { regExp: /^(-[0-9]+)/ }}
                                 }
                                 Row{width: parent.width;height: content.rowHeight;spacing: width*0.1;
                                     CusText{text:lt+qsTr("Spacing");width: parent.width*0.3;font.pointSize: CommonSettings.fontPointSize;}
-                                    NumberLineEdit{id:gap;width: parent.width*0.6;step:1;max:range[1];value:1;min:1;}
+                                    NumberLineEdit{id:gap;width: parent.width*0.6;step:2;max:range[1];value:2;min:2;}
                                 }
                             }
                         }

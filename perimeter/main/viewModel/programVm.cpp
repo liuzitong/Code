@@ -115,12 +115,14 @@ void StaticProgramVm::deleteProgram()
 void StaticProgramVm::circleDots(int outterRadius, int innerRadius, int gap)
 {
 //    std::vector<Point> dots;
-    int grid=floor(double(outterRadius)/gap-0.5);
-    int x_begin=-grid*gap-0.5*gap;
-    int x_end=grid*gap+0.5*gap;
-    int y_begin=x_end;
-    int y_end=x_begin;
-    for(int y=y_begin;y>=y_end;y=y-gap)
+    // int grid=floor(double(outterRadius)/gap/*-0.5*/);
+    // outterRadius=(floor(double(outterRadius)/gap)+0.5)*gap;
+    // innerRadius=(floor(double(innerRadius)/gap)+0.5)*gap;
+    int x_begin=-(floor(double(outterRadius)/gap)+0.5)*gap;
+    int x_end=(floor(double(outterRadius)/gap)+0.5)*gap;
+    int y_begin=x_begin;
+    int y_end=x_end;
+    for(int y=y_begin;y<=y_end;y+=gap)
         for(int x=x_begin;x<=x_end;x+=gap)
         {
             int radius_squared=pow(y,2)+pow(x,2);
@@ -134,12 +136,11 @@ void StaticProgramVm::circleDots(int outterRadius, int innerRadius, int gap)
 
 void StaticProgramVm::rectangleDots(int x0, int y0, int x1, int y1, int gap)
 {
-
     int x_begin=floor(double(x0)/gap)*gap+0.5*gap;
     int x_end=ceil(double(x1)/gap)*gap-0.5*gap;
-    int y_begin=floor(double(y0)/gap)*gap+0.5*gap;
-    int y_end=ceil(double(y1)/gap)*gap-0.5*gap;
-    for(int y=y_begin;y>=y_end;y=y-gap)
+    int y_begin=floor(double(y0)/gap)*gap-0.5*gap;
+    int y_end=(ceil(double(y1)/gap)*gap+0.5*gap);
+    for(int y=y_begin;y>=y_end;y-=gap)
         for(int x=x_begin;x<=x_end;x+=gap)
         {
             m_data->m_data.dots.push_back(Point{float(x),float(y)});

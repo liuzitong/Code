@@ -62,7 +62,7 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                             }
                             Row{width: parent.width*0.6;height: parent.rowHeight;anchors.horizontalCenter: parent.horizontalCenter;spacing: width*0.1;
                                 CusText{text:lt+qsTr("Spacing");width: parent.width*0.3;font.pointSize: CommonSettings.fontPointSize;}
-                                NumberLineEdit{id:gap;width: parent.width*0.6;step:1;max:range[1];value:1;min:1;}
+                                NumberLineEdit{id:gap;width: parent.width*0.6;step:2;max:range[1];value:2;min:2;}
                             }
                         }
                         Row{
