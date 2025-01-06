@@ -31,6 +31,7 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <perimeter/main/services/dicom.h>
+#include <perimeter/main/services/datevalidator.h>
 #if !defined(WIN32)
 #include <unistd.h>
 #endif
@@ -185,6 +186,7 @@ int  main ( int argc, char *argv[] )
         QApplication app(argc, argv);
 
         JRpcServerSvc jprc_svc; jprc_svc.start(GUNS_JRPC_SVC_NAME);
+        Perimeter::DateValidator dateValidater;
         Perimeter::AppCtrl *app_ctrl = new Perimeter::AppCtrl;
         app_ctrl->doInit();
 
@@ -203,6 +205,7 @@ int  main ( int argc, char *argv[] )
         QQmlApplicationEngine *eng = new QQmlApplicationEngine;
         eng->rootContext()->setContextProperty("applicationDirPath", QGuiApplication::applicationDirPath());
         eng->rootContext()->setContextProperty( QStringLiteral("gVkbd"), qobject_cast< QObject* >( cli_mon ));
+        eng->rootContext()->setContextProperty("dateValidator",&dateValidater);
         eng->addImportPath(QStringLiteral("qrc:/") );
         eng->addImageProvider( QStringLiteral("PermImProv"), new FcPerm::PermImProv( ) );
 

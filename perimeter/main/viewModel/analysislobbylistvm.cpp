@@ -174,11 +174,6 @@ QString AnalysisLobbyListVm::drawImage(CheckResult_ptr checkResult_ptr)
             if(checkReport(0)||checkReport(2))        //常规分析和总览显示概率图
             {
                 analysisMethodSvc->ThresholdAnalysis(resultId,dev,mDev,peDev,peMDev,md,psd,VFI,GHT,p_md,p_psd);
-//                if(md<-5)
-//                {
-//                    analysisMethodSvc->drawWords(img,{tr("Pattern Deviation not"),tr("Shown for serverely"),tr("Depressed fields. Refer"),tr("to Total Deviation")});
-//                }
-//                else
                 analysisMethodSvc->drawPE(peDev,locs,range,img);
             }
             else if(checkReport(1)||checkReport(3))      //三合一显示量化缺损

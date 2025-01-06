@@ -1,4 +1,4 @@
-#include "general_analysis_vm.h"
+﻿#include "general_analysis_vm.h"
 #include <QMessageBox>
 #include <QVariant>
 #include <perimeter/main/services/analysis_svc.h>
@@ -144,7 +144,7 @@ StaticAnalysisVm::StaticAnalysisVm(const QVariantList &args)
             analysisMethodSvc->drawText(m_values,m_locs,m_range,m_OS_OD,img,DrawType::DB);img.save(m_previewFolder+"dBDiagram.bmp");
             analysisMethodSvc->drawGray(m_values,m_locs,m_range,m_innerRange,img);img.save(m_previewFolder+"gray.bmp");
             analysisMethodSvc->drawPE(m_peDev,m_locs,m_range,img);img.save(m_previewFolder+"TotalPE.bmp");
-            if(m_md<-5)
+            if(m_md<-20)
             {
                 analysisMethodSvc->drawWords(img,{tr("Pattern Deviation not"),tr("Shown for serverely"),tr("Depressed fields. Refer"),tr("to Total Deviation")});
                 img.save(m_previewFolder+"PatternPE.bmp");
@@ -251,7 +251,7 @@ void StaticAnalysisVm::showReport(int report,bool uploadDicom)
 
             analysisMethodSvc->drawText(m_dev,m_locs,m_range,m_OS_OD,img480,DrawType::Dev,1.0,true);img480.save(m_reportFolder+"TotalDeviation.bmp");
             analysisMethodSvc->drawPE(m_peDev,m_locs,m_range,img480);img480.save(m_reportFolder+"TotalPE.bmp");
-            if(m_md<-5)
+            if(m_md<-20)
             {
                 analysisMethodSvc->drawWords(img480,{tr("Pattern Deviation not"),tr("Shown for serverely"),tr("Depressed fields. Refer"),tr("to Total Deviation")},1.0,true);
                 img480.save(m_reportFolder+"PatternDeviation.bmp");img480.save(m_reportFolder+"PatternPE.bmp");
@@ -274,7 +274,7 @@ void StaticAnalysisVm::showReport(int report,bool uploadDicom)
             analysisMethodSvc->drawText(m_values,m_locs,m_range,m_OS_OD,img480,DrawType::DB,1.0,true);img480.save(m_reportFolder+"dBDiagram.bmp");
             analysisMethodSvc->drawGray(m_values,m_locs,m_range,m_innerRange,img480);img480.save(m_reportFolder+"gray.bmp");
             analysisMethodSvc->drawPE(m_peDev,m_locs,m_range,img480);img480.save(m_reportFolder+"TotalPE.bmp");
-            if(m_md<-5)
+            if(m_md<-20)
             {
                 analysisMethodSvc->drawWords(img480,{tr("Pattern Deviation not"),tr("Shown for serverely"),tr("Depressed fields. Refer"),tr("to Total Deviation")},1.0,true);
                 img480.save(m_reportFolder+"PatternPE.bmp");
@@ -746,7 +746,7 @@ OverViewListVm::OverViewListVm(QList<int> ids,int diagramWidth)
         analysisMethodSvc->drawText(m_values,m_locs,m_range,m_OS_OD,img,DrawType::DB);img.save(dBDiagramPicPath1);
         analysisMethodSvc->drawGray(m_values,m_locs,m_range,m_innerRange,img);img.save(grayPicPath1);
         analysisMethodSvc->drawPE(m_peDev,m_locs,m_range,img);img.save(TotalPEPicPath1);
-        if(m_md<-5)
+        if(m_md<-20)
         {
             analysisMethodSvc->drawWords(img,{tr("Pattern Deviation not"),tr("Shown for serverely"),tr("Depressed fields. Refer"),tr("to Total Deviation")});
             img.save(PatternPEPicPath1);
@@ -763,7 +763,7 @@ OverViewListVm::OverViewListVm(QList<int> ids,int diagramWidth)
         analysisMethodSvc->drawText(m_values,m_locs,m_range,m_OS_OD,img2,DrawType::DB,1.0,true);img2.save(dBDiagramPicPath2);
         analysisMethodSvc->drawGray(m_values,m_locs,m_range,m_innerRange,img2);img2.save(grayPicPath2);
         analysisMethodSvc->drawPE(m_peDev,m_locs,m_range,img2);img2.save(TotalPEPicPath2);
-        if(m_md<-5)
+        if(m_md<-20)
         {
             analysisMethodSvc->drawWords(img2,{tr("Pattern Deviation not"),tr("Shown for serverely"),tr("Depressed fields. Refer"),tr("to Total Deviation")},1.0,true);
             img2.save(PatternPEPicPath2);
