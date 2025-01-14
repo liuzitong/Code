@@ -529,6 +529,8 @@ void Perimeter::ProgressAnalysisListVm::getSingleProgressReport(int index,QStrin
     manager->setReportVariable("deviceInfo",tr("Device info")+": "+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("deviceInfo").toString());
     manager->setReportVariable("version",tr("Version")+": "+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("version").toString());
 
+
+
     if(!uploadDicom)
     {
         UtilitySvc::reportEngine->setPreviewScaleType(LimeReport::ScaleType::Percents,50);

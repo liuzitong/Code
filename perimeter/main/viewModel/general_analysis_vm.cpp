@@ -269,19 +269,21 @@ void StaticAnalysisVm::showReport(int report,bool uploadDicom)
             analysisMethodSvc->drawGray(m_values,m_locs,m_range,m_innerRange,img480);img480.save(m_reportFolder+"gray.bmp");
             analysisMethodSvc->drawDefectDepth(m_dev,m_locs,m_range,img480,1.0,true);img480.save(m_reportFolder+"defectDepth.bmp");
         }
-        else if(report==2)
-        {
-            analysisMethodSvc->drawText(m_values,m_locs,m_range,m_OS_OD,img480,DrawType::DB,1.0,true);img480.save(m_reportFolder+"dBDiagram.bmp");
-            analysisMethodSvc->drawGray(m_values,m_locs,m_range,m_innerRange,img480);img480.save(m_reportFolder+"gray.bmp");
-            analysisMethodSvc->drawPE(m_peDev,m_locs,m_range,img480);img480.save(m_reportFolder+"TotalPE.bmp");
-            if(m_md<-20)
-            {
-                analysisMethodSvc->drawWords(img480,{tr("Pattern Deviation not"),tr("Shown for serverely"),tr("Depressed fields. Refer"),tr("to Total Deviation")},1.0,true);
-                img480.save(m_reportFolder+"PatternPE.bmp");
-            }
-            else
-                analysisMethodSvc->drawPE(m_peMDev,m_locs,m_range,img480);img480.save(m_reportFolder+"PatternPE.bmp");
-        }
+
+        //report ==2 在单独的 StaticAnalysisOverViewVm
+        // else if(report==2)
+        // {
+        //     analysisMethodSvc->drawText(m_values,m_locs,m_range,m_OS_OD,img480,DrawType::DB,1.0,true);img480.save(m_reportFolder+"dBDiagram.bmp");
+        //     analysisMethodSvc->drawGray(m_values,m_locs,m_range,m_innerRange,img480);img480.save(m_reportFolder+"gray.bmp");
+        //     analysisMethodSvc->drawPE(m_peDev,m_locs,m_range,img480);img480.save(m_reportFolder+"TotalPE.bmp");
+        //     if(m_md<-20)
+        //     {
+        //         analysisMethodSvc->drawWords(img480,{tr("Pattern Deviation not"),tr("Shown for serverely"),tr("Depressed fields. Refer"),tr("to Total Deviation")},1.0,true);
+        //         img480.save(m_reportFolder+"PatternPE.bmp");
+        //     }
+        //     else
+        //         analysisMethodSvc->drawPE(m_peMDev,m_locs,m_range,img480);img480.save(m_reportFolder+"PatternPE.bmp");
+        // }
         else if(report==3)
         {
             analysisMethodSvc->drawText(m_values,m_locs,m_range,m_OS_OD,img800,DrawType::DB,0.8,true);img800.save(m_reportFolder+"dBDiagram.bmp");
@@ -305,7 +307,7 @@ void StaticAnalysisVm::showReport(int report,bool uploadDicom)
         {
             case 0:filePath="./reports/Single.lrxml";break;
             case 1:filePath="./reports/ThreeInOne.lrxml";break;
-            case 2:filePath="./reports/OverView.lrxml";break;
+            // case 2:filePath="./reports/OverView.lrxml";break;
             case 3:filePath="./reports/TwoInOne.lrxml";break;
             case 4:filePath="./reports/DB.lrxml";break;
         }
@@ -329,6 +331,7 @@ void StaticAnalysisVm::showReport(int report,bool uploadDicom)
     manager->setReportVariable("age", m_patient.m_age);
     manager->setReportVariable("checkTime", m_checkResult.m_time.time().toString("H:mm:ss"));
     manager->setReportVariable("sex", int(m_patient.m_sex)==0?tr("Male"):tr("Female"));
+
     auto rx=m_patient.m_rx;
     if(!m_OS_OD)
     {
@@ -367,7 +370,7 @@ void StaticAnalysisVm::showReport(int report,bool uploadDicom)
     manager->setReportVariable("GHT",tr("GHT")+QString(": ")+GHT);
     manager->setReportVariable("MD",tr("MD")+QString(": ")+QString::number(m_md,'f',2)+(m_p_md<10-FLT_EPSILON?" (P<"+QString::number(m_p_md)+"%)":""));
     manager->setReportVariable("PSD",tr("PSD")+QString(": ")+QString::number(m_psd,'f',2)+(m_p_psd<10-FLT_EPSILON?" (P<"+QString::number(m_p_psd)+"%)":""));
-
+    manager->setReportVariable("range",m_program.m_params.commonParams.Range[1]);
     if(m_type==0)
     {
         switch (report)
@@ -385,12 +388,12 @@ void StaticAnalysisVm::showReport(int report,bool uploadDicom)
             manager->setReportVariable("DefectDepthImagePath","./reportImage/defectDepth.bmp");
             manager->setReportVariable("DBImagePath","./reportImage/dBDiagram.bmp");
             break;
-        case 2:
-            manager->setReportVariable("DBImagePath","./reportImage/dBDiagram.bmp");
-            manager->setReportVariable("GrayImagePath","./reportImage/gray.bmp");
-            manager->setReportVariable("TotalPEImagePath","./reportImage/TotalPE.bmp");
-            manager->setReportVariable("PatternPEImagePath","./reportImage/PatternPE.bmp");
-            break;
+        // case 2:
+        //     manager->setReportVariable("DBImagePath","./reportImage/dBDiagram.bmp");
+        //     manager->setReportVariable("GrayImagePath","./reportImage/gray.bmp");
+        //     manager->setReportVariable("TotalPEImagePath","./reportImage/TotalPE.bmp");
+        //     manager->setReportVariable("PatternPEImagePath","./reportImage/PatternPE.bmp");
+        //     break;
         case 3:
             manager->setReportVariable("DefectDepthImagePath","./reportImage/defectDepth.bmp");
             manager->setReportVariable("DBImagePath","./reportImage/dBDiagram.bmp");
@@ -403,9 +406,9 @@ void StaticAnalysisVm::showReport(int report,bool uploadDicom)
     else
     {
         manager->setReportVariable("ScreeningImagePath","./reportImage/Screening.bmp");
-        manager->setReportVariable("Seen",QString(tr("Seen"))+":"+QString::number(m_dotSeen)+"/"+QString::number(m_values.length()));
-        manager->setReportVariable("WeakSeen",QString(tr("Weak seen"))+":"+QString::number(m_dotWeakSeen)+"/"+QString::number(m_values.length()));
-        manager->setReportVariable("Unseen",QString(tr("Unseen"))+":"+QString::number(m_dotUnseen)+"/"+QString::number(m_values.length()));
+        manager->setReportVariable("Seen",QString(tr("Seen"))+":"+QString::number(m_dotSeen)+"/"+QString::number(m_program.m_data.dots.size()));
+        manager->setReportVariable("WeakSeen",QString(tr("Weak seen"))+":"+QString::number(m_dotWeakSeen)+"/"+QString::number(m_program.m_data.dots.size()));
+        manager->setReportVariable("Unseen",QString(tr("Unseen"))+":"+QString::number(m_dotUnseen)+"/"+QString::number(m_program.m_data.dots.size()));
     }
 
 
@@ -545,6 +548,7 @@ void DynamicAnalysisVm::showReport(int report,bool uploadDicom)
     QString cursorBrightness=QString::number(params.brightness);
     manager->setReportVariable("checkTimespan",tr("Check timespan")+QString(": ")+time.toString("mm:ss"));
     manager->setReportVariable("stimCursor",tr("Stimulus cursor")+QString(": ")+cursorSize+","+cursorColor);
+    manager->setReportVariable("range",m_program.m_params.Range[1]);
 
 
     if(report==0)
