@@ -231,7 +231,7 @@ void ProgressAnalysisListVm::getProgressBaseLineReport(QString diagnosis,bool up
         months.push_back(month);
     }
 
-    img=QImage({((endYear-startYear)*24+120)*2,600}, QImage::Format_RGB32);
+    img=QImage({((endYear-startYear)*96+240)*2,600}, QImage::Format_RGB32);
     analysisSvc->drawBaseLine(mdList,startYear,endYear,months,img,true);img.save(m_reportFolder+"baseLine.bmp");
     analysisSvc->BaseLineAnalysis(mdList,months,avgMd,progressSpeedBase,progressSpeedDeviation,slopeType);
 
