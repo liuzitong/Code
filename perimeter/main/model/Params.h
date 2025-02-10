@@ -158,14 +158,14 @@ struct StaticParams/*:public QObject*/
          * 此为周期,即是经过固定个点,搞一次
          * 周期为亮点次数
          */
-        int falsePositiveCycle;
+        int falsePositiveCycle;  //参数作废，改为从灯开始亮的时候到200ms内应答的为假阳性，此次响应结果作废。
         /**
          * @brief falseNegativeCycle
          * 假阴性：在曾经响应过的位置，再减少几个DB的亮度(即是更亮)再次测试，如响应就正常，不响应则记录一次假阴性。
          * 此为周期,即时经过固定个点,在上个周期数个点之中随机调一个做此项测试.
          * 周期为亮点次数
          */
-        int falseNegativeCycle;
+        int falseNegativeCycle;  //参数作废，改为离心度相同或更小的点和前面的目标点进行比较，目标点响应了，而后面的点在比目标点还低4db以上时仍未响应，记录一次假阴性。
         /**
          * @brief fixationViewLossCycle
          * 固视丢失周期,属于盲点测试打开的情况下的,测试这个亮点次数后,在盲点刺激,应答就属于一次固视丢失

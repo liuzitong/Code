@@ -306,22 +306,22 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                             Component.onCompleted: {idPopup.ok.connect(function(){currentProgram.params.fixedParams.falsePositiveCycle=value;});idPopup.currentProgramChanged.connect(function(){value=currentProgram.params.fixedParams.falsePositiveCycle;}); }
                                         }
                                     }
-                                    Item{
-                                        width: parent.width; height:parent.parent.rowHeight;
-                                        CusText{text:lt+qsTr("False negative cycle"); anchors.left: parent.left; anchors.leftMargin: 0;width: parent.width*0.45;horizontalAlignment: Text.AlignLeft;font.pointSize:fontPointSize;}
-                                        NumberLineEdit{
-                                            width: parent.width*0.5; anchors.right: parent.right;step:1;max:50;min:0;
-                                            Component.onCompleted: {idPopup.ok.connect(function(){currentProgram.params.fixedParams.falseNegativeCycle=value;});idPopup.currentProgramChanged.connect(function(){value=currentProgram.params.fixedParams.falseNegativeCycle;}); }
-                                        }
-                                    }
-                                    Item{
-                                        width: parent.width; height:parent.parent.rowHeight;
-                                        CusText{text:lt+qsTr("Fixation loss cycle"); anchors.left: parent.left; anchors.leftMargin: 0;width: parent.width*0.45;horizontalAlignment: Text.AlignLeft;font.pointSize:fontPointSize;}
-                                        NumberLineEdit{
-                                            width: parent.width*0.5; anchors.right: parent.right;step:1;max:50;min:0;
-                                            Component.onCompleted: {idPopup.ok.connect(function(){currentProgram.params.fixedParams.fixationViewLossCycle=value;});idPopup.currentProgramChanged.connect(function(){value=currentProgram.params.fixedParams.fixationViewLossCycle;}); }
-                                        }
-                                    }
+                                    // Item{
+                                    //     width: parent.width; height:parent.parent.rowHeight;
+                                    //     CusText{text:lt+qsTr("False negative cycle"); anchors.left: parent.left; anchors.leftMargin: 0;width: parent.width*0.45;horizontalAlignment: Text.AlignLeft;font.pointSize:fontPointSize;}
+                                    //     NumberLineEdit{
+                                    //         width: parent.width*0.5; anchors.right: parent.right;step:1;max:50;min:0;
+                                    //         Component.onCompleted: {idPopup.ok.connect(function(){currentProgram.params.fixedParams.falseNegativeCycle=value;});idPopup.currentProgramChanged.connect(function(){value=currentProgram.params.fixedParams.falseNegativeCycle;}); }
+                                    //     }
+                                    // }
+                                    // Item{
+                                    //     width: parent.width; height:parent.parent.rowHeight;
+                                    //     CusText{text:lt+qsTr("Fixation loss cycle"); anchors.left: parent.left; anchors.leftMargin: 0;width: parent.width*0.45;horizontalAlignment: Text.AlignLeft;font.pointSize:fontPointSize;}
+                                    //     NumberLineEdit{
+                                    //         width: parent.width*0.5; anchors.right: parent.right;step:1;max:50;min:0;
+                                    //         Component.onCompleted: {idPopup.ok.connect(function(){currentProgram.params.fixedParams.fixationViewLossCycle=value;});idPopup.currentProgramChanged.connect(function(){value=currentProgram.params.fixedParams.fixationViewLossCycle;}); }
+                                    //     }
+                                    // }
 
                                 }
                                 Column{

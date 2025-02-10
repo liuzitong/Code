@@ -203,15 +203,16 @@ Item {id:root; width: 1366;height: 691
                                                 LineEdit{
                                                     property var checkedDots:currentCheckResult===null?0:currentCheckResult.type===2?0:currentCheckResult.resultData.falsePositiveCount;
                                                     property var totalDots: currentCheckResult===null?0:currentCheckResult.type===2?0:currentCheckResult.resultData.falsePositiveTestCount;
-                                                    text:currentCheckResult===null?"":currentCheckResult.type===2?"":checkedDots+"/"+totalDots;width: parent.width*0.5;enabled: false;
+                                                    text:currentCheckResult===null?"":currentCheckResult.type===2?"":Math.round(currentCheckResult.resultData.falsePositiveCount/currentCheckResult.resultData.falsePositiveTestCount*100)+"%";
+                                                    width: parent.width*0.5;enabled: false;
                                                 }
                                             }
                                             Row{width:parent.width;height: parent.height*0.65/3;spacing: width*0.05;
                                                 CusText{text:lt+qsTr("False negative rate"); horizontalAlignment: Text.AlignLeft;width: parent.width*0.45;font.pointSize: fontPointSize;}
                                                 LineEdit{
-                                                    property var checkedDots: currentCheckResult===null?0:currentCheckResult.type===2?0:currentCheckResult.resultData.falseNegativeCount;
-                                                    property var totalDots: currentCheckResult===null?0:currentCheckResult.type===2?0:currentCheckResult.resultData.falseNegativeTestCount;
-                                                    text:currentCheckResult===null?"":currentCheckResult.type===2?"":checkedDots+"/"+totalDots;
+                                                    // property var checkedDots: currentCheckResult===null?0:currentCheckResult.type===2?0:currentCheckResult.resultData.falseNegativeCount;
+                                                    // property var totalDots: currentCheckResult===null?0:currentCheckResult.type===2?0:currentCheckResult.resultData.falseNegativeTestCount;
+                                                    text:currentCheckResult===null?"":currentCheckResult.type===2?"":Math.round(currentCheckResult.resultData.falseNegativeCount/currentCheckResult.resultData.falseNegativeTestCount*100)+"%";
 //                                                    text:if(currentCheckResult!==null&&currentCheckResult.type!==2) {return checkedDots+"/"+totalDots;} else {return "";}
                                                     width: parent.width*0.5;
                                                     enabled: false;
