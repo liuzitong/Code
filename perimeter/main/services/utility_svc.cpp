@@ -115,7 +115,7 @@ UtilitySvc::UtilitySvc()
         m_debugMode=jo["debugMode"].toBool();
         m_showCheckingDot=jo["showCheckingDot"].toBool();
         m_beginningCheckDBDec=jo["beginningCheckDBDec"].toInt();
-        m_beginningCheckDBCount=jo["beginningCheckDBCount"].toInt();
+        // m_beginningCheckDBCount=jo["beginningCheckDBCount"].toInt();
         m_beginningCheckResultIgnoreCount=jo["beginningCheckResultIgnoreCount"].toInt();
         m_beginningCheckResultIgnoreDB=jo["beginningCheckResultIgnoreDB"].toInt();
 

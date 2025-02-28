@@ -68,7 +68,7 @@ public:
     bool m_debugMode;
     bool m_showCheckingDot;
     int m_beginningCheckDBDec;
-    int m_beginningCheckDBCount;
+    // int m_beginningCheckDBCount;
     int m_beginningCheckResultIgnoreCount;
     int m_beginningCheckResultIgnoreDB;
 

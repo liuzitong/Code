@@ -14,7 +14,7 @@
     "checkZoneRatio":1.4,
     "beginningCheckDBDec":9,
     "beginningCheckDBCount":4,
-    "beginningCheckResultIgnoreCount":4,
+    "beginningCheckResultIgnoreCount":0,
     "beginningCheckResultIgnoreDB":25,
     "boundaryOne":
     {

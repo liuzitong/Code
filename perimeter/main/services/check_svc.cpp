@@ -76,7 +76,7 @@ private:
     int m_y_offset;
     QVector<DotRecord> m_dotRecords;    //index为位置0~m_totalCount-1
     bool m_isStartWithBaseDots;         //基础4点开始检查.
-    bool m_isDoingBaseDotsCheck;        //处于给基础4点测试定值阶段
+    // bool m_isDoingBaseDotsCheck;        //处于给基础4点测试定值阶段
     DotRecord m_centerDotRecord;        //index 为2*m_totalCount
     QVector<int> m_answeredTimes;    //根据此处得到autoAdaptTime;
     int m_autoAdaptTime;
@@ -89,6 +89,7 @@ private:
     int m_beginningCheckDBCount=0;              //最开始从低点测
     int m_stimulationCount=0;                   //刺激次数到了测试盲点位置
     bool m_stimulated;
+    QVector<int> m_indexesDec;                  //开始亮度调低的那些点，防止调低两次
     QVector<DotRecord*> m_lastCheckDotRecord;
     QVector<LastCheckedDotType> m_lastCheckeDotType;
     QVector<std::tuple<LastCheckedDotType,QPointF, int>> m_checkCycleDotList;       //存储待测试盲点测试,假阴,假阳等信息
@@ -343,7 +344,7 @@ void StaticCheck::resetData()
     m_stimulated=false;
     m_alreadyChecked=false;
     m_isStartWithBaseDots=false;
-    m_isDoingBaseDotsCheck=false;
+    // m_isDoingBaseDotsCheck=false;
     m_answeredTimes.clear();
     m_dotRecords.clear();
     m_lastShortTermCycleCheckedDotIndex.clear();
@@ -379,7 +380,7 @@ void StaticCheck::resetData()
             ||m_programModel->m_params.commonParams.strategy==StaticParams::CommonParams::Strategy::fastInterative)
     {
         m_isStartWithBaseDots=true;
-        m_isDoingBaseDotsCheck=true;
+        // m_isDoingBaseDotsCheck=true;
     }
 
     if(m_programModel->m_params.commonParams.strategy!=StaticParams::CommonParams::Strategy::singleStimulation)
@@ -388,16 +389,20 @@ void StaticCheck::resetData()
         {
             bool isBaseDot=false;
             auto dot=m_programModel->m_data.dots[i];
+            QVector<int> stimulationDBs;
             if(m_isStartWithBaseDots)
             {
                 auto baseDots=m_programModel->m_data.baseDots;
                 for(uint j=0;j<baseDots.size();j++)
                     if((qAbs(dot.x-baseDots[j].x)<FLT_EPSILON)&&(qAbs(dot.y-baseDots[j].y)<FLT_EPSILON))
                         isBaseDot=true;
+                if(isBaseDot)
+                {
+                    stimulationDBs={m_utilitySvc->getExpectedDB(m_value_30d,{dot.x,dot.y}/*,m_resultModel->m_OS_OD*/)-UtilitySvc::getSingleton()->m_beginningCheckDBDec};
+                }
             }
             //非参考点初始测试DB设置为-999,之后选点的时候根据周围已经检查出的值赋值
-            QVector<int> stimulationDBs;
-            if(isBaseDot||!m_isStartWithBaseDots)
+            else
             {
                 stimulationDBs={m_utilitySvc->getExpectedDB(m_value_30d,{dot.x,dot.y}/*,m_resultModel->m_OS_OD*/)+DBChanged};
             }
@@ -467,15 +472,20 @@ void StaticCheck::Checkprocess()
         }
         else
         {
-            m_lastCheckDotRecord.push_back(&getCheckDotRecordRef());   //存储lastDotType为commondot 并且存储指针
-            if(m_beginningCheckDBCount<UtilitySvc::getSingleton()->m_beginningCheckDBCount)                                   //调高最高时测的几次的DB。
-            {
-                if(m_lastCheckDotRecord.last()->StimulationDBs.count()==1)
-                {
-                    m_lastCheckDotRecord.last()->StimulationDBs[0]=qMax( m_lastCheckDotRecord.last()->StimulationDBs[0]-UtilitySvc::getSingleton()->m_beginningCheckDBDec,0);
-                    m_beginningCheckDBCount++;
-                }
-            }
+
+            auto recordRef=&getCheckDotRecordRef();
+
+            // if(m_beginningCheckDBCount<UtilitySvc::getSingleton()->m_beginningCheckDBCount&&!m_isStartWithBaseDots)                                   //调低最开始时测的几次的DB。
+            // {
+            //     if(recordRef->StimulationDBs.count()==1&&!m_indexesDec.contains(recordRef->index))                            //防止调低两次
+            //     {
+            //         recordRef->StimulationDBs[0]=qMax( recordRef->StimulationDBs[0]-UtilitySvc::getSingleton()->m_beginningCheckDBDec,0);
+            //         m_beginningCheckDBCount++;
+            //         m_indexesDec.append(recordRef->index);
+            //     }
+            // }
+            m_lastCheckDotRecord.push_back(recordRef);   //存储lastDotType为commondot 并且存储指针
+
             emit nextCheckingDotChanged(m_lastCheckDotRecord.last()->loc);
             checkingDot=true;
             getReadyToStimulate(m_lastCheckDotRecord.last()->loc,m_lastCheckDotRecord.last()->StimulationDBs.last());
