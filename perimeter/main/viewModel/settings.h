@@ -22,7 +22,9 @@ class Settings :public QObject
 //    Q_PROPERTY(QString trigger READ getTrigger NOTIFY triggerChanged)
     Q_PROPERTY(QString langTrigger READ langTrigger /*WRITE setLangTrigger*/ NOTIFY langTriggerChanged)
     Q_PROPERTY(bool virtualKeyBoard READ getVirtualKeyBoard WRITE setVirtualKeyBoard NOTIFY virtualKeyBoardChanged)
+    Q_PROPERTY(bool useDigitalSignature READ getUseDigitalSignature WRITE setUseDigitalSignature NOTIFY useDigitalSignatureChanged)
     Q_PROPERTY(bool showUserAuthorities READ getShowUserAuthorities)
+
 //    Q_PROPERTY(QVariantList boundaries READ getBoundaries)
 
 
@@ -42,6 +44,7 @@ public:
     int defaultProgramType(){return m_defaultProgramType;}void setDefaultProgramType(int value){m_defaultProgramType=value;}
     QString langTrigger(){return "";}Q_SIGNAL void langTriggerChanged();
     bool getVirtualKeyBoard(){return m_virtualKeyBoard;}void setVirtualKeyBoard(bool value){m_virtualKeyBoard=value;emit virtualKeyBoardChanged();}Q_SIGNAL void virtualKeyBoardChanged();
+    bool getUseDigitalSignature(){return m_useDigitalSignature;}void setUseDigitalSignature(bool value){m_useDigitalSignature=value;emit useDigitalSignatureChanged();}Q_SIGNAL void useDigitalSignatureChanged();
     bool getShowUserAuthorities(){return m_showUserAuthorities;}
 //    QVariantList getBoundaries(){return m_boundaries;}
 
@@ -66,6 +69,7 @@ private:
     QString m_programUnlockPwd;
     bool m_showUserAuthorities;
     bool m_virtualKeyBoard;
+    bool m_useDigitalSignature;
     bool m_isRuntimeLangEng;
     int m_defaultProgramId;
     int m_defaultProgramType;

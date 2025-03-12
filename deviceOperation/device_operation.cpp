@@ -87,9 +87,9 @@ void DeviceOperation::connectDev()
     if(m_devCtl==nullptr)
     {
         // updateDevInfo("connecting.");
-// #ifndef _DEBUG                               //release 情况下重连
+#ifndef _DEBUG                               //release 情况下重连
         m_reconnectTimer.start();
-// #endif
+#endif
         auto deviceSettings=DeviceSettings::getSingleton();
         quint32 vid_pid=deviceSettings->m_VID.toInt(nullptr,16)<<16|deviceSettings->m_PID.toInt(nullptr,16);
         m_devCtl.reset(UsbDev::DevCtl::createInstance(vid_pid));
@@ -591,6 +591,7 @@ void DeviceOperation::waitMotorStop(QVector<UsbDev::DevCtl::MotorId> motorIDs)
     do
     {
         if(m_deviceStatus!=2) return;
+        QThread::msleep(10);
         QApplication::processEvents();
     }while(getMotorsBusy(motorIDs)/*||(mstimer.elapsed()<100)*/);
     log->info("Wait for motor stop is over");
@@ -601,6 +602,7 @@ void DeviceOperation::waitShutterClose()
     if(m_deviceStatus!=2) return;
     while(qAbs(m_statusData.motorPosition(UsbDev::DevCtl::MotorId_Shutter)-m_config.shutterOpenPosRef())<70)
     {
+        QThread::msleep(10);
         QApplication::processEvents();
     }
 }
@@ -613,6 +615,7 @@ void DeviceOperation::waitForSomeTime(int time)
     mstimer.restart();
     do
     {
+        QThread::msleep(10);
         QApplication::processEvents();
     }while(mstimer.elapsed()<time);
     log->info("Wait for some time is over");
@@ -1193,7 +1196,10 @@ void DeviceOperation::workOnWorkStatusChanged(int status)
         connect(m_devCtl.data(),&UsbDev::DevCtl::newConfig,this,&DeviceOperation::workOnNewConfig);
 
         m_devCtl->readProfile();
-        while (m_profile.isEmpty()) {QApplication::processEvents();}
+        while (m_profile.isEmpty()) {
+            QThread::msleep(10);
+            QApplication::processEvents();
+        }
 
         m_devCtl->readConfig();
         setDeviceStatus(2);

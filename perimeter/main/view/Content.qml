@@ -15,9 +15,11 @@ Rectangle {
     property string backGroundBorderColor:"#bdc0c6"
     property string ribbonColor: "#333e44"
     property string selectionColor: "";
-    property string language:IcUiQmlApi.appCtrl.settings.language
+    property string language:IcUiQmlApi.appCtrl.settings.language;
     property var currentPatient: patientPage.currentPatient;
-    property var permission: null;
+    property var permission: userLoginVm.permission;
+    property string doctorName: userLoginVm.localUser.name;
+    property string doctorUID: userLoginVm.localUser.uid;
     signal login;
     property var castLightAdjustStatus:IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus;
 
@@ -54,7 +56,7 @@ Rectangle {
         {
            if(permission[i]==="Perm.patient.delete")
            {
-               console.log("give permission");
+               // console.log("give permission");
                CommonSettings.deletePermission=true;
            }
         }
@@ -188,25 +190,25 @@ Rectangle {
                                 id:patientInfo;visible: false;height: parent.height;spacing: height*0.5;
                                 Flow{
                                     height: parent.height;
-                                    CusText{text:lt+qsTr("Name")+":  "; horizontalAlignment: Text.AlignRight;color:"white";width: 2*height;font.pointSize: height*0.4;}
+                                    CusText{text:lt+qsTr("Name")+":"; horizontalAlignment: Text.AlignRight;color:"white";width: 2*height;font.pointSize: height*0.4;}
                                     CusText{id:name;text:currentPatient.name; horizontalAlignment: Text.AlignLeft;color:"white";font.pointSize: height*0.4;}
                                 }
                                 Flow{
                                     height: parent.height;
-                                    CusText{text:lt+qsTr("Sex")+":  "; horizontalAlignment: Text.AlignRight;color:"white";width: 2*height;font.pointSize: height*0.4;}
+                                    CusText{text:lt+qsTr("Sex")+":"; horizontalAlignment: Text.AlignRight;color:"white";width: 2*height;font.pointSize: height*0.4;}
                                     CusText{id:sex;text:{switch (currentPatient.sex){ case 0:return lt+qsTr("Male");case 1:return lt+qsTr("Female");case 2:return lt+qsTr("Others");};}
                                             horizontalAlignment: Text.AlignLeft;color:"white";font.pointSize: height*0.4;width: height*1;}
                                 }
                                 Flow{
                                     height: parent.height;
-                                    CusText{text:lt+qsTr("Age")+":  "; horizontalAlignment: Text.AlignRight;color:"white";width: 2*height;font.pointSize: height*0.4;}
+                                    CusText{text:lt+qsTr("Age")+":"; horizontalAlignment: Text.AlignRight;color:"white";width: 2*height;font.pointSize: height*0.4;}
                                     CusText{id:age;text:CusUtils.getAge(currentPatient.birthDate); horizontalAlignment: Text.AlignLeft;color:"white";font.pointSize: height*0.4;width: height*1;}
                                 }
 
 
                                 Flow{
                                     height: parent.height;
-                                    CusText{text:"ID:  "; horizontalAlignment: Text.AlignRight;color:"white";width: height;font.pointSize: height*0.4;}
+                                    CusText{text:"ID:"; horizontalAlignment: Text.AlignRight;color:"white";width: height;font.pointSize: height*0.4;}
                                     CusText{id:id;text:currentPatient.patientId; horizontalAlignment: Text.AlignLeft;color:"white";font.pointSize: height*0.4;width: height*1.5;}
                                 }
                             }
@@ -214,41 +216,59 @@ Rectangle {
                     }
                     Item{
                         width: parent.width;height: parent.height*0.60;
-                        CusButton{
-                            type:"click";isAnime: false;underImageText.text: lt+qsTr("Login");underImageText.color: "white"; fontSize: height/4;rec.visible: false;width:image.sourceSize.width;imageSrc: "qrc:/Pics/base-svg/menu_login.svg";pressImageSrc: "qrc:/Pics/base-svg/menu_login_select.svg";
-                            onClicked:login();
-                        }
-                        CusText
+                        Flow
                         {
-                            property string deviceStatus: IcUiQmlApi.appCtrl.checkSvc.deviceStatus===1?(qsTr("Device is reconnecting.")+lt):"";
-
-                            property string castLightStatus: IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus!==3?(qsTr("Device is adjusting light please wait.")+lt+"Current DA:"+IcUiQmlApi.appCtrl.deviceStatusData.castLightDA+" target DA:"+IcUiQmlApi.appCtrl.checkSvc.targetCastLightSensorDA+"."):"" ;
-
-                            property string checkStatus:
-                            {
-                                if(checkPage.visible)
-                                {
-                                    if(IcUiQmlApi.appCtrl.checkSvc.checkState===0) return qsTr("Start");
-                                    if(IcUiQmlApi.appCtrl.checkSvc.checkState===1) return qsTr("Checking");
-                                    if(IcUiQmlApi.appCtrl.checkSvc.checkState===2) return qsTr("Pausing");
-                                    if(IcUiQmlApi.appCtrl.checkSvc.checkState===3) return qsTr("Stoping");
-                                    if(IcUiQmlApi.appCtrl.checkSvc.checkState===4) return qsTr("Finishing");
-                                    if(IcUiQmlApi.appCtrl.checkSvc.checkState===5) return qsTr("Stopped");
-                                    if(IcUiQmlApi.appCtrl.checkSvc.checkState===6) return qsTr("Finished");
-                                }
-                                else
-                                {
-                                    return "";
-                                }
-                            }
-                            width: parent.width*0.2;
                             height: parent.height;
                             anchors.left: parent.left;
-                            anchors.leftMargin: parent.width*0.07;
-                            text:deviceStatus!=""?deviceStatus:castLightStatus!=""?castLightStatus:checkStatus;
-                            horizontalAlignment: Text.AlignLeft
-                            color:deviceStatus!=""?"Red":castLightStatus!=""?"Yellow":"White";
+                            spacing: height*.05;
+
+                            CusButton{
+                                type:"click";isAnime: false;underImageText.text: lt+qsTr("Login");underImageText.color: "white"; fontSize: height/4;rec.visible: false;width:image.sourceSize.width;imageSrc: "qrc:/Pics/base-svg/menu_login.svg";pressImageSrc: "qrc:/Pics/base-svg/menu_login_select.svg";
+                                onClicked:login();
+                            }
+                            CusText
+                            {
+                                text:lt+qsTr("User")+":"+doctorName;
+                                horizontalAlignment: Text.AlignLeft
+                                verticalAlignment: Text.AlignVCenter
+                                height: parent.height;
+                                color: "white";
+                                width: parent.parent.width*.12
+                            }
+
+                            CusText
+                            {
+                                property string deviceStatus: IcUiQmlApi.appCtrl.checkSvc.deviceStatus===1?(qsTr("Device is reconnecting.")+lt):"";
+                                property string castLightStatus: IcUiQmlApi.appCtrl.checkSvc.castLightAdjustStatus!==3?(qsTr("Device is adjusting light please wait.")+lt+"Current DA:"+IcUiQmlApi.appCtrl.deviceStatusData.castLightDA+" target DA:"+IcUiQmlApi.appCtrl.checkSvc.targetCastLightSensorDA+"."):"" ;
+                                property string checkStatus:
+                                {
+                                    if(checkPage.visible)
+                                    {
+                                        if(IcUiQmlApi.appCtrl.checkSvc.checkState===0) return qsTr("Start");
+                                        if(IcUiQmlApi.appCtrl.checkSvc.checkState===1) return qsTr("Checking");
+                                        if(IcUiQmlApi.appCtrl.checkSvc.checkState===2) return qsTr("Pausing");
+                                        if(IcUiQmlApi.appCtrl.checkSvc.checkState===3) return qsTr("Stoping");
+                                        if(IcUiQmlApi.appCtrl.checkSvc.checkState===4) return qsTr("Finishing");
+                                        if(IcUiQmlApi.appCtrl.checkSvc.checkState===5) return qsTr("Stopped");
+                                        if(IcUiQmlApi.appCtrl.checkSvc.checkState===6) return qsTr("Finished");
+                                    }
+                                    else
+                                    {
+                                        return "";
+                                    }
+                                }
+                                width: parent.parent.width*0.2;
+                                height: parent.height;
+                                // anchors.left: parent.left;
+                                // anchors.leftMargin: parent.width*0.07;
+                                text:deviceStatus!=""?deviceStatus:castLightStatus!=""?castLightStatus:checkStatus;
+                                horizontalAlignment: Text.AlignLeft
+                                color:deviceStatus!=""?"Red":castLightStatus!=""?"Yellow":"White";
+
+                            }
+
                         }
+
 
                         Flow{
                             id:contentSwitcher

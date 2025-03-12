@@ -27,9 +27,10 @@ ApplicationWindow {
     Content{id:content;anchors.fill: parent;visible: false;onLogin:{visible=false;permMgrView.visible=true;}}
     PermMgrView{
         id:permMgrView; anchors.fill: parent;
-        onReqExitAndGo: {visible=false;content.permission=arg;content.visible=true;}
+        onReqExitAndGo: {visible=false;userLoginVm=arg;content.visible=true;/*console.log(userLoginVm.userLoginData);*/console.log(userLoginVm.localUser.uid);console.log(userLoginVm.localUser.name);}
         onReqExit: {Qt.quit();}
     }
+    property var userLoginVm:null;
     property bool isEng: IcUiQmlApi.appCtrl.settings.isRuntimeLangEng;
     property string lt:"";
     onVisibleChanged:

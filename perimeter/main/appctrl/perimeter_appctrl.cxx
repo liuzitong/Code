@@ -19,6 +19,7 @@
 #include "perimeter/main/services/utility_svc.h"
 #include "perimeter/third-part/perm/perm_mod.hxx"
 #include <perimeter/main/services/keyboard_filter.h>
+#include <perimeter/main/services/signatureHelper.h>
 #if defined( WIN32 )
 #include <windows.h>
 #endif
@@ -47,6 +48,7 @@ private:
     QObject*    m_settings;
     QObject*    m_checkSvc;
     QObject*    m_deviceStatusData;
+    QObject*    m_signatureHelper;
 //    QObject*    m_currentPatient;
 public :
     AppCtrlPriv ( AppCtrl *pa );
@@ -63,6 +65,7 @@ public :
     QObject*    getSettings()                       {return m_settings;}
     QObject*    getUtilitySvc()                      {return FrameProvidSvc::getSingleton().data();}
     QObject*    getDeviceStatusData()                    {return m_deviceStatusData;}
+    QObject*    getSignatureHelper()                {return m_signatureHelper;}
 //    QObject*    getDeviceOperation()                {return DevOps::DeviceOperation::getSingleton().data();/*return new QObject();*/}
 //    QString     getLanguage()                       {return m_language;}
 //    void        setLanguage(QString value)          {m_language=value;}
@@ -90,6 +93,7 @@ AppCtrlPriv :: AppCtrlPriv ( AppCtrl *pa )
     m_checkSvc=perimeter_new(CheckSvc);
     m_settings=perimeter_new(Settings);
     m_deviceStatusData=perimeter_new(DeviceStatusDataVm);
+    m_signatureHelper=perimeter_new(SignatureHelper);
 }
 
 void AppCtrl::adjustWindowSize(QObject *win_obj)
@@ -214,6 +218,11 @@ QObject *AppCtrl::getFrameProvidSvc() const
 QObject *AppCtrl::getUtilitySvc() const
 {
     return UtilitySvc::getSingleton().data();
+}
+
+QObject *AppCtrl::getSignatureHelper() const
+{
+    return T_PrivPtr( m_obj )-> getSignatureHelper();
 }
 
 QObject *AppCtrl::getDeviceStatusData() const

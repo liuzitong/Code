@@ -18,6 +18,9 @@ Column {
     property int report;
     property string pageFrom: "";
 
+    property bool useDigitalSignature: IcUiQmlApi.appCtrl.settings.useDigitalSignature;
+
+
 
     signal refresh();
     signal changePage(var pageName,var params);
@@ -93,9 +96,9 @@ Column {
                                 var diagnosis=content.item.diagnosis
                                 switch (report)
                                 {
-                                case 0:progressAnalysisListVm.getProgressBaseLineReport(diagnosis);return;
-                                case 1:progressAnalysisListVm.getThreeFollowUpsReport(progressAnalysisListVm.selectedIndex,diagnosis);return;
-                                case 2:progressAnalysisListVm.getSingleProgressReport(progressAnalysisListVm.selectedIndex,diagnosis);return;
+                                case 0:progressAnalysisListVm.getProgressBaseLineReport(diagnosis,false,useDigitalSignature,doctorUID);return;
+                                case 1:progressAnalysisListVm.getThreeFollowUpsReport(progressAnalysisListVm.selectedIndex,diagnosis,false,useDigitalSignature,doctorUID);return;
+                                case 2:progressAnalysisListVm.getSingleProgressReport(progressAnalysisListVm.selectedIndex,diagnosis,false,useDigitalSignature,doctorUID);return;
                                 }
                             }
                         }
@@ -104,9 +107,9 @@ Column {
                                 var diagnosis=content.item.diagnosis
                                 switch (report)
                                 {
-                                case 0:progressAnalysisListVm.getProgressBaseLineReport(diagnosis,true);return;
-                                case 1:progressAnalysisListVm.getThreeFollowUpsReport(progressAnalysisListVm.selectedIndex,diagnosis,true);return;
-                                case 2:progressAnalysisListVm.getSingleProgressReport(progressAnalysisListVm.selectedIndex,diagnosis,true);return;
+                                case 0:progressAnalysisListVm.getProgressBaseLineReport(diagnosis,true,useDigitalSignature,doctorUID);return;
+                                case 1:progressAnalysisListVm.getThreeFollowUpsReport(progressAnalysisListVm.selectedIndex,diagnosis,true,useDigitalSignature,doctorUID);return;
+                                case 2:progressAnalysisListVm.getSingleProgressReport(progressAnalysisListVm.selectedIndex,diagnosis,true,useDigitalSignature,doctorUID);return;
                                 }
                             }
                         }

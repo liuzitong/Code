@@ -133,6 +133,7 @@ void UserLoginVmPriv::login()
 //                m_app_set_svc->setQuitCode(1);
             }
             m_localPwdMgrSvc->loginTo(name, pwd);
+            m_localPwdMgrSvc->setUid(m_permBroker->userAndPermInfo()->UID());
             emit m_parent->showNavMainView();
         }
 

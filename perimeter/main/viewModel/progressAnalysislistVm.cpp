@@ -181,7 +181,7 @@ QVariant Perimeter::ProgressAnalysisListVm::getSingleProgressPreview(int index,i
     return QVariant(progress.last());
 }
 
-void ProgressAnalysisListVm::getProgressBaseLineReport(QString diagnosis,bool uploadDicom)
+void ProgressAnalysisListVm::getProgressBaseLineReport(QString diagnosis,bool uploadDicom,bool useDigitalSignature,int UID)
 {
     auto analysisSvc=AnalysisSvc::getSingleton();
     QVector<float> mdList;
@@ -281,6 +281,11 @@ void ProgressAnalysisListVm::getProgressBaseLineReport(QString diagnosis,bool up
     manager->setReportVariable("deviceInfo",tr("Device info")+": "+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("deviceInfo").toString());
     manager->setReportVariable("version", tr("Version")+": "+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("version").toString());
 
+    if(useDigitalSignature)
+    {
+        manager->setReportVariable("digitalSignaturePath","./signature/"+QString::number(UID)+".png");
+    }
+
 
     if(!uploadDicom)
     {
@@ -300,7 +305,7 @@ void ProgressAnalysisListVm::getProgressBaseLineReport(QString diagnosis,bool up
     }
 }
 
-void Perimeter::ProgressAnalysisListVm::getThreeFollowUpsReport(int index,QString diagnosis,bool uploadDicom)
+void Perimeter::ProgressAnalysisListVm::getThreeFollowUpsReport(int index,QString diagnosis,bool uploadDicom,bool useDigitalSignature,int UID)
 {
     auto analysisSvc=AnalysisSvc::getSingleton();
     QVector<QVector<int>> val,mPE,mDev,progressVal,progressPicVal;
@@ -383,6 +388,11 @@ void Perimeter::ProgressAnalysisListVm::getThreeFollowUpsReport(int index,QStrin
     manager->setReportVariable("deviceInfo",tr("Device info")+": "+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("deviceInfo").toString());
     manager->setReportVariable("version",tr("Version")+": "+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("version").toString());
 
+    if(useDigitalSignature)
+    {
+        manager->setReportVariable("digitalSignaturePath","./signature/"+QString::number(UID)+".png");
+    }
+
 
     if(!uploadDicom)
     {
@@ -402,7 +412,7 @@ void Perimeter::ProgressAnalysisListVm::getThreeFollowUpsReport(int index,QStrin
     }
 }
 
-void Perimeter::ProgressAnalysisListVm::getSingleProgressReport(int index,QString diagnosis,bool uploadDicom)
+void Perimeter::ProgressAnalysisListVm::getSingleProgressReport(int index,QString diagnosis,bool uploadDicom,bool useDigitalSignature,int UID)
 {
     CheckResult_ptr checkResult_ptr(new CheckResult());
     checkResult_ptr->m_id=m_selectedResultId;
@@ -529,6 +539,10 @@ void Perimeter::ProgressAnalysisListVm::getSingleProgressReport(int index,QStrin
     manager->setReportVariable("deviceInfo",tr("Device info")+": "+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("deviceInfo").toString());
     manager->setReportVariable("version",tr("Version")+": "+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("version").toString());
 
+    if(useDigitalSignature)
+    {
+        manager->setReportVariable("digitalSignaturePath","./signature/"+QString::number(UID)+".png");
+    }
 
 
     if(!uploadDicom)

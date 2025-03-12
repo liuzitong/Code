@@ -41,6 +41,7 @@ public:
     explicit LocalPwdMgrSvcPriv ( LocalPwdMgrSvc *pa );
     ~LocalPwdMgrSvcPriv( );
 
+    inline void setUid (int value ) { m_uid=value; }
     inline quint64 uid ( ) { return m_uid; }
     inline QString name( ) { return m_name; }
     inline QString pwd ( ) { return m_pwd; }
@@ -271,6 +272,11 @@ void LocalPwdMgrSvc::release()
 
 quint64 LocalPwdMgrSvc::uid() const
 { return T_PrivPtr( m_obj )->uid(); }
+
+void LocalPwdMgrSvc::setUid(int value)
+{
+    return T_PrivPtr( m_obj )->setUid(value);
+}
 
 QString LocalPwdMgrSvc::name() const
 { return T_PrivPtr( m_obj )->name(); }

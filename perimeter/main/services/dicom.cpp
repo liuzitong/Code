@@ -1,4 +1,4 @@
-#include "dicom.h"
+﻿#include "dicom.h"
 #include "qjsonarray.h"
 #include "qjsonobject.h"
 
@@ -78,15 +78,18 @@ bool Dicom::upLoadDcm(PatientModel patientModel)
         p.start(cmdUpload);
         if(p.waitForFinished())
         {
+            p.terminate();
             return true;
         }
         else
         {
+            p.terminate();
             return false;
         }
     }
     else
     {
+        p.terminate();
         return false;
     }
 }

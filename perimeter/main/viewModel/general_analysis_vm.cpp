@@ -8,7 +8,8 @@
 #include "perimeter/third-part/qxpack/indcom/ui_qml_base/qxpack_ic_ui_qml_api.hxx"
 #include <perimeter/main/services/translate_svc.h>
 #include <perimeter/main/services/dicom.h>
-
+#include <Perimeter/main/appctrl/perimeter_appctrl.hxx>
+#include <QDebug>
 
 
 
@@ -228,7 +229,7 @@ QPointF StaticAnalysisVm::getPixFromPoint(QPointF point, float width, float heig
     return QPointF(width/2+(point.x()+0.0)*pixPerDegW,height/2-(point.y()-0.0)*pixPerDegH);
 }
 
-void StaticAnalysisVm::showReport(int report,bool uploadDicom)
+void StaticAnalysisVm::showReport(int report,bool uploadDicom,bool useDigitalSignature,int UID)
 {
 //    std::cout<<"***********************"<<std::endl;
 //    QElapsedTimer timer;
@@ -421,6 +422,15 @@ void StaticAnalysisVm::showReport(int report,bool uploadDicom)
     manager->setReportVariable("deviceInfo",tr("Device info")+QString(":")+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("deviceInfo").toString());
     manager->setReportVariable("version", tr("Version")+QString(":")+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("version").toString());
 
+
+    qDebug()<<"./signature/"+QString::number(UID)+".png";
+    if(useDigitalSignature)
+    {
+        manager->setReportVariable("digitalSignaturePath","./signature/"+QString::number(UID)+".png");
+    }
+
+
+
     if(!uploadDicom)
     {
         UtilitySvc::reportEngine->setPreviewScaleType(LimeReport::ScaleType::Percents,50);
@@ -495,7 +505,7 @@ DynamicAnalysisVm::~DynamicAnalysisVm()
 
 }
 
-void DynamicAnalysisVm::showReport(int report,bool uploadDicom)
+void DynamicAnalysisVm::showReport(int report,bool uploadDicom,bool useDigitalSignature,int UID)
 {
     auto analysisMethodSvc=AnalysisSvc::getSingleton();
     QImage img1100=QImage({1100,1100}, QImage::Format_RGB32);
@@ -570,7 +580,15 @@ void DynamicAnalysisVm::showReport(int report,bool uploadDicom)
             model->setData( model->index(i,2),QString::number(UtilitySvc::OrthToPolar(data[i].start.toQPointF()).y(),'f',0));
             model->setData( model->index(i,3),QString::number(UtilitySvc::OrthToPolar(data[i].end.toQPointF()).x(),'f',0));
             model->setData( model->index(i,4),QString::number(UtilitySvc::OrthToPolar(data[i].end.toQPointF()).y(),'f',0));
-            model->setData( model->index(i,5),data[i].isSeen?tr("Seen"):tr("Unseen"));
+            if(data[i].isSeen)
+            {
+                model->setData( model->index(i,5),tr("Seen"));
+            }
+            else
+            {
+                model->setData( model->index(i,5),tr("Unseen"));
+            }
+
         }
     }
 
@@ -582,6 +600,11 @@ void DynamicAnalysisVm::showReport(int report,bool uploadDicom)
 //    manager->setReportVariable("FixationDeviationImagePath","./reportImage/FixationDeviation.bmp");
     manager->setReportVariable("deviceInfo",tr("Device info")+QString(":")+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("deviceInfo").toString());
     manager->setReportVariable("version", tr("Version")+QString(":")+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("version").toString());
+
+    if(useDigitalSignature)
+    {
+        manager->setReportVariable("digitalSignaturePath","./signature/"+QString::number(UID)+".png");
+    }
 
 
     if(!uploadDicom)
@@ -621,7 +644,7 @@ StaticAnalysisOverViewVm::~StaticAnalysisOverViewVm()
 
 }
 
-void StaticAnalysisOverViewVm::showReport(int report,QString diagnosis,bool uploadDicom)
+void StaticAnalysisOverViewVm::showReport(int report,QString diagnosis,bool uploadDicom,bool useDigitalSignature,int UID)
 {
     qDebug()<<diagnosis;
     if(UtilitySvc::reportEngine==nullptr) UtilitySvc::reportEngine=new  LimeReport::ReportEngine();
@@ -660,6 +683,12 @@ void StaticAnalysisOverViewVm::showReport(int report,QString diagnosis,bool uplo
     manager->setReportVariable("DiagnosisContent", diagnosis);
     manager->setReportVariable("deviceInfo",tr("Device info")+QString(":")+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("deviceInfo").toString());
     manager->setReportVariable("version", tr("Version")+QString(":")+QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("version").toString());
+
+    if(useDigitalSignature)
+    {
+        manager->setReportVariable("digitalSignaturePath","./signature/"+QString::number(UID)+".png");
+    }
+
 
     if(!uploadDicom)
     {

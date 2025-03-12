@@ -82,7 +82,7 @@ Item{
                             id:query; width: parent.width; height:patientInfo.rowHight;spacing: height*0.5
                             CusButton{id:queryAllPatients;text:lt+qsTr("Show all");onClicked: {patientInfoListView.patientListModelVm.getPatientListByTimeSpan("","");queryStarted();}}
                             CusComboBox{
-                                id:queryStrategy;height: parent.height;width: parent.height*4.5;
+                                id:queryStrategy;height: parent.height;width: parent.height*5.0;
                                 borderColor: backGroundBorderColor;font.family:"Microsoft YaHei";
                                 imageSrc: "qrc:/Pics/base-svg/btn_drop_down.svg";
 //                                model: ListModel {ListElement { name: lt+qsTr("Query by time") } ListElement { name: lt+qsTr("Patient ID") } ListElement { name: lt+qsTr("Name") }ListElement { name: lt+qsTr("Sex") }ListElement { name: lt+qsTr("Birth date") }}
@@ -360,7 +360,6 @@ Item{
                             function refresh(){
                                 pageIndex.currentPage=1;
                                 var rowCount=patientInfoListView.model.rowCount();
-                                console.log("model count:"+rowCount);
                                 pageIndex.totalPage=rowCount/pageSize;
                                 if(rowCount%pageSize!==0) pageIndex.totalPage+=1;
                                 pageIndex.totalRecordCount=rowCount;

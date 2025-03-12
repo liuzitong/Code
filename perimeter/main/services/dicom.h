@@ -1,4 +1,4 @@
-#ifndef DICOM_H
+﻿#ifndef DICOM_H
 #define DICOM_H
 
 #include <QPair>
@@ -7,7 +7,7 @@
 // #include <dcmtk/config/osconfig.h>
 #include <dcmtk/dcmdata/dcdeftag.h>
 #include <perimeter/main/model/patientmodel.h>
-#include <perimeter/main/model/checkResultModel.h>.h>
+#include <perimeter/main/model/checkResultModel.h>
 // #include <dcmtk/dcmdata/dcistrmf.h>
 // #include <dcmtk/dcmdata/libi2d/i2dbmps.h>
 

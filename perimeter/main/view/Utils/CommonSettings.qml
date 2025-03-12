@@ -8,7 +8,7 @@ Item {
     property string darkButtonColor:"#e0e0e0";
     property int windowHeight;
 
-    property int textHeight: windowHeight*0.018;
+    property int textHeight: windowHeight*0.0180;
     property int fontPointSize: textHeight*0.8;
     property bool deletePermission: false;
     property string buttonDisabledBackGroundColor: "#c0c0c0";

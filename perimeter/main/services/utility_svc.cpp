@@ -286,6 +286,7 @@ void UtilitySvc::wait(int msecs)
     while(elapsedTimer.elapsed()<=msecs)
     {
         QApplication::processEvents();
+        QThread::msleep(10);
     }
 }
 

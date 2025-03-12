@@ -1,8 +1,9 @@
-#ifndef PERIMETER_MAIN_HXX
+﻿#ifndef PERIMETER_MAIN_HXX
 #define PERIMETER_MAIN_HXX
 
 #include "perimeter/base/common/perimeter_def.h"
 #include "qxpack/indcom/afw/qxpack_ic_modmgrbase.hxx"
+
 #include <QObject>
 
 namespace Perimeter {

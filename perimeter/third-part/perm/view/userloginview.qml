@@ -172,7 +172,7 @@ IcPageBase {   // this is the wrapped Popup element in ui_qml_control
 
         function turnNavMainView( )
         {
-            idUserLoginView.request( "NavMainView", user_login_vm.permission);
+            idUserLoginView.request( "NavMainView", user_login_vm);
 //            if(user_login_vm !== null)
 //            {
 //                user_login_vm.quitLogin();

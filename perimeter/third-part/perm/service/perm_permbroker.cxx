@@ -227,7 +227,10 @@ bool PermBrokerPriv::login(const QJsonObject &jo)
         }
     }
 
-    if ( data.contains("UID")            ) { this->setUIDOfUserAndPermInfo(data.value("UID").toString()); }
+    if ( data.contains("UID")            ) {
+        this->setUIDOfUserAndPermInfo(data.value("UID").toString());
+        m_user_and_perm_info->UID();
+    }
     if ( data.contains("accToken")       ) { this->setAccTokenOfUserAndPermInfo(data.value("accToken").toString()); }
     if ( data.contains("queryToken")     ) { this->setQueryTokenOfUserAndPermInfo(data.value("queryToken").toString()); }
     if ( data.contains("actualPermList") ) { this->setActualPermListOfUserAndPermInfo(data.value("actualPermList").toArray()); }

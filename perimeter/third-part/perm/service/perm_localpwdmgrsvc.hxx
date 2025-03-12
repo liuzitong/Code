@@ -14,7 +14,7 @@ namespace FcPerm {
 class PERM_API LocalPwdMgrSvc : public QxPack::IcSvcBase
 {
     Q_OBJECT
-    Q_PROPERTY(quint64 uid  READ uid  NOTIFY dataChanged)
+    Q_PROPERTY(quint64 uid  READ uid WRITE setUid  NOTIFY dataChanged)
     Q_PROPERTY(QString name READ name NOTIFY dataChanged)
     Q_PROPERTY(QString pwd  READ pwd  NOTIFY dataChanged)
     Q_PROPERTY(bool    rememberpwd  READ rememberpwd WRITE setRememberpwd  NOTIFY dataChanged)
@@ -23,7 +23,8 @@ public:
     static LocalPwdMgrSvc * getInstance( );
     static void release( );
 
-    quint64 uid ( ) const;
+
+    quint64 uid ( ) const;void setUid(int value);
     QString name( ) const;
     QString pwd ( ) const;
     bool    rememberpwd();

@@ -18,6 +18,7 @@ Column {
     property int report;
     property int type;
     property string pageFrom: "";
+    property bool useDigitalSignature: IcUiQmlApi.appCtrl.settings.useDigitalSignature;
 
 //    property int textHeight: height*0.05;
 
@@ -112,16 +113,16 @@ Column {
                         CusButton{text:lt+qsTr("Print");onClicked:
                             {
                                 if(analysisVm.type!==3)
-                                    analysisVm.showReport(report);
+                                    analysisVm.showReport(report,false,useDigitalSignature,doctorUID);
                                 else
-                                    analysisVm.showReport(report,content.item.diagnosis);
+                                    analysisVm.showReport(report,content.item.diagnosis,false,useDigitalSignature,doctorUID);
                             }}
                         CusButton{text:lt+qsTr("UploadDicom");onClicked:
                             {
                                 if(analysisVm.type!==3)
-                                    analysisVm.showReport(report,true);
+                                    analysisVm.showReport(report,true,useDigitalSignature,doctorUID);
                                 else
-                                    analysisVm.showReport(report,content.item.diagnosis,true);
+                                    analysisVm.showReport(report,content.item.diagnosis,true,useDigitalSignature,doctorUID);
                             }
                         }
                     }

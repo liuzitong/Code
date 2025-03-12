@@ -10,7 +10,7 @@ Item{
     property string borderColor:commonBorderColor
     property bool hoverEnabled: true;
     property string text
-    property int fontSize:height*0.3
+    property int fontSize:CommonSettings.fontPointSize;
     property int radius:height/6
     property int borderWidth:1
     property string hoverColor: "white"

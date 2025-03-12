@@ -27,6 +27,7 @@ Settings::Settings()
         m_programUnlockPwd=jo["programUnlockPwd"].toString();
         m_virtualKeyBoard=jo["virtualKeyBoard"].toBool();
         m_showUserAuthorities=jo["showUserAuthorities"].toBool();
+        m_useDigitalSignature=jo["useDigitalSignature"].toBool();
         changeLang();
         jsonFile.close();
     }
@@ -47,7 +48,8 @@ void Settings::save()
         {"defaultProgramType",m_defaultProgramType},
         {"programUnlockPwd",m_programUnlockPwd},
         {"virtualKeyBoard",m_virtualKeyBoard},
-        {"showUserAuthorities",m_showUserAuthorities}
+        {"showUserAuthorities",m_showUserAuthorities},
+        {"useDigitalSignature",m_useDigitalSignature}
     };
     QJsonDocument jsonDoc;
     jsonDoc.setObject(jo);

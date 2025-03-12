@@ -9,7 +9,6 @@
         <file>Content.qml</file>
         <file>DynamicAnalysis.qml</file>
         <file>DynamicParamsSetting.qml</file>
-        <file>Login.qml</file>
         <file>NewProgram.qml</file>
         <file>PatientManagement.qml</file>
         <file>ProgramCustomize.qml</file>

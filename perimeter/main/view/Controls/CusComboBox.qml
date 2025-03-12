@@ -10,11 +10,12 @@ ComboBox {
     property string imageSrc: "qrc:/Pics/base-svg/btn_drop_down.svg";
     property string backgroundColor:enabled? CommonSettings.buttonBackGroundColor: CommonSettings.buttonDisabledBackGroundColor
     font.family:"Microsoft YaHei"
-    font.pointSize:height*0.30;
+    font.pointSize:CommonSettings.fontPointSize;
     height: parent.height;
     property bool complexType: false;
     property bool popDirectionDown: true;
     property string text: "";
+
 
 
 

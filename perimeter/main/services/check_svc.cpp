@@ -1370,7 +1370,10 @@ bool StaticCheck::waitForAnswer()
                 UtilitySvc::wait(m_programModel->m_params.fixedParams.leastWaitingTime);                //最小等待时间
             }
             else
+            {
+                QThread::msleep(10);
                 QApplication::processEvents();
+            }
         }
         m_answeredTimes.append(m_stimulationWaitingForAnswerElapsedTimer.elapsed());
     }
@@ -1381,6 +1384,7 @@ bool StaticCheck::waitForAnswer()
             while(!KeyBoardFilter::freshed)
             {
                 QApplication::processEvents();
+                QThread::msleep(10);
             }
             answerResult=KeyBoardFilter::answered;
             KeyBoardFilter::freshed=false;
@@ -1408,6 +1412,7 @@ void StaticCheck::checkWaiting()
     while(m_deviceOperation->getAnswerPadStatus())
     {
         if(m_deviceOperation->m_deviceStatus!=2||*m_checkState==3) return;
+        QThread::msleep(10);
         QApplication::processEvents();
         if(timer.elapsed()>300)
         {
@@ -1648,6 +1653,7 @@ QVector<QPointF> DynamicCheck::waitForAnswer()
     while(!m_deviceOperation->getDynamicMoveStatus())
     {
         if(m_deviceOperation->m_deviceStatus!=2) return {};
+        QThread::msleep(10);
         QApplication::processEvents();          //等待刷新状态
     }
 
@@ -1694,6 +1700,7 @@ QVector<QPointF> DynamicCheck::waitForAnswer()
                 answerLocs.push_back(answerLoc);
                 goto Wait;
             }
+            QThread::msleep(10);
             QApplication::processEvents();
         }
         goto Exit;
@@ -1703,6 +1710,7 @@ QVector<QPointF> DynamicCheck::waitForAnswer()
             if(m_deviceOperation->m_deviceStatus!=2) return {};
             if(m_deviceOperation->getAnswerPadStatus())
             {
+                QThread::msleep(10);
                 QApplication::processEvents();
             }
             else
@@ -1722,6 +1730,7 @@ QVector<QPointF> DynamicCheck::waitForAnswer()
 //                m_deviceOperation->stopDynamic();
                 goto Exit;
             }
+            QThread::msleep(10);
             QApplication::processEvents();
         }
         goto Exit;
@@ -1741,6 +1750,7 @@ QVector<QPointF> DynamicCheck::waitForAnswer()
 //                    m_deviceOperation->stopDynamic();
                     goto Exit;
                 }
+                QThread::msleep(10);
                 QApplication::processEvents();
             }
 //            qDebug()<<"dynamicMove stopped";
@@ -1754,6 +1764,7 @@ QVector<QPointF> DynamicCheck::waitForAnswer()
 //                    qDebug()<<"dynamicMove really stopped:"+QString::number(watiForAnswerCount);
                     goto Exit;
                 }
+                QThread::msleep(10);
                 QApplication::processEvents();
             }
         }
@@ -1833,6 +1844,7 @@ void DynamicCheck::checkWaiting()
     while(m_deviceOperation->getAnswerPadStatus())
     {
         if(m_deviceOperation->m_deviceStatus!=2) return;
+        QThread::msleep(10);
         QApplication::processEvents();
         if(timer.elapsed()>300)
         {
