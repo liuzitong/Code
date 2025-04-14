@@ -61,13 +61,16 @@ void Settings::save()
 void Settings::changeLang()
 {
     QLocale::Language lang;
+    QString sAppPath = QCoreApplication::applicationDirPath();
     if(m_language=="Chinese"||(m_language=="Default"&&QLocale::system().language()==QLocale::Chinese))
     {
+        QFile::rename(sAppPath+"/resource/worklist/dcm_worklist_zh_CN.qm_", sAppPath+"/resource/worklist/dcm_worklist_zh_CN.qm");
         lang=QLocale::Chinese;
         setIsRuntimeLangEng(false);
     }
     else
     {
+        QFile::rename(sAppPath+"/resource/worklist/dcm_worklist_zh_CN.qm", sAppPath+"/resource/worklist/dcm_worklist_zh_CN.qm_");
         lang=QLocale::English;
         setIsRuntimeLangEng(true);
     }

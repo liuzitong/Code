@@ -56,7 +56,8 @@ SOURCES += \
     $$PWD/services/utility_svc.cpp \
     $$PWD/services/frame_provid_svc.cpp \
     $$PWD/services/keyboard_filter.cpp \
-    $$PWD/services/JRpcServerSvc.cxx
+    $$PWD/services/JRpcServerSvc.cxx \
+    $$PWD/services/work_list.cpp
 
 HEADERS += \
     $$PWD/appctrl/testclass.h \
@@ -70,7 +71,8 @@ HEADERS += \
     $$PWD/services/utility_svc.h \
     $$PWD/services/frame_provid_svc.h \
     $$PWD/services/keyboard_filter.h \
-    $$PWD/services/JRpcServerSvc.hxx
+    $$PWD/services/JRpcServerSvc.hxx \
+    $$PWD/services/work_list.h
 
 RESOURCES += \
     $$PWD/view/utils/utils.qrc

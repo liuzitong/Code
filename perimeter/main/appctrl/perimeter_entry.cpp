@@ -153,7 +153,7 @@ bool  checkMyselfExist()//如果程序已经有一个在运行，则返回true
 // main entry
 // ============================================================================
 #include <qmath.h>
-
+#include <perimeter/main/services/work_list.h>
 int  main ( int argc, char *argv[] )
 {
     if(checkMyselfExist()) return 0;

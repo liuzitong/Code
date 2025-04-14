@@ -28,6 +28,7 @@ include( $$PWD/../../main/perimeter_main.pri )
 include( $$PWD/../../third-part/qxpackic_all.pri )
 include( $$PWD/../../third-part/perm/perm.pri )
 include( $$PWD/../../third-part/dcmtk/dcmtk.pri )
+include( $$PWD/../../../dicom/dicom3.pri   )
 
 #include( $$PWD/../../../deviceOperation-build/deviceOperation.pri )
 # ///////////////////////////////////////////////////////////////////////////

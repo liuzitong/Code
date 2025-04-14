@@ -57,7 +57,7 @@ QString Dicom::cmdPdfToDcm(QVector<QPair<DcmTagKey, QString>> infos)
 
 bool Dicom::upLoadDcm(PatientModel patientModel)
 {
-
+    patientModel.m_name.replace(' ','^');
     QVector<QPair<DcmTagKey, QString>> infos;
     infos=
         {

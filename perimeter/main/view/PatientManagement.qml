@@ -49,7 +49,20 @@ Item{
     Component.onCompleted:
     {
 //        patientInfoListView.patientListModelVm=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::PatientListModelVm", true);
-        timer.setTimeout(function() {query.startQuery();}, 500);
+        timer.setTimeout(function() {patientInfoListView.patientListModelVm.getPatientListByTimeSpan("",""); queryStarted();}, 500);
+        IcUiQmlApi.appCtrl.workList.newPatient.connect(function(patient){
+            console.log("wawawa");
+            console.log(patient);
+
+            if(currentPatient!==null) IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::PatientVm", currentPatient);
+            if(modifyPatient!==null) IcUiQmlApi.appCtrl.objMgr.detachObj("Perimeter::PatientVm", currentPatient);
+            currentPatient=null;
+            modifyPatient=null;
+            currentPatient=patient;
+            patientInfoListView.patientListModelVm.getPatientListByTimeSpan("","");
+            queryStarted();
+
+        })
 //        currentPatient=IcUiQmlApi.appCtrl.objMgr.attachObj("Perimeter::PatientVm", false,[1]);
     }
 
@@ -651,11 +664,11 @@ Item{
             CusText
             {
                 id:headsUp;color: "red";
-                width: parent.width*0.31;height:parent.height;
+                width: parent.width*0.20;height:parent.height;
             }
 
             Item{
-                height:parent.height;width:parent.width*0.23;
+                height:parent.height;width:parent.width*0.34;
                 Flow{anchors.fill: parent; layoutDirection: Qt.RightToLeft;spacing: height*0.8;
                     CusButton{
                         text:lt+qsTr("Check");
@@ -733,7 +746,7 @@ Item{
                             currentPatient.insert();
                             console.log(currentPatient.id);
                             root.currentPatientChanged();
-                            query.startQuery();
+                            patientInfoListView.patientListModelVm.getPatientListByTimeSpan("","");
                             creatingNewPatient=false;
                         }
                     }
@@ -761,6 +774,15 @@ Item{
                             rx2_l.text="";
                             rx3_l.text="";
                             visual_l.text="";
+                        }
+                    }
+
+                    CusButton{
+                        id:workListButton;text:lt+qsTr("Worklist")
+                        onClicked:
+                        {
+                            currentPatient=IcUiQmlApi.appCtrl.workList.getPatient();
+                            // patientInfoListView.patientListModelVm.getPatientListByTimeSpan("","");
                         }
                     }
                 }

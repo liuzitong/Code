@@ -20,6 +20,7 @@
 #include "perimeter/third-part/perm/perm_mod.hxx"
 #include <perimeter/main/services/keyboard_filter.h>
 #include <perimeter/main/services/signatureHelper.h>
+#include <perimeter/main/services/work_list.h>
 #if defined( WIN32 )
 #include <windows.h>
 #endif
@@ -66,6 +67,7 @@ public :
     QObject*    getUtilitySvc()                      {return FrameProvidSvc::getSingleton().data();}
     QObject*    getDeviceStatusData()                    {return m_deviceStatusData;}
     QObject*    getSignatureHelper()                {return m_signatureHelper;}
+    // QObject*    getWorkList()                      {return m_workList;}
 //    QObject*    getDeviceOperation()                {return DevOps::DeviceOperation::getSingleton().data();/*return new QObject();*/}
 //    QString     getLanguage()                       {return m_language;}
 //    void        setLanguage(QString value)          {m_language=value;}
@@ -94,6 +96,7 @@ AppCtrlPriv :: AppCtrlPriv ( AppCtrl *pa )
     m_settings=perimeter_new(Settings);
     m_deviceStatusData=perimeter_new(DeviceStatusDataVm);
     m_signatureHelper=perimeter_new(SignatureHelper);
+
 }
 
 void AppCtrl::adjustWindowSize(QObject *win_obj)
@@ -152,6 +155,7 @@ AppCtrlPriv :: ~AppCtrlPriv ( )
     perimeter_delete(m_testClass,TestClass);
     perimeter_delete(m_settings,Settings);
     perimeter_delete(m_deviceStatusData,DeviceStatusDataVm);
+    perimeter_delete(m_signatureHelper,SignatureHelper);
 }
 
 // ============================================================================
@@ -233,6 +237,11 @@ QObject *AppCtrl::getDeviceStatusData() const
 bool AppCtrl::getShowDeviceStatusData() const
 {
     return KeyBoardFilter::showDeviceStatusData;
+}
+
+QObject *AppCtrl::getWorkList() const
+{
+    return work_list::getSingleton();
 }
 
 //QObject *AppCtrl::getDeviceOperation() const

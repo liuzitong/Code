@@ -99,9 +99,22 @@ void PatientVm::update()
 
 void PatientVm::insert()
 {
-    auto patient_ptr=getPatientData();
-    qx::dao::insert(patient_ptr);
-    m_data->m_id=patient_ptr->m_id;
+    Patient_List Patient_List;
+    QString patientId=m_data->m_patientId;
+    qx_query query("select * from patient where patientId=:patientId");
+    query.bind(":patientId",patientId);
+    QSqlError daoError = qx::dao::execute_query(query, Patient_List);
+    if(Patient_List.count()>0)
+    {
+        m_data.reset(new PatientModel(Patient_List.first()));
+        update();
+    }
+    else
+    {
+        auto patient_ptr=getPatientData();
+        qx::dao::insert(patient_ptr);
+        m_data->m_id=patient_ptr->m_id;
+    }
 }
 
 QObject *PatientVm::getLastCheckResult()
@@ -181,10 +194,13 @@ QString PatientVm::getBirthDate()
 void PatientVm::setBirthDate(QString date)
 {
     QList<QString> list=date.split("-");
-    int year=list[0].toInt();
-    int month=list[1].toInt();
-    int day=list[2].toInt();
-    m_data->m_birthDate.setDate(year,month,day);emit birthDateChanged();
+    if(list.count()==3)
+    {
+        int year=list[0].toInt();
+        int month=list[1].toInt();
+        int day=list[2].toInt();
+        m_data->m_birthDate.setDate(year,month,day);emit birthDateChanged();
+    }
 }
 
 QDateTime PatientVm::getLastUpdate()
