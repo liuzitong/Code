@@ -191,7 +191,6 @@ private:
     void move5Motors(UsbDev::DevCtl::MoveMethod);
     void fillXYMotorAndFocalInfoByXYCoord();
     void moveColorAndSpotMotorAvoidCollision();
-    //获取XY电机位置还有焦距
     bool getXYMotorPosAndFocalDistFromCoord(const CoordSpacePosInfo& coordSpacePosInfo,CoordMotorPosFocalDistInfo& coordMotorPosFocalDistInfo);
     void staticCastTest( CoordMotorPosFocalDistInfo& dot,int focalMotorPos,int db,quint8* sps,int durationTime,int shutterPos);
     void dynamicCastTest( CoordSpacePosInfo& dotSpaceBegin, CoordSpacePosInfo& dotSpaceEnd,int spotSlot,int speedLevel);

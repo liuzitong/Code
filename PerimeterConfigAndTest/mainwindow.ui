@@ -45,9 +45,9 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>0</y>
-         <width>1438</width>
-         <height>873</height>
+         <y>-120</y>
+         <width>1421</width>
+         <height>984</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_33">
@@ -3827,7 +3827,7 @@
                         <item>
                          <widget class="QPlainTextEdit" name="plainTextEdit_runDotLocs">
                           <property name="placeholderText">
-                           <string>格式:x1,y1;x2,y2;x3,y3......注意标点为英文</string>
+                           <string>格式:x1,y1;x2,y2;x3,y3...标点为英文</string>
                           </property>
                          </widget>
                         </item>
@@ -4394,6 +4394,11 @@
                     <item>
                      <property name="text">
                       <string>校光测试</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>初始防撞针测试</string>
                      </property>
                     </item>
                    </widget>

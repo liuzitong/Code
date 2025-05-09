@@ -707,7 +707,7 @@ void MainWindow::on_pushButton_testStart_clicked()
             if(m_status.currentColorSlot!=colorSlot||m_status.currentLightSpotPos!=spotSlot)              //变换到改变光斑颜色位置
             {
                 showDevInfo("移动到避免碰撞位.");
-                moveColorAndSpotMotorAvoidCollision();
+                // moveColorAndSpotMotorAvoidCollision();
                 int  color_Circl_Motor_Steps=m_profile.motorRange(UsbDev::DevCtl::MotorId_Color).second-m_profile.motorRange(UsbDev::DevCtl::MotorId_Color).first;
                 int  spot_Circl_Motor_Steps=m_profile.motorRange(UsbDev::DevCtl::MotorId_Light_Spot).second-m_profile.motorRange(UsbDev::DevCtl::MotorId_Light_Spot).first;
 
@@ -822,6 +822,7 @@ void MainWindow::on_pushButton_testStart_clicked()
                 waitForSomeTime(200);
             }
             qDebug()<<"run dot over";
+            break;
         }
         case 4:
         {
@@ -832,6 +833,60 @@ void MainWindow::on_pushButton_testStart_clicked()
             quint8 speed[5]{sps[0],sps[1],sps[2],0,0};
             m_devCtl->move5Motors(speed,motorPos,UsbDev::DevCtl::Abosolute);
             m_devCtl->openShutter(65535,ui->lineEdit_shutterOpen->text().toInt());
+            break;
+        }
+        case 5:
+        {
+            auto colorPtr=m_config.switchColorMotorPosPtr();
+            auto spotPtr=m_config.switchLightSpotMotorPosPtr();
+            int movePosColorArr[]={0.5*(colorPtr[0]+colorPtr[1]),0.5*(colorPtr[1]+colorPtr[2]),0.5*(colorPtr[2]+colorPtr[3])};
+            int movePosLightSpotArr[]={0.5*(spotPtr[0]+spotPtr[1]),0.5*(spotPtr[1]+spotPtr[2]),0.5*(spotPtr[2]+spotPtr[3])};
+
+            for(int i=0;i<3;i++)
+            {
+                int movePosColor=movePosColorArr[i]+700;
+                int movePosLightSpot=movePosLightSpotArr[i]+700;
+                int  color_Circl_Motor_Steps=m_profile.motorRange(UsbDev::DevCtl::MotorId_Color).second-m_profile.motorRange(UsbDev::DevCtl::MotorId_Color).first;
+                int  spot_Circl_Motor_Steps=m_profile.motorRange(UsbDev::DevCtl::MotorId_Light_Spot).second-m_profile.motorRange(UsbDev::DevCtl::MotorId_Light_Spot).first;
+                int focalPos=ui->lineEdit_focusUnite->text().toInt();
+                waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
+                m_devCtl->resetMotor(UsbDev::DevCtl::MotorId_Focus,ui->spinBox_resetSpeed->value());
+                waitForSomeTime(1000);
+                m_devCtl->resetMotor(UsbDev::DevCtl::MotorId_Color,ui->spinBox_resetSpeed->value());
+                m_devCtl->resetMotor(UsbDev::DevCtl::MotorId_Light_Spot,ui->spinBox_resetSpeed->value());
+                {
+                    int  motorPos[5]{0,0,0,movePosColor,movePosLightSpot};
+                    quint8 speed[5]{0,0,0,sps[3],sps[4]};
+                    waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});          //移动一下
+                    m_devCtl->move5Motors(speed,motorPos,UsbDev::DevCtl::Abosolute);
+                }
+                waitForSomeTime(300);
+                {
+                    int motorPos[5]{0,0,focalPos,0,0};
+                    waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
+                    m_devCtl->move5Motors(std::array<quint8, 5>{0,0,sps[2],0,0}.data(),motorPos);
+                }
+                waitForSomeTime(300);
+                {
+                    int  motorPos[5]{0,0,0,color_Circl_Motor_Steps,spot_Circl_Motor_Steps};
+                    quint8 speed[5]{0,0,0,sps[3],sps[4]};
+                    waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});          //转一圈拖动光斑和颜色
+                    m_devCtl->move5Motors(speed,motorPos,UsbDev::DevCtl::Relative);
+                }
+                waitForSomeTime(300);
+                {
+                    int motorPos[5]={0,0,0,-1000,-1000};
+                    quint8 speed[5]{0,0,0,sps[3],sps[4]};
+                    waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
+                    m_devCtl->move5Motors(speed,motorPos,UsbDev::DevCtl::Relative);    //防止干扰误差
+                }
+                waitForSomeTime(300);
+            }
+            m_devCtl->resetMotor(UsbDev::DevCtl::MotorId_Focus,ui->spinBox_resetSpeed->value());
+            waitForSomeTime(1000);
+            m_devCtl->resetMotor(UsbDev::DevCtl::MotorId_Color,ui->spinBox_resetSpeed->value());
+            m_devCtl->resetMotor(UsbDev::DevCtl::MotorId_Light_Spot,ui->spinBox_resetSpeed->value());
+            break;
         }
     }
 }
@@ -1616,6 +1671,8 @@ void MainWindow::fillXYMotorAndFocalInfoByXYCoord()
 
 }
 
+
+
 bool MainWindow::getXYMotorPosAndFocalDistFromCoord(const CoordSpacePosInfo& coordSpacePosInfo,CoordMotorPosFocalDistInfo& coordMotorPosFocalDistInfo)
 {
     static bool isMainDotInfoTable;
@@ -1837,28 +1894,7 @@ bool MainWindow::waitForAnswer()
     return false;
 }
 
-void MainWindow::moveColorAndSpotMotorAvoidCollision()
-{
-    waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
-    auto colorPos=m_config.switchColorMotorPosPtr()[0]+m_settings.m_stepOffset;
-    auto spotPos=m_config.switchLightSpotMotorPosPtr()[0]+m_settings.m_stepOffset;
 
-    int motorPos[5];
-    motorPos[0]=0;
-    motorPos[1]=0;
-    motorPos[2]=0;
-    motorPos[3]=colorPos;
-    motorPos[4]=spotPos;
-
-    quint8 sps[5];
-    sps[0]=ui->spinBox_XMotorSpeed_2->value();
-    sps[1]=ui->spinBox_YMotorSpeed_2->value();
-    sps[2]=ui->spinBox_focalMotorSpeed_2->value();
-    sps[3]=ui->spinBox_colorMotorSpeed_2->value();
-    sps[4]=ui->spinBox_spotMotorSpeed_2->value();
-
-    m_devCtl->move5Motors(std::array<quint8, 5>{0,0,0,sps[3],sps[4]}.data(),motorPos);
-}
 
 
 

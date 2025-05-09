@@ -24,7 +24,7 @@ static void  gSigTerm_Handler( int sig )
 
 static void gMsgHandler( QtMsgType type, const QMessageLogContext &ctxt, const QString &msg )
 {
-#ifdef _DEBUG
+// #ifdef _DEBUG
     QString  fmt_str;
     uint t_id = reinterpret_cast<uint>( QThread::currentThread());
 //    char tmp[26]; QxPack::tailPath( ctxt.file, tmp, sizeof(tmp), 1 );
@@ -73,7 +73,7 @@ static void gMsgHandler( QtMsgType type, const QMessageLogContext &ctxt, const Q
     #else
         std::fprintf( stderr, fmt_str.toUtf8().constData() );
     #endif
-#endif
+// #endif
 
 }
 

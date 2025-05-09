@@ -138,13 +138,11 @@ void DeviceOperation::setCursorColorAndCursorSize(int color, int spot)
 #endif
     auto log=spdlog::get("logger");
     log->info("set cursor color and cursor size begins.");
-    // resetMotors({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
-    moveColorAndSpotMotorAvoidCollision();
     waitForSomeTime(m_waitingTime);
     waitMotorStop({{UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot}});
     auto profile=m_profile;
     auto config=m_config;
-    quint8 sps[5]={1,1,1,1,1};
+    auto sps=m_deviceSettings->m_5MotorSpeed;
     auto colorToSlot=m_deviceSettings->m_colorToSlot;
     auto spotSizeToSlot=m_deviceSettings->m_spotSizeToSlot;
     int colorSlot,spotSlot;
@@ -347,6 +345,57 @@ void DeviceOperation::moveToAdjustLight(int motorPosX,int motorPosY,int motorPos
                    UsbDev::DevCtl::MotorId_Y
                    });
     move5Motors(isMotorMove,motorPos);
+}
+
+void DeviceOperation::avoidNeedleCollision()
+{
+    auto colorPtr=m_config.switchColorMotorPosPtr();
+    auto spotPtr=m_config.switchLightSpotMotorPosPtr();
+    int movePosColorArr[]={0.5*(colorPtr[0]+colorPtr[1]),0.5*(colorPtr[1]+colorPtr[2]),0.5*(colorPtr[2]+colorPtr[3])};
+    int movePosLightSpotArr[]={0.5*(spotPtr[0]+spotPtr[1]),0.5*(spotPtr[1]+spotPtr[2]),0.5*(spotPtr[2]+spotPtr[3])};
+    auto sps=m_deviceSettings->m_5MotorSpeed;
+    for(int i=0;i<3;i++)
+    {
+        int movePosColor=movePosColorArr[i]+700;
+        int movePosLightSpot=movePosLightSpotArr[i]+700;
+        int color_Circl_Motor_Steps=m_profile.motorRange(UsbDev::DevCtl::MotorId_Color).second-m_profile.motorRange(UsbDev::DevCtl::MotorId_Color).first;
+        int spot_Circl_Motor_Steps=m_profile.motorRange(UsbDev::DevCtl::MotorId_Light_Spot).second-m_profile.motorRange(UsbDev::DevCtl::MotorId_Light_Spot).first;
+        int focalPos=m_config.focusPosForSpotAndColorChangeRef();
+        waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
+        resetMotors({UsbDev::DevCtl::MotorId_Focus});
+        waitForSomeTime(1000);
+        resetMotors({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
+        {
+            int  motorPos[5]{0,0,0,movePosColor,movePosLightSpot};
+            quint8 speed[5]{0,0,0,sps[3],sps[4]};
+            waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});          //移动一下
+            m_devCtl->move5Motors(speed,motorPos,UsbDev::DevCtl::Abosolute);
+        }
+        waitForSomeTime(300);
+        {
+            int motorPos[5]{0,0,focalPos,0,0};
+            waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
+            m_devCtl->move5Motors(std::array<quint8, 5>{0,0,sps[2],0,0}.data(),motorPos);
+        }
+        waitForSomeTime(300);
+        {
+            int  motorPos[5]{0,0,0,color_Circl_Motor_Steps,spot_Circl_Motor_Steps};
+            quint8 speed[5]{0,0,0,sps[3],sps[4]};
+            waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});          //转一圈拖动光斑和颜色
+            m_devCtl->move5Motors(speed,motorPos,UsbDev::DevCtl::Relative);
+        }
+        waitForSomeTime(300);
+        {
+            int motorPos[5]={0,0,0,-1000,-1000};
+            quint8 speed[5]{0,0,0,sps[3],sps[4]};
+            waitMotorStop({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
+            m_devCtl->move5Motors(speed,motorPos,UsbDev::DevCtl::Relative);    //防止干扰误差
+        }
+        waitForSomeTime(300);
+    }
+    resetMotors({UsbDev::DevCtl::MotorId_Focus});
+    waitForSomeTime(1000);
+    resetMotors({UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
 }
 
 
@@ -564,22 +613,6 @@ void DeviceOperation::move5Motors(bool isMotorMove[], int MotorPoses[])
         m_devCtl->move5Motors(sps,MotorPoses);
 }
 
-void DeviceOperation::moveColorAndSpotMotorAvoidCollision()
-{
-    if(m_deviceStatus!=2) return;
-    waitMotorStop({UsbDev::DevCtl::MotorId_Focus,UsbDev::DevCtl::MotorId_Color,UsbDev::DevCtl::MotorId_Light_Spot});
-    auto colorPos=m_config.switchColorMotorPosPtr()[0]+m_deviceSettings->m_stepOffset;
-    auto spotPos=m_config.switchLightSpotMotorPosPtr()[0]+m_deviceSettings->m_stepOffset;
-
-    int motorPos[5];
-    motorPos[0]=0;
-    motorPos[1]=0;
-    motorPos[2]=0;
-    motorPos[3]=colorPos;
-    motorPos[4]=spotPos;
-    bool isMotorMove[5]{false,false,false,true,true};
-    move5Motors(isMotorMove,motorPos);
-}
 
 void DeviceOperation::waitMotorStop(QVector<UsbDev::DevCtl::MotorId> motorIDs)
 {
@@ -699,10 +732,16 @@ void DeviceOperation::dimDownCastLight()
 void DeviceOperation::resetMotors(QVector<UsbDev::DevCtl::MotorId> motorIDs)
 {
     if(m_deviceStatus!=2) return;
-    auto spsConfig=m_deviceSettings->m_motorChinSpeed;
     for(auto& motorID:motorIDs)
     {
-        int speed=spsConfig[motorID];
+        int speed;
+        if(motorID<=6)
+        {
+            speed=m_deviceSettings->m_5MotorSpeed[motorID-1];
+        }
+        else
+            speed=m_deviceSettings->m_motorChinSpeed[motorID-7];
+
         m_devCtl->resetMotor(motorID,speed);
     }
 }
@@ -1051,7 +1090,7 @@ void DeviceOperation::workOnNewFrameData()
 
     ai::Result res;
     ai::Image image{m_videoSize.width(),m_videoSize.height(),data.data()};
-    getPupilResultByImage(image,&res);
+    ai::getPupilResultByImage(image,&res);
     QImage img((uchar*)data.data(),m_videoSize.width(),m_videoSize.height(),QImage::Format_Grayscale8);
     img=img.convertToFormat(QImage::Format_ARGB32);
     QByteArray ba1=QByteArray((char*)img.bits(),img.byteCount());
@@ -1151,9 +1190,12 @@ void DeviceOperation::workOnNewConfig()
         }
     }
 
+
     // m_devicePupilProcessor.m_pupilGreyLimit=m_config.pupilGreyThresholdDAPtr()[0];
     // m_devicePupilProcessor.m_pupilReflectionDotWhiteLimit=m_config.pupilGreyThresholdDAPtr()[1];
     emit newDeviceID(QString(m_config.deviceIDRef()));
+    avoidNeedleCollision();
+    // waitForSomeTime(10000);
     auto date=QDate::currentDate();
     auto lastAdjustedDate=QDate::fromString(m_deviceSettings->m_castLightLastAdjustedDate,"yyyy/MM/dd");
     bool adjusted=((date.year()==lastAdjustedDate.year())&&(date.month()==lastAdjustedDate.month())&&(date.day()==lastAdjustedDate.day()));

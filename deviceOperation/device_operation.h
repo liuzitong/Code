@@ -116,7 +116,6 @@ public:
     void stopDynamic();
     void openShutter(int durationTime);
     void move5Motors(bool isMotorMove[],int MotorPoses[]);
-    void moveColorAndSpotMotorAvoidCollision();
     void setCursorColorAndCursorSize(int color, int size);
     void setDB(int DB);
     void setLamp(LampId id,int index,bool onOff);
@@ -249,6 +248,7 @@ private:
     QVector<QPair<QPointF,QPoint>> m_lastDynamicCoordAndXYMotorPos;
     static QSharedPointer<DeviceOperation> m_singleton;
     void moveToAdjustLight(int motorPosX, int motorPosY, int motorPosFocal);
+    void avoidNeedleCollision();
 
 
 

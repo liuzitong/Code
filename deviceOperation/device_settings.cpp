@@ -40,7 +40,6 @@ DeviceSettings::DeviceSettings()
     m_pupilAutoAlignStep=m_rootObj.value("pupilAutoAlignStep").toInt();
     localConfigPath=m_rootObj.value("localConfigPath").toString();
     localDataPath=m_rootObj.value("localDataPath").toString();
-    m_stepOffset=m_rootObj.value("stepOffset").toInt();
 
     m_pixelDistFromPupilCenterToMiddleReflectionDot=m_rootObj.value("pixelDistFromPupilCenterToMiddleReflectionDot").toInt();
     m_pupilDiameterPixelToMillimeterConstant=m_rootObj.value("pupilDiameterPixelToMillimeterConstant").toDouble();
