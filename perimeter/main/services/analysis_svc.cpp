@@ -342,7 +342,7 @@ void AnalysisSvc::ThresholdAnalysis(int resultId,QVector<int>& dev,QVector<int>&
 
 //    qDebug()<<m_psd;
 
-    int md_correction=round(md+psd);
+    int md_correction=abs(qRound(md+psd));
 //    qDebug()<<md;
 
     for(int i=0;i<dev.length();i++)
@@ -350,7 +350,12 @@ void AnalysisSvc::ThresholdAnalysis(int resultId,QVector<int>& dev,QVector<int>&
         if(dev[i]==-99)
             mDev[i]=-99;
         else
-            mDev[i]=dev[i]-md_correction;
+        {
+            if(md>=0)
+                mDev[i]=dev[i]-md_correction;
+            else
+                mDev[i]=dev[i]+md_correction;
+        }
     }
 
 
