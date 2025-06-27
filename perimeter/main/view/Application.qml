@@ -11,7 +11,9 @@ import perm.view 1.0
 
 
 ApplicationWindow {
-    id: window;visible: true;width: 1360;height: 762;title: lt+qsTr("Perimeter");
+    // id: window;visible: true;width: 1360;height: 762;title: lt+qsTr("Perimeter");
+    // id: window;visible: true;width: 1914;height: 1074;title: lt+qsTr("Perimeter");
+    id: window;visible: true; width: windowSize.width-6;  height: windowSize.height-6;title: lt+qsTr("Perimeter");
 //    minimumWidth: 1366;minimumHeight: 768;
 //    visibility:"Maximized"          //最大化
 

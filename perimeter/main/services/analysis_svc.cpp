@@ -211,7 +211,8 @@ void AnalysisSvc::ThresholdAnalysis(int resultId,QVector<int>& dev,QVector<int>&
     QVector<int> vfiRingStandard(5,0);
     QVector<int> vfiRingTest(5,0);
 
-    float VFI_Weight[5]={3.29f,1.28f,0.79f,0.57f,0.43f};
+    // float VFI_Weight[5]={3.29f,1.28f,0.79f,0.57f,0.43f};
+    auto& VFI_Weight=UtilitySvc::getSingleton()->m_VFI_weight;
 
     int age_correction;
     int testAge=patient.m_age;
@@ -284,12 +285,13 @@ void AnalysisSvc::ThresholdAnalysis(int resultId,QVector<int>& dev,QVector<int>&
 
         if(sv[i]>0)
         {
-            int ringIndex=round(radius/6+0.4)-1;
+            int ringIndex=ceil(radius/6)-1;
             if(ringIndex>4) ringIndex=4;
 
+            auto md_corretion=UtilitySvc::getSingleton()->m_mdCorrection;
             vfiRingStandard[ringIndex]+=sv[i];
-            auto val=checkResult.m_data.checkData[i];
-            if(val>51) val=51;
+            auto val=checkResult.m_data.checkData[i]+md_corretion;
+            if(val>sv[i]) val=sv[i];
             if(val<0) val=0;
             vfiRingTest[ringIndex]+=val;
         }
@@ -985,6 +987,7 @@ void AnalysisSvc::drawText(QVector<int> values,QVector<QPointF> locs,int range,i
 
 void AnalysisSvc::drawGray(QVector<int> values, QVector<QPointF> locs, int range, int innerRange, QImage& img)
 {
+
     img.fill(qRgb(255, 255, 255));
     drawPixScale(range,img);
     QPainter painter(&img);

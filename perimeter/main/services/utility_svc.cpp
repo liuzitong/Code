@@ -118,6 +118,15 @@ UtilitySvc::UtilitySvc()
         // m_beginningCheckDBCount=jo["beginningCheckDBCount"].toInt();
         m_beginningCheckResultIgnoreCount=jo["beginningCheckResultIgnoreCount"].toInt();
         m_beginningCheckResultIgnoreDB=jo["beginningCheckResultIgnoreDB"].toInt();
+        m_mdCorrection=jo["mdCorrection"].toDouble();
+
+        {
+            auto arr=jo["VFI_Weight"].toArray();
+            for(int i=0;i<arr.size();i++)
+            {
+                m_VFI_weight.append(arr[i].toDouble());
+            }
+        }
 
         QStringList strs=jo["realTimeEyePosPicSize"].toString().split("*");
         if(strs.size()==2)

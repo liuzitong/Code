@@ -1,4 +1,4 @@
-import QtQuick 2.6
+﻿import QtQuick 2.6
 import QtQuick.Controls 2.0
 import QtQuick.Window 2.3
 import QtQml 2.2
@@ -83,13 +83,13 @@ Row{
         CusText{text:root.textBottom; anchors.horizontalCenter: parent.horizontalCenter;height:parent.height*0.1;font.pointSize: root.fontSize;width: parent.width;}
     }
     Column{
-        width: parent.height*0.15;height: parent.height;
+        width: parent.height*0.12;height: parent.height;
         Item {
             width: parent.width;height:parent.height*0.1;
         }
         Item{
             width: parent.width;height:parent.height*0.8;
-            CusText{width: parent.width;height:parent.height/10; horizontalAlignment: Text.AlignLeft;anchors.verticalCenter: parent.verticalCenter;font.pointSize: root.fontSize;
+            CusText{width: parent.width;height:parent.height; horizontalAlignment: Text.AlignLeft;anchors.verticalCenter: parent.verticalCenter;font.pointSize: root.fontSize;
             text: " ("+root.range+")"}
         }
         Item {

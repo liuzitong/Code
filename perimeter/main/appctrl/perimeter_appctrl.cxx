@@ -50,6 +50,7 @@ private:
     QObject*    m_checkSvc;
     QObject*    m_deviceStatusData;
     QObject*    m_signatureHelper;
+
 //    QObject*    m_currentPatient;
 public :
     AppCtrlPriv ( AppCtrl *pa );
@@ -96,6 +97,7 @@ AppCtrlPriv :: AppCtrlPriv ( AppCtrl *pa )
     m_settings=perimeter_new(Settings);
     m_deviceStatusData=perimeter_new(DeviceStatusDataVm);
     m_signatureHelper=perimeter_new(SignatureHelper);
+
 
 }
 
@@ -243,6 +245,8 @@ QObject *AppCtrl::getWorkList() const
 {
     return work_list::getSingleton();
 }
+
+
 
 //QObject *AppCtrl::getDeviceOperation() const
 //{

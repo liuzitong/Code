@@ -32,6 +32,7 @@
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <perimeter/main/services/dicom.h>
 #include <perimeter/main/services/datevalidator.h>
+#include <QScreen>
 #if !defined(WIN32)
 #include <unistd.h>
 #endif
@@ -171,6 +172,8 @@ int  main ( int argc, char *argv[] )
     p.execute("taskkill /im "+ TEXT_PermExe+" /f");
     p.close();
 
+
+
     // start the application
     gPrintMemCntr("pre-stage");
     {
@@ -206,6 +209,11 @@ int  main ( int argc, char *argv[] )
         eng->rootContext()->setContextProperty("applicationDirPath", QGuiApplication::applicationDirPath());
         eng->rootContext()->setContextProperty( QStringLiteral("gVkbd"), qobject_cast< QObject* >( cli_mon ));
         eng->rootContext()->setContextProperty("dateValidator",&dateValidater);
+
+        QScreen* screen = QGuiApplication::primaryScreen();
+        QRect screenGeometry = screen->geometry();
+        eng->rootContext()->setContextProperty(QStringLiteral("windowSize"), screenGeometry);
+
         eng->addImportPath(QStringLiteral("qrc:/") );
         eng->addImageProvider( QStringLiteral("PermImProv"), new FcPerm::PermImProv( ) );
 

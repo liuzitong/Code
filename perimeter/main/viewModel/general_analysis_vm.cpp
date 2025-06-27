@@ -114,7 +114,13 @@ StaticAnalysisVm::StaticAnalysisVm(const QVariantList &args)
         {
             analysisMethodSvc->ThresholdAnalysis(resultId,m_dev,m_mDev,m_peDev,m_peMDev,m_md,m_psd,m_VFI,m_GHT,m_p_md,m_p_psd);
             analysisMethodSvc->drawText(m_values,m_locs,m_range,m_OS_OD,img,DrawType::DB);img.save(m_previewFolder+"dBDiagram.bmp");
-            analysisMethodSvc->drawGray(m_values,m_locs,m_range,m_innerRange,img);img.save(m_previewFolder+"gray.bmp");
+
+            QImage img2;
+            if(imageSize<=240)
+                img2=QImage({240,240}, QImage::Format_RGB32);
+            else
+                img2=QImage({480,480}, QImage::Format_RGB32);
+            analysisMethodSvc->drawGray(m_values,m_locs,m_range,m_innerRange,img2);img2.save(m_previewFolder+"gray.bmp");
 
 
             analysisMethodSvc->drawText(m_dev,m_locs,m_range,m_OS_OD,img,DrawType::Dev);img.save(m_previewFolder+"TotalDeviation.bmp");
