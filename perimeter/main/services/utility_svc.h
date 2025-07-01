@@ -71,7 +71,7 @@ public:
     // int m_beginningCheckDBCount;
     int m_beginningCheckResultIgnoreCount;
     int m_beginningCheckResultIgnoreDB;
-    double m_mdCorrection;
+    // double m_mdCorrection;
 
     QVector<QVector<QVector<int>>> m_value_30d_cursorSize_cursorColor;
     QVector<QVector<int>> m_value_30d_cursorSizeIII_ageCorrection;     //cursorSize!=2 ,it's CursorColor

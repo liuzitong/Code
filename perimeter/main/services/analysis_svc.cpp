@@ -225,11 +225,11 @@ void AnalysisSvc::ThresholdAnalysis(int resultId,QVector<int>& dev,QVector<int>&
     qDebug()<<checkResult.m_OS_OD;
     for(int i=0;i<int(dotList.size());i++)
     {
+
         auto dot=dotList[i];
-        float radius=sqrt(pow(dot.x,2)+pow(dot.y,2));
-        int index;
 //        if(radius<=30)
 //        {
+        int index;
         index=UtilitySvc::getSingleton()->getIndex(QPointF{dot.x,dot.y},m_pointLoc_30d/*,checkResult.m_OS_OD*/);
         if(index==-1) continue;
         sv[i]=value_30d[index];
@@ -282,37 +282,11 @@ void AnalysisSvc::ThresholdAnalysis(int resultId,QVector<int>& dev,QVector<int>&
         }
 
 //        qDebug()<<peDev[i];
-
-        if(sv[i]>0)
-        {
-            int ringIndex=ceil(radius/6)-1;
-            if(ringIndex>4) ringIndex=4;
-
-            auto md_corretion=UtilitySvc::getSingleton()->m_mdCorrection;
-            vfiRingStandard[ringIndex]+=sv[i];
-            auto val=checkResult.m_data.checkData[i]+md_corretion;
-            if(val>sv[i]) val=sv[i];
-            if(val<0) val=0;
-            vfiRingTest[ringIndex]+=val;
-        }
     }
 
-    float vfih=0,vfid=0;
-    for(int i=0;i<5;i++)
-    {
-        if(vfiRingStandard[i]!=0)
-        {
-            float temp=float(vfiRingTest[i])/(vfiRingStandard[i]+0.0001);
-            if(temp>1){temp=1;}
-            vfih+=VFI_Weight[i]*temp;
-            vfid+=VFI_Weight[i];
-        }
-    }
-//    qDebug()<<vfih;
-//    qDebug()<<vfid;
 
-    VFI=vfih/vfid;                                     //vfi
-//    qDebug()<<m_VFI;
+
+
     md=0;
     for(auto& i: dev)
     {
@@ -327,6 +301,51 @@ void AnalysisSvc::ThresholdAnalysis(int resultId,QVector<int>& dev,QVector<int>&
         if(i!=-99) psd+=pow(i-md,2);
     }
     psd=sqrt(psd/(dev.length()-2));
+
+
+
+    auto vfi_corretion=md+psd;
+    if(vfi_corretion<0) vfi_corretion=-vfi_corretion;
+    else vfi_corretion=0;
+    // auto vfi_corretion=UtilitySvc::getSingleton()->m_mdCorrection;
+    for(int i=0;i<int(dotList.size());i++)
+    {
+        if(sv[i]>0)
+        {
+            auto dot=dotList[i];
+            float radius=sqrt(pow(dot.x,2)+pow(dot.y,2));
+
+            int ringIndex=ceil(radius/6)-1;
+            if(ringIndex>4) ringIndex=4;
+
+            vfiRingStandard[ringIndex]+=sv[i];
+            auto val=checkResult.m_data.checkData[i]+vfi_corretion;
+            if(val>sv[i]) val=sv[i];
+            if(val<0) val=0;
+            vfiRingTest[ringIndex]+=val;
+        }
+    }
+
+
+
+
+    float vfih=0,vfid=0;
+    for(int i=0;i<5;i++)
+    {
+        if(vfiRingStandard[i]!=0)
+        {
+            float temp=float(vfiRingTest[i])/(vfiRingStandard[i]+0.0001);
+            if(temp>1){temp=1;}
+            vfih+=VFI_Weight[i]*temp;
+            vfid+=VFI_Weight[i];
+        }
+    }
+
+    VFI=vfih/vfid;                                     //vfi
+    VFI*=UtilitySvc::getSingleton()->m_VFImultiplier;
+
+
+
 
     if(psd>4.3) p_psd=0.5;
     else if(psd>3.7) p_psd=1;

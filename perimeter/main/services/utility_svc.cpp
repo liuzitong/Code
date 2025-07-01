@@ -118,7 +118,7 @@ UtilitySvc::UtilitySvc()
         // m_beginningCheckDBCount=jo["beginningCheckDBCount"].toInt();
         m_beginningCheckResultIgnoreCount=jo["beginningCheckResultIgnoreCount"].toInt();
         m_beginningCheckResultIgnoreDB=jo["beginningCheckResultIgnoreDB"].toInt();
-        m_mdCorrection=jo["mdCorrection"].toDouble();
+        // m_mdCorrection=jo["mdCorrection"].toDouble();
 
         {
             auto arr=jo["VFI_Weight"].toArray();
