@@ -292,7 +292,7 @@ Rectangle {
                                /* console.log(IcUiQmlApi.appCtrl.settings.language);*/}
                             }
                             CusButton{
-                                type:"click";isAnime: false;underImageText.text: lt+qsTr("Settings");underImageText.color: "white"; fontSize: height/4;rec.visible: false;
+                                type:"click";isAnime: false;underImageText.text: lt+qsTr("Settings");underImageText.color: "white"; fontSize: height*.20;rec.visible: false;
                                 width:image.sourceSize.width;imageSrc: "qrc:/Pics/base-svg/menu_set.svg";pressImageSrc: "qrc:/Pics/base-svg/menu_set_select.svg";
                                 onClicked:
                                 {
@@ -302,10 +302,10 @@ Rectangle {
                             }
                             CusButton{
                                 id:programCustomizeButton;
-                                type:"click";isAnime: false;underImageText.text: lt+qsTr("Customize");underImageText.color: "white"; fontSize: height/4;rec.visible: false;width:image.sourceSize.width;imageSrc: "qrc:/Pics/base-svg/menu_customize.svg";pressImageSrc: "qrc:/Pics/base-svg/menu_customize_select.svg";
+                                type:"click";isAnime: false;underImageText.text: lt+qsTr("Customize");underImageText.color: "white"; fontSize: height*.20;rec.visible: false;width:image.sourceSize.width;imageSrc: "qrc:/Pics/base-svg/menu_customize.svg";pressImageSrc: "qrc:/Pics/base-svg/menu_customize_select.svg";
                                 onClicked: contentPage.changePage("programCustomize",null);
                             }
-                            CusButton{type:"click";isAnime: false;underImageText.text: lt+qsTr("About");underImageText.color: "white"; fontSize: height/4;rec.visible: false;width:image.sourceSize.width;imageSrc: "qrc:/Pics/base-svg/menu_about.svg";pressImageSrc: "qrc:/Pics/base-svg/menu_about_select.svg";onClicked: {about.open();}}
+                            CusButton{type:"click";isAnime: false;underImageText.text: lt+qsTr("About");underImageText.color: "white"; fontSize: height*.20;rec.visible: false;width:image.sourceSize.width;imageSrc: "qrc:/Pics/base-svg/menu_about.svg";pressImageSrc: "qrc:/Pics/base-svg/menu_about_select.svg";onClicked: {about.open();}}
                         }
                     }
                 }

@@ -9,7 +9,7 @@ Item {
     property int windowHeight;
 
     property int textHeight: windowHeight*0.0180;
-    property int fontPointSize: textHeight*0.8;
+    property int fontPointSize: IcUiQmlApi.appCtrl.settings.language==="Chinese"?textHeight*0.8:textHeight*0.7;
     property bool deletePermission: false;
     property string buttonDisabledBackGroundColor: "#c0c0c0";
     property string buttonBackGroundColor: "#eceef0";
