@@ -12,7 +12,6 @@
 #include <QDebug>
 
 
-
 namespace Perimeter {
 class ThresholdAnalysisResult : public QObject
 {
@@ -565,6 +564,8 @@ void DynamicAnalysisVm::showReport(int report,bool uploadDicom,bool useDigitalSi
     manager->setReportVariable("checkTimespan",tr("Check timespan")+QString(": ")+time.toString("mm:ss"));
     manager->setReportVariable("stimCursor",tr("Stimulus cursor")+QString(": ")+cursorSize+","+cursorColor);
     manager->setReportVariable("range",m_program.m_params.Range[1]);
+    QString brightness=tr("Move brightness")+QString(": ")+QString::number(m_program.m_params.brightness);
+    manager->setReportVariable("brightness",brightness);
 
 
     if(report==0)

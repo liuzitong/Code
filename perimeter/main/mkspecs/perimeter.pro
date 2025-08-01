@@ -59,7 +59,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L$$PWD/../../../deviceOperation/bin/debug
     LIBS += -L$$PWD/../../../perimeter/third-part/LimeReport/build/5.9.7/win64/debug/lib
 
-    LIBS += -l"QxOrmd" -l"limereportd" -l"QtZintd" -l"deviceOperationd" -l"ipckbdclid" -l"libboost_serialization-vc140-mt-gd-x64-1_78"
+    LIBS += -l"QxOrmd" -l"limereportd" -l"QtZintd" -l"deviceOperationd" -l"ipckbdclid" -l"libboost_serialization-vc143-mt-gd-x64-1_78"
 
     CONFIG += qml_debug
     CONFIG += console
@@ -69,7 +69,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L$$PWD/../../../deviceOperation/bin/release
     LIBS += -L$$PWD/../../../perimeter/third-part/LimeReport/build/5.9.7/win64/release/lib
 
-    LIBS += -l"QxOrm" -l"limereport" -l"QtZint" -l"deviceOperation" -l"ipckbdcli" -l"libboost_serialization-vc140-mt-x64-1_78"
+    LIBS += -l"QxOrm" -l"limereport" -l"QtZint" -l"deviceOperation" -l"ipckbdcli" -l"libboost_serialization-vc143-mt-x64-1_78"
 
     DEFINES+=QT_QML_DEBUG_NO_WARNING
     DESTDIR=$$PWD/../../bin/release

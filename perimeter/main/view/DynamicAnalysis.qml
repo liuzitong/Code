@@ -55,7 +55,9 @@ Item
                             model: [
                                 {name:lt+qsTr("Stimulus cursor"),param:cursorSize[params.cursorSize]+","+cursorColor[params.cursorColor]},
                                 {name:lt+qsTr("Background color"),param:backGroundColor[params.backGroundColor]},
-                                {name:lt+qsTr("Strategy"),param:strategy[params.strategy]}]
+                                {name:lt+qsTr("Strategy"),param:strategy[params.strategy]},
+                                {name:lt+qsTr("Move brightness"),param:params.brightness},
+                            ]
                             CusText{text:modelData.name+":  "+modelData.param; horizontalAlignment: Text.AlignLeft;height:textHeight;width: parent.width;}
                         }
                     }
