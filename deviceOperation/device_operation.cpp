@@ -913,6 +913,7 @@ void DeviceOperation::workOnNewStatuData()
         int minStep=m_deviceSettings->m_castLightDAChangeMinStep;
         int maxStep=qRound(DADiff*m_deviceSettings->m_castLightDAChangeRate);
         int step=qMax(minStep,maxStep);
+        log->info("DADiff:{},changeRate:{},maxStep:{},minSetp:{},step:{}",DADiff,m_deviceSettings->m_castLightDAChangeRate,maxStep,minStep,step);
 
 
         if(m_deviationCalibrationTimer.elapsed()>m_deviceSettings->m_deviationCalibrationWatingTime&&currentcastLightSensorDA<m_deviceSettings->m_deviationCalibrationDA)           //过了一段时间光强依然很低，所以就判定没照到
@@ -926,9 +927,9 @@ void DeviceOperation::workOnNewStatuData()
             m_currentCastLightDA=m_deviceSettings->m_castLightDA;
         }
 
-        if(targetcastLightSensorDA>currentcastLightSensorDA&&currentcastLightSensorDA>m_deviceSettings->m_deviationCalibrationDA)                       //照到了但是达不到光强
+        if(targetcastLightSensorDA>currentcastLightSensorDA)
         {
-            if(m_currentCastLightDA==m_deviceSettings->m_castLightDALimit)                                                                              //超时判定灯盘粗了
+            if(m_currentCastLightDA==m_deviceSettings->m_castLightDALimit&&currentcastLightSensorDA>m_deviceSettings->m_deviationCalibrationDA)                     //照到了但是达不到光强超时判定灯盘粗了
             {
                 log->critical("Bulb can't reach target brightness.");
                 sendErroRInfo(tr("Bulb can't reach target brightness.Please Change bulb or contact customer service.This is serious"));
