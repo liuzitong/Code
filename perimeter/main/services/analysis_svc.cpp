@@ -305,7 +305,7 @@ void AnalysisSvc::ThresholdAnalysis(int resultId,QVector<int>& dev,QVector<int>&
 
 
     auto vfi_corretion=md+psd;
-    if(vfi_corretion<0) vfi_corretion=-vfi_corretion;
+    if(vfi_corretion<0&&md>-20) vfi_corretion=-vfi_corretion;
     else vfi_corretion=0;
     // auto vfi_corretion=UtilitySvc::getSingleton()->m_mdCorrection;
     for(int i=0;i<int(dotList.size());i++)
@@ -343,6 +343,7 @@ void AnalysisSvc::ThresholdAnalysis(int resultId,QVector<int>& dev,QVector<int>&
 
     VFI=vfih/vfid;                                     //vfi
     VFI*=UtilitySvc::getSingleton()->m_VFImultiplier;
+    if(VFI>1) VFI=1;
 
 
 

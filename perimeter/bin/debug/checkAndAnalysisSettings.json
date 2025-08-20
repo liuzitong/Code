@@ -28,6 +28,5 @@
         "radius":55
     },
     "boundaryShowRange":60,
-    "VFI_Weight":[3.29,1.28,0.79,0.57,0.43],
-    "mdCorrection":1.0
+    "VFI_Weight":[3.29,1.28,0.79,0.57,0.43]
 }
