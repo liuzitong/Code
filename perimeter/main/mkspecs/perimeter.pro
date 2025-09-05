@@ -7,6 +7,11 @@ QT += printsupport
 QT += xml
 QT += datavisualization
 #QT += concurrent
+
+QMAKE_LFLAGS_RELEASE = /INCREMENTAL:NO /DEBUG
+QMAKE_CXXFLAGS_RELEASE = $$QMAKE_CFLAGS_RELEASE_WITH_DEBUGINFO
+QMAKE_LFLAGS_RELEASE = $$QMAKE_LFLAGS_RELEASE_WITH_DEBUGINFO
+
 CONFIG += thread
 CONFIG += c++11
 
@@ -14,6 +19,9 @@ CONFIG -= app_bundle
 DEFINES += QT_DEPRECATED_WARNINGS QT_MESSAGELOGCONTEXT _QX_NO_PRECOMPILED_HEADER
 QMAKE_CFLAGS += /utf-8
 QMAKE_CXXFLAGS += /utf-8
+
+
+
 RC_FILE = perimeter.rc
 TRANSLATIONS +=  $$PWD/../../perimeter_zh_CN.ts
 TR_EXCLUDE += $$PWD/../../../perimeter/third-part/boost/*

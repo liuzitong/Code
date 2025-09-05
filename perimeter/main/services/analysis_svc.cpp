@@ -304,10 +304,8 @@ void AnalysisSvc::ThresholdAnalysis(int resultId,QVector<int>& dev,QVector<int>&
 
 
 
-    auto vfi_corretion=md+psd;
-    if(vfi_corretion<0&&md>-20) vfi_corretion=-vfi_corretion;
-    else vfi_corretion=0;
-    // auto vfi_corretion=UtilitySvc::getSingleton()->m_mdCorrection;
+    // auto vfi_corretion=qAbs(md+psd);
+    // if(md>=0) vfi_corretion=-vfi_corretion;
     for(int i=0;i<int(dotList.size());i++)
     {
         if(sv[i]>0)
@@ -319,7 +317,7 @@ void AnalysisSvc::ThresholdAnalysis(int resultId,QVector<int>& dev,QVector<int>&
             if(ringIndex>4) ringIndex=4;
 
             vfiRingStandard[ringIndex]+=sv[i];
-            auto val=checkResult.m_data.checkData[i]+vfi_corretion;
+            auto val=checkResult.m_data.checkData[i]/*+vfi_corretion*/;
             if(val>sv[i]) val=sv[i];
             if(val<0) val=0;
             vfiRingTest[ringIndex]+=val;
