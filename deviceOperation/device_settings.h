@@ -50,8 +50,8 @@ public:
     double m_deviationCalibrationStep;          //X方向上的扫描角度
     bool m_deviationCalibrationFail;
     int m_deviationCalibrationDA;        //低于次值一段时间就开始对位
-
     int m_deviationCalibrationWatingTime;
+    int m_motorPosDeviationTorlerance;      //高于此值重发移动指令
     static QSharedPointer<DeviceSettings> getSingleton();
     static QSharedPointer<DeviceSettings> m_singleton;
 

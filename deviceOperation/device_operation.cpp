@@ -345,6 +345,24 @@ void DeviceOperation::moveToAdjustLight(int motorPosX,int motorPosY,int motorPos
                    UsbDev::DevCtl::MotorId_Y
                    });
     move5Motors(isMotorMove,motorPos);
+    QElapsedTimer timer;
+    timer.start();
+    while(timer.elapsed()<=500)
+    {
+        waitForSomeTime(30);
+        waitMotorStop({UsbDev::DevCtl::MotorId_Color,
+            UsbDev::DevCtl::MotorId_Light_Spot,
+            UsbDev::DevCtl::MotorId_Focus,
+            UsbDev::DevCtl::MotorId_X,
+            UsbDev::DevCtl::MotorId_Y
+        });
+        int deviationTorlerance=m_deviceSettings->m_motorPosDeviationTorlerance;
+        bool needMoveAgain= m_statusDataOut.xMotorCurrPos-motorPosX>deviationTorlerance||
+                             m_statusDataOut.yMotorCurrPos-motorPosY>deviationTorlerance;
+
+        if(needMoveAgain) move5Motors(isMotorMove,motorPos);
+        else break;
+    }
 }
 
 void DeviceOperation::avoidNeedleCollision()
@@ -426,6 +444,25 @@ void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB,bool
     waitForSomeTime(m_waitingTime);
     waitShutterClose();
     move5Motors(isMotorMove,motorPos);
+
+    QElapsedTimer timer;
+    timer.start();
+    while(timer.elapsed()<=200)
+    {
+        waitForSomeTime(30);
+        waitMotorStop({UsbDev::DevCtl::MotorId_Color,
+            UsbDev::DevCtl::MotorId_Light_Spot,
+            UsbDev::DevCtl::MotorId_Focus,
+            UsbDev::DevCtl::MotorId_X,
+            UsbDev::DevCtl::MotorId_Y
+        });
+        int deviationTorlerance=m_deviceSettings->m_motorPosDeviationTorlerance;
+        bool needMoveAgain= m_statusDataOut.xMotorCurrPos-motorPos[0]>deviationTorlerance||
+                             m_statusDataOut.yMotorCurrPos-motorPos[1]>deviationTorlerance;
+
+        if(needMoveAgain) move5Motors(isMotorMove,motorPos);
+        else break;
+    }
     waitForSomeTime(m_waitingTime);
 }
 

@@ -65,6 +65,7 @@ DeviceSettings::DeviceSettings()
     m_reflectDotDist=m_rootObj.value("reflectDotDist").toInt();
     m_reconnectTime=m_rootObj.value("reconnectTime").toInt();
     m_castLightDALimit=m_rootObj.value("castLightDALimit").toInt();
+    m_motorPosDeviationTorlerance=m_rootObj.value("motorPosDeviationTorlerance").toInt();
 
     auto motorSpeed=m_rootObj.value("motorSpeed").toArray();
     for(int i=0;i<motorSpeed.count();i++)
