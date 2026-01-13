@@ -176,7 +176,7 @@ Item {id:root; width: 1366;height: 691
                                             Row{width:parent.width;height: parent.height*0.65/3;spacing: width*0.05;
                                                 CusText{text:lt+qsTr("Strategy"); horizontalAlignment: Text.AlignLeft;width: parent.width*0.45;font.pointSize: fontPointSize;}
                                                 LineEdit{
-                                                    property var staticStrategy: [lt+qsTr("Full threshold"),lt+qsTr("Fast threshold"),lt+qsTr("Smart interactive"),lt+qsTr("Fast interative"),lt+qsTr("One stage"),lt+qsTr("Two stages"),lt+qsTr("Quantify defects"),lt+qsTr("Single stimulus")];
+                                                    property var staticStrategy: [lt+qsTr("Full threshold"),lt+qsTr("Fast threshold"),lt+qsTr("Smart interactive"),lt+qsTr("Fast interative"),lt+qsTr("Two Zone"),lt+qsTr("Three Zone"),lt+qsTr("Quantify defects"),lt+qsTr("Single stimulus")];
                                                     property var dynamicStrategy: [lt+qsTr("Standard"),lt+qsTr("Blind area"),lt+qsTr("Dark area"),lt+qsTr("Single stimulus")]
                                                     property var params:currentProgram.type!==2?currentProgram.params.commonParams:currentProgram.params;
                                                     width: parent.width*0.5;enabled: false;
@@ -185,8 +185,8 @@ Item {id:root; width: 1366;height: 691
 //                                                        text="";
 //                                                        var params=(currentProgram.type!==2?currentProgram.params.commonParams:currentProgram.params);
 //                                                        if(currentProgram.type!==2)
-//                                                            switch (params.strategy){ case 0:text+=lt+qsTr("Full threshold");break;case 1:text+=lt+qsTr("Smart interactive");break;case 2:text+=lt+qsTr("Fast interative");break;case 3: text+=lt+qsTr("One stage");break;
-//                                                                                      case 4:text+=lt+qsTr("Two stages");break;case 5:text+=lt+qsTr("Quantify defects");break;case 6:text+=lt+qsTr("Single stimulus");break;}
+//                                                            switch (params.strategy){ case 0:text+=lt+qsTr("Full threshold");break;case 1:text+=lt+qsTr("Smart interactive");break;case 2:text+=lt+qsTr("Fast interative");break;case 3: text+=lt+qsTr("Two Zone");break;
+//                                                                                      case 4:text+=lt+qsTr("Three Zone");break;case 5:text+=lt+qsTr("Quantify defects");break;case 6:text+=lt+qsTr("Single stimulus");break;}
 //                                                        else
 //                                                            switch (params.strategy){ case 0:text+=lt+qsTr("Standard");break;case 1:text+=lt+qsTr("Blind area");break;case 2:text+=lt+qsTr("Dark area");break;case 3: text+=lt+qsTr("Straight line");break;}
 //                                                    });}

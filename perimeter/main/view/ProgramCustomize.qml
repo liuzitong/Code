@@ -218,7 +218,7 @@ Item {id:root; width: 1366;height: 691; visible: true;anchors.fill:parent;
                                             else
                                                 strategyNames=[{name:lt+qsTr("Full threshold"),strategy:0},{name:lt+qsTr("Fast threshold"),strategy:1},{name:lt+qsTr("Smart interactive"),strategy:2},{name:lt+qsTr("Fast interactive"),strategy:3}];
                                             break;
-                                        case 1:strategyNames=[{name:lt+qsTr("One stage"),strategy:4},{name:lt+qsTr("Two stages"),strategy:5},{name:lt+qsTr("Quantify defects"),strategy:6},{name:lt+qsTr("Single stimulation"),strategy:7}];break;
+                                        case 1:strategyNames=[{name:lt+qsTr("Two Zone"),strategy:4},{name:lt+qsTr("Three Zone"),strategy:5},{name:lt+qsTr("Quantify defects"),strategy:6},{name:lt+qsTr("Single stimulation"),strategy:7}];break;
                                         default:break;
                                     }
                                 }

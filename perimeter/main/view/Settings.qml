@@ -67,7 +67,7 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                         Column{
                             id: column
 //                            property int rowHeight: height/12;
-                            spacing: rowHeight*0.7;
+                            spacing: rowHeight*0.4;
                             anchors.fill: parent;
                             // Item{width: parent.width;height:rowHeight*0.05;}
                             Flow{
@@ -101,6 +101,12 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                         gVkbd.enabled=IcUiQmlApi.appCtrl.settings.virtualKeyBoard;
                                     }
                                 }
+                            }
+
+                            Flow{
+                                height: rowHeight;width: parent.width*0.7; anchors.horizontalCenter: parent.horizontalCenter;spacing: width*0.1
+                                CusText{text:lt+qsTr("Doctor name")+":"; horizontalAlignment: Text.AlignRight;width: parent.width*0.44;font.pointSize: fontPointSize;}
+                                LineEdit{id:doctorName;height: rowHeight;width:parent.width*0.44;text:IcUiQmlApi.appCtrl.settings.doctorName}
                             }
 
                             Flow{
@@ -169,6 +175,7 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                     IcUiQmlApi.appCtrl.settings.useDigitalSignature=useDigitalSignature.checked;
                                     gVkbd.enabled=idEnableVkbd.checked;
                                     IcUiQmlApi.appCtrl.settings.hospitalName=hospitalName.text;
+                                    IcUiQmlApi.appCtrl.settings.doctorName=doctorName.text;
                                     IcUiQmlApi.appCtrl.settings.save();
                                     idPopup.close();
                                 }

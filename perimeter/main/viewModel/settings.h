@@ -22,6 +22,7 @@ class Settings :public QObject
 //    Q_PROPERTY(QString trigger READ getTrigger NOTIFY triggerChanged)
     Q_PROPERTY(QString langTrigger READ langTrigger /*WRITE setLangTrigger*/ NOTIFY langTriggerChanged)
     Q_PROPERTY(bool virtualKeyBoard READ getVirtualKeyBoard WRITE setVirtualKeyBoard NOTIFY virtualKeyBoardChanged)
+    Q_PROPERTY(QString doctorName READ getDoctorName WRITE setDoctorName NOTIFY doctorNameChanged)
     Q_PROPERTY(bool useDigitalSignature READ getUseDigitalSignature WRITE setUseDigitalSignature NOTIFY useDigitalSignatureChanged)
     Q_PROPERTY(bool showUserAuthorities READ getShowUserAuthorities)
 
@@ -44,6 +45,7 @@ public:
     int defaultProgramType(){return m_defaultProgramType;}void setDefaultProgramType(int value){m_defaultProgramType=value;}
     QString langTrigger(){return "";}Q_SIGNAL void langTriggerChanged();
     bool getVirtualKeyBoard(){return m_virtualKeyBoard;}void setVirtualKeyBoard(bool value){m_virtualKeyBoard=value;emit virtualKeyBoardChanged();}Q_SIGNAL void virtualKeyBoardChanged();
+    QString getDoctorName(){return m_doctorName;}void setDoctorName(QString value){m_doctorName=value;emit doctorNameChanged();}Q_SIGNAL void doctorNameChanged();
     bool getUseDigitalSignature(){return m_useDigitalSignature;}void setUseDigitalSignature(bool value){m_useDigitalSignature=value;emit useDigitalSignatureChanged();}Q_SIGNAL void useDigitalSignatureChanged();
     bool getShowUserAuthorities(){return m_showUserAuthorities;}
 //    QVariantList getBoundaries(){return m_boundaries;}
@@ -67,6 +69,7 @@ private:
     QString m_version;
     QString m_deviceInfo;
     QString m_programUnlockPwd;
+    QString m_doctorName;
     bool m_showUserAuthorities;
     bool m_virtualKeyBoard;
     bool m_useDigitalSignature;

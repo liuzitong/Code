@@ -324,12 +324,17 @@ void StaticAnalysisVm::showReport(int report,bool uploadDicom,bool useDigitalSig
     }
     if(UtilitySvc::reportEngine==nullptr) UtilitySvc::reportEngine=new  LimeReport::ReportEngine();         //耗时长
     UtilitySvc::reportEngine->loadFromFile(filePath);                                                      //耗时长
-    if(!TranslateController::isRuntimeLangEng())  UtilitySvc::reportEngine->setReportLanguage(QLocale::Chinese);
+    if(TranslateController::isRuntimeLangEng())
+        UtilitySvc::reportEngine->setReportLanguage(QLocale::English);
+    else
+        UtilitySvc::reportEngine->setReportLanguage(QLocale::Chinese);
+
     auto manager=UtilitySvc::reportEngine->dataManager();
     manager->clearUserVariables();
     manager->setReportVariable("ProgramName",TranslateController::getTranlatedName(m_program.m_name));
     manager->setReportVariable("OS_OD",m_checkResult.m_OS_OD==0?"OS":"OD");
     manager->setReportVariable("hospitalName",QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("hospitalName").toString());
+    manager->setReportVariable("doctorName",QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("doctorName").toString());
     manager->setReportVariable("name",m_patient.m_name);
     manager->setReportVariable("birthDate",m_patient.m_birthDate.toString("yyyy/MM/dd"));
     manager->setReportVariable("checkDate", m_checkResult.m_time.date().toString("yyyy/MM/dd"));
@@ -369,7 +374,7 @@ void StaticAnalysisVm::showReport(int report,bool uploadDicom,bool useDigitalSig
     QString cursorColor;switch(int(commomParams.cursorColor)){case 0:cursorColor=tr("White");break;case 1:cursorColor=tr("Red");break;case 2:cursorColor=tr("Blue");break;}
     manager->setReportVariable("stimCursor",tr("Stimulus cursor")+QString(": ")+cursorSize+","+cursorColor);
     manager->setReportVariable("backgroundColor",tr("Background color")+QString(": ")+QString(int(commomParams.backGroundColor)==0?"31.5":"315")+" ASB");
-    QString strategy;switch(int(commomParams.strategy)){case 0:strategy=tr("Full threshold");break;case 1:strategy=tr("Fast threshold");break;case 2:strategy=tr("Smart interactive");break;case 3:strategy=tr("Fast interactive");break;case 4:strategy=tr("One stage");break;case 5:strategy=tr("Two stages");break;case 6:strategy=tr("Quantify defects");break;case 7:strategy=tr("Single stimulation");break;}
+    QString strategy;switch(int(commomParams.strategy)){case 0:strategy=tr("Full threshold");break;case 1:strategy=tr("Fast threshold");break;case 2:strategy=tr("Smart interactive");break;case 3:strategy=tr("Fast interactive");break;case 4:strategy=tr("Two Zone");break;case 5:strategy=tr("Three Zone");break;case 6:strategy=tr("Quantify defects");break;case 7:strategy=tr("Single stimulation");break;}
     manager->setReportVariable("Strategy",tr("Strategy")+QString(": ")+strategy);
     manager->setReportVariable("VFI",QString(tr("VFI"))+": "+QString::number(qRound(m_VFI*100))+"%");
     QString GHT;switch (m_GHT){case 0:GHT=tr("Out of limits");break;case 1:GHT=tr("Low sensitivity");break;case 2:GHT=tr("Border of limits");break;case 3:GHT=tr("Within normal limits");case 4:tr("Abnormally high of sensitivity");break;}
@@ -520,7 +525,10 @@ void DynamicAnalysisVm::showReport(int report,bool uploadDicom,bool useDigitalSi
 
 
     if(UtilitySvc::reportEngine==nullptr) UtilitySvc::reportEngine=new  LimeReport::ReportEngine();
-    if(!TranslateController::isRuntimeLangEng())  UtilitySvc::reportEngine->setReportLanguage(QLocale::Chinese);
+    if(TranslateController::isRuntimeLangEng())
+        UtilitySvc::reportEngine->setReportLanguage(QLocale::English);
+    else
+        UtilitySvc::reportEngine->setReportLanguage(QLocale::Chinese);
     if(report==0)
     {
         UtilitySvc::reportEngine->loadFromFile("./reports/Dynamic.lrxml");
@@ -534,6 +542,7 @@ void DynamicAnalysisVm::showReport(int report,bool uploadDicom,bool useDigitalSi
     manager->setReportVariable("ProgramName",TranslateController::getTranlatedName(m_program.m_name));
     manager->setReportVariable("OS_OD",m_checkResult.m_OS_OD==0?"OS":"OD");
     manager->setReportVariable("hospitalName",QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("hospitalName").toString());
+    manager->setReportVariable("doctorName",QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("doctorName").toString());
     manager->setReportVariable("name",m_patient.m_name);
     manager->setReportVariable("birthDate",m_patient.m_birthDate.toString("yyyy/MM/dd"));
     manager->setReportVariable("checkDate", m_checkResult.m_time.date().toString("yyyy/MM/dd"));
@@ -655,10 +664,14 @@ void StaticAnalysisOverViewVm::showReport(int report,QString diagnosis,bool uplo
 {
     qDebug()<<diagnosis;
     if(UtilitySvc::reportEngine==nullptr) UtilitySvc::reportEngine=new  LimeReport::ReportEngine();
-    if(!TranslateController::isRuntimeLangEng())  UtilitySvc::reportEngine->setReportLanguage(QLocale::Chinese);
+    if(TranslateController::isRuntimeLangEng())
+        UtilitySvc::reportEngine->setReportLanguage(QLocale::English);
+    else
+        UtilitySvc::reportEngine->setReportLanguage(QLocale::Chinese);
     UtilitySvc::reportEngine->loadFromFile("./reports/OverView.lrxml");
     auto manager=UtilitySvc::reportEngine->dataManager();
     manager->setReportVariable("hospitalName",QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("hospitalName").toString());
+    manager->setReportVariable("doctorName",QxPack::IcUiQmlApi::appCtrl()->property("settings").value<QObject*>()->property("doctorName").toString());
     manager->setReportVariable("name",m_patient.m_name);
     manager->setReportVariable("birthDate",m_patient.m_birthDate.toString("yyyy/MM/dd"));
     manager->setReportVariable("ID", m_patient.m_patientId);

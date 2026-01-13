@@ -142,8 +142,8 @@ ModalPopupDialog /*Rectangle*/{   // this is the wrapped Popup element in ui_qml
                                                     {
                                                         switch (strategies[i])
                                                         {
-                                                        case 4:listModel.append({modelData:lt+qsTr("One stage")});break;
-                                                        case 5:listModel.append({modelData:lt+qsTr("Two stages")});break;
+                                                        case 4:listModel.append({modelData:lt+qsTr("Two Zone")});break;
+                                                        case 5:listModel.append({modelData:lt+qsTr("Three Zone")});break;
                                                         case 6:listModel.append({modelData:lt+qsTr("Quantify defects")});break;
                                                         case 7:listModel.append({modelData:lt+qsTr("Single stimulus")});break;
                                                         }

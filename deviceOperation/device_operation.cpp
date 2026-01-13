@@ -421,7 +421,7 @@ void DeviceOperation::avoidNeedleCollision()
 void DeviceOperation::getReadyToStimulate(QPointF loc, int spotSize, int DB,bool isMainDotInfoTable)
 {
     m_isMainTable=isMainDotInfoTable;
-    if(m_deviceStatus!=2) return;
+    // if(m_deviceStatus!=2) return;
     auto coordSpacePosInfo=DeviceDataProcesser::getXYMotorPosAndFocalDistFromCoord(loc,isMainDotInfoTable);
     auto spotSizeToSlot=m_deviceSettings->m_spotSizeToSlot;
     int spotSlot;
