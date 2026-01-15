@@ -26,15 +26,16 @@ else{
 }
 
 
-SRCFILE = $$DESTDIR/$${TARGET}.dll
+# SRCFILE = $$DESTDIR/$${TARGET}.dll
+SRCFILE = $$DESTDIR
 CONFIG(debug,debug|release){
-    PERIMETER_DIR = $$PWD/../perimeter/bin/debug/$${TARGET}.dll
+    PERIMETER_DIR = $$PWD/../perimeter/bin/debug
     LIBS += -l"pupilDetectd"
 
 #    PERIMETER_CONFIG_DIR = $$PWD/../PerimeterConfigAndTest/bin/debug/$${TARGET}.dll
 
 }else {
-    PERIMETER_DIR = $$PWD/../perimeter/bin/release/$${TARGET}.dll
+    PERIMETER_DIR = $$PWD/../perimeter/bin/release
     LIBS += -l"pupilDetect"
 #    PERIMETER_CONFIG_DIR = $$PWD/../PerimeterConfigAndTest/bin/release/$${TARGET}.dll
 }
@@ -55,7 +56,11 @@ message( $$PERIMETER_CONFIG_DIR_WIN)
 #message( $$LIB_DEST_DIR_WIN)
 #message( $$CURRENTFILEPATH_WIN)
 
-QMAKE_POST_LINK += copy /Y $$SRCFILE_WIN $$PERIMETER_DIR_WIN & \
+# QMAKE_POST_LINK += copy /Y $$SRCFILE_WIN $$PERIMETER_DIR_WIN & \
+QMAKE_POST_LINK+= copy /Y $$SRCFILE_WIN\\$${TARGET}.dll $$PERIMETER_DIR_WIN & \
+                copy /Y $$SRCFILE_WIN\\$${TARGET}.pdb $$PERIMETER_DIR_WIN & \
+
+# QMAKE_POST_LINK+= xcopy /Y $$SRCFILE_WIN $$PERIMETER_DIR_WIN & \
 #copy to configer
 #copy /Y $$SRCFILE_WIN $$PERIMETER_CONFIG_DIR_WIN & \
 
