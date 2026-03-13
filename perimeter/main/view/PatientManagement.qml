@@ -555,7 +555,7 @@ Item{
                                            {
                                                var x,y;
                                                x=parseFloat(rx2);
-                                               if(x<0.5||x>1.25) x=0;
+                                               if(Math.abs(x)<0.5||Math.abs(x)>1.25) x=0;
                                                else x=x/2;
 
                                                if(age>=60) y=3.25;
