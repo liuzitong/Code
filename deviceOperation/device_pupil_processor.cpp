@@ -32,12 +32,7 @@ void DevicePupilProcessor::processData(void* result)
             m_pupilDiameter=sum/m_pupilDiameterArr.size();
         }
 
-        int m_refectionResValidCount=0;
-
-        for(auto& i:res->reflectDots)
-        {
-            if(i.x>0) m_refectionResValidCount++;
-        }
+        int m_refectionResValidCount=res->reflectDotsCount;
 
         m_reflectionResValid=(m_refectionResValidCount==3);
 

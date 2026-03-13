@@ -11,7 +11,7 @@ QSharedPointer<FrameProvidSvc> FrameProvidSvc::m_singleton=nullptr;
 
 FrameProvidSvc::FrameProvidSvc()
 {
-    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::newFrameData,this,&FrameProvidSvc::onNewVideoContentReceived);
+    connect(DevOps::DeviceOperation::getSingleton().data(),&DevOps::DeviceOperation::newFrameData,this,&FrameProvidSvc::onNewVideoContentReceived,Qt::QueuedConnection);
 }
 
 FrameProvidSvc::~FrameProvidSvc()
@@ -19,11 +19,11 @@ FrameProvidSvc::~FrameProvidSvc()
 
 }
 
-void FrameProvidSvc::takePic()
-{
-    std::cout<<"takePic"<<std::endl;
-    m_takePic=true;
-}
+// void FrameProvidSvc::takePic()
+// {
+//     std::cout<<"takePic"<<std::endl;
+//     m_takePic=true;
+// }
 
 QSharedPointer<FrameProvidSvc> FrameProvidSvc::getSingleton()
 {
@@ -78,26 +78,26 @@ void FrameProvidSvc::setVideoSize(int width, int height)
 
 
 
-void FrameProvidSvc::onNewVideoContentReceived(QByteArray ba1,QByteArray ba2,bool valid)
+void FrameProvidSvc::onNewVideoContentReceived(/*QByteArray ba1,*/QByteArray frame_data/*,bool valid*/)
 {
     auto videoSize=DevOps::DeviceOperation::getSingleton()->m_videoSize;
-    QImage img((uchar*)ba1.data(),videoSize.width(),videoSize.height(),QImage::Format::Format_ARGB32);
-    QImage img2((uchar*)ba2.data(),videoSize.width(),videoSize.height(),QImage::Format::Format_ARGB32);
-    if(m_takePic&&valid)
-    {
-        QString Time=QDateTime::currentDateTime().toString("yyyy_MM_dd_hh_MM_ss_zzz");
-        auto filePath=QString("./saveAIPics/")+Time+"_original.bmp";
-        img.save(filePath);
+    // QImage img((uchar*)ba1.data(),videoSize.width(),videoSize.height(),QImage::Format::Format_ARGB32);
+    QImage img((uchar*)frame_data.data(),videoSize.width(),videoSize.height(),QImage::Format::Format_ARGB32);
+    // if(m_takePic&&valid)
+    // {
+    //     QString Time=QDateTime::currentDateTime().toString("yyyy_MM_dd_hh_MM_ss_zzz");
+    //     auto filePath=QString("./saveAIPics/")+Time+"_original.bmp";
+    //     img.save(filePath);
 
-        auto filePath2=QString("./saveAIPics/")+Time+"_marked.bmp";
-        img2.save(filePath2);
+    //     auto filePath2=QString("./saveAIPics/")+Time+"_marked.bmp";
+    //     img2.save(filePath2);
 
-        m_takePic=false;
-    }
+    //     m_takePic=false;
+    // }
 
-    img2=img2.scaled(m_width,m_height,Qt::AspectRatioMode::KeepAspectRatio);
-    drawCrossHair(img2);
-    QVideoFrame frame(img2);
+    img=img.scaled(m_width,m_height,Qt::AspectRatioMode::KeepAspectRatio);
+    drawCrossHair(img);
+    QVideoFrame frame(img);
     setFormat(frame.width(),frame.height(),frame.pixelFormat());
     if (m_surface)
         m_surface->present(frame);

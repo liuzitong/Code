@@ -20,7 +20,7 @@ public:
     FrameProvidSvc();
     ~FrameProvidSvc();
 
-    Q_INVOKABLE void takePic();
+    // Q_INVOKABLE void takePic();
 
     static QSharedPointer<FrameProvidSvc> getSingleton();
 
@@ -47,7 +47,7 @@ public slots:
      * \brief 接收外部数据源，视频帧
      * \param frame
      */
-    void onNewVideoContentReceived(QByteArray ba1,QByteArray ba2,bool valid);
+    void onNewVideoContentReceived(/*QByteArray ba1,*/QByteArray frame_data/*,bool valid*/);
 private:
     void drawCrossHair(QImage& img);
     QAbstractVideoSurface *m_surface = NULL;

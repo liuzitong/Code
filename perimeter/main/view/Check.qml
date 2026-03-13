@@ -259,7 +259,7 @@ Item {id:root; width: 1366;height: 691
                                 Item{id:videoArea; width:Math.round(parent.width*0.83/4)*4;height: width*3/4;anchors.horizontalCenter: parent.horizontalCenter;
                                     Rectangle
                                     {   anchors.fill: parent;color:"black";
-                                        MouseArea{anchors.fill:parent;onClicked:{console.log("123"); frameProvidSvc.takePic();}}
+                                        // MouseArea{anchors.fill:parent;onClicked:{console.log("123"); frameProvidSvc.takePic();}}
                                         VideoOutput{
                                             source: frameProvidSvc //cameraDev
                                             anchors.fill: parent

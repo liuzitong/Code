@@ -1120,6 +1120,8 @@ void DeviceOperation::workOnNewFrameData()
     // double usage=get_cpu_usage();
     // std::cout<<usage<<std::endl;
     // if(usage>=80.0f) return;
+    auto log=spdlog::get("logger");
+    log->info("workOnNewFrameData.");
     m_frameData=m_devCtl->takeNextPendingFrameData();
     m_frameRawDataLock.lock();
     m_frameRawData=m_frameData.rawData();
@@ -1127,11 +1129,12 @@ void DeviceOperation::workOnNewFrameData()
     auto data=m_frameData.rawData();
 
     ai::Result res;
-    ai::Image image{m_videoSize.width(),m_videoSize.height(),data.data()};
+    ai::Image image={m_videoSize.width(),m_videoSize.height(),data.data()};
     ai::getPupilResultByImage(image,&res);
+
     QImage img((uchar*)data.data(),m_videoSize.width(),m_videoSize.height(),QImage::Format_Grayscale8);
     img=img.convertToFormat(QImage::Format_ARGB32);
-    QByteArray ba1=QByteArray((char*)img.bits(),img.byteCount());
+    // QByteArray ba1=QByteArray((char*)img.bits(),img.byteCount());
 
     QPainter painter(&img);
     painter.setPen(QPen{Qt::yellow,2});
@@ -1140,14 +1143,20 @@ void DeviceOperation::workOnNewFrameData()
     if(pupil.center.x>0)
     {
         painter.drawEllipse({pupil.center.x,pupil.center.y},pupil.long_axis/2,pupil.short_axis/2);
-        for(auto& dot:res.reflectDots)
-        {
-            painter.setPen(Qt::green);
-            painter.drawEllipse({qRound(dot.x),qRound(dot.y)},3,3);
-        }
+
     }
-    QByteArray ba2=QByteArray((char*)img.bits(),img.byteCount());
-    emit newFrameData(ba1,ba2,pupil.center.x>0);
+
+    for(auto& dot:res.reflectDots)
+    {
+        painter.setPen(Qt::green);
+        painter.drawEllipse({qRound(dot.x),qRound(dot.y)},3,3);
+    }
+
+    QByteArray frame_data_marked=QByteArray((char*)img.bits(),img.byteCount());
+    emit newFrameData(frame_data_marked);
+    // bool center_x_positive=pupil.center.x>0;
+    // QMetaObject::invokeMethod(this, "newFrameData", Q_ARG(QByteArray, ba1), Q_ARG(QByteArray, ba2),Q_ARG(ai::Ellipse, pupil),Q_ARG(bool, center_x_positive));
+
 
     m_devicePupilProcessor.processData(&res);
     setChinDistAlarm(m_devicePupilProcessor.m_isTooFar);
@@ -1163,9 +1172,7 @@ void DeviceOperation::workOnNewFrameData()
                 auto spsConfig=m_deviceSettings->m_motorChinSpeed;
                 quint8 sps[2]{spsConfig[0],spsConfig[1]};
                 int motorPos[2]{0};
-
                 QPointF pupilDeviation={res.pupil.center.x-0.5*m_videoSize.width(),res.pupil.center.y-0.5*m_videoSize.height()};
-
                 if(!m_statusData.isMotorBusy(UsbDev::DevCtl::MotorId_Chin_Hoz)&&qAbs(pupilDeviation.x())>tolerance)
                 {
                     motorPos[0]=-pupilDeviation.x()*step;
@@ -1191,6 +1198,7 @@ void DeviceOperation::workOnNewFrameData()
         }
     }
     emit pupilDiameterChanged();
+    // QMetaObject::invokeMethod(this, "pupilDiameterChanged");
 }
 
 void DeviceOperation::workOnNewProfile()
@@ -1271,7 +1279,7 @@ void DeviceOperation::workOnWorkStatusChanged(int status)
         // updateDevInfo("Connect Successfully.");
         // connect(m_devCtl.data(),&UsbDev::DevCtl::updateInfo,this,&DeviceOperation::updateDevInfo);
         connect(m_devCtl.data(),&UsbDev::DevCtl::newStatusData,this,&DeviceOperation::workOnNewStatuData);
-        connect(m_devCtl.data(),&UsbDev::DevCtl::newFrameData,this,&DeviceOperation::workOnNewFrameData);
+        connect(m_devCtl.data(),&UsbDev::DevCtl::newFrameData,this,&DeviceOperation::workOnNewFrameData,Qt::QueuedConnection);
         connect(m_devCtl.data(),&UsbDev::DevCtl::newProfile,this,&DeviceOperation::workOnNewProfile);
         connect(m_devCtl.data(),&UsbDev::DevCtl::newConfig,this,&DeviceOperation::workOnNewConfig);
 

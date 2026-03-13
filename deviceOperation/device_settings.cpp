@@ -6,6 +6,7 @@
 #include <iostream>
 #include <QFile>
 #include <QMutex>
+#include <iostream>
 
 QSharedPointer<DeviceSettings> DeviceSettings::m_singleton=nullptr;
 
@@ -26,15 +27,23 @@ DeviceSettings::DeviceSettings()
     }
 
     QJsonObject m_rootObj = jsonDoc.object();
-    QStringList keys = m_rootObj.keys();
-    for(int i = 0; i < keys.size(); i++)
+    // QStringList keys = m_rootObj.keys();
+    // for(int i = 0; i < keys.size(); i++)
 //    {
 //        qDebug() << "key" << i << " is:" << keys.at(i);
 //    }
 
-
     m_PID = m_rootObj.value("PID").toString();
     m_VID = m_rootObj.value("VID").toString();
+
+    if(m_PID=="-1")
+    {
+        int aa=0;
+        int b=1;
+        int c=b/aa;
+
+        std::cout<<c<<std::endl;
+    }
 
     m_pupilAutoAlignPixelTolerance=m_rootObj.value("pupilAutoAlignPixelTolerance").toInt();
     m_pupilAutoAlignStep=m_rootObj.value("pupilAutoAlignStep").toInt();
