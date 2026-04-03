@@ -355,7 +355,7 @@ Item {id:root; width: 1366;height: 691; visible: true;anchors.fill:parent;
                                         else{
                                             currentProgram.params.strategy=newProgram.strategy;
                                             currentProgram.params.Range[1]=newProgram.range;
-                                            currentProgram.reports=[0,1];
+                                            currentProgram.report=[0,1];
                                         }
                                         console.log(newProgram.programName);
                                         currentProgram.name=newProgram.programName;

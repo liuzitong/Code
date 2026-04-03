@@ -587,7 +587,7 @@ void DynamicAnalysisVm::showReport(int report,bool uploadDicom,bool useDigitalSi
         auto data=m_checkResult.m_data.checkData;
         auto dataSource=manager->dataSource("dotinfos");
         auto model=dataSource->model();
-        model->insertRows(0,data.size()-2);
+        model->insertRows(0,data.size()-1);
 
         for(int i=0;i<int(data.size());i++)
         {
@@ -596,6 +596,7 @@ void DynamicAnalysisVm::showReport(int report,bool uploadDicom,bool useDigitalSi
             model->setData( model->index(i,2),QString::number(UtilitySvc::OrthToPolar(data[i].start.toQPointF()).y(),'f',0));
             model->setData( model->index(i,3),QString::number(UtilitySvc::OrthToPolar(data[i].end.toQPointF()).x(),'f',0));
             model->setData( model->index(i,4),QString::number(UtilitySvc::OrthToPolar(data[i].end.toQPointF()).y(),'f',0));
+            // model->setData( model->index(i,5),QString::number(22));
             if(data[i].isSeen)
             {
                 model->setData( model->index(i,5),tr("Seen"));
